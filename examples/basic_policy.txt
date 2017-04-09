@@ -1,0 +1,2 @@
+alice, data1, read
+bob, data2, write
