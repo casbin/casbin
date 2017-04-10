@@ -20,11 +20,7 @@ func (enforcer *Enforcer) init(modelPath string, policyPath string) {
 
 func (enforcer *Enforcer) reload() {
 	enforcer.model = loadModel(enforcer.modelPath)
-	fmt.Println("Model:")
-	fmt.Println("r: " + enforcer.model["r"].value)
-	fmt.Println("p: " + enforcer.model["p"].value)
-	fmt.Println("e: " + enforcer.model["e"].value)
-	fmt.Println("m: " + enforcer.model["m"].value)
+	printModel(enforcer.model)
 
 	loadPolicy(enforcer.policyPath, enforcer.model)
 }

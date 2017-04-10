@@ -14,6 +14,14 @@ type Assertion struct {
 	value string
 	tokens []string
 	policy [][]string
+	rm *RoleManager
+}
+
+func (ast *Assertion) buildRoleLinks() {
+	ast.rm = newRoleManager(1)
+	for _, policy_role := range ast.policy {
+		ast.rm.addLink(policy_role[0], policy_role[1])
+	}
 }
 
 type Model map[string]*Assertion
@@ -22,21 +30,25 @@ func escape(s string) (string) {
 	return strings.Replace(s, ".", "_", -1)
 }
 
-func loadAssertion(cfg config.ConfigInterface, sec string, key string) (*Assertion) {
+func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) {
 	ast := Assertion{}
 	ast.key = key
 	ast.value = cfg.String(sec + "::" + key)
+
+	if ast.value == "" {
+		return
+	}
 
 	if sec == "request_definition" || sec == "policy_definition" {
 		ast.tokens = strings.Split(ast.value, ", ")
 		for i := range ast.tokens {
 			ast.tokens[i] = key + "_" + ast.tokens[i]
 		}
-	} else if sec == "matchers" {
+	} else {
 		ast.value = escape(ast.value)
 	}
 
-	return &ast
+	model[key] = &ast
 }
 
 func loadModel(path string) (model Model) {
@@ -44,23 +56,28 @@ func loadModel(path string) (model Model) {
 
 	model = make(Model)
 
-	model["r"] = loadAssertion(cfg, "request_definition", "r")
-	model["p"] = loadAssertion(cfg, "policy_definition", "p")
-	model["e"] = loadAssertion(cfg, "policy_effect", "e")
-	model["m"] = loadAssertion(cfg, "matchers", "m")
+	loadAssertion(model, cfg, "request_definition", "r")
+	loadAssertion(model, cfg, "policy_definition", "p")
+	loadAssertion(model, cfg, "policy_effect", "e")
+	loadAssertion(model, cfg, "matchers", "m")
 
-	//fmt.Println("R Tokens: ")
-	//fmt.Println(model["r"].tokens)
-	//
-	//fmt.Println("P Tokens: ")
-	//fmt.Println(model["p"].tokens)
+	loadAssertion(model, cfg, "role_definition", "g")
 
 	return model
 }
 
+func printModel(model Model) {
+	fmt.Println("Model:")
+	for k, v := range model {
+		fmt.Println(k + ": " + v.value)
+	}
+}
+
 func loadPolicy(path string, model Model) {
-	fmt.Println("Policy: ")
+	fmt.Println("Policy:")
 	readLine(path, model, loadPolicyLine)
+
+	model["g"].buildRoleLinks()
 }
 
 func loadPolicyLine(line string, model Model) {
