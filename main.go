@@ -2,7 +2,7 @@ package main
 
 func testBasicModel() {
 	enforcer := &Enforcer{}
-	enforcer.init("examples/basic_model.conf", "examples/basic_policy.txt")
+	enforcer.init("examples/basic_model.conf", "examples/basic_policy.csv")
 
 	enforcer.enforce("alice", "data1", "read")
 	enforcer.enforce("alice", "data1", "write")
@@ -16,7 +16,7 @@ func testBasicModel() {
 
 func testRBACModel() {
 	enforcer := &Enforcer{}
-	enforcer.init("examples/rbac_model.conf", "examples/basic_policy.txt")
+	enforcer.init("examples/rbac_model.conf", "examples/basic_policy.csv")
 }
 
 func main() {

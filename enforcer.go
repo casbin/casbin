@@ -9,7 +9,6 @@ type Enforcer struct {
 	modelPath string
 	policyPath string
 	model   Model
-	policy  [][]string
 }
 
 func (enforcer *Enforcer) init(modelPath string, policyPath string) {
@@ -22,33 +21,31 @@ func (enforcer *Enforcer) init(modelPath string, policyPath string) {
 func (enforcer *Enforcer) reload() {
 	enforcer.model = loadModel(enforcer.modelPath)
 	fmt.Println("Model:")
-	fmt.Println("r: " + enforcer.model.r.value)
-	fmt.Println("p: " + enforcer.model.p.value)
-	fmt.Println("e: " + enforcer.model.e.value)
-	fmt.Println("m: " + enforcer.model.m.value)
+	fmt.Println("r: " + enforcer.model["r"].value)
+	fmt.Println("p: " + enforcer.model["p"].value)
+	fmt.Println("e: " + enforcer.model["e"].value)
+	fmt.Println("m: " + enforcer.model["m"].value)
 
-	enforcer.policy = loadPolicy(enforcer.policyPath)
-	fmt.Println("Policy:")
-	fmt.Println(enforcer.policy)
+	loadPolicy(enforcer.policyPath, enforcer.model)
 }
 
 func (enforcer *Enforcer) enforce(rvals ...string) bool {
 	fmt.Print("Request: ")
 	fmt.Println(rvals)
 
-	policyResults := make([]bool, len(enforcer.policy))
+	policyResults := make([]bool, len(enforcer.model["p"].policy))
 
-	for i, pvals := range enforcer.policy {
+	for i, pvals := range enforcer.model["p"].policy {
 		//fmt.Print("Policy Rule: ")
 		//fmt.Println(pvals)
 
-		expression, _ := govaluate.NewEvaluableExpression(enforcer.model.m.value)
+		expression, _ := govaluate.NewEvaluableExpression(enforcer.model["m"].value)
 
 		parameters := make(map[string]interface{}, 8)
-		for j, token := range enforcer.model.r.tokens {
+		for j, token := range enforcer.model["r"].tokens {
 			parameters[token] = rvals[j]
 		}
-		for j, token := range enforcer.model.p.tokens {
+		for j, token := range enforcer.model["p"].tokens {
 			parameters[token] = pvals[j]
 		}
 
@@ -63,7 +60,7 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 	//fmt.Println(policyResults)
 
 	result := false
-	if enforcer.model.e.value == "some(where (p.eft == allow))" {
+	if enforcer.model["e"].value == "some(where (p.eft == allow))" {
 		result = false
 		for _, res := range policyResults {
 			if res {

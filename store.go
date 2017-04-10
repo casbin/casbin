@@ -3,29 +3,26 @@ package main
 import (
 	"github.com/lxmgo/config"
 	"os"
-	"io/ioutil"
 	"strings"
 	"fmt"
+	"bufio"
+	"io"
 )
-
-type Model struct {
-	r Assertion
-	p Assertion
-	e Assertion
-	m Assertion
-}
 
 type Assertion struct {
 	key string
 	value string
 	tokens []string
+	policy [][]string
 }
+
+type Model map[string]*Assertion
 
 func escape(s string) (string) {
 	return strings.Replace(s, ".", "_", -1)
 }
 
-func loadAssertion(cfg config.ConfigInterface, sec string, key string) (Assertion) {
+func loadAssertion(cfg config.ConfigInterface, sec string, key string) (*Assertion) {
 	ast := Assertion{}
 	ast.key = key
 	ast.value = cfg.String(sec + "::" + key)
@@ -39,52 +36,56 @@ func loadAssertion(cfg config.ConfigInterface, sec string, key string) (Assertio
 		ast.value = escape(ast.value)
 	}
 
-	return ast
+	return &ast
 }
 
 func loadModel(path string) (model Model) {
 	cfg, _ := config.NewConfig(path)
-	model = Model{}
 
-	model.r = loadAssertion(cfg, "request_definition", "r")
-	model.p = loadAssertion(cfg, "policy_definition", "p")
-	model.e = loadAssertion(cfg, "policy_effect", "e")
-	model.m = loadAssertion(cfg, "matchers", "m")
+	model = make(Model)
 
-	fmt.Println("R Tokens: ")
-	fmt.Println(model.r.tokens)
+	model["r"] = loadAssertion(cfg, "request_definition", "r")
+	model["p"] = loadAssertion(cfg, "policy_definition", "p")
+	model["e"] = loadAssertion(cfg, "policy_effect", "e")
+	model["m"] = loadAssertion(cfg, "matchers", "m")
 
-	fmt.Println("P Tokens: ")
-	fmt.Println(model.p.tokens)
+	//fmt.Println("R Tokens: ")
+	//fmt.Println(model["r"].tokens)
+	//
+	//fmt.Println("P Tokens: ")
+	//fmt.Println(model["p"].tokens)
 
 	return model
 }
 
-func loadPolicy(path string) ([][]string) {
-	fi, err := os.Open(path)
-	if err != nil{panic(err)}
-	defer fi.Close()
-	fd, err := ioutil.ReadAll(fi)
-	text := string(fd)
+func loadPolicy(path string, model Model) {
+	fmt.Println("Policy: ")
+	readLine(path, model, loadPolicyLine)
+}
 
-	column := 0
-	lines := strings.Split(text, "\r\n")
-	row := len(lines)
-	if row > 0 {
-		policyLine := strings.Split(lines[0], ", ")
-		column = len(policyLine)
+func loadPolicyLine(line string, model Model) {
+	tokens := strings.Split(line, ", ")
+	fmt.Println(tokens)
+
+	model[tokens[0]].policy = append(model[tokens[0]].policy, tokens[1:])
+}
+
+func readLine(fileName string, model Model, handler func(string, Model)) error {
+	f, err := os.Open(fileName)
+	if err != nil {
+		return err
 	}
-
-	if column == 0 {
-		return nil
+	buf := bufio.NewReader(f)
+	for {
+		line, err := buf.ReadString('\n')
+		line = strings.TrimSpace(line)
+		handler(line, model)
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
 	}
-
-	policyLines := make([][]string, row)
-
-	for i, line := range lines {
-		policyLine := strings.Split(line, ", ")
-		policyLines[i] = policyLine
-	}
-
-	return policyLines
+	return nil
 }
