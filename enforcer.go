@@ -26,22 +26,22 @@ func (enforcer *Enforcer) reload() {
 }
 
 func (enforcer *Enforcer) enforce(rvals ...string) bool {
-	fmt.Print("Request: ")
-	fmt.Println(rvals)
+	fmt.Print("Request ")
+	fmt.Print(rvals)
 
-	policyResults := make([]bool, len(enforcer.model["p"].policy))
+	policyResults := make([]bool, len(enforcer.model["p"]["p"].policy))
 
-	for i, pvals := range enforcer.model["p"].policy {
+	for i, pvals := range enforcer.model["p"]["p"].policy {
 		//fmt.Print("Policy Rule: ")
 		//fmt.Println(pvals)
 
-		expression, _ := govaluate.NewEvaluableExpression(enforcer.model["m"].value)
+		expression, _ := govaluate.NewEvaluableExpression(enforcer.model["m"]["m"].value)
 
 		parameters := make(map[string]interface{}, 8)
-		for j, token := range enforcer.model["r"].tokens {
+		for j, token := range enforcer.model["r"]["r"].tokens {
 			parameters[token] = rvals[j]
 		}
-		for j, token := range enforcer.model["p"].tokens {
+		for j, token := range enforcer.model["p"]["p"].tokens {
 			parameters[token] = pvals[j]
 		}
 
@@ -56,7 +56,7 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 	//fmt.Println(policyResults)
 
 	result := false
-	if enforcer.model["e"].value == "some(where (p.eft == allow))" {
+	if enforcer.model["e"]["e"].value == "some(where (p_eft == allow))" {
 		result = false
 		for _, res := range policyResults {
 			if res {
@@ -66,7 +66,7 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 		}
 	}
 
-	fmt.Print("Final Result: ")
+	fmt.Print(": ")
 	fmt.Println(result)
 
 	return result

@@ -24,22 +24,39 @@ func (ast *Assertion) buildRoleLinks() {
 	}
 }
 
-type Model map[string]*Assertion
+type Model map[string]AssertionMap
+type AssertionMap map[string]*Assertion
 
 func escape(s string) (string) {
 	return strings.Replace(s, ".", "_", -1)
 }
 
+const (
+	R_SECTION_NAME = "request_definition"
+	P_SECTION_NAME = "policy_definition"
+	G_SECTION_NAME = "role_definition"
+	E_SECTION_NAME = "policy_effect"
+	M_SECTION_NAME = "matchers"
+)
+
+var sectionNameMap = map[string]string {
+	"r": "request_definition",
+	"p": "policy_definition",
+	"g": "role_definition",
+	"e": "policy_effect",
+	"m": "matchers",
+}
+
 func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) {
 	ast := Assertion{}
 	ast.key = key
-	ast.value = cfg.String(sec + "::" + key)
+	ast.value = cfg.String(sectionNameMap[key] + "::" + key)
 
 	if ast.value == "" {
 		return
 	}
 
-	if sec == "request_definition" || sec == "policy_definition" {
+	if sec == "r" || sec == "p" {
 		ast.tokens = strings.Split(ast.value, ", ")
 		for i := range ast.tokens {
 			ast.tokens[i] = key + "_" + ast.tokens[i]
@@ -48,7 +65,12 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 		ast.value = escape(ast.value)
 	}
 
-	model[key] = &ast
+	_, ok := model[sec]
+	if !ok {
+		model[sec] = make(AssertionMap)
+	}
+
+	model[sec][key] = &ast
 }
 
 func loadModel(path string) (model Model) {
@@ -56,12 +78,12 @@ func loadModel(path string) (model Model) {
 
 	model = make(Model)
 
-	loadAssertion(model, cfg, "request_definition", "r")
-	loadAssertion(model, cfg, "policy_definition", "p")
-	loadAssertion(model, cfg, "policy_effect", "e")
-	loadAssertion(model, cfg, "matchers", "m")
+	loadAssertion(model, cfg, "r", "r")
+	loadAssertion(model, cfg, "p", "p")
+	loadAssertion(model, cfg, "e", "e")
+	loadAssertion(model, cfg, "m", "m")
 
-	loadAssertion(model, cfg, "role_definition", "g")
+	loadAssertion(model, cfg, "g", "g")
 
 	return model
 }
@@ -69,7 +91,10 @@ func loadModel(path string) (model Model) {
 func printModel(model Model) {
 	fmt.Println("Model:")
 	for k, v := range model {
-		fmt.Println(k + ": " + v.value)
+		for i, j := range v {
+			fmt.Print(k + "." + i + ": ")
+			fmt.Println(j.value)
+		}
 	}
 }
 
@@ -77,14 +102,16 @@ func loadPolicy(path string, model Model) {
 	fmt.Println("Policy:")
 	readLine(path, model, loadPolicyLine)
 
-	model["g"].buildRoleLinks()
+	// model["g"].buildRoleLinks()
 }
 
 func loadPolicyLine(line string, model Model) {
 	tokens := strings.Split(line, ", ")
 	fmt.Println(tokens)
 
-	model[tokens[0]].policy = append(model[tokens[0]].policy, tokens[1:])
+	key := tokens[0]
+	sec := key[:1]
+	model[sec][key].policy = append(model[sec][key].policy, tokens[1:])
 }
 
 func readLine(fileName string, model Model, handler func(string, Model)) error {
