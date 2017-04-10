@@ -2,47 +2,32 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"github.com/Knetic/govaluate"
 )
 
-type Model struct {
-	r string
-	p string
-	e string
-	m string
-}
-
 type Enforcer struct {
+	modelPath string
+	policyPath string
 	model   Model
-	rTokens []string
-	pTokens []string
 	policy  [][]string
 }
 
 func (enforcer *Enforcer) init(modelPath string, policyPath string) {
-	enforcer.model = load_model(modelPath)
+	enforcer.modelPath = modelPath
+	enforcer.policyPath = policyPath
+
+	enforcer.reload()
+}
+
+func (enforcer *Enforcer) reload() {
+	enforcer.model = loadModel(enforcer.modelPath)
 	fmt.Println("Model:")
-	fmt.Println("r: " + enforcer.model.r)
-	fmt.Println("p: " + enforcer.model.p)
-	fmt.Println("e: " + enforcer.model.e)
-	fmt.Println("m: " + enforcer.model.m)
+	fmt.Println("r: " + enforcer.model.r.value)
+	fmt.Println("p: " + enforcer.model.p.value)
+	fmt.Println("e: " + enforcer.model.e.value)
+	fmt.Println("m: " + enforcer.model.m.value)
 
-	enforcer.rTokens = strings.Split(enforcer.model.r, ", ")
-	for i := range enforcer.rTokens {
-		enforcer.rTokens[i] = "r_" + enforcer.rTokens[i]
-	}
-	fmt.Println("R Tokens: ")
-	fmt.Println(enforcer.rTokens)
-
-	enforcer.pTokens = strings.Split(enforcer.model.p, ", ")
-	for i := range enforcer.pTokens {
-		enforcer.pTokens[i] = "p_" + enforcer.pTokens[i]
-	}
-	fmt.Println("P Tokens: ")
-	fmt.Println(enforcer.pTokens)
-
-	enforcer.policy = load_policy(policyPath)
+	enforcer.policy = loadPolicy(enforcer.policyPath)
 	fmt.Println("Policy:")
 	fmt.Println(enforcer.policy)
 }
@@ -57,13 +42,13 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 		//fmt.Print("Policy Rule: ")
 		//fmt.Println(pvals)
 
-		expression, _ := govaluate.NewEvaluableExpression(enforcer.model.m)
+		expression, _ := govaluate.NewEvaluableExpression(enforcer.model.m.value)
 
 		parameters := make(map[string]interface{}, 8)
-		for j, token := range enforcer.rTokens {
+		for j, token := range enforcer.model.r.tokens {
 			parameters[token] = rvals[j]
 		}
-		for j, token := range enforcer.pTokens {
+		for j, token := range enforcer.model.p.tokens {
 			parameters[token] = pvals[j]
 		}
 
@@ -78,7 +63,7 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 	//fmt.Println(policyResults)
 
 	result := false
-	if enforcer.model.e == "some(where (p.eft == allow))" {
+	if enforcer.model.e.value == "some(where (p.eft == allow))" {
 		result = false
 		for _, res := range policyResults {
 			if res {
