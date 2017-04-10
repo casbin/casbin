@@ -46,8 +46,27 @@ func testRole() {
 	}
 }
 
+func testBasicModelWithRoot() {
+	enforcer := &Enforcer{}
+	enforcer.init("examples/basic_model_with_root.conf", "examples/basic_policy.csv")
+
+	enforcer.enforce("alice", "data1", "read")
+	enforcer.enforce("alice", "data1", "write")
+	enforcer.enforce("alice", "data2", "read")
+	enforcer.enforce("alice", "data2", "write")
+	enforcer.enforce("bob", "data1", "read")
+	enforcer.enforce("bob", "data1", "write")
+	enforcer.enforce("bob", "data2", "read")
+	enforcer.enforce("bob", "data2", "write")
+	enforcer.enforce("root", "data1", "read")
+	enforcer.enforce("root", "data1", "write")
+	enforcer.enforce("root", "data2", "read")
+	enforcer.enforce("root", "data2", "write")
+}
+
 func main() {
 	// testBasicModel()
-	testRBACModel()
+	// testRBACModel()
+	testBasicModelWithRoot()
 	// testRole()
 }
