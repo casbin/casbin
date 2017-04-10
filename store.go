@@ -22,6 +22,9 @@ func (ast *Assertion) buildRoleLinks() {
 	for _, policy_role := range ast.policy {
 		ast.rm.addLink(policy_role[0], policy_role[1])
 	}
+
+	fmt.Println("Role links for: " + ast.key)
+	ast.rm.printRoles()
 }
 
 type Model map[string]AssertionMap
@@ -30,14 +33,6 @@ type AssertionMap map[string]*Assertion
 func escape(s string) (string) {
 	return strings.Replace(s, ".", "_", -1)
 }
-
-const (
-	R_SECTION_NAME = "request_definition"
-	P_SECTION_NAME = "policy_definition"
-	G_SECTION_NAME = "role_definition"
-	E_SECTION_NAME = "policy_effect"
-	M_SECTION_NAME = "matchers"
-)
 
 var sectionNameMap = map[string]string {
 	"r": "request_definition",
@@ -102,7 +97,9 @@ func loadPolicy(path string, model Model) {
 	fmt.Println("Policy:")
 	readLine(path, model, loadPolicyLine)
 
-	// model["g"].buildRoleLinks()
+	for _, ast := range model["g"] {
+		ast.buildRoleLinks()
+	}
 }
 
 func loadPolicyLine(line string, model Model) {

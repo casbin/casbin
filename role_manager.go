@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type RoleManager struct {
 	allRoles map[string]*Role
 	level int
@@ -32,11 +34,22 @@ func (rm *RoleManager) addLink(name1 string, name2 string) {
 }
 
 func (rm *RoleManager) hasLink(name1 string, name2 string) bool {
+	if name1 == name2 {
+		return true
+	}
+
 	if !rm.hasRole(name1) || !rm.hasRole(name2) {
 		return false
 	}
+
 	role1 := rm.createRole(name1)
 	return role1.hasRole(name2, rm.level)
+}
+
+func (rm *RoleManager) printRoles() {
+	for _, role := range rm.allRoles {
+		fmt.Println(role.toString())
+	}
 }
 
 type Role struct {
@@ -75,4 +88,12 @@ func (r *Role) hasRole(name string, level int) bool {
 		}
 	}
 	return false
+}
+
+func (r *Role) toString() string {
+	names := ""
+	for _, role := range r.roles {
+		names += role.name + " "
+	}
+	return r.name + ": " + names
 }

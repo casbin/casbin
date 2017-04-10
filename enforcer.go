@@ -29,13 +29,32 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 	fmt.Print("Request ")
 	fmt.Print(rvals)
 
+	expString := enforcer.model["m"]["m"].value
+	var expression *govaluate.EvaluableExpression = nil
+
+	_, ok := enforcer.model["g"]
+	if !ok {
+		expression, _ = govaluate.NewEvaluableExpression(expString)
+	} else {
+		functions := make(map[string]govaluate.ExpressionFunction)
+
+		for key, ast := range enforcer.model["g"] {
+			functions[key] = func(args ...interface{}) (interface{}, error) {
+				name1 := args[0].(string)
+				name2 := args[1].(string)
+
+				return (bool)(ast.rm.hasLink(name1, name2)), nil
+			}
+		}
+
+		expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+	}
+
 	policyResults := make([]bool, len(enforcer.model["p"]["p"].policy))
 
 	for i, pvals := range enforcer.model["p"]["p"].policy {
 		//fmt.Print("Policy Rule: ")
 		//fmt.Println(pvals)
-
-		expression, _ := govaluate.NewEvaluableExpression(enforcer.model["m"]["m"].value)
 
 		parameters := make(map[string]interface{}, 8)
 		for j, token := range enforcer.model["r"]["r"].tokens {
