@@ -4,9 +4,9 @@ import (
 	"github.com/lxmgo/config"
 	"os"
 	"strings"
-	"fmt"
 	"bufio"
 	"io"
+	"log"
 )
 
 type Assertion struct {
@@ -23,7 +23,7 @@ func (ast *Assertion) buildRoleLinks() {
 		ast.rm.addLink(policy_role[0], policy_role[1])
 	}
 
-	fmt.Println("Role links for: " + ast.key)
+	log.Print("Role links for: " + ast.key)
 	ast.rm.printRoles()
 }
 
@@ -84,17 +84,16 @@ func loadModel(path string) (model Model) {
 }
 
 func printModel(model Model) {
-	fmt.Println("Model:")
+	log.Print("Model:")
 	for k, v := range model {
 		for i, j := range v {
-			fmt.Print(k + "." + i + ": ")
-			fmt.Println(j.value)
+			log.Printf("%s.%s: %s", k, i, j.value)
 		}
 	}
 }
 
 func loadPolicy(path string, model Model) {
-	fmt.Println("Policy:")
+	log.Print("Policy:")
 	readLine(path, model, loadPolicyLine)
 
 	for _, ast := range model["g"] {
@@ -104,7 +103,7 @@ func loadPolicy(path string, model Model) {
 
 func loadPolicyLine(line string, model Model) {
 	tokens := strings.Split(line, ", ")
-	fmt.Println(tokens)
+	log.Print(tokens)
 
 	key := tokens[0]
 	sec := key[:1]

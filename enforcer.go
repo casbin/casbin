@@ -1,9 +1,9 @@
 package casbin
 
 import (
-	"fmt"
 	"github.com/Knetic/govaluate"
 	"strings"
+	"log"
 )
 
 type Enforcer struct {
@@ -40,9 +40,6 @@ func (enforcer *Enforcer) keyMatch(key1 string, key2 string) bool {
 }
 
 func (enforcer *Enforcer) enforce(rvals ...string) bool {
-	fmt.Print("Request ")
-	fmt.Print(rvals)
-
 	expString := enforcer.model["m"]["m"].value
 	var expression *govaluate.EvaluableExpression = nil
 
@@ -67,8 +64,7 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 	policyResults := make([]bool, len(enforcer.model["p"]["p"].policy))
 
 	for i, pvals := range enforcer.model["p"]["p"].policy {
-		//fmt.Print("Policy Rule: ")
-		//fmt.Println(pvals)
+		//log.Print("Policy Rule: ", pvals)
 
 		parameters := make(map[string]interface{}, 8)
 		for j, token := range enforcer.model["r"]["r"].tokens {
@@ -79,14 +75,12 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 		}
 
 		result, _ := expression.Evaluate(parameters)
-		//fmt.Print("Result: ")
-		//fmt.Println(result)
+		//log.Print("Result: ", result)
 
 		policyResults[i] = result.(bool)
 	}
 
-	//fmt.Print("Rule Results: ")
-	//fmt.Println(policyResults)
+	//log.Print("Rule Results: ", policyResults)
 
 	result := false
 	if enforcer.model["e"]["e"].value == "some(where (p_eft == allow))" {
@@ -99,8 +93,7 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 		}
 	}
 
-	fmt.Print(": ")
-	fmt.Println(result)
+	log.Print("Request ", rvals, ": ", result)
 
 	return result
 }

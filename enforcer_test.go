@@ -1,8 +1,8 @@
 package casbin
 
 import (
-"testing"
-"fmt"
+	"testing"
+	"log"
 )
 
 func testEnforce(t *testing.T, e *Enforcer, sub string, obj string, act string, res bool) {
@@ -59,8 +59,7 @@ func TestRBACModel(t *testing.T) {
 
 func testKeyMatch(t *testing.T, e *Enforcer, key1 string, key2 string, res bool) {
 	my_res := e.keyMatch(key1, key2)
-	fmt.Print(key1 + ", " + key2 + ": ")
-	fmt.Println(my_res)
+	log.Printf("%s, %s: %t", key1, key2, my_res)
 
 	if my_res != res {
 		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)

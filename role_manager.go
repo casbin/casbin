@@ -1,6 +1,6 @@
 package casbin
 
-import "fmt"
+import "log"
 
 type RoleManager struct {
 	allRoles map[string]*Role
@@ -48,7 +48,7 @@ func (rm *RoleManager) hasLink(name1 string, name2 string) bool {
 
 func (rm *RoleManager) printRoles() {
 	for _, role := range rm.allRoles {
-		fmt.Println(role.toString())
+		log.Print(role.toString())
 	}
 }
 
