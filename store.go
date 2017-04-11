@@ -1,4 +1,4 @@
-package main
+package casbin
 
 import (
 	"github.com/lxmgo/config"
