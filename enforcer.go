@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/Knetic/govaluate"
+	"strings"
 )
 
 type Enforcer struct {
@@ -23,6 +24,19 @@ func (enforcer *Enforcer) reload() {
 	printModel(enforcer.model)
 
 	loadPolicy(enforcer.policyPath, enforcer.model)
+}
+
+func (enforcer *Enforcer) keyMatch(key1 string, key2 string) bool {
+	i := strings.Index(key2, "*")
+	if i == -1 {
+		return key1 == key2
+	} else {
+		if len(key1) > i {
+			return key1[:i] == key2[:i]
+		} else {
+			return key1 == key2[:i]
+		}
+	}
 }
 
 func (enforcer *Enforcer) enforce(rvals ...string) bool {

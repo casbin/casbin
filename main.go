@@ -64,9 +64,23 @@ func testBasicModelWithRoot() {
 	enforcer.enforce("root", "data2", "write")
 }
 
+func testKeyMatch() {
+	enforcer := &Enforcer{}
+
+	for _, u := range []string{"/foo", "/foo/bar", "/foobar"} {
+		for _, g := range []string{"/foo", "/foo*", "/foo/*"} {
+			res := enforcer.keyMatch(u, g)
+			fmt.Print(u + ", " + g + ": ")
+			fmt.Println(res)
+		}
+	}
+}
+
 func main() {
 	// testBasicModel()
 	// testRBACModel()
-	testBasicModelWithRoot()
+	// testBasicModelWithRoot()
+
 	// testRole()
+	testKeyMatch()
 }
