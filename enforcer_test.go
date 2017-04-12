@@ -168,3 +168,11 @@ func TestGetPolicy(t *testing.T) {
 
 	testGetGroupingPolicy(t, e, [][]string{{"alice", "data2_admin"}})
 }
+
+func TestClearPolicy(t *testing.T) {
+	e := &Enforcer{}
+	e.init("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	e.loadPolicy()
+	testGetPolicy(t, e, [][]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
+}

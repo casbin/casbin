@@ -15,6 +15,7 @@ func buildRoleLinks(model Model) {
 }
 
 func loadPolicy(path string, model Model) {
+	clearPolicy(model)
 	log.Print("Policy:")
 	loadPolicyFile(path, model, loadPolicyLine)
 }
@@ -26,6 +27,16 @@ func printPolicy(model Model) {
 
 	for key, ast := range model["g"] {
 		log.Print(key, ": ", ast.value, ": ", ast.policy)
+	}
+}
+
+func clearPolicy(model Model) {
+	for _, ast := range model["p"] {
+		ast.policy = nil
+	}
+
+	for _, ast := range model["g"] {
+		ast.policy = nil
 	}
 }
 
