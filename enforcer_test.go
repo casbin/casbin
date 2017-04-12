@@ -58,10 +58,10 @@ func TestRBACModel(t *testing.T) {
 }
 
 func testKeyMatch(t *testing.T, e *Enforcer, key1 string, key2 string, res bool) {
-	my_res := e.keyMatch(key1, key2)
-	log.Printf("%s, %s: %t", key1, key2, my_res)
+	myRes := e.keyMatch(key1, key2)
+	log.Printf("%s < %s: %t", key1, key2, myRes)
 
-	if my_res != res {
+	if myRes != res {
 		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)
 	}
 }
@@ -80,34 +80,79 @@ func TestKeyMatch(t *testing.T) {
 	testKeyMatch(t, e, "/foobar", "/foo/*", false)
 }
 
-func testGetRoles(e *Enforcer, name string) {
-	log.Print("Roles for ", name, ": ", e.getRoles(name))
+func arrayEquals(a []string, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func array2DEquals(a [][]string, b [][]string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i, v := range a {
+		if !arrayEquals(v, b[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
+	myRes := e.getRoles(name)
+	log.Print("Roles for ", name, ": ", myRes)
+
+	if !arrayEquals(res, myRes) {
+		t.Error("Roles for ", name, ": ", myRes, ", supposed to be ", res)
+	}
 }
 
 func TestGetRoles(t *testing.T) {
 	e := &Enforcer{}
 	e.init("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	testGetRoles(e, "alice")
-	testGetRoles(e, "bob")
-	testGetRoles(e, "data2_admin")
-	testGetRoles(e, "non_exist")
+	testGetRoles(t, e, "alice", []string{"data2_admin"})
+	testGetRoles(t, e, "bob", []string{})
+	testGetRoles(t, e, "data2_admin", []string{})
+	testGetRoles(t, e, "non_exist", []string{})
 }
 
-func testGetPolicy(e *Enforcer, fieldIndex int, fieldValue string) {
-	log.Print("Policy for ", fieldValue, ": ", e.getFilteredPolicy(fieldIndex, fieldValue))
+func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
+	myRes := e.getPolicy()
+	log.Print("Policy: ", myRes)
+
+	if !array2DEquals(res, myRes) {
+		t.Error("Policy: ", myRes, ", supposed to be ", res)
+	}
+}
+
+func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, fieldValue string, res [][]string) {
+	myRes := e.getFilteredPolicy(fieldIndex, fieldValue)
+	log.Print("Policy for ", fieldValue, ": ", myRes)
+
+	if !array2DEquals(res, myRes) {
+		t.Error("Policy for ", fieldValue, ": ", myRes, ", supposed to be ", res)
+	}
 }
 
 func TestGetPolicy(t *testing.T) {
 	e := &Enforcer{}
 	e.init("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	log.Print("Policy: ", e.getPolicy())
-	testGetPolicy(e, 0, "alice")
-	testGetPolicy(e, 0, "bob")
-	testGetPolicy(e, 0, "data2_admin")
-	testGetPolicy(e, 1, "data1")
-	testGetPolicy(e, 1, "data2")
-	testGetPolicy(e, 2, "read")
-	testGetPolicy(e, 2, "write")
+	testGetPolicy(t, e, [][]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
+	testGetFilteredPolicy(t, e, 0, "alice", [][]string{{"alice", "data1", "read"}})
+	testGetFilteredPolicy(t, e, 0, "bob", [][]string{{"bob", "data2", "write"}})
+	testGetFilteredPolicy(t, e, 0, "data2_admin", [][]string{{"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
+	testGetFilteredPolicy(t, e, 1, "data1", [][]string{{"alice", "data1", "read"}})
+	testGetFilteredPolicy(t, e, 1, "data2", [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
+	testGetFilteredPolicy(t, e, 2, "read", [][]string{{"alice", "data1", "read"}, {"data2_admin", "data2", "read"}})
+	testGetFilteredPolicy(t, e, 2, "write", [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "write"}})
 }
