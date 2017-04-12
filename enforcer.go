@@ -2,7 +2,6 @@ package casbin
 
 import (
 	"github.com/Knetic/govaluate"
-	"strings"
 	"log"
 )
 
@@ -16,27 +15,20 @@ func (enforcer *Enforcer) init(modelPath string, policyPath string) {
 	enforcer.modelPath = modelPath
 	enforcer.policyPath = policyPath
 
-	enforcer.reload()
+	enforcer.loadAll()
 }
 
-func (enforcer *Enforcer) reload() {
+func (enforcer *Enforcer) loadAll() {
 	enforcer.model = loadModel(enforcer.modelPath)
 	printModel(enforcer.model)
 
-	loadPolicy(enforcer.policyPath, enforcer.model)
+	enforcer.loadPolicy()
 }
 
-func (enforcer *Enforcer) keyMatch(key1 string, key2 string) bool {
-	i := strings.Index(key2, "*")
-	if i == -1 {
-		return key1 == key2
-	} else {
-		if len(key1) > i {
-			return key1[:i] == key2[:i]
-		} else {
-			return key1 == key2[:i]
-		}
-	}
+func (enforcer *Enforcer) loadPolicy() {
+	loadPolicy(enforcer.policyPath, enforcer.model)
+	printPolicy(enforcer.model)
+	buildRoleLinks(enforcer.model)
 }
 
 func (enforcer *Enforcer) enforce(rvals ...string) bool {

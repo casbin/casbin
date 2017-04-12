@@ -8,15 +8,15 @@ import (
 	"io"
 )
 
-func loadPolicy(path string, model Model) {
-	log.Print("Policy:")
-	loadPolicyFile(path, model, loadPolicyLine)
-
+func buildRoleLinks(model Model) {
 	for _, ast := range model["g"] {
 		ast.buildRoleLinks()
 	}
+}
 
-	printPolicy(model)
+func loadPolicy(path string, model Model) {
+	log.Print("Policy:")
+	loadPolicyFile(path, model, loadPolicyLine)
 }
 
 func printPolicy(model Model) {

@@ -58,7 +58,7 @@ func TestRBACModel(t *testing.T) {
 }
 
 func testKeyMatch(t *testing.T, e *Enforcer, key1 string, key2 string, res bool) {
-	myRes := e.keyMatch(key1, key2)
+	myRes := keyMatch(key1, key2)
 	log.Printf("%s < %s: %t", key1, key2, myRes)
 
 	if myRes != res {
