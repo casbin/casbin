@@ -1,6 +1,8 @@
 package casbin
 
-import "log"
+import (
+	"log"
+)
 
 type RoleManager struct {
 	allRoles map[string]*Role
@@ -44,6 +46,14 @@ func (rm *RoleManager) hasLink(name1 string, name2 string) bool {
 
 	role1 := rm.createRole(name1)
 	return role1.hasRole(name2, rm.level)
+}
+
+func (rm *RoleManager) getRoles(name string) []string {
+	if rm.hasRole(name) {
+		return rm.createRole(name).getRoles()
+	} else {
+		return nil
+	}
 }
 
 func (rm *RoleManager) printRoles() {
@@ -96,4 +106,12 @@ func (r *Role) toString() string {
 		names += role.name + " "
 	}
 	return r.name + ": " + names
+}
+
+func (r *Role) getRoles() []string {
+	names := []string{}
+	for _, role := range r.roles {
+		names = append(names, role.name)
+	}
+	return names
 }
