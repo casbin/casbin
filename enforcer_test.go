@@ -87,3 +87,17 @@ func TestGetRoles(t *testing.T) {
 	log.Print("Roles for alice: ", e.getRoles("alice"))
 	log.Print("Roles for bob: ", e.getRoles("bob"))
 }
+
+func TestGetPolicy(t *testing.T) {
+	e := &Enforcer{}
+	e.init("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	log.Print("Policy: ", getPolicy(e.model, "p"))
+	log.Print("Policy for alice: ", getFilteredPolicy(e.model, "p", 0, "alice"))
+	log.Print("Policy for bob: ", getFilteredPolicy(e.model, "p", 0, "alice"))
+	log.Print("Policy for data2_admin: ", getFilteredPolicy(e.model, "p", 0, "data2_admin"))
+	log.Print("Policy for data1: ", getFilteredPolicy(e.model, "p", 1, "data1"))
+	log.Print("Policy for data2: ", getFilteredPolicy(e.model, "p", 1, "data2"))
+	log.Print("Policy for read: ", getFilteredPolicy(e.model, "p", 2, "read"))
+	log.Print("Policy for write: ", getFilteredPolicy(e.model, "p", 2, "write"))
+}
