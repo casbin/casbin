@@ -94,23 +94,34 @@ func printModel(model Model) {
 
 func loadPolicy(path string, model Model) {
 	log.Print("Policy:")
-	readLine(path, model, loadPolicyLine)
+	loadPolicyFile(path, model, loadPolicyLine)
 
 	for _, ast := range model["g"] {
 		ast.buildRoleLinks()
+	}
+
+	printPolicy(model)
+}
+
+func printPolicy(model Model) {
+	for key, ast := range model["p"] {
+		log.Print(key, ": ", ast.value, ": ", ast.policy)
+	}
+
+	for key, ast := range model["g"] {
+		log.Print(key, ": ", ast.value, ": ", ast.policy)
 	}
 }
 
 func loadPolicyLine(line string, model Model) {
 	tokens := strings.Split(line, ", ")
-	log.Print(tokens)
 
 	key := tokens[0]
 	sec := key[:1]
 	model[sec][key].policy = append(model[sec][key].policy, tokens[1:])
 }
 
-func readLine(fileName string, model Model, handler func(string, Model)) error {
+func loadPolicyFile(fileName string, model Model, handler func(string, Model)) error {
 	f, err := os.Open(fileName)
 	if err != nil {
 		return err

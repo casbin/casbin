@@ -103,9 +103,9 @@ func (r *Role) hasRole(name string, level int) bool {
 func (r *Role) toString() string {
 	names := ""
 	for _, role := range r.roles {
-		names += role.name + " "
+		names += role.name + ", "
 	}
-	return r.name + ": " + names
+	return r.name + " < " + names
 }
 
 func (r *Role) getRoles() []string {
