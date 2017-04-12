@@ -80,12 +80,18 @@ func TestKeyMatch(t *testing.T) {
 	testKeyMatch(t, e, "/foobar", "/foo/*", false)
 }
 
+func testGetRoles(e *Enforcer, name string) {
+	log.Print("Roles for ", name, ": ", e.getRoles(name))
+}
+
 func TestGetRoles(t *testing.T) {
 	e := &Enforcer{}
 	e.init("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	log.Print("Roles for alice: ", e.getRoles("alice"))
-	log.Print("Roles for bob: ", e.getRoles("bob"))
+	testGetRoles(e, "alice")
+	testGetRoles(e, "bob")
+	testGetRoles(e, "data2_admin")
+	testGetRoles(e, "non_exist")
 }
 
 func testGetPolicy(e *Enforcer, fieldIndex int, fieldValue string) {
@@ -96,7 +102,7 @@ func TestGetPolicy(t *testing.T) {
 	e := &Enforcer{}
 	e.init("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	log.Print("Policy: ", getPolicy(e.model, "p"))
+	log.Print("Policy: ", e.getPolicy())
 	testGetPolicy(e, 0, "alice")
 	testGetPolicy(e, 0, "bob")
 	testGetPolicy(e, 0, "data2_admin")
