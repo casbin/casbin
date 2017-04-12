@@ -105,3 +105,19 @@ func (enforcer *Enforcer) getRoles(name string) []string {
 func (enforcer *Enforcer) getRolesForPolicyType(ptype string, name string) []string {
 	return enforcer.model["g"][ptype].rm.getRoles(name)
 }
+
+func (enforcer *Enforcer) getPolicy() [][]string {
+	return enforcer.getPolicyForPolicyType("p")
+}
+
+func (enforcer *Enforcer) getPolicyForPolicyType(ptype string) [][]string {
+	return getPolicy(enforcer.model, ptype)
+}
+
+func (enforcer *Enforcer) getFilteredPolicy(fieldIndex int, fieldValue string) [][]string {
+	return enforcer.getFilteredPolicyForPolicyType("p", fieldIndex, fieldValue)
+}
+
+func (enforcer *Enforcer) getFilteredPolicyForPolicyType(ptype string, fieldIndex int, fieldValue string) [][]string {
+	return getFilteredPolicy(enforcer.model, ptype, fieldIndex, fieldValue)
+}

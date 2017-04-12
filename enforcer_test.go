@@ -88,16 +88,20 @@ func TestGetRoles(t *testing.T) {
 	log.Print("Roles for bob: ", e.getRoles("bob"))
 }
 
+func testGetPolicy(e *Enforcer, fieldIndex int, fieldValue string) {
+	log.Print("Policy for ", fieldValue, ": ", e.getFilteredPolicy(fieldIndex, fieldValue))
+}
+
 func TestGetPolicy(t *testing.T) {
 	e := &Enforcer{}
 	e.init("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	log.Print("Policy: ", getPolicy(e.model, "p"))
-	log.Print("Policy for alice: ", getFilteredPolicy(e.model, "p", 0, "alice"))
-	log.Print("Policy for bob: ", getFilteredPolicy(e.model, "p", 0, "alice"))
-	log.Print("Policy for data2_admin: ", getFilteredPolicy(e.model, "p", 0, "data2_admin"))
-	log.Print("Policy for data1: ", getFilteredPolicy(e.model, "p", 1, "data1"))
-	log.Print("Policy for data2: ", getFilteredPolicy(e.model, "p", 1, "data2"))
-	log.Print("Policy for read: ", getFilteredPolicy(e.model, "p", 2, "read"))
-	log.Print("Policy for write: ", getFilteredPolicy(e.model, "p", 2, "write"))
+	testGetPolicy(e, 0, "alice")
+	testGetPolicy(e, 0, "bob")
+	testGetPolicy(e, 0, "data2_admin")
+	testGetPolicy(e, 1, "data1")
+	testGetPolicy(e, 1, "data2")
+	testGetPolicy(e, 2, "read")
+	testGetPolicy(e, 2, "write")
 }

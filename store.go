@@ -142,14 +142,10 @@ func loadPolicyFile(fileName string, model Model, handler func(string, Model)) e
 }
 
 func getPolicy(model Model, ptype string) [][]string {
-	return getFilteredPolicy(model, ptype, -1, "")
+	return model["p"][ptype].policy
 }
 
 func getFilteredPolicy(model Model, ptype string, fieldIndex int, fieldValue string) [][]string {
-	if fieldIndex == -1 {
-		return model["p"][ptype].policy
-	}
-
 	res := [][]string{}
 
 	for _, v := range model["p"][ptype].policy {
