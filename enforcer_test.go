@@ -79,3 +79,11 @@ func TestKeyMatch(t *testing.T) {
 	testKeyMatch(t, e, "/foobar", "/foo*", true)
 	testKeyMatch(t, e, "/foobar", "/foo/*", false)
 }
+
+func TestGetRoles(t *testing.T) {
+	e := &Enforcer{}
+	e.init("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	log.Print("Roles for alice: ", e.getRoles("alice"))
+	log.Print("Roles for bob: ", e.getRoles("bob"))
+}

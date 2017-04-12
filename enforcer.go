@@ -98,3 +98,10 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 	return result
 }
 
+func (enforcer *Enforcer) getRoles(name string) []string {
+	return enforcer.getRolesForPolicyType("g", name)
+}
+
+func (enforcer *Enforcer) getRolesForPolicyType(ptype string, name string) []string {
+	return enforcer.model["g"][ptype].rm.getRoles(name)
+}
