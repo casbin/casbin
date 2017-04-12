@@ -156,3 +156,7 @@ func getFilteredPolicy(model Model, ptype string, fieldIndex int, fieldValue str
 
 	return res
 }
+
+func getGroupingPolicy(model Model, ptype string) [][]string {
+	return model["g"][ptype].policy
+}

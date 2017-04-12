@@ -121,3 +121,11 @@ func (enforcer *Enforcer) getFilteredPolicy(fieldIndex int, fieldValue string) [
 func (enforcer *Enforcer) getFilteredPolicyForPolicyType(ptype string, fieldIndex int, fieldValue string) [][]string {
 	return getFilteredPolicy(enforcer.model, ptype, fieldIndex, fieldValue)
 }
+
+func (enforcer *Enforcer) getGroupingPolicy() [][]string {
+	return enforcer.getGroupingPolicyForPolicyType("g")
+}
+
+func (enforcer *Enforcer) getGroupingPolicyForPolicyType(ptype string) [][]string {
+	return getGroupingPolicy(enforcer.model, ptype)
+}
