@@ -104,7 +104,6 @@ func loadPolicyFile(fileName string, model Model, handler func(string, Model)) e
 			return err
 		}
 	}
-	return nil
 }
 
 func savePolicyFile(fileName string, text string) error {
