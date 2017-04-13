@@ -10,11 +10,13 @@ type Enforcer struct {
 	modelPath  string
 	policyPath string
 	model      Model
+	enabled    bool
 }
 
 func (enforcer *Enforcer) init(modelPath string, policyPath string) {
 	enforcer.modelPath = modelPath
 	enforcer.policyPath = policyPath
+	enforcer.enabled = true
 
 	enforcer.loadAll()
 }
@@ -36,7 +38,15 @@ func (enforcer *Enforcer) savePolicy() {
 	savePolicy(enforcer.policyPath, enforcer.model)
 }
 
+func (enforcer *Enforcer) enable(enable bool) {
+	enforcer.enabled = enable
+}
+
 func (enforcer *Enforcer) enforce(rvals ...string) bool {
+	if !enforcer.enabled {
+		return true
+	}
+
 	expString := enforcer.model["m"]["m"].value
 	var expression *govaluate.EvaluableExpression
 
