@@ -31,6 +31,10 @@ func (enforcer *Enforcer) loadPolicy() {
 	buildRoleLinks(enforcer.model)
 }
 
+func (enforcer *Enforcer) savePolicy() {
+	savePolicy(enforcer.policyPath, enforcer.model)
+}
+
 func (enforcer *Enforcer) enforce(rvals ...string) bool {
 	expString := enforcer.model["m"]["m"].value
 	var expression *govaluate.EvaluableExpression = nil

@@ -6,6 +6,7 @@ import (
 	"os"
 	"bufio"
 	"io"
+	"bytes"
 )
 
 func buildRoleLinks(model Model) {
@@ -30,6 +31,40 @@ func printPolicy(model Model) {
 	}
 }
 
+func arrayToString(s []string) string {
+	var tmp bytes.Buffer
+	for i, v := range s {
+		if i != len(s) - 1 {
+			tmp.WriteString(v + ", ")
+		} else {
+			tmp.WriteString(v)
+		}
+	}
+	return tmp.String()
+}
+
+func savePolicy(path string, model Model) {
+	var tmp bytes.Buffer
+
+	for key, ast := range model["p"] {
+		for _, rule := range ast.policy {
+			tmp.WriteString(key + ", ")
+			tmp.WriteString(arrayToString(rule))
+			tmp.WriteString("\n")
+		}
+	}
+
+	for key, ast := range model["g"] {
+		for _, rule := range ast.policy {
+			tmp.WriteString(key + ", ")
+			tmp.WriteString(arrayToString(rule))
+			tmp.WriteString("\n")
+		}
+	}
+
+	savePolicyFile(path, strings.TrimRight(tmp.String(), "\n"))
+}
+
 func clearPolicy(model Model) {
 	for _, ast := range model["p"] {
 		ast.policy = nil
@@ -41,6 +76,10 @@ func clearPolicy(model Model) {
 }
 
 func loadPolicyLine(line string, model Model) {
+	if line == "" {
+		return
+	}
+
 	tokens := strings.Split(line, ", ")
 
 	key := tokens[0]
@@ -65,6 +104,18 @@ func loadPolicyFile(fileName string, model Model, handler func(string, Model)) e
 			return err
 		}
 	}
+	return nil
+}
+
+func savePolicyFile(fileName string, text string) error {
+	f, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	w := bufio.NewWriter(f)
+	w.WriteString(text)
+	w.Flush()
+	f.Close()
 	return nil
 }
 
