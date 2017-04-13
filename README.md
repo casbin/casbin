@@ -88,8 +88,8 @@ roles := e.getRoles("alice")
 Credits
 --
 
-- [github.com/lxmgo/config](github.com/lxmgo/config)
-- [github.com/Knetic/govaluate](github.com/Knetic/govaluate)
+- [github.com/lxmgo/config](https://github.com/lxmgo/config)
+- [github.com/Knetic/govaluate](https://github.com/Knetic/govaluate)
 
 License
 --
