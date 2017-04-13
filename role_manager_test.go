@@ -1,8 +1,8 @@
 package casbin
 
 import (
-	"testing"
 	"log"
+	"testing"
 )
 
 func testRole(t *testing.T, rm *RoleManager, name1 string, name2 string, res bool) {

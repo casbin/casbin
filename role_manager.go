@@ -6,10 +6,10 @@ import (
 
 type RoleManager struct {
 	allRoles map[string]*Role
-	level int
+	level    int
 }
 
-func newRoleManager(level int) (*RoleManager) {
+func newRoleManager(level int) *RoleManager {
 	rm := RoleManager{}
 	rm.allRoles = make(map[string]*Role)
 	rm.level = level
@@ -21,7 +21,7 @@ func (rm *RoleManager) hasRole(name string) bool {
 	return ok
 }
 
-func (rm *RoleManager) createRole(name string) (*Role) {
+func (rm *RoleManager) createRole(name string) *Role {
 	if !rm.hasRole(name) {
 		rm.allRoles[name] = newRole(name)
 	}
@@ -63,11 +63,11 @@ func (rm *RoleManager) printRoles() {
 }
 
 type Role struct {
-	name string
+	name  string
 	roles []*Role
 }
 
-func newRole(name string) (*Role) {
+func newRole(name string) *Role {
 	r := Role{}
 	r.name = name
 	return &r
@@ -93,7 +93,7 @@ func (r *Role) hasRole(name string, level int) bool {
 	}
 
 	for _, role := range r.roles {
-		if role.hasRole(name, level - 1) {
+		if role.hasRole(name, level-1) {
 			return true
 		}
 	}

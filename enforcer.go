@@ -6,9 +6,9 @@ import (
 )
 
 type Enforcer struct {
-	modelPath string
+	modelPath  string
 	policyPath string
-	model   Model
+	model      Model
 }
 
 func (enforcer *Enforcer) init(modelPath string, policyPath string) {

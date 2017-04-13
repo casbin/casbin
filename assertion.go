@@ -3,11 +3,11 @@ package casbin
 import "log"
 
 type Assertion struct {
-	key string
-	value string
+	key    string
+	value  string
 	tokens []string
 	policy [][]string
-	rm *RoleManager
+	rm     *RoleManager
 }
 
 func (ast *Assertion) buildRoleLinks() {

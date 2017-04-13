@@ -1,12 +1,12 @@
 package casbin
 
 import (
-	"log"
-	"strings"
-	"os"
 	"bufio"
-	"io"
 	"bytes"
+	"io"
+	"log"
+	"os"
+	"strings"
 )
 
 func buildRoleLinks(model Model) {
@@ -34,7 +34,7 @@ func printPolicy(model Model) {
 func arrayToString(s []string) string {
 	var tmp bytes.Buffer
 	for i, v := range s {
-		if i != len(s) - 1 {
+		if i != len(s)-1 {
 			tmp.WriteString(v + ", ")
 		} else {
 			tmp.WriteString(v)

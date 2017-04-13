@@ -2,18 +2,18 @@ package casbin
 
 import (
 	"github.com/lxmgo/config"
-	"strings"
 	"log"
+	"strings"
 )
 
 type Model map[string]AssertionMap
 type AssertionMap map[string]*Assertion
 
-func escape(s string) (string) {
+func escape(s string) string {
 	return strings.Replace(s, ".", "_", -1)
 }
 
-var sectionNameMap = map[string]string {
+var sectionNameMap = map[string]string{
 	"r": "request_definition",
 	"p": "policy_definition",
 	"g": "role_definition",

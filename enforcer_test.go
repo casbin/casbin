@@ -1,8 +1,8 @@
 package casbin
 
 import (
-	"testing"
 	"log"
+	"testing"
 )
 
 func testEnforce(t *testing.T, e *Enforcer, sub string, obj string, act string, res bool) {
