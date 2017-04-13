@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath  string
 	policyPath string
@@ -37,7 +38,7 @@ func (enforcer *Enforcer) savePolicy() {
 
 func (enforcer *Enforcer) enforce(rvals ...string) bool {
 	expString := enforcer.model["m"]["m"].value
-	var expression *govaluate.EvaluableExpression = nil
+	var expression *govaluate.EvaluableExpression
 
 	_, ok := enforcer.model["g"]
 	if !ok {

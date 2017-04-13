@@ -7,7 +7,7 @@ import (
 )
 
 type Model map[string]AssertionMap
-type AssertionMap map[string]*Assertion
+type AssertionMap map[string]*assertion
 
 func escape(s string) string {
 	return strings.Replace(s, ".", "_", -1)
@@ -22,7 +22,7 @@ var sectionNameMap = map[string]string{
 }
 
 func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) {
-	ast := Assertion{}
+	ast := assertion{}
 	ast.key = key
 	ast.value = cfg.String(sectionNameMap[key] + "::" + key)
 
