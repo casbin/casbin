@@ -57,6 +57,20 @@ func TestRBACModel(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestRBACModelWithResourceRoles(t *testing.T) {
+	e := &Enforcer{}
+	e.init("examples/rbac_model_with_resource_roles.conf", "examples/rbac_policy_with_resource_roles.csv")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", true)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", true)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
 func testKeyMatch(t *testing.T, e *Enforcer, key1 string, key2 string, res bool) {
 	myRes := keyMatch(key1, key2)
 	log.Printf("%s < %s: %t", key1, key2, myRes)
