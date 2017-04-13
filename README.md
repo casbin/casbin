@@ -1,6 +1,7 @@
 casbin
 ====
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/hsluoyz/casbin)](https://goreportcard.com/report/github.com/hsluoyz/casbin)
 [![Build Status](https://travis-ci.org/hsluoyz/casbin.svg?branch=master)](https://travis-ci.org/hsluoyz/casbin)
 [![Godoc](https://godoc.org/github.com/hsluoyz/casbin?status.png)](https://godoc.org/github.com/hsluoyz/casbin)
 
