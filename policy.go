@@ -119,14 +119,14 @@ func savePolicyFile(fileName string, text string) error {
 	return nil
 }
 
-func getPolicy(model Model, ptype string) [][]string {
-	return model["p"][ptype].policy
+func getPolicy(model Model, sec string, ptype string) [][]string {
+	return model[sec][ptype].policy
 }
 
-func getFilteredPolicy(model Model, ptype string, fieldIndex int, fieldValue string) [][]string {
+func getFilteredPolicy(model Model, sec string, ptype string, fieldIndex int, fieldValue string) [][]string {
 	res := [][]string{}
 
-	for _, v := range model["p"][ptype].policy {
+	for _, v := range model[sec][ptype].policy {
 		if v[fieldIndex] == fieldValue {
 			res = append(res, v)
 		}
@@ -135,6 +135,32 @@ func getFilteredPolicy(model Model, ptype string, fieldIndex int, fieldValue str
 	return res
 }
 
-func getGroupingPolicy(model Model, ptype string) [][]string {
-	return model["g"][ptype].policy
+func hasPolicy(model Model, sec string, ptype string, policy []string) bool {
+	for _, rule := range model[sec][ptype].policy {
+		if arrayEquals(policy, rule) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func addPolicy(model Model, sec string, ptype string, policy []string) bool {
+	if !hasPolicy(model, sec, ptype, policy) {
+		model[sec][ptype].policy = append(model[sec][ptype].policy, policy)
+		return true
+	} else {
+		return false
+	}
+}
+
+func removePolicy(model Model, sec string, ptype string, policy []string) bool {
+	for i, rule := range model[sec][ptype].policy {
+		if arrayEquals(policy, rule) {
+			model[sec][ptype].policy = append(model[sec][ptype].policy[:i], model[sec][ptype].policy[i+1:]...)
+			return true
+		}
+	}
+
+	return false
 }

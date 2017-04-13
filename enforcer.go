@@ -107,7 +107,7 @@ func (enforcer *Enforcer) getPolicy() [][]string {
 }
 
 func (enforcer *Enforcer) getPolicyForPolicyType(ptype string) [][]string {
-	return getPolicy(enforcer.model, ptype)
+	return getPolicy(enforcer.model, "p", ptype)
 }
 
 func (enforcer *Enforcer) getFilteredPolicy(fieldIndex int, fieldValue string) [][]string {
@@ -115,7 +115,7 @@ func (enforcer *Enforcer) getFilteredPolicy(fieldIndex int, fieldValue string) [
 }
 
 func (enforcer *Enforcer) getFilteredPolicyForPolicyType(ptype string, fieldIndex int, fieldValue string) [][]string {
-	return getFilteredPolicy(enforcer.model, ptype, fieldIndex, fieldValue)
+	return getFilteredPolicy(enforcer.model, "p", ptype, fieldIndex, fieldValue)
 }
 
 func (enforcer *Enforcer) getGroupingPolicy() [][]string {
@@ -123,5 +123,5 @@ func (enforcer *Enforcer) getGroupingPolicy() [][]string {
 }
 
 func (enforcer *Enforcer) getGroupingPolicyForPolicyType(ptype string) [][]string {
-	return getGroupingPolicy(enforcer.model, ptype)
+	return getPolicy(enforcer.model, "g", ptype)
 }
