@@ -6,10 +6,10 @@ import (
 )
 
 func testRole(t *testing.T, rm *RoleManager, name1 string, name2 string, res bool) {
-	my_res := rm.hasLink(name1, name2)
-	log.Printf("%s, %s: %t", name1, name2, my_res)
+	myRes := rm.hasLink(name1, name2)
+	log.Printf("%s, %s: %t", name1, name2, myRes)
 
-	if my_res != res {
+	if myRes != res {
 		t.Errorf("%s < %s: %t, supposed to be %t", name1, name2, !res, res)
 	}
 }

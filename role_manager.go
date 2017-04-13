@@ -4,6 +4,7 @@ import (
 	"log"
 )
 
+// RoleManager is the interface to manage the roles in RBAC.
 type RoleManager struct {
 	allRoles map[string]*Role
 	level    int
@@ -62,6 +63,7 @@ func (rm *RoleManager) printRoles() {
 	}
 }
 
+// Role is the data structure for a role in RBAC.
 type Role struct {
 	name  string
 	roles []*Role

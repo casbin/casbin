@@ -6,7 +6,10 @@ import (
 	"strings"
 )
 
+// Model represents the whole access control model.
 type Model map[string]AssertionMap
+
+// AssertionMap is the collection of assertions, can be "r", "p", "g", "e", "m".
 type AssertionMap map[string]*assertion
 
 func escape(s string) string {
