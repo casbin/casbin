@@ -183,3 +183,29 @@ func TestModifyGroupingPolicy(t *testing.T) {
 	testGetRoles(t, e, "eve", []string{"data3_admin"})
 	testGetRoles(t, e, "non_exist", []string{})
 }
+
+func benchmarkEnforce(b *testing.B, e *Enforcer, sub string, obj string, act string, res bool) {
+	if e.enforce(sub, obj, act) != res {
+		b.Errorf("%s, %s, %s: %t, supposed to be %t", sub, obj, act, !res, res)
+	}
+}
+
+func BenchmarkBasicModel(b *testing.B) {
+	e := &Enforcer{}
+	e.init("examples/basic_model.conf", "examples/basic_policy.csv")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		benchmarkEnforce(b, e, "alice", "data1", "read", true)
+	}
+}
+
+func BenchmarkRBACModel(b *testing.B) {
+	e := &Enforcer{}
+	e.init("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		benchmarkEnforce(b, e, "alice", "data2", "read", true)
+	}
+}
