@@ -125,3 +125,39 @@ func (enforcer *Enforcer) getGroupingPolicy() [][]string {
 func (enforcer *Enforcer) getGroupingPolicyForPolicyType(ptype string) [][]string {
 	return getPolicy(enforcer.model, "g", ptype)
 }
+
+func (enforcer *Enforcer) addPolicy(policy []string) {
+	enforcer.addPolicyForPolicyType("p", policy)
+}
+
+func (enforcer *Enforcer) removePolicy(policy []string) {
+	enforcer.removePolicyForPolicyType("p", policy)
+}
+
+func (enforcer *Enforcer) addPolicyForPolicyType(ptype string, policy []string) {
+	addPolicy(enforcer.model, "p", ptype, policy)
+}
+
+func (enforcer *Enforcer) removePolicyForPolicyType(ptype string, policy []string) {
+	removePolicy(enforcer.model, "p", ptype, policy)
+}
+
+func (enforcer *Enforcer) addGroupingPolicy(policy []string) {
+	enforcer.addGroupingPolicyForPolicyType("g", policy)
+	buildRoleLinks(enforcer.model)
+}
+
+func (enforcer *Enforcer) removeGroupingPolicy(policy []string) {
+	enforcer.removeGroupingPolicyForPolicyType("g", policy)
+	buildRoleLinks(enforcer.model)
+}
+
+func (enforcer *Enforcer) addGroupingPolicyForPolicyType(ptype string, policy []string) {
+	addPolicy(enforcer.model, "g", ptype, policy)
+	buildRoleLinks(enforcer.model)
+}
+
+func (enforcer *Enforcer) removeGroupingPolicyForPolicyType(ptype string, policy []string) {
+	removePolicy(enforcer.model, "g", ptype, policy)
+	buildRoleLinks(enforcer.model)
+}
