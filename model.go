@@ -3,6 +3,7 @@ package casbin
 import (
 	"github.com/lxmgo/config"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -24,13 +25,13 @@ var sectionNameMap = map[string]string{
 	"m": "matchers",
 }
 
-func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) {
+func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) bool {
 	ast := assertion{}
 	ast.key = key
-	ast.value = cfg.String(sectionNameMap[key] + "::" + key)
+	ast.value = cfg.String(sectionNameMap[sec] + "::" + key)
 
 	if ast.value == "" {
-		return
+		return false
 	}
 
 	if sec == "r" || sec == "p" {
@@ -48,6 +49,26 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 	}
 
 	model[sec][key] = &ast
+	return true
+}
+
+func getKeySuffix(i int) string {
+	if i == 1 {
+		return ""
+	} else {
+		return strconv.Itoa(i)
+	}
+}
+
+func loadSection(model Model, cfg config.ConfigInterface, sec string) {
+	i := 1
+	for {
+		if !loadAssertion(model, cfg, sec, sec + getKeySuffix(i)) {
+			break
+		} else {
+			i++
+		}
+	}
 }
 
 func loadModel(path string) (model Model) {
@@ -55,12 +76,12 @@ func loadModel(path string) (model Model) {
 
 	model = make(Model)
 
-	loadAssertion(model, cfg, "r", "r")
-	loadAssertion(model, cfg, "p", "p")
-	loadAssertion(model, cfg, "e", "e")
-	loadAssertion(model, cfg, "m", "m")
+	loadSection(model, cfg, "r")
+	loadSection(model, cfg, "p")
+	loadSection(model, cfg, "e")
+	loadSection(model, cfg, "m")
 
-	loadAssertion(model, cfg, "g", "g")
+	loadSection(model, cfg, "g")
 
 	return model
 }
