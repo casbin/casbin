@@ -57,11 +57,12 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 		functions := make(map[string]govaluate.ExpressionFunction)
 
 		for key, ast := range enforcer.model["g"] {
+			rm := ast.rm
 			functions[key] = func(args ...interface{}) (interface{}, error) {
 				name1 := args[0].(string)
 				name2 := args[1].(string)
 
-				return (bool)(ast.rm.hasLink(name1, name2)), nil
+				return (bool)(rm.hasLink(name1, name2)), nil
 			}
 		}
 
