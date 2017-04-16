@@ -94,6 +94,28 @@ func TestKeyMatch(t *testing.T) {
 	testKeyMatch(t, e, "/foobar", "/foo/*", false)
 }
 
+func TestKeymatchModel(t *testing.T) {
+	e := &Enforcer{}
+	e.Init("examples/keymatch_model.conf", "examples/keymatch_policy.csv")
+
+	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
+	testEnforce(t, e, "alice", "/alice_data/resource1", "POST", true)
+	testEnforce(t, e, "alice", "/alice_data/resource2", "GET", true)
+	testEnforce(t, e, "alice", "/alice_data/resource2", "POST", false)
+	testEnforce(t, e, "alice", "/bob_data/resource1", "GET", false)
+	testEnforce(t, e, "alice", "/bob_data/resource1", "POST", false)
+	testEnforce(t, e, "alice", "/bob_data/resource2", "GET", false)
+	testEnforce(t, e, "alice", "/bob_data/resource2", "POST", false)
+	testEnforce(t, e, "bob", "/alice_data/resource1", "GET", false)
+	testEnforce(t, e, "bob", "/alice_data/resource1", "POST", false)
+	testEnforce(t, e, "bob", "/alice_data/resource2", "GET", true)
+	testEnforce(t, e, "bob", "/alice_data/resource2", "POST", false)
+	testEnforce(t, e, "bob", "/bob_data/resource1", "GET", false)
+	testEnforce(t, e, "bob", "/bob_data/resource1", "POST", true)
+	testEnforce(t, e, "bob", "/bob_data/resource2", "GET", false)
+	testEnforce(t, e, "bob", "/bob_data/resource2", "POST", true)
+}
+
 func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
 	myRes := e.GetRoles(name)
 	log.Print("Roles for ", name, ": ", myRes)

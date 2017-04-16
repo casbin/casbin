@@ -50,12 +50,17 @@ func (enforcer *Enforcer) Enforce(rvals ...string) bool {
 	expString := enforcer.model["m"]["m"].value
 	var expression *govaluate.EvaluableExpression
 
-	_, ok := enforcer.model["g"]
-	if !ok {
-		expression, _ = govaluate.NewEvaluableExpression(expString)
-	} else {
-		functions := make(map[string]govaluate.ExpressionFunction)
+	functions := make(map[string]govaluate.ExpressionFunction)
 
+	functions["keyMatch"] = func(args ...interface{}) (interface{}, error) {
+		name1 := args[0].(string)
+		name2 := args[1].(string)
+
+		return (bool)(keyMatch(name1, name2)), nil
+	}
+
+	_, ok := enforcer.model["g"]
+	if ok {
 		for key, ast := range enforcer.model["g"] {
 			rm := ast.rm
 			functions[key] = func(args ...interface{}) (interface{}, error) {
@@ -65,9 +70,8 @@ func (enforcer *Enforcer) Enforce(rvals ...string) bool {
 				return (bool)(rm.hasLink(name1, name2)), nil
 			}
 		}
-
-		expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 	}
+	expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 
 	policyResults := make([]bool, len(enforcer.model["p"]["p"].policy))
 
