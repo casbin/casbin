@@ -63,7 +63,7 @@ Get started
 
 ```golang
 e := &Enforcer{}
-e.init("examples/basic_model.conf", "examples/basic_policy.csv")
+e.Init("examples/basic_model.conf", "examples/basic_policy.csv")
 ```
 
 2. Add the enforcement hook into your code before the access happens.
@@ -73,7 +73,7 @@ sub := "alice"
 obj := "data1"
 act := "read"
 
-if e.enforce(sub, obj, act) == true {
+if e.Enforce(sub, obj, act) == true {
     // permit alice to read data1
 } else {
     // deny the request, show an error
@@ -83,7 +83,7 @@ if e.enforce(sub, obj, act) == true {
 3. You can get the roles for a user with our management API.
 
 ```golang
-roles := e.getRoles("alice")
+roles := e.GetRoles("alice")
 ```
 
 4. Please refer to the ``_test.go`` files for more usage.

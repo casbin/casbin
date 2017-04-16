@@ -13,36 +13,36 @@ type Enforcer struct {
 	enabled    bool
 }
 
-func (enforcer *Enforcer) init(modelPath string, policyPath string) {
+func (enforcer *Enforcer) Init(modelPath string, policyPath string) {
 	enforcer.modelPath = modelPath
 	enforcer.policyPath = policyPath
 	enforcer.enabled = true
 
-	enforcer.loadAll()
+	enforcer.LoadAll()
 }
 
-func (enforcer *Enforcer) loadAll() {
+func (enforcer *Enforcer) LoadAll() {
 	enforcer.model = loadModel(enforcer.modelPath)
 	printModel(enforcer.model)
 
-	enforcer.loadPolicy()
+	enforcer.LoadPolicy()
 }
 
-func (enforcer *Enforcer) loadPolicy() {
+func (enforcer *Enforcer) LoadPolicy() {
 	loadPolicy(enforcer.policyPath, enforcer.model)
 	printPolicy(enforcer.model)
 	buildRoleLinks(enforcer.model)
 }
 
-func (enforcer *Enforcer) savePolicy() {
+func (enforcer *Enforcer) SavePolicy() {
 	savePolicy(enforcer.policyPath, enforcer.model)
 }
 
-func (enforcer *Enforcer) enable(enable bool) {
+func (enforcer *Enforcer) Enable(enable bool) {
 	enforcer.enabled = enable
 }
 
-func (enforcer *Enforcer) enforce(rvals ...string) bool {
+func (enforcer *Enforcer) Enforce(rvals ...string) bool {
 	if !enforcer.enabled {
 		return true
 	}
@@ -106,70 +106,70 @@ func (enforcer *Enforcer) enforce(rvals ...string) bool {
 	return result
 }
 
-func (enforcer *Enforcer) getRoles(name string) []string {
-	return enforcer.getRolesForPolicyType("g", name)
+func (enforcer *Enforcer) GetRoles(name string) []string {
+	return enforcer.GetRolesForPolicyType("g", name)
 }
 
-func (enforcer *Enforcer) getRolesForPolicyType(ptype string, name string) []string {
+func (enforcer *Enforcer) GetRolesForPolicyType(ptype string, name string) []string {
 	return enforcer.model["g"][ptype].rm.getRoles(name)
 }
 
-func (enforcer *Enforcer) getPolicy() [][]string {
-	return enforcer.getPolicyForPolicyType("p")
+func (enforcer *Enforcer) GetPolicy() [][]string {
+	return enforcer.GetPolicyForPolicyType("p")
 }
 
-func (enforcer *Enforcer) getPolicyForPolicyType(ptype string) [][]string {
+func (enforcer *Enforcer) GetPolicyForPolicyType(ptype string) [][]string {
 	return getPolicy(enforcer.model, "p", ptype)
 }
 
-func (enforcer *Enforcer) getFilteredPolicy(fieldIndex int, fieldValue string) [][]string {
-	return enforcer.getFilteredPolicyForPolicyType("p", fieldIndex, fieldValue)
+func (enforcer *Enforcer) GetFilteredPolicy(fieldIndex int, fieldValue string) [][]string {
+	return enforcer.GetFilteredPolicyForPolicyType("p", fieldIndex, fieldValue)
 }
 
-func (enforcer *Enforcer) getFilteredPolicyForPolicyType(ptype string, fieldIndex int, fieldValue string) [][]string {
+func (enforcer *Enforcer) GetFilteredPolicyForPolicyType(ptype string, fieldIndex int, fieldValue string) [][]string {
 	return getFilteredPolicy(enforcer.model, "p", ptype, fieldIndex, fieldValue)
 }
 
-func (enforcer *Enforcer) getGroupingPolicy() [][]string {
-	return enforcer.getGroupingPolicyForPolicyType("g")
+func (enforcer *Enforcer) GetGroupingPolicy() [][]string {
+	return enforcer.GetGroupingPolicyForPolicyType("g")
 }
 
-func (enforcer *Enforcer) getGroupingPolicyForPolicyType(ptype string) [][]string {
+func (enforcer *Enforcer) GetGroupingPolicyForPolicyType(ptype string) [][]string {
 	return getPolicy(enforcer.model, "g", ptype)
 }
 
-func (enforcer *Enforcer) addPolicy(policy []string) {
-	enforcer.addPolicyForPolicyType("p", policy)
+func (enforcer *Enforcer) AddPolicy(policy []string) {
+	enforcer.AddPolicyForPolicyType("p", policy)
 }
 
-func (enforcer *Enforcer) removePolicy(policy []string) {
-	enforcer.removePolicyForPolicyType("p", policy)
+func (enforcer *Enforcer) RemovePolicy(policy []string) {
+	enforcer.RemovePolicyForPolicyType("p", policy)
 }
 
-func (enforcer *Enforcer) addPolicyForPolicyType(ptype string, policy []string) {
+func (enforcer *Enforcer) AddPolicyForPolicyType(ptype string, policy []string) {
 	addPolicy(enforcer.model, "p", ptype, policy)
 }
 
-func (enforcer *Enforcer) removePolicyForPolicyType(ptype string, policy []string) {
+func (enforcer *Enforcer) RemovePolicyForPolicyType(ptype string, policy []string) {
 	removePolicy(enforcer.model, "p", ptype, policy)
 }
 
-func (enforcer *Enforcer) addGroupingPolicy(policy []string) {
-	enforcer.addGroupingPolicyForPolicyType("g", policy)
+func (enforcer *Enforcer) AddGroupingPolicy(policy []string) {
+	enforcer.AddGroupingPolicyForPolicyType("g", policy)
 	buildRoleLinks(enforcer.model)
 }
 
-func (enforcer *Enforcer) removeGroupingPolicy(policy []string) {
-	enforcer.removeGroupingPolicyForPolicyType("g", policy)
+func (enforcer *Enforcer) RemoveGroupingPolicy(policy []string) {
+	enforcer.RemoveGroupingPolicyForPolicyType("g", policy)
 	buildRoleLinks(enforcer.model)
 }
 
-func (enforcer *Enforcer) addGroupingPolicyForPolicyType(ptype string, policy []string) {
+func (enforcer *Enforcer) AddGroupingPolicyForPolicyType(ptype string, policy []string) {
 	addPolicy(enforcer.model, "g", ptype, policy)
 	buildRoleLinks(enforcer.model)
 }
 
-func (enforcer *Enforcer) removeGroupingPolicyForPolicyType(ptype string, policy []string) {
+func (enforcer *Enforcer) RemoveGroupingPolicyForPolicyType(ptype string, policy []string) {
 	removePolicy(enforcer.model, "g", ptype, policy)
 	buildRoleLinks(enforcer.model)
 }
