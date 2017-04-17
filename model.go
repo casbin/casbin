@@ -71,10 +71,10 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 	}
 }
 
-func loadModel(path string) (model Model) {
+func loadModel(path string) Model {
 	cfg, _ := config.NewConfig(path)
 
-	model = make(Model)
+	model := make(Model)
 
 	loadSection(model, cfg, "r")
 	loadSection(model, cfg, "p")

@@ -9,7 +9,10 @@ import (
 type Enforcer struct {
 	modelPath  string
 	policyPath string
+
 	model      Model
+	fm         FunctionMap
+
 	enabled    bool
 }
 
@@ -26,6 +29,7 @@ func (enforcer *Enforcer) Init(modelPath string, policyPath string) {
 func (enforcer *Enforcer) LoadAll() {
 	enforcer.model = loadModel(enforcer.modelPath)
 	printModel(enforcer.model)
+	enforcer.fm = loadFunctionMap()
 
 	enforcer.LoadPolicy()
 }
@@ -57,6 +61,10 @@ func (enforcer *Enforcer) Enforce(rvals ...string) bool {
 	var expression *govaluate.EvaluableExpression
 
 	functions := make(map[string]govaluate.ExpressionFunction)
+
+	for key, function := range enforcer.fm {
+		functions[key] = function
+	}
 
 	functions["keyMatch"] = func(args ...interface{}) (interface{}, error) {
 		name1 := args[0].(string)
