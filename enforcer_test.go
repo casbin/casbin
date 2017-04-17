@@ -135,6 +135,24 @@ func TestGetRoles(t *testing.T) {
 	testGetRoles(t, e, "non_exist", []string{})
 }
 
+func testStringList(t *testing.T, title string, f func() []string, res []string) {
+	myRes := f()
+	log.Print(title + ": ", myRes)
+
+	if !arrayEquals(res, myRes) {
+		t.Error(title + ": ", myRes, ", supposed to be ", res)
+	}
+}
+
+func TestGetList(t *testing.T) {
+	e := &Enforcer{}
+	e.Init("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	testStringList(t, "Subjects", e.GetSubjects, []string{"alice", "bob", "data2_admin"})
+	testStringList(t, "Objeccts", e.GetObjects, []string{"data1", "data2"})
+	testStringList(t, "Actions", e.GetActions, []string{"read", "write"})
+}
+
 func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	myRes := e.GetPolicy()
 	log.Print("Policy: ", myRes)

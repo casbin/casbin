@@ -25,3 +25,16 @@ func array2DEquals(a [][]string, b [][]string) bool {
 	}
 	return true
 }
+
+func arrayRemoveDuplicates(s *[]string) {
+	found := make(map[string]bool)
+	j := 0
+	for i, x := range *s {
+		if !found[x] {
+			found[x] = true
+			(*s)[j] = (*s)[i]
+			j++
+		}
+	}
+	*s = (*s)[:j]
+}

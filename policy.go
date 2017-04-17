@@ -163,3 +163,16 @@ func removePolicy(model Model, sec string, ptype string, policy []string) bool {
 
 	return false
 }
+
+func getValuesForFieldInPolicy(model Model, fieldIndex int) []string {
+	users := []string{}
+
+	for _, rule := range model["p"]["p"].policy {
+		users = append(users, rule[fieldIndex])
+	}
+
+	arrayRemoveDuplicates(&users)
+	// sort.Strings(users)
+
+	return users
+}
