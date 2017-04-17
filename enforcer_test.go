@@ -72,13 +72,20 @@ func TestRBACModelWithResourceRoles(t *testing.T) {
 }
 
 func getAttr(name string, attr string) string {
+	// This is the same as:
+	//
+	// alice.domain = domain1
+	// bob.domain = domain2
+	// data1.domain = domain1
+	// data2.domain = domain2
+
 	if attr != "domain" {
 		return "unknown"
 	}
 
-	if name == "alice" {
+	if name == "alice" || name == "data1" {
 		return "domain1"
-	} else if name == "bob" {
+	} else if name == "bob" || name == "data2" {
 		return "domain2"
 	} else {
 		return "unknown"

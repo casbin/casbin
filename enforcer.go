@@ -80,23 +80,38 @@ func (enforcer *Enforcer) Enforce(rvals ...string) bool {
 	}
 	expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 
-	policyResults := make([]bool, len(enforcer.model["p"]["p"].policy))
+	var policyResults []bool
+	if len(enforcer.model["p"]["p"].policy) != 0 {
+		policyResults = make([]bool, len(enforcer.model["p"]["p"].policy))
 
-	for i, pvals := range enforcer.model["p"]["p"].policy {
-		//log.Print("Policy Rule: ", pvals)
+		for i, pvals := range enforcer.model["p"]["p"].policy {
+			//log.Print("Policy Rule: ", pvals)
+
+			parameters := make(map[string]interface{}, 8)
+			for j, token := range enforcer.model["r"]["r"].tokens {
+				parameters[token] = rvals[j]
+			}
+			for j, token := range enforcer.model["p"]["p"].tokens {
+				parameters[token] = pvals[j]
+			}
+
+			result, _ := expression.Evaluate(parameters)
+			//log.Print("Result: ", result)
+
+			policyResults[i] = result.(bool)
+		}
+	} else {
+		policyResults = make([]bool, 1)
 
 		parameters := make(map[string]interface{}, 8)
 		for j, token := range enforcer.model["r"]["r"].tokens {
 			parameters[token] = rvals[j]
 		}
-		for j, token := range enforcer.model["p"]["p"].tokens {
-			parameters[token] = pvals[j]
-		}
 
 		result, _ := expression.Evaluate(parameters)
 		//log.Print("Result: ", result)
 
-		policyResults[i] = result.(bool)
+		policyResults[0] = result.(bool)
 	}
 
 	//log.Print("Rule Results: ", policyResults)
