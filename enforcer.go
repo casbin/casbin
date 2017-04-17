@@ -118,16 +118,20 @@ func (enforcer *Enforcer) GetRolesForPolicyType(ptype string, name string) []str
 	return enforcer.model["g"][ptype].rm.getRoles(name)
 }
 
-func (enforcer *Enforcer) GetSubjects() []string {
-	return getValuesForFieldInPolicy(enforcer.model, 0)
+func (enforcer *Enforcer) GetAllSubjects() []string {
+	return getValuesForFieldInPolicy(enforcer.model, "p", "p", 0)
 }
 
-func (enforcer *Enforcer) GetObjects() []string {
-	return getValuesForFieldInPolicy(enforcer.model, 1)
+func (enforcer *Enforcer) GetAllObjects() []string {
+	return getValuesForFieldInPolicy(enforcer.model, "p", "p", 1)
 }
 
-func (enforcer *Enforcer) GetActions() []string {
-	return getValuesForFieldInPolicy(enforcer.model, 2)
+func (enforcer *Enforcer) GetAllActions() []string {
+	return getValuesForFieldInPolicy(enforcer.model, "p", "p", 2)
+}
+
+func (enforcer *Enforcer) GetAllRoles() []string {
+	return getValuesForFieldInPolicy(enforcer.model, "g", "g", 1)
 }
 
 func (enforcer *Enforcer) GetPolicy() [][]string {

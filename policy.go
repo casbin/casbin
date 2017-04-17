@@ -164,10 +164,10 @@ func removePolicy(model Model, sec string, ptype string, policy []string) bool {
 	return false
 }
 
-func getValuesForFieldInPolicy(model Model, fieldIndex int) []string {
+func getValuesForFieldInPolicy(model Model, sec string, ptype string, fieldIndex int) []string {
 	users := []string{}
 
-	for _, rule := range model["p"]["p"].policy {
+	for _, rule := range model[sec][ptype].policy {
 		users = append(users, rule[fieldIndex])
 	}
 

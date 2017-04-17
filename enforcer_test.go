@@ -148,9 +148,10 @@ func TestGetList(t *testing.T) {
 	e := &Enforcer{}
 	e.Init("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	testStringList(t, "Subjects", e.GetSubjects, []string{"alice", "bob", "data2_admin"})
-	testStringList(t, "Objeccts", e.GetObjects, []string{"data1", "data2"})
-	testStringList(t, "Actions", e.GetActions, []string{"read", "write"})
+	testStringList(t, "Subjects", e.GetAllSubjects, []string{"alice", "bob", "data2_admin"})
+	testStringList(t, "Objeccts", e.GetAllObjects, []string{"data1", "data2"})
+	testStringList(t, "Actions", e.GetAllActions, []string{"read", "write"})
+	testStringList(t, "Roles", e.GetAllRoles, []string{"data2_admin"})
 }
 
 func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
