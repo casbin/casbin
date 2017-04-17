@@ -66,13 +66,6 @@ func (enforcer *Enforcer) Enforce(rvals ...string) bool {
 		functions[key] = function
 	}
 
-	functions["keyMatch"] = func(args ...interface{}) (interface{}, error) {
-		name1 := args[0].(string)
-		name2 := args[1].(string)
-
-		return (bool)(keyMatch(name1, name2)), nil
-	}
-
 	_, ok := enforcer.model["g"]
 	if ok {
 		for key, ast := range enforcer.model["g"] {
@@ -226,4 +219,14 @@ func (enforcer *Enforcer) AddGroupingPolicyForPolicyType(ptype string, policy []
 func (enforcer *Enforcer) RemoveGroupingPolicyForPolicyType(ptype string, policy []string) {
 	removePolicy(enforcer.model, "g", ptype, policy)
 	buildRoleLinks(enforcer.model)
+}
+
+// Add the function that gets attributes for a subject in ABAC.
+func (enforcer *Enforcer) AddSubjectAttributeFunction(function Function) {
+	addFunction(enforcer.fm, "subAttr", function)
+}
+
+// Add the function that gets attributes for a object in ABAC.
+func (enforcer *Enforcer) AddObjectAttributeFunction(function Function) {
+	addFunction(enforcer.fm, "objAttr", function)
 }

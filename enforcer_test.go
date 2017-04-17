@@ -71,9 +71,42 @@ func TestRBACModelWithResourceRoles(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func getAttr(name string, attr string) string {
+	if attr != "domain" {
+		return "unknown"
+	}
+
+	if name == "alice" {
+		return "domain1"
+	} else if name == "bob" {
+		return "domain2"
+	} else {
+		return "unknown"
+	}
+}
+
+func getAttrFunc(args ...interface{}) (interface{}, error) {
+	name := args[0].(string)
+	attr := args[1].(string)
+
+	return (string)(getAttr(name, attr)), nil
+}
+
 func TestABACModel(t *testing.T) {
 	e := &Enforcer{}
 	e.Init("examples/abac_model.conf", "")
+
+	e.AddSubjectAttributeFunction(getAttrFunc)
+	e.AddObjectAttributeFunction(getAttrFunc)
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", true)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", true)
+	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
 func testKeyMatch(t *testing.T, e *Enforcer, key1 string, key2 string, res bool) {

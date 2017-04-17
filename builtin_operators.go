@@ -1,6 +1,8 @@
 package casbin
 
-import "strings"
+import (
+	"strings"
+)
 
 func keyMatch(key1 string, key2 string) bool {
 	i := strings.Index(key2, "*")
