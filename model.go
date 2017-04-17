@@ -13,10 +13,6 @@ type Model map[string]AssertionMap
 // AssertionMap is the collection of assertions, can be "r", "p", "g", "e", "m".
 type AssertionMap map[string]*assertion
 
-func escape(s string) string {
-	return strings.Replace(s, ".", "_", -1)
-}
-
 var sectionNameMap = map[string]string{
 	"r": "request_definition",
 	"p": "policy_definition",
@@ -32,6 +28,10 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 
 	if ast.value == "" {
 		return false
+	}
+
+	if sec == "m" {
+		ast.value = fixAttribute(ast.value)
 	}
 
 	if sec == "r" || sec == "p" {

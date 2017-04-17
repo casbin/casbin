@@ -71,6 +71,11 @@ func TestRBACModelWithResourceRoles(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestABACModel(t *testing.T) {
+	e := &Enforcer{}
+	e.Init("examples/abac_model.conf", "")
+}
+
 func testKeyMatch(t *testing.T, e *Enforcer, key1 string, key2 string, res bool) {
 	myRes := keyMatch(key1, key2)
 	log.Printf("%s < %s: %t", key1, key2, myRes)

@@ -1,5 +1,24 @@
 package casbin
 
+import (
+	"strings"
+	"regexp"
+)
+
+func escape(s string) string {
+	return strings.Replace(s, ".", "_", -1)
+}
+
+func fixAttribute(s string) string {
+	reg := regexp.MustCompile("r\\.sub\\.([A-Za-z0-9]*)")
+	res := reg.ReplaceAllString(s, "subAttr(r.sub, \"$1\")")
+
+	reg = regexp.MustCompile("r\\.obj\\.([A-Za-z0-9]*)")
+	res = reg.ReplaceAllString(res, "objAttr(r.obj, \"$1\")")
+
+	return res
+}
+
 func arrayEquals(a []string, b []string) bool {
 	if len(a) != len(b) {
 		return false
