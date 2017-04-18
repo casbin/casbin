@@ -365,7 +365,7 @@ func TestDBLoadPolicy(t *testing.T) {
 	e := &Enforcer{}
 	e.Init("examples/basic_model.conf", "")
 
-	a := newDbAdapter("mysql", "root:1234@tcp(127.0.0.1:3306)/")
+	a := newDbAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
 	a.open()
 	a.loadPolicy(e.model)
 	printPolicy(e.model)
@@ -376,7 +376,7 @@ func TestDBSavePolicy(t *testing.T) {
 	e := &Enforcer{}
 	e.Init("examples/basic_model.conf", "examples/basic_policy.csv")
 
-	a := newDbAdapter("mysql", "root:1234@tcp(127.0.0.1:3306)/")
+	a := newDbAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
 	a.open()
 	a.savePolicy(e.model)
 	a.close()
