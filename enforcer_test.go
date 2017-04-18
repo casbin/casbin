@@ -361,27 +361,6 @@ func TestEnable(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
-func TestDBLoadPolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.Init("examples/basic_model.conf", "")
-
-	a := newDbAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
-	a.open()
-	a.loadPolicy(e.model)
-	printPolicy(e.model)
-	a.close()
-}
-
-func TestDBSavePolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.Init("examples/basic_model.conf", "examples/basic_policy.csv")
-
-	a := newDbAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
-	a.open()
-	a.savePolicy(e.model)
-	a.close()
-}
-
 func benchmarkEnforce(b *testing.B, e *Enforcer, sub string, obj string, act string, res bool) {
 	if e.Enforce(sub, obj, act) != res {
 		b.Errorf("%s, %s, %s: %t, supposed to be %t", sub, obj, act, !res, res)

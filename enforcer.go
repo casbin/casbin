@@ -22,19 +22,19 @@ func (enforcer *Enforcer) Init(modelPath string, policyPath string) {
 	enforcer.policyPath = policyPath
 	enforcer.enabled = true
 
-	enforcer.LoadAll()
-}
-
-// Reload the model file and policy file, usually used when those files have been changed.
-func (enforcer *Enforcer) LoadAll() {
-	enforcer.model = loadModel(enforcer.modelPath)
-	printModel(enforcer.model)
-	enforcer.fm = loadFunctionMap()
-
+	enforcer.LoadModel()
 	enforcer.LoadPolicy()
 }
 
-// Reload the policy file only.
+// Reload the model from the model CONF file.
+// Because the policy is attached to a model, so the policy is invalidated and needs to be loaded by yourself.
+func (enforcer *Enforcer) LoadModel() {
+	enforcer.model = loadModel(enforcer.modelPath)
+	printModel(enforcer.model)
+	enforcer.fm = loadFunctionMap()
+}
+
+// Reload the policy.
 func (enforcer *Enforcer) LoadPolicy() {
 	loadPolicy(enforcer.policyPath, enforcer.model)
 	printPolicy(enforcer.model)

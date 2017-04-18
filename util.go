@@ -3,6 +3,7 @@ package casbin
 import (
 	"strings"
 	"regexp"
+	"bytes"
 )
 
 func escape(s string) string {
@@ -56,4 +57,16 @@ func arrayRemoveDuplicates(s *[]string) {
 		}
 	}
 	*s = (*s)[:j]
+}
+
+func arrayToString(s []string) string {
+	var tmp bytes.Buffer
+	for i, v := range s {
+		if i != len(s)-1 {
+			tmp.WriteString(v + ", ")
+		} else {
+			tmp.WriteString(v)
+		}
+	}
+	return tmp.String()
 }
