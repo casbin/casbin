@@ -46,17 +46,17 @@ func arrayToString(s []string) string {
 func savePolicy(path string, model Model) {
 	var tmp bytes.Buffer
 
-	for key, ast := range model["p"] {
+	for ptype, ast := range model["p"] {
 		for _, rule := range ast.policy {
-			tmp.WriteString(key + ", ")
+			tmp.WriteString(ptype + ", ")
 			tmp.WriteString(arrayToString(rule))
 			tmp.WriteString("\n")
 		}
 	}
 
-	for key, ast := range model["g"] {
+	for ptype, ast := range model["g"] {
 		for _, rule := range ast.policy {
-			tmp.WriteString(key + ", ")
+			tmp.WriteString(ptype + ", ")
 			tmp.WriteString(arrayToString(rule))
 			tmp.WriteString("\n")
 		}

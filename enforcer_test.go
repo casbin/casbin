@@ -361,6 +361,16 @@ func TestEnable(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestDB(t *testing.T) {
+	e := &Enforcer{}
+	e.Init("examples/basic_model.conf", "")
+
+	a := newDbAdapter("mysql", "root:1234@tcp(127.0.0.1:3306)/")
+	a.open()
+	a.readTable(e.model)
+	printPolicy(e.model)
+}
+
 func benchmarkEnforce(b *testing.B, e *Enforcer, sub string, obj string, act string, res bool) {
 	if e.Enforce(sub, obj, act) != res {
 		b.Errorf("%s, %s, %s: %t, supposed to be %t", sub, obj, act, !res, res)
