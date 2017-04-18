@@ -4,6 +4,7 @@ import (
 	"log"
 	"testing"
 	"reflect"
+	"github.com/hsluoyz/casbin/util"
 )
 
 func testEnforce(t *testing.T, e *Enforcer, sub string, obj string, act string, res bool) {
@@ -169,7 +170,7 @@ func TestABACModel2(t *testing.T) {
 }
 
 func testKeyMatch(t *testing.T, e *Enforcer, key1 string, key2 string, res bool) {
-	myRes := KeyMatch(key1, key2)
+	myRes := util.KeyMatch(key1, key2)
 	log.Printf("%s < %s: %t", key1, key2, myRes)
 
 	if myRes != res {
@@ -217,7 +218,7 @@ func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
 	myRes := e.GetRoles(name)
 	log.Print("Roles for ", name, ": ", myRes)
 
-	if !ArrayEquals(res, myRes) {
+	if !util.ArrayEquals(res, myRes) {
 		t.Error("Roles for ", name, ": ", myRes, ", supposed to be ", res)
 	}
 }
@@ -236,7 +237,7 @@ func testStringList(t *testing.T, title string, f func() []string, res []string)
 	myRes := f()
 	log.Print(title + ": ", myRes)
 
-	if !ArrayEquals(res, myRes) {
+	if !util.ArrayEquals(res, myRes) {
 		t.Error(title + ": ", myRes, ", supposed to be ", res)
 	}
 }
@@ -255,7 +256,7 @@ func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	myRes := e.GetPolicy()
 	log.Print("Policy: ", myRes)
 
-	if !Array2DEquals(res, myRes) {
+	if !util.Array2DEquals(res, myRes) {
 		t.Error("Policy: ", myRes, ", supposed to be ", res)
 	}
 }
@@ -264,7 +265,7 @@ func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, fieldValue
 	myRes := e.GetFilteredPolicy(fieldIndex, fieldValue)
 	log.Print("Policy for ", fieldValue, ": ", myRes)
 
-	if !Array2DEquals(res, myRes) {
+	if !util.Array2DEquals(res, myRes) {
 		t.Error("Policy for ", fieldValue, ": ", myRes, ", supposed to be ", res)
 	}
 }
@@ -273,7 +274,7 @@ func testGetGroupingPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	myRes := e.GetGroupingPolicy()
 	log.Print("Grouping policy: ", myRes)
 
-	if !Array2DEquals(res, myRes) {
+	if !util.Array2DEquals(res, myRes) {
 		t.Error("Grouping policy: ", myRes, ", supposed to be ", res)
 	}
 }

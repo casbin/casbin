@@ -1,4 +1,4 @@
-package casbin
+package util
 
 import (
 	"strings"

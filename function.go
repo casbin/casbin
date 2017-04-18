@@ -1,5 +1,7 @@
 package casbin
 
+import "github.com/hsluoyz/casbin/util"
+
 // FunctionMap represents the collection of Function.
 type FunctionMap map[string]func(args ...interface{}) (interface{}, error)
 
@@ -13,7 +15,7 @@ func addFunction(fm FunctionMap, name string, function Function) {
 func loadFunctionMap() FunctionMap {
 	fm := make(FunctionMap)
 
-	addFunction(fm, "keyMatch", KeyMatchFunc)
+	addFunction(fm, "keyMatch", util.KeyMatchFunc)
 
 	return fm
 }

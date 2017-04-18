@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"github.com/hsluoyz/casbin/util"
 )
 
 // Model represents the whole access control model.
@@ -31,7 +32,7 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 	}
 
 	if sec == "m" {
-		ast.value = FixAttribute(ast.value)
+		ast.value = util.FixAttribute(ast.value)
 	}
 
 	if sec == "r" || sec == "p" {
@@ -40,7 +41,7 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 			ast.tokens[i] = key + "_" + ast.tokens[i]
 		}
 	} else {
-		ast.value = EscapeAssertion(ast.value)
+		ast.value = util.EscapeAssertion(ast.value)
 	}
 
 	_, ok := model[sec]

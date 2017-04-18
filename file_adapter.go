@@ -6,6 +6,7 @@ import (
 	"strings"
 	"io"
 	"bytes"
+	"github.com/hsluoyz/casbin/util"
 )
 
 type fileAdapter struct {
@@ -28,7 +29,7 @@ func (a *fileAdapter) savePolicy(model Model) {
 	for ptype, ast := range model["p"] {
 		for _, rule := range ast.policy {
 			tmp.WriteString(ptype + ", ")
-			tmp.WriteString(ArrayToString(rule))
+			tmp.WriteString(util.ArrayToString(rule))
 			tmp.WriteString("\n")
 		}
 	}
@@ -36,7 +37,7 @@ func (a *fileAdapter) savePolicy(model Model) {
 	for ptype, ast := range model["g"] {
 		for _, rule := range ast.policy {
 			tmp.WriteString(ptype + ", ")
-			tmp.WriteString(ArrayToString(rule))
+			tmp.WriteString(util.ArrayToString(rule))
 			tmp.WriteString("\n")
 		}
 	}
