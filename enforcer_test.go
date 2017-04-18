@@ -3,6 +3,7 @@ package casbin
 import (
 	"log"
 	"testing"
+	"reflect"
 )
 
 func testEnforce(t *testing.T, e *Enforcer, sub string, obj string, act string, res bool) {
@@ -114,6 +115,57 @@ func TestABACModel(t *testing.T) {
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", true)
 	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
+type testUser struct {
+	name string
+	domain string
+}
+
+func newTestUser(name string, domain string) *testUser {
+	u := testUser{}
+	u.name = name
+	u.domain = domain
+	return &u
+}
+
+func (u *testUser) getAttribute(attributeName string) string {
+	ru := reflect.ValueOf(u)
+	f := reflect.Indirect(ru).FieldByName(attributeName)
+	return f.String()
+}
+
+type testResource struct {
+	name string
+	domain string
+}
+
+func newTestResource(name string, domain string) *testResource {
+	r := testResource{}
+	r.name = name
+	r.domain = domain
+	return &r
+}
+
+func (u *testResource) getAttribute(attributeName string) string {
+	ru := reflect.ValueOf(u)
+	f := reflect.Indirect(ru).FieldByName(attributeName)
+	return f.String()
+}
+
+func TestABACModel2(t *testing.T) {
+	e := &Enforcer{}
+	e.Init("examples/abac_model.conf", "")
+
+	alice := newTestUser("alice", "domain1")
+	bob := newTestUser("bob", "domain2")
+	data1 := newTestResource("data1", "domain1")
+	data2 := newTestResource("data2", "domain2")
+
+	log.Println(alice.getAttribute("domain"))
+	log.Println(bob.getAttribute("domain"))
+	log.Println(data1.getAttribute("domain"))
+	log.Println(data2.getAttribute("domain"))
 }
 
 func testKeyMatch(t *testing.T, e *Enforcer, key1 string, key2 string, res bool) {
