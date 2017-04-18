@@ -28,7 +28,7 @@ func (a *fileAdapter) savePolicy(model Model) {
 	for ptype, ast := range model["p"] {
 		for _, rule := range ast.policy {
 			tmp.WriteString(ptype + ", ")
-			tmp.WriteString(arrayToString(rule))
+			tmp.WriteString(ArrayToString(rule))
 			tmp.WriteString("\n")
 		}
 	}
@@ -36,7 +36,7 @@ func (a *fileAdapter) savePolicy(model Model) {
 	for ptype, ast := range model["g"] {
 		for _, rule := range ast.policy {
 			tmp.WriteString(ptype + ", ")
-			tmp.WriteString(arrayToString(rule))
+			tmp.WriteString(ArrayToString(rule))
 			tmp.WriteString("\n")
 		}
 	}

@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-func keyMatch(key1 string, key2 string) bool {
+func KeyMatch(key1 string, key2 string) bool {
 	i := strings.Index(key2, "*")
 	if i == -1 {
 		return key1 == key2
@@ -17,9 +17,9 @@ func keyMatch(key1 string, key2 string) bool {
 	}
 }
 
-func keyMatchFunc(args ...interface{}) (interface{}, error) {
+func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return (bool)(keyMatch(name1, name2)), nil
+	return (bool)(KeyMatch(name1, name2)), nil
 }

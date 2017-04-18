@@ -6,11 +6,11 @@ import (
 	"bytes"
 )
 
-func escape(s string) string {
+func EscapeAssertion(s string) string {
 	return strings.Replace(s, ".", "_", -1)
 }
 
-func fixAttribute(s string) string {
+func FixAttribute(s string) string {
 	reg := regexp.MustCompile("r\\.sub\\.([A-Za-z0-9]*)")
 	res := reg.ReplaceAllString(s, "subAttr(r.sub, \"$1\")")
 
@@ -20,7 +20,7 @@ func fixAttribute(s string) string {
 	return res
 }
 
-func arrayEquals(a []string, b []string) bool {
+func ArrayEquals(a []string, b []string) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -33,20 +33,20 @@ func arrayEquals(a []string, b []string) bool {
 	return true
 }
 
-func array2DEquals(a [][]string, b [][]string) bool {
+func Array2DEquals(a [][]string, b [][]string) bool {
 	if len(a) != len(b) {
 		return false
 	}
 
 	for i, v := range a {
-		if !arrayEquals(v, b[i]) {
+		if !ArrayEquals(v, b[i]) {
 			return false
 		}
 	}
 	return true
 }
 
-func arrayRemoveDuplicates(s *[]string) {
+func ArrayRemoveDuplicates(s *[]string) {
 	found := make(map[string]bool)
 	j := 0
 	for i, x := range *s {
@@ -59,7 +59,7 @@ func arrayRemoveDuplicates(s *[]string) {
 	*s = (*s)[:j]
 }
 
-func arrayToString(s []string) string {
+func ArrayToString(s []string) string {
 	var tmp bytes.Buffer
 	for i, v := range s {
 		if i != len(s)-1 {

@@ -62,7 +62,7 @@ func getFilteredPolicy(model Model, sec string, ptype string, fieldIndex int, fi
 
 func hasPolicy(model Model, sec string, ptype string, policy []string) bool {
 	for _, rule := range model[sec][ptype].policy {
-		if arrayEquals(policy, rule) {
+		if ArrayEquals(policy, rule) {
 			return true
 		}
 	}
@@ -81,7 +81,7 @@ func addPolicy(model Model, sec string, ptype string, policy []string) bool {
 
 func removePolicy(model Model, sec string, ptype string, policy []string) bool {
 	for i, rule := range model[sec][ptype].policy {
-		if arrayEquals(policy, rule) {
+		if ArrayEquals(policy, rule) {
 			model[sec][ptype].policy = append(model[sec][ptype].policy[:i], model[sec][ptype].policy[i+1:]...)
 			return true
 		}
@@ -97,7 +97,7 @@ func getValuesForFieldInPolicy(model Model, sec string, ptype string, fieldIndex
 		users = append(users, rule[fieldIndex])
 	}
 
-	arrayRemoveDuplicates(&users)
+	ArrayRemoveDuplicates(&users)
 	// sort.Strings(users)
 
 	return users

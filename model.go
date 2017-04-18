@@ -31,7 +31,7 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 	}
 
 	if sec == "m" {
-		ast.value = fixAttribute(ast.value)
+		ast.value = FixAttribute(ast.value)
 	}
 
 	if sec == "r" || sec == "p" {
@@ -40,7 +40,7 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 			ast.tokens[i] = key + "_" + ast.tokens[i]
 		}
 	} else {
-		ast.value = escape(ast.value)
+		ast.value = EscapeAssertion(ast.value)
 	}
 
 	_, ok := model[sec]

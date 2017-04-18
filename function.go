@@ -13,7 +13,7 @@ func addFunction(fm FunctionMap, name string, function Function) {
 func loadFunctionMap() FunctionMap {
 	fm := make(FunctionMap)
 
-	addFunction(fm, "keyMatch", keyMatchFunc)
+	addFunction(fm, "keyMatch", KeyMatchFunc)
 
 	return fm
 }
