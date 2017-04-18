@@ -88,6 +88,18 @@ roles := e.GetRoles("alice")
 
 4. Please refer to the ``_test.go`` files for more usage.
 
+Examples
+--
+
+Model | Model file | Policy file
+----|------|----
+basic | [basic_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/basic_model.conf) | [basic_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/basic_policy.csv)
+basic with root | [basic_model_with_root.conf](https://github.com/hsluoyz/casbin/blob/master/examples/basic_model_with_root.conf) | [basic_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/basic_policy.csv)
+RESTful | [keymatch_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/keymatch_model.conf)  | [keymatch_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/keymatch_policy.csv)
+RBAC | [rbac_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_model.conf)  | [rbac_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_policy.csv)
+RBAC with resource roles | [rbac_model_with_resource_roles.conf](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_model_with_resource_roles.conf)  | [rbac_policy_with_resource_roles.csv](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_policy_with_resource_roles.csv)
+ABAC | [abac_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/abac_model.conf)  | N/A
+
 Credits
 --
 
