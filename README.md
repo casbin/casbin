@@ -53,7 +53,7 @@ Installation
 --
 
 ```
-go get github.com/hsluoyz/casbin/...
+go get github.com/hsluoyz/casbin
 ```
 
 Get started
@@ -87,6 +87,29 @@ roles := e.GetRoles("alice")
 ```
 
 4. Please refer to the ``_test.go`` files for more usage.
+
+Persistence
+--
+
+By default, both model and policy are stored in files. The model should be in .CONF format, and the policy should be in .CSV (Comma-Separated Values) format. The database backend will be added in a near future.
+
+We think the model represents the access control model that our customer uses and is not often modified at run-time, so we don't implement an interface to save the current model (like modified by API) back into the model CONF file. The policy is much more dynamic than model and can be loaded from a policy file or saved to a policy file at any time.
+
+Here're some common-used persistence APIs. the path to the model and policy is already specified in ``enforcer.Init()`` function and can't be changed when reloading or saving.
+
+```golang
+e := &Enforcer{}
+e.Init("examples/basic_model.conf", "examples/basic_policy.csv")
+
+// Reload the model file and policy file, usually used when those files have been changed.
+e.LoadAll()
+
+// Reload the policy file only.
+e.LoadPolicy()
+
+// Save the current policy (usually changed with casbin API) back to the policy file.
+e.SavePolicy()
+```
 
 Examples
 --
