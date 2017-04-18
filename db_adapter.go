@@ -57,7 +57,7 @@ func (a *dbAdapter) dropTable() {
 	}
 }
 
-func (a *dbAdapter) readTable(model Model) {
+func (a *dbAdapter) loadPolicy(model Model) {
 	var (
 		ptype string
 		v1 string
@@ -101,18 +101,24 @@ func (a *dbAdapter) readTable(model Model) {
 }
 
 func (a *dbAdapter) writeTableLine(ptype string, rule []string) {
-	line := ptype
+	line := "'" + ptype + "'"
 	for i := range rule {
 		line += ",'" + rule[i] + "'"
 	}
+	for i := 0; i < 4 - len(rule); i ++ {
+		line += ",''"
+	}
 
-	_, err := a.db.Prepare("insert into policy values(" + line + ")")
+	_, err := a.db.Exec("insert into policy values(" + line + ")")
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (a *dbAdapter) writeTable(model Model) {
+func (a *dbAdapter) savePolicy(model Model) {
+	a.dropTable()
+	a.createTable()
+
 	for ptype, ast := range model["p"] {
 		for _, rule := range ast.policy {
 			a.writeTableLine(ptype, rule)
