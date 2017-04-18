@@ -1,7 +1,6 @@
 package casbin
 
 import (
-	"log"
 	"os"
 	"bufio"
 	"strings"
@@ -9,13 +8,21 @@ import (
 	"bytes"
 )
 
-func loadPolicy(path string, model Model) {
-	clearPolicy(model)
-	log.Print("Policy:")
-	loadPolicyFile(path, model, loadPolicyLine)
+type fileAdapter struct {
+	filePath string
 }
 
-func savePolicy(path string, model Model) {
+func newFileAdapter(filePath string) *fileAdapter {
+	a := fileAdapter{}
+	a.filePath = filePath
+	return &a
+}
+
+func (a *fileAdapter) loadPolicy(model Model) {
+	a.loadPolicyFile(model, loadPolicyLine)
+}
+
+func (a *fileAdapter) savePolicy(model Model) {
 	var tmp bytes.Buffer
 
 	for ptype, ast := range model["p"] {
@@ -34,11 +41,11 @@ func savePolicy(path string, model Model) {
 		}
 	}
 
-	savePolicyFile(path, strings.TrimRight(tmp.String(), "\n"))
+	a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
 }
 
-func loadPolicyFile(fileName string, model Model, handler func(string, Model)) error {
-	f, err := os.Open(fileName)
+func (a *fileAdapter) loadPolicyFile(model Model, handler func(string, Model)) error {
+	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
 	}
@@ -56,8 +63,8 @@ func loadPolicyFile(fileName string, model Model, handler func(string, Model)) e
 	}
 }
 
-func savePolicyFile(fileName string, text string) error {
-	f, err := os.Create(fileName)
+func (a *fileAdapter) savePolicyFile(text string) error {
+	f, err := os.Create(a.filePath)
 	if err != nil {
 		return err
 	}
