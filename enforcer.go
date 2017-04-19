@@ -32,7 +32,7 @@ func (e *Enforcer) Init(modelPath string, policyPath string) {
 func (e *Enforcer) LoadModel() {
 	e.model = LoadModel(e.modelPath)
 	e.model.PrintModel()
-	e.fm = loadFunctionMap()
+	e.fm = LoadFunctionMap()
 }
 
 // Clear all policy.
@@ -247,10 +247,10 @@ func (e *Enforcer) RemoveGroupingPolicyForPolicyType(ptype string, policy []stri
 
 // Add the function that gets attributes for a subject in ABAC.
 func (e *Enforcer) AddSubjectAttributeFunction(function Function) {
-	addFunction(e.fm, "subAttr", function)
+	e.fm.AddFunction("subAttr", function)
 }
 
 // Add the function that gets attributes for a object in ABAC.
 func (e *Enforcer) AddObjectAttributeFunction(function Function) {
-	addFunction(e.fm, "objAttr", function)
+	e.fm.AddFunction("objAttr", function)
 }
