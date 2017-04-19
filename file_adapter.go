@@ -1,12 +1,12 @@
 package casbin
 
 import (
-	"os"
 	"bufio"
-	"strings"
-	"io"
 	"bytes"
 	"github.com/hsluoyz/casbin/util"
+	"io"
+	"os"
+	"strings"
 )
 
 type fileAdapter struct {

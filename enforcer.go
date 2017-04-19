@@ -7,13 +7,13 @@ import (
 
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
-	modelPath  string
-	adapter    *fileAdapter
+	modelPath string
+	adapter   *fileAdapter
 
-	model      Model
-	fm         FunctionMap
+	model Model
+	fm    FunctionMap
 
-	enabled    bool
+	enabled bool
 }
 
 // Initialize an enforcer with a model file and a policy file.

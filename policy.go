@@ -1,9 +1,9 @@
 package casbin
 
 import (
+	"github.com/hsluoyz/casbin/util"
 	"log"
 	"strings"
-	"github.com/hsluoyz/casbin/util"
 )
 
 func buildRoleLinks(model Model) {
@@ -43,7 +43,6 @@ func loadPolicyLine(line string, model Model) {
 	sec := key[:1]
 	model[sec][key].policy = append(model[sec][key].policy, tokens[1:])
 }
-
 
 func getPolicy(model Model, sec string, ptype string) [][]string {
 	return model[sec][ptype].policy

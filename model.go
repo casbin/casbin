@@ -1,11 +1,11 @@
 package casbin
 
 import (
+	"github.com/hsluoyz/casbin/util"
 	"github.com/lxmgo/config"
 	"log"
 	"strconv"
 	"strings"
-	"github.com/hsluoyz/casbin/util"
 )
 
 // Model represents the whole access control model.
@@ -64,7 +64,7 @@ func getKeySuffix(i int) string {
 func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 	i := 1
 	for {
-		if !loadAssertion(model, cfg, sec, sec + getKeySuffix(i)) {
+		if !loadAssertion(model, cfg, sec, sec+getKeySuffix(i)) {
 			break
 		} else {
 			i++

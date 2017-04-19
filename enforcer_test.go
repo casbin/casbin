@@ -1,10 +1,10 @@
 package casbin
 
 import (
-	"log"
-	"testing"
-	"reflect"
 	"github.com/hsluoyz/casbin/util"
+	"log"
+	"reflect"
+	"testing"
 )
 
 func testEnforce(t *testing.T, e *Enforcer, sub string, obj string, act string, res bool) {
@@ -119,7 +119,7 @@ func TestABACModel(t *testing.T) {
 }
 
 type testUser struct {
-	name string
+	name   string
 	domain string
 }
 
@@ -137,7 +137,7 @@ func (u *testUser) getAttribute(attributeName string) string {
 }
 
 type testResource struct {
-	name string
+	name   string
 	domain string
 }
 
@@ -235,10 +235,10 @@ func TestGetRoles(t *testing.T) {
 
 func testStringList(t *testing.T, title string, f func() []string, res []string) {
 	myRes := f()
-	log.Print(title + ": ", myRes)
+	log.Print(title+": ", myRes)
 
 	if !util.ArrayEquals(res, myRes) {
-		t.Error(title + ": ", myRes, ", supposed to be ", res)
+		t.Error(title+": ", myRes, ", supposed to be ", res)
 	}
 }
 

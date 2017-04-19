@@ -6,9 +6,9 @@ import (
 )
 
 type dbAdapter struct {
-	driverName string
+	driverName     string
 	dataSourceName string
-	db *sql.DB
+	db             *sql.DB
 }
 
 func newDbAdapter(driverName string, dataSourceName string) *dbAdapter {
@@ -29,7 +29,7 @@ func (a *dbAdapter) open() {
 		panic(err)
 	}
 
-	db, err = sql.Open("mysql", a.dataSourceName + "casbin")
+	db, err = sql.Open("mysql", a.dataSourceName+"casbin")
 	if err != nil {
 		panic(err)
 	}
@@ -60,10 +60,10 @@ func (a *dbAdapter) dropTable() {
 func (a *dbAdapter) loadPolicy(model Model) {
 	var (
 		ptype string
-		v1 string
-		v2 string
-		v3 string
-		v4 string
+		v1    string
+		v2    string
+		v3    string
+		v4    string
 	)
 
 	rows, err := a.db.Query("select * from policy")
@@ -105,7 +105,7 @@ func (a *dbAdapter) writeTableLine(ptype string, rule []string) {
 	for i := range rule {
 		line += ",'" + rule[i] + "'"
 	}
-	for i := 0; i < 4 - len(rule); i ++ {
+	for i := 0; i < 4-len(rule); i++ {
 		line += ",''"
 	}
 

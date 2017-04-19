@@ -1,9 +1,9 @@
 package util
 
 import (
-	"strings"
-	"regexp"
 	"bytes"
+	"regexp"
+	"strings"
 )
 
 func EscapeAssertion(s string) string {
