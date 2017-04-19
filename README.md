@@ -91,23 +91,44 @@ roles := e.GetRoles("alice")
 Persistence
 --
 
-By default, both model and policy are stored in files. The model should be in .CONF format, and the policy should be in .CSV (Comma-Separated Values) format. The database backend will be added in a near future.
+Both model and policy can be persisted in casbin with the following restrictions:
 
-We think the model represents the access control model that our customer uses and is not often modified at run-time, so we don't implement an interface to save the current model (like modified by API) back into the model CONF file. The policy is much more dynamic than model and can be loaded from a policy file or saved to a policy file at any time.
+Persist Method | casbin Model | casbin Policy
+----|------|----
+File | Load only | Load/Save
+Database (RDBMS) | Not supported | Load/Save
 
-Here're some common-used persistence APIs. the path to the model and policy is already specified in ``enforcer.Init()`` function and can't be changed when reloading or saving.
+We think the model represents the access control model that our customer uses and is not often modified at run-time, so we don't implement an API to modify the current model or save the model into a file. And the model cannot be loaded from or saved into a database. The model file should be in .CONF format.
+
+The policy is much more dynamic than model and can be loaded from a file/database or saved to a file/database at any time. As for file persistence, the policy file should be in .CSV (Comma-Separated Values) format. As for the database backend, casbin should support all relational DBMSs but I only tested with MySQL. casbin has no built-in database with it, you have to setup a database on your own. Let me know if there are any compatibility issues here. casbin will automatically create a database named ``casbin`` and use it for policy storage. So make sure your provided credential has the related privileges for the database you use.
+
+
+Below shows how to initialize an enforcer from file:
 
 ```golang
 e := &Enforcer{}
-e.Init("examples/basic_model.conf", "examples/basic_policy.csv")
+// Initialize an enforcer with a model file and a policy file.
+e.InitWithFile("examples/basic_model.conf", "examples/basic_policy.csv")
+```
 
-// Reload the model file and policy file, usually used when those files have been changed.
-e.LoadAll()
+Below shows how to initialize an enforcer from database. it connects to a MySQL DB on 127.0.0.1:3306 with root and blank password.
 
-// Reload the policy file only.
+```golang
+e := &Enforcer{}
+// Initialize an enforcer with a model file and a policy from database.
+e.InitWithDB("examples/basic_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
+```
+
+You may also want to reload the model, reload the policy or save the policy after initialization:
+
+```golang
+// Reload the model from the model CONF file.
+e.LoadModel()
+
+// Reload the policy from file/database.
 e.LoadPolicy()
 
-// Save the current policy (usually changed with casbin API) back to the policy file.
+// Save the current policy (usually after changed with casbin API) back to file/database.
 e.SavePolicy()
 ```
 

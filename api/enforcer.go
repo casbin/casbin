@@ -43,7 +43,7 @@ func (e *Enforcer) InitWithDB(modelPath string, driverName string, dataSourceNam
 }
 
 // Reload the model from the model CONF file.
-// Because the policy is attached to a model, so the policy is invalidated and needs to be loaded by yourself.
+// Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
 func (e *Enforcer) LoadModel() {
 	e.model = casbin.LoadModel(e.modelPath)
 	e.model.PrintModel()
@@ -55,7 +55,7 @@ func (e *Enforcer) ClearPolicy() {
 	e.model.ClearPolicy()
 }
 
-// Reload the policy.
+// Reload the policy from file/database.
 func (e *Enforcer) LoadPolicy() {
 	e.model.ClearPolicy()
 	e.adapter.LoadPolicy(e.model)
@@ -65,7 +65,7 @@ func (e *Enforcer) LoadPolicy() {
 	e.model.BuildRoleLinks()
 }
 
-// Save the current policy (usually changed with casbin API) back to the policy file.
+// Save the current policy (usually after changed with casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() {
 	e.adapter.SavePolicy(e.model)
 }
