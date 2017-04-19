@@ -5,7 +5,7 @@ import (
 	"log"
 	"reflect"
 	"testing"
-	"github.com/hsluoyz/casbin"
+	"github.com/hsluoyz/casbin/persist"
 )
 
 func testEnforce(t *testing.T, e *Enforcer, sub string, obj string, act string, res bool) {
@@ -344,7 +344,7 @@ func TestDBSavePolicy(t *testing.T) {
 	e := &Enforcer{}
 	e.Init("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
 
-	a := casbin.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
+	a := persist.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
 	a.SavePolicy(e.model)
 }
 
@@ -352,7 +352,7 @@ func TestDBSaveAndLoadPolicy(t *testing.T) {
 	e := &Enforcer{}
 	e.Init("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
 
-	a := casbin.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
+	a := persist.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
 	a.SavePolicy(e.model)
 
 	e.ClearPolicy()

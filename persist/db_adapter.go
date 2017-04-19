@@ -1,8 +1,9 @@
-package casbin
+package persist
 
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/hsluoyz/casbin"
 )
 
 // The database adapter for policy persistence, can load policy from database or save policy to database.
@@ -61,7 +62,7 @@ func (a *DBAdapter) dropTable() {
 }
 
 // Load policy from database.
-func (a *DBAdapter) LoadPolicy(model Model) {
+func (a *DBAdapter) LoadPolicy(model casbin.Model) {
 	a.open()
 	defer a.close()
 
@@ -123,7 +124,7 @@ func (a *DBAdapter) writeTableLine(ptype string, rule []string) {
 }
 
 // Save policy to database.
-func (a *DBAdapter) SavePolicy(model Model) {
+func (a *DBAdapter) SavePolicy(model casbin.Model) {
 	a.open()
 	defer a.close()
 

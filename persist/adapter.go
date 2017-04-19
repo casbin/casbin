@@ -1,8 +1,11 @@
-package casbin
+package persist
 
-import "strings"
+import (
+	"strings"
+	"github.com/hsluoyz/casbin"
+)
 
-func loadPolicyLine(line string, model Model) {
+func loadPolicyLine(line string, model casbin.Model) {
 	if line == "" {
 		return
 	}

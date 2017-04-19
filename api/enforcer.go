@@ -4,12 +4,13 @@ import (
 	"github.com/Knetic/govaluate"
 	"log"
 	"github.com/hsluoyz/casbin"
+	"github.com/hsluoyz/casbin/persist"
 )
 
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath string
-	adapter   *casbin.FileAdapter
+	adapter   *persist.FileAdapter
 
 	model casbin.Model
 	fm    casbin.FunctionMap
@@ -20,7 +21,7 @@ type Enforcer struct {
 // Initialize an enforcer with a model file and a policy file.
 func (e *Enforcer) Init(modelPath string, policyPath string) {
 	e.modelPath = modelPath
-	e.adapter = casbin.NewFileAdapter(policyPath)
+	e.adapter = persist.NewFileAdapter(policyPath)
 
 	e.enabled = true
 

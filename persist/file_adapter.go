@@ -1,4 +1,4 @@
-package casbin
+package persist
 
 import (
 	"bufio"
@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"github.com/hsluoyz/casbin"
 )
 
 // The file adapter for policy persistence, can load policy from file or save policy to file.
@@ -22,12 +23,12 @@ func NewFileAdapter(filePath string) *FileAdapter {
 }
 
 // Load policy from file.
-func (a *FileAdapter) LoadPolicy(model Model) {
+func (a *FileAdapter) LoadPolicy(model casbin.Model) {
 	a.loadPolicyFile(model, loadPolicyLine)
 }
 
 // Save policy to file.
-func (a *FileAdapter) SavePolicy(model Model) {
+func (a *FileAdapter) SavePolicy(model casbin.Model) {
 	var tmp bytes.Buffer
 
 	for ptype, ast := range model["p"] {
@@ -49,7 +50,7 @@ func (a *FileAdapter) SavePolicy(model Model) {
 	a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
 }
 
-func (a *FileAdapter) loadPolicyFile(model Model, handler func(string, Model)) error {
+func (a *FileAdapter) loadPolicyFile(model casbin.Model, handler func(string, casbin.Model)) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
