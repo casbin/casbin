@@ -35,6 +35,11 @@ func (e *Enforcer) LoadModel() {
 	e.fm = loadFunctionMap()
 }
 
+// Clear all policy.
+func (e *Enforcer) ClearPolicy() {
+	e.model.ClearPolicy()
+}
+
 // Reload the policy.
 func (e *Enforcer) LoadPolicy() {
 	e.model.ClearPolicy()
