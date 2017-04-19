@@ -8,9 +8,18 @@ casbin
 [![Release](https://img.shields.io/github/release/hsluoyz/casbin.svg)](https://github.com/hsluoyz/casbin/releases/latest)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
 
-casbin is a powerful and efficient open-source access control library for Golang projects. It provides support for enforcing authorization based on various models like ACL, RBAC, ABAC.
+casbin is a powerful and efficient open-source access control library for Golang projects. It provides support for enforcing authorization based on various models. By far, the access control models supported by casbin are:
 
-In casbin, an access control model is abstracted into a CONF file based on the PERM metamodel (Policy, Effect, Request, Matchers). So switching or upgrading the authorization mechanism for a project is just as simple as modifying a configuration. A model CONF can be as simple as:
+1. [ACL (Access Control List)](https://en.wikipedia.org/wiki/Access_control_list)
+2. ACL with [superuser](https://en.wikipedia.org/wiki/Superuser)
+3. [RBAC (Role-Based Access Control)](https://en.wikipedia.org/wiki/Role-based_access_control)
+4. RBAC with resource roles
+5. [ABAC (Attribute-Based Access Control)](https://en.wikipedia.org/wiki/Attribute-Based_Access_Control)
+6. [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer)
+
+In casbin, an access control model is abstracted into a CONF file based on the **PERM metamodel (Policy, Effect, Request, Matchers)**. So switching or upgrading the authorization mechanism for a project is just as simple as modifying a configuration. You can customize your own access control model by combining the available models. For example, you can get RBAC roles and ABAC attributes together inside one model and share one set of policy rules.
+
+The most basic and simplest model in casbin is ACL. ACL's model CONF is:
 
 ```
 [request_definition]
@@ -26,12 +35,17 @@ e = some(where (p.eft == allow))
 m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
 ```
 
-A simple policy for this model is a CSV like:
+An example policy for ACL model is like:
 
 ```csv
 p, alice, data1, read
 p, bob, data2, write
 ```
+
+It means:
+
+- alice can read data1
+- bob can write data2
 
 ## Features
 
@@ -87,7 +101,7 @@ roles := e.GetRoles("alice")
 
 ## Persistence
 
-Both model and policy can be persisted in casbin with the following restrictions:
+The model and policy can be persisted in casbin with the following restrictions:
 
 Persist Method | casbin Model | casbin Policy
 ----|------|----
