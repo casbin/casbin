@@ -17,63 +17,63 @@ type Enforcer struct {
 }
 
 // Initialize an enforcer with a model file and a policy file.
-func (enforcer *Enforcer) Init(modelPath string, policyPath string) {
-	enforcer.modelPath = modelPath
-	enforcer.adapter = newFileAdapter(policyPath)
+func (e *Enforcer) Init(modelPath string, policyPath string) {
+	e.modelPath = modelPath
+	e.adapter = newFileAdapter(policyPath)
 
-	enforcer.enabled = true
+	e.enabled = true
 
-	enforcer.LoadModel()
-	enforcer.LoadPolicy()
+	e.LoadModel()
+	e.LoadPolicy()
 }
 
 // Reload the model from the model CONF file.
 // Because the policy is attached to a model, so the policy is invalidated and needs to be loaded by yourself.
-func (enforcer *Enforcer) LoadModel() {
-	enforcer.model = loadModel(enforcer.modelPath)
-	printModel(enforcer.model)
-	enforcer.fm = loadFunctionMap()
+func (e *Enforcer) LoadModel() {
+	e.model = loadModel(e.modelPath)
+	printModel(e.model)
+	e.fm = loadFunctionMap()
 }
 
 // Reload the policy.
-func (enforcer *Enforcer) LoadPolicy() {
-	clearPolicy(enforcer.model)
-	enforcer.adapter.loadPolicy(enforcer.model)
+func (e *Enforcer) LoadPolicy() {
+	clearPolicy(e.model)
+	e.adapter.loadPolicy(e.model)
 
 	log.Print("Policy:")
-	printPolicy(enforcer.model)
+	printPolicy(e.model)
 
-	buildRoleLinks(enforcer.model)
+	buildRoleLinks(e.model)
 }
 
 // Save the current policy (usually changed with casbin API) back to the policy file.
-func (enforcer *Enforcer) SavePolicy() {
-	enforcer.adapter.savePolicy(enforcer.model)
+func (e *Enforcer) SavePolicy() {
+	e.adapter.savePolicy(e.model)
 }
 
 // Change the enforcing state of casbin, when casbin is disabled, all access will be allowed by the Enforce() function.
-func (enforcer *Enforcer) Enable(enable bool) {
-	enforcer.enabled = enable
+func (e *Enforcer) Enable(enable bool) {
+	e.enabled = enable
 }
 
 // Decide whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
-func (enforcer *Enforcer) Enforce(rvals ...string) bool {
-	if !enforcer.enabled {
+func (e *Enforcer) Enforce(rvals ...string) bool {
+	if !e.enabled {
 		return true
 	}
 
-	expString := enforcer.model["m"]["m"].value
+	expString := e.model["m"]["m"].value
 	var expression *govaluate.EvaluableExpression
 
 	functions := make(map[string]govaluate.ExpressionFunction)
 
-	for key, function := range enforcer.fm {
+	for key, function := range e.fm {
 		functions[key] = function
 	}
 
-	_, ok := enforcer.model["g"]
+	_, ok := e.model["g"]
 	if ok {
-		for key, ast := range enforcer.model["g"] {
+		for key, ast := range e.model["g"] {
 			rm := ast.rm
 			functions[key] = func(args ...interface{}) (interface{}, error) {
 				name1 := args[0].(string)
@@ -86,17 +86,17 @@ func (enforcer *Enforcer) Enforce(rvals ...string) bool {
 	expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 
 	var policyResults []bool
-	if len(enforcer.model["p"]["p"].policy) != 0 {
-		policyResults = make([]bool, len(enforcer.model["p"]["p"].policy))
+	if len(e.model["p"]["p"].policy) != 0 {
+		policyResults = make([]bool, len(e.model["p"]["p"].policy))
 
-		for i, pvals := range enforcer.model["p"]["p"].policy {
+		for i, pvals := range e.model["p"]["p"].policy {
 			//log.Print("Policy Rule: ", pvals)
 
 			parameters := make(map[string]interface{}, 8)
-			for j, token := range enforcer.model["r"]["r"].tokens {
+			for j, token := range e.model["r"]["r"].tokens {
 				parameters[token] = rvals[j]
 			}
-			for j, token := range enforcer.model["p"]["p"].tokens {
+			for j, token := range e.model["p"]["p"].tokens {
 				parameters[token] = pvals[j]
 			}
 
@@ -109,7 +109,7 @@ func (enforcer *Enforcer) Enforce(rvals ...string) bool {
 		policyResults = make([]bool, 1)
 
 		parameters := make(map[string]interface{}, 8)
-		for j, token := range enforcer.model["r"]["r"].tokens {
+		for j, token := range e.model["r"]["r"].tokens {
 			parameters[token] = rvals[j]
 		}
 
@@ -122,7 +122,7 @@ func (enforcer *Enforcer) Enforce(rvals ...string) bool {
 	//log.Print("Rule Results: ", policyResults)
 
 	result := false
-	if enforcer.model["e"]["e"].value == "some(where (p_eft == allow))" {
+	if e.model["e"]["e"].value == "some(where (p_eft == allow))" {
 		result = false
 		for _, res := range policyResults {
 			if res {
@@ -138,115 +138,115 @@ func (enforcer *Enforcer) Enforce(rvals ...string) bool {
 }
 
 // Get the roles assigned to a subject.
-func (enforcer *Enforcer) GetRoles(name string) []string {
-	return enforcer.GetRolesForPolicyType("g", name)
+func (e *Enforcer) GetRoles(name string) []string {
+	return e.GetRolesForPolicyType("g", name)
 }
 
 // Get the roles assigned to a subject, policy type can be specified.
-func (enforcer *Enforcer) GetRolesForPolicyType(ptype string, name string) []string {
-	return enforcer.model["g"][ptype].rm.getRoles(name)
+func (e *Enforcer) GetRolesForPolicyType(ptype string, name string) []string {
+	return e.model["g"][ptype].rm.getRoles(name)
 }
 
 // Get the list of subjects that show up in the current policy.
-func (enforcer *Enforcer) GetAllSubjects() []string {
-	return getValuesForFieldInPolicy(enforcer.model, "p", "p", 0)
+func (e *Enforcer) GetAllSubjects() []string {
+	return getValuesForFieldInPolicy(e.model, "p", "p", 0)
 }
 
 // Get the list of objects that show up in the current policy.
-func (enforcer *Enforcer) GetAllObjects() []string {
-	return getValuesForFieldInPolicy(enforcer.model, "p", "p", 1)
+func (e *Enforcer) GetAllObjects() []string {
+	return getValuesForFieldInPolicy(e.model, "p", "p", 1)
 }
 
 // Get the list of actions that show up in the current policy.
-func (enforcer *Enforcer) GetAllActions() []string {
-	return getValuesForFieldInPolicy(enforcer.model, "p", "p", 2)
+func (e *Enforcer) GetAllActions() []string {
+	return getValuesForFieldInPolicy(e.model, "p", "p", 2)
 }
 
 // Get the list of roles that show up in the current policy.
-func (enforcer *Enforcer) GetAllRoles() []string {
-	return getValuesForFieldInPolicy(enforcer.model, "g", "g", 1)
+func (e *Enforcer) GetAllRoles() []string {
+	return getValuesForFieldInPolicy(e.model, "g", "g", 1)
 }
 
 // Get all the authorization rules in the policy.
-func (enforcer *Enforcer) GetPolicy() [][]string {
-	return enforcer.GetPolicyForPolicyType("p")
+func (e *Enforcer) GetPolicy() [][]string {
+	return e.GetPolicyForPolicyType("p")
 }
 
 // Get all the authorization rules in the policy, policy type can be specified.
-func (enforcer *Enforcer) GetPolicyForPolicyType(ptype string) [][]string {
-	return getPolicy(enforcer.model, "p", ptype)
+func (e *Enforcer) GetPolicyForPolicyType(ptype string) [][]string {
+	return getPolicy(e.model, "p", ptype)
 }
 
 // Get all the authorization rules in the policy, a field filter can be specified.
-func (enforcer *Enforcer) GetFilteredPolicy(fieldIndex int, fieldValue string) [][]string {
-	return enforcer.GetFilteredPolicyForPolicyType("p", fieldIndex, fieldValue)
+func (e *Enforcer) GetFilteredPolicy(fieldIndex int, fieldValue string) [][]string {
+	return e.GetFilteredPolicyForPolicyType("p", fieldIndex, fieldValue)
 }
 
 // Get all the authorization rules in the policy, a field filter can be specified, policy type can be specified.
-func (enforcer *Enforcer) GetFilteredPolicyForPolicyType(ptype string, fieldIndex int, fieldValue string) [][]string {
-	return getFilteredPolicy(enforcer.model, "p", ptype, fieldIndex, fieldValue)
+func (e *Enforcer) GetFilteredPolicyForPolicyType(ptype string, fieldIndex int, fieldValue string) [][]string {
+	return getFilteredPolicy(e.model, "p", ptype, fieldIndex, fieldValue)
 }
 
 // Get all the role inheritance rules in the policy.
-func (enforcer *Enforcer) GetGroupingPolicy() [][]string {
-	return enforcer.GetGroupingPolicyForPolicyType("g")
+func (e *Enforcer) GetGroupingPolicy() [][]string {
+	return e.GetGroupingPolicyForPolicyType("g")
 }
 
 // Get all the role inheritance rules in the policy, policy type can be specified.
-func (enforcer *Enforcer) GetGroupingPolicyForPolicyType(ptype string) [][]string {
-	return getPolicy(enforcer.model, "g", ptype)
+func (e *Enforcer) GetGroupingPolicyForPolicyType(ptype string) [][]string {
+	return getPolicy(e.model, "g", ptype)
 }
 
 // Add an authorization rule to the current policy.
-func (enforcer *Enforcer) AddPolicy(policy []string) {
-	enforcer.AddPolicyForPolicyType("p", policy)
+func (e *Enforcer) AddPolicy(policy []string) {
+	e.AddPolicyForPolicyType("p", policy)
 }
 
 // Remove an authorization rule from the current policy.
-func (enforcer *Enforcer) RemovePolicy(policy []string) {
-	enforcer.RemovePolicyForPolicyType("p", policy)
+func (e *Enforcer) RemovePolicy(policy []string) {
+	e.RemovePolicyForPolicyType("p", policy)
 }
 
 // Add an authorization rule to the current policy, policy type can be specified.
-func (enforcer *Enforcer) AddPolicyForPolicyType(ptype string, policy []string) {
-	addPolicy(enforcer.model, "p", ptype, policy)
+func (e *Enforcer) AddPolicyForPolicyType(ptype string, policy []string) {
+	addPolicy(e.model, "p", ptype, policy)
 }
 
 // Remove an authorization rule from the current policy, policy type can be specified.
-func (enforcer *Enforcer) RemovePolicyForPolicyType(ptype string, policy []string) {
-	removePolicy(enforcer.model, "p", ptype, policy)
+func (e *Enforcer) RemovePolicyForPolicyType(ptype string, policy []string) {
+	removePolicy(e.model, "p", ptype, policy)
 }
 
 // Add a role inheritance rule to the current policy.
-func (enforcer *Enforcer) AddGroupingPolicy(policy []string) {
-	enforcer.AddGroupingPolicyForPolicyType("g", policy)
-	buildRoleLinks(enforcer.model)
+func (e *Enforcer) AddGroupingPolicy(policy []string) {
+	e.AddGroupingPolicyForPolicyType("g", policy)
+	buildRoleLinks(e.model)
 }
 
 // Remove a role inheritance rule from the current policy.
-func (enforcer *Enforcer) RemoveGroupingPolicy(policy []string) {
-	enforcer.RemoveGroupingPolicyForPolicyType("g", policy)
-	buildRoleLinks(enforcer.model)
+func (e *Enforcer) RemoveGroupingPolicy(policy []string) {
+	e.RemoveGroupingPolicyForPolicyType("g", policy)
+	buildRoleLinks(e.model)
 }
 
 // Add a role inheritance rule to the current policy, policy type can be specified.
-func (enforcer *Enforcer) AddGroupingPolicyForPolicyType(ptype string, policy []string) {
-	addPolicy(enforcer.model, "g", ptype, policy)
-	buildRoleLinks(enforcer.model)
+func (e *Enforcer) AddGroupingPolicyForPolicyType(ptype string, policy []string) {
+	addPolicy(e.model, "g", ptype, policy)
+	buildRoleLinks(e.model)
 }
 
 // Remove a role inheritance rule from the current policy, policy type can be specified.
-func (enforcer *Enforcer) RemoveGroupingPolicyForPolicyType(ptype string, policy []string) {
-	removePolicy(enforcer.model, "g", ptype, policy)
-	buildRoleLinks(enforcer.model)
+func (e *Enforcer) RemoveGroupingPolicyForPolicyType(ptype string, policy []string) {
+	removePolicy(e.model, "g", ptype, policy)
+	buildRoleLinks(e.model)
 }
 
 // Add the function that gets attributes for a subject in ABAC.
-func (enforcer *Enforcer) AddSubjectAttributeFunction(function Function) {
-	addFunction(enforcer.fm, "subAttr", function)
+func (e *Enforcer) AddSubjectAttributeFunction(function Function) {
+	addFunction(e.fm, "subAttr", function)
 }
 
 // Add the function that gets attributes for a object in ABAC.
-func (enforcer *Enforcer) AddObjectAttributeFunction(function Function) {
-	addFunction(enforcer.fm, "objAttr", function)
+func (e *Enforcer) AddObjectAttributeFunction(function Function) {
+	addFunction(e.fm, "objAttr", function)
 }
