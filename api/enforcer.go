@@ -1,17 +1,18 @@
-package casbin
+package api
 
 import (
 	"github.com/Knetic/govaluate"
 	"log"
+	"github.com/hsluoyz/casbin"
 )
 
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath string
-	adapter   *FileAdapter
+	adapter   *casbin.FileAdapter
 
-	model Model
-	fm    FunctionMap
+	model casbin.Model
+	fm    casbin.FunctionMap
 
 	enabled bool
 }
@@ -19,7 +20,7 @@ type Enforcer struct {
 // Initialize an enforcer with a model file and a policy file.
 func (e *Enforcer) Init(modelPath string, policyPath string) {
 	e.modelPath = modelPath
-	e.adapter = NewFileAdapter(policyPath)
+	e.adapter = casbin.NewFileAdapter(policyPath)
 
 	e.enabled = true
 
@@ -30,9 +31,9 @@ func (e *Enforcer) Init(modelPath string, policyPath string) {
 // Reload the model from the model CONF file.
 // Because the policy is attached to a model, so the policy is invalidated and needs to be loaded by yourself.
 func (e *Enforcer) LoadModel() {
-	e.model = LoadModel(e.modelPath)
+	e.model = casbin.LoadModel(e.modelPath)
 	e.model.PrintModel()
-	e.fm = LoadFunctionMap()
+	e.fm = casbin.LoadFunctionMap()
 }
 
 // Clear all policy.
@@ -246,11 +247,11 @@ func (e *Enforcer) RemoveGroupingPolicyForPolicyType(ptype string, policy []stri
 }
 
 // Add the function that gets attributes for a subject in ABAC.
-func (e *Enforcer) AddSubjectAttributeFunction(function Function) {
+func (e *Enforcer) AddSubjectAttributeFunction(function func(args ...interface{}) (interface{}, error)) {
 	e.fm.AddFunction("subAttr", function)
 }
 
 // Add the function that gets attributes for a object in ABAC.
-func (e *Enforcer) AddObjectAttributeFunction(function Function) {
+func (e *Enforcer) AddObjectAttributeFunction(function func(args ...interface{}) (interface{}, error)) {
 	e.fm.AddFunction("objAttr", function)
 }
