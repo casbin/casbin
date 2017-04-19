@@ -14,21 +14,21 @@ func buildRoleLinks(model Model) {
 
 func printPolicy(model Model) {
 	for key, ast := range model["p"] {
-		log.Print(key, ": ", ast.value, ": ", ast.policy)
+		log.Print(key, ": ", ast.Value, ": ", ast.Policy)
 	}
 
 	for key, ast := range model["g"] {
-		log.Print(key, ": ", ast.value, ": ", ast.policy)
+		log.Print(key, ": ", ast.Value, ": ", ast.Policy)
 	}
 }
 
 func clearPolicy(model Model) {
 	for _, ast := range model["p"] {
-		ast.policy = nil
+		ast.Policy = nil
 	}
 
 	for _, ast := range model["g"] {
-		ast.policy = nil
+		ast.Policy = nil
 	}
 }
 
@@ -41,17 +41,17 @@ func loadPolicyLine(line string, model Model) {
 
 	key := tokens[0]
 	sec := key[:1]
-	model[sec][key].policy = append(model[sec][key].policy, tokens[1:])
+	model[sec][key].Policy = append(model[sec][key].Policy, tokens[1:])
 }
 
 func getPolicy(model Model, sec string, ptype string) [][]string {
-	return model[sec][ptype].policy
+	return model[sec][ptype].Policy
 }
 
 func getFilteredPolicy(model Model, sec string, ptype string, fieldIndex int, fieldValue string) [][]string {
 	res := [][]string{}
 
-	for _, v := range model[sec][ptype].policy {
+	for _, v := range model[sec][ptype].Policy {
 		if v[fieldIndex] == fieldValue {
 			res = append(res, v)
 		}
@@ -61,7 +61,7 @@ func getFilteredPolicy(model Model, sec string, ptype string, fieldIndex int, fi
 }
 
 func hasPolicy(model Model, sec string, ptype string, policy []string) bool {
-	for _, rule := range model[sec][ptype].policy {
+	for _, rule := range model[sec][ptype].Policy {
 		if util.ArrayEquals(policy, rule) {
 			return true
 		}
@@ -72,7 +72,7 @@ func hasPolicy(model Model, sec string, ptype string, policy []string) bool {
 
 func addPolicy(model Model, sec string, ptype string, policy []string) bool {
 	if !hasPolicy(model, sec, ptype, policy) {
-		model[sec][ptype].policy = append(model[sec][ptype].policy, policy)
+		model[sec][ptype].Policy = append(model[sec][ptype].Policy, policy)
 		return true
 	} else {
 		return false
@@ -80,9 +80,9 @@ func addPolicy(model Model, sec string, ptype string, policy []string) bool {
 }
 
 func removePolicy(model Model, sec string, ptype string, policy []string) bool {
-	for i, rule := range model[sec][ptype].policy {
+	for i, rule := range model[sec][ptype].Policy {
 		if util.ArrayEquals(policy, rule) {
-			model[sec][ptype].policy = append(model[sec][ptype].policy[:i], model[sec][ptype].policy[i+1:]...)
+			model[sec][ptype].Policy = append(model[sec][ptype].Policy[:i], model[sec][ptype].Policy[i+1:]...)
 			return true
 		}
 	}
@@ -93,7 +93,7 @@ func removePolicy(model Model, sec string, ptype string, policy []string) bool {
 func getValuesForFieldInPolicy(model Model, sec string, ptype string, fieldIndex int) []string {
 	users := []string{}
 
-	for _, rule := range model[sec][ptype].policy {
+	for _, rule := range model[sec][ptype].Policy {
 		users = append(users, rule[fieldIndex])
 	}
 

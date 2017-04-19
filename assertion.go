@@ -2,20 +2,20 @@ package casbin
 
 import "log"
 
-type assertion struct {
-	key    string
-	value  string
-	tokens []string
-	policy [][]string
-	rm     *RoleManager
+type Assertion struct {
+	Key    string
+	Value  string
+	Tokens []string
+	Policy [][]string
+	RM     *RoleManager
 }
 
-func (ast *assertion) buildRoleLinks() {
-	ast.rm = newRoleManager(1)
-	for _, rule := range ast.policy {
-		ast.rm.addLink(rule[0], rule[1])
+func (ast *Assertion) buildRoleLinks() {
+	ast.RM = newRoleManager(1)
+	for _, rule := range ast.Policy {
+		ast.RM.addLink(rule[0], rule[1])
 	}
 
-	log.Print("Role links for: " + ast.key)
-	ast.rm.printRoles()
+	log.Print("Role links for: " + ast.Key)
+	ast.RM.printRoles()
 }

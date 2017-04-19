@@ -120,13 +120,13 @@ func (a *dbAdapter) savePolicy(model Model) {
 	a.createTable()
 
 	for ptype, ast := range model["p"] {
-		for _, rule := range ast.policy {
+		for _, rule := range ast.Policy {
 			a.writeTableLine(ptype, rule)
 		}
 	}
 
 	for ptype, ast := range model["g"] {
-		for _, rule := range ast.policy {
+		for _, rule := range ast.Policy {
 			a.writeTableLine(ptype, rule)
 		}
 	}

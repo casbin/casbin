@@ -62,7 +62,7 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 		return true
 	}
 
-	expString := e.model["m"]["m"].value
+	expString := e.model["m"]["m"].Value
 	var expression *govaluate.EvaluableExpression
 
 	functions := make(map[string]govaluate.ExpressionFunction)
@@ -74,7 +74,7 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 	_, ok := e.model["g"]
 	if ok {
 		for key, ast := range e.model["g"] {
-			rm := ast.rm
+			rm := ast.RM
 			functions[key] = func(args ...interface{}) (interface{}, error) {
 				name1 := args[0].(string)
 				name2 := args[1].(string)
@@ -86,17 +86,17 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 	expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 
 	var policyResults []bool
-	if len(e.model["p"]["p"].policy) != 0 {
-		policyResults = make([]bool, len(e.model["p"]["p"].policy))
+	if len(e.model["p"]["p"].Policy) != 0 {
+		policyResults = make([]bool, len(e.model["p"]["p"].Policy))
 
-		for i, pvals := range e.model["p"]["p"].policy {
+		for i, pvals := range e.model["p"]["p"].Policy {
 			//log.Print("Policy Rule: ", pvals)
 
 			parameters := make(map[string]interface{}, 8)
-			for j, token := range e.model["r"]["r"].tokens {
+			for j, token := range e.model["r"]["r"].Tokens {
 				parameters[token] = rvals[j]
 			}
-			for j, token := range e.model["p"]["p"].tokens {
+			for j, token := range e.model["p"]["p"].Tokens {
 				parameters[token] = pvals[j]
 			}
 
@@ -109,7 +109,7 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 		policyResults = make([]bool, 1)
 
 		parameters := make(map[string]interface{}, 8)
-		for j, token := range e.model["r"]["r"].tokens {
+		for j, token := range e.model["r"]["r"].Tokens {
 			parameters[token] = rvals[j]
 		}
 
@@ -122,7 +122,7 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 	//log.Print("Rule Results: ", policyResults)
 
 	result := false
-	if e.model["e"]["e"].value == "some(where (p_eft == allow))" {
+	if e.model["e"]["e"].Value == "some(where (p_eft == allow))" {
 		result = false
 		for _, res := range policyResults {
 			if res {
@@ -144,7 +144,7 @@ func (e *Enforcer) GetRoles(name string) []string {
 
 // Get the roles assigned to a subject, policy type can be specified.
 func (e *Enforcer) GetRolesForPolicyType(ptype string, name string) []string {
-	return e.model["g"][ptype].rm.getRoles(name)
+	return e.model["g"][ptype].RM.getRoles(name)
 }
 
 // Get the list of subjects that show up in the current policy.

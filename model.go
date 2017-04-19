@@ -12,7 +12,7 @@ import (
 type Model map[string]AssertionMap
 
 // AssertionMap is the collection of assertions, can be "r", "p", "g", "e", "m".
-type AssertionMap map[string]*assertion
+type AssertionMap map[string]*Assertion
 
 var sectionNameMap = map[string]string{
 	"r": "request_definition",
@@ -23,25 +23,25 @@ var sectionNameMap = map[string]string{
 }
 
 func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) bool {
-	ast := assertion{}
-	ast.key = key
-	ast.value = cfg.String(sectionNameMap[sec] + "::" + key)
+	ast := Assertion{}
+	ast.Key = key
+	ast.Value = cfg.String(sectionNameMap[sec] + "::" + key)
 
-	if ast.value == "" {
+	if ast.Value == "" {
 		return false
 	}
 
 	if sec == "m" {
-		ast.value = util.FixAttribute(ast.value)
+		ast.Value = util.FixAttribute(ast.Value)
 	}
 
 	if sec == "r" || sec == "p" {
-		ast.tokens = strings.Split(ast.value, ", ")
-		for i := range ast.tokens {
-			ast.tokens[i] = key + "_" + ast.tokens[i]
+		ast.Tokens = strings.Split(ast.Value, ", ")
+		for i := range ast.Tokens {
+			ast.Tokens[i] = key + "_" + ast.Tokens[i]
 		}
 	} else {
-		ast.value = util.EscapeAssertion(ast.value)
+		ast.Value = util.EscapeAssertion(ast.Value)
 	}
 
 	_, ok := model[sec]
@@ -91,7 +91,7 @@ func printModel(model Model) {
 	log.Print("Model:")
 	for k, v := range model {
 		for i, j := range v {
-			log.Printf("%s.%s: %s", k, i, j.value)
+			log.Printf("%s.%s: %s", k, i, j.Value)
 		}
 	}
 }
