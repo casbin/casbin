@@ -33,8 +33,7 @@ p, alice, data1, read
 p, bob, data2, write
 ```
 
-Features
---
+## Features
 
 What casbin does:
 
@@ -49,21 +48,19 @@ What casbin does NOT do:
 1. authentication (aka verify ``username`` and ``password`` when a user logs in)
 2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and casbin is not designed as a password container. However, casbin stores the user-role mapping for the RBAC scenario. 
 
-Installation
---
+## Installation
 
 ```
 go get github.com/hsluoyz/casbin
 ```
 
-Get started
---
+## Get started
 
 1. Initialize an enforcer by specifying a model CONF file and the policy file.
 
 ```golang
-e := &Enforcer{}
-e.Init("examples/basic_model.conf", "examples/basic_policy.csv")
+e := &api.Enforcer{}
+e.InitWithFile("examples/basic_model.conf", "examples/basic_policy.csv")
 ```
 
 2. Add the enforcement hook into your code before the access happens.
@@ -88,8 +85,7 @@ roles := e.GetRoles("alice")
 
 4. Please refer to the ``_test.go`` files for more usage.
 
-Persistence
---
+## Persistence
 
 Both model and policy can be persisted in casbin with the following restrictions:
 
@@ -102,22 +98,27 @@ We think the model represents the access control model that our customer uses an
 
 The policy is much more dynamic than model and can be loaded from a file/database or saved to a file/database at any time. As for file persistence, the policy file should be in .CSV (Comma-Separated Values) format. As for the database backend, casbin should support all relational DBMSs but I only tested with MySQL. casbin has no built-in database with it, you have to setup a database on your own. Let me know if there are any compatibility issues here. casbin will automatically create a database named ``casbin`` and use it for policy storage. So make sure your provided credential has the related privileges for the database you use.
 
+### File
 
 Below shows how to initialize an enforcer from file:
 
 ```golang
-e := &Enforcer{}
+e := &api.Enforcer{}
 // Initialize an enforcer with a model file and a policy file.
 e.InitWithFile("examples/basic_model.conf", "examples/basic_policy.csv")
 ```
 
+### Database
+
 Below shows how to initialize an enforcer from database. it connects to a MySQL DB on 127.0.0.1:3306 with root and blank password.
 
 ```golang
-e := &Enforcer{}
-// Initialize an enforcer with a model file and a policy from database.
+e := &api.Enforcer{}
+// Initialize an enforcer with a model file and policy from database.
 e.InitWithDB("examples/basic_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
 ```
+
+### Load/Save
 
 You may also want to reload the model, reload the policy or save the policy after initialization:
 
@@ -132,8 +133,7 @@ e.LoadPolicy()
 e.SavePolicy()
 ```
 
-Examples
---
+## Examples
 
 Model | Model file | Policy file
 ----|------|----
@@ -144,13 +144,17 @@ RBAC | [rbac_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/
 RBAC with resource roles | [rbac_model_with_resource_roles.conf](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_model_with_resource_roles.conf)  | [rbac_policy_with_resource_roles.csv](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_policy_with_resource_roles.csv)
 ABAC | [abac_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/abac_model.conf)  | N/A
 
-Credits
---
+## Credits
 
 - [github.com/lxmgo/config](https://github.com/lxmgo/config)
 - [github.com/Knetic/govaluate](https://github.com/Knetic/govaluate)
 
-License
---
+## License
 
-This project is licensed under the Apache 2.0 license.
+This project is licensed under the [Apache 2.0 license](https://github.com/hsluoyz/casbin/blob/master/LICENSE).
+
+## Contact
+
+If you have any issues or feature requests, please feel free to contact me at:
+- https://github.com/hsluoyz/casbin/issues
+- hsluoyz@gmail.com (Yang Luo's email, if your issue needs to be kept private, please contact me via this mail)
