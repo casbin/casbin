@@ -36,7 +36,8 @@ func (rm *RoleManager) addLink(name1 string, name2 string) {
 	role1.addRole(role2)
 }
 
-func (rm *RoleManager) hasLink(name1 string, name2 string) bool {
+// Whether role: name1 has (aka inherits) role: name2.
+func (rm *RoleManager) HasLink(name1 string, name2 string) bool {
 	if name1 == name2 {
 		return true
 	}
@@ -49,7 +50,8 @@ func (rm *RoleManager) hasLink(name1 string, name2 string) bool {
 	return role1.hasRole(name2, rm.level)
 }
 
-func (rm *RoleManager) getRoles(name string) []string {
+// Get the roles that a subject has (aka inherits).
+func (rm *RoleManager) GetRoles(name string) []string {
 	if rm.hasRole(name) {
 		return rm.createRole(name).getRoles()
 	} else {

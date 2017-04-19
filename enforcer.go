@@ -83,7 +83,7 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 				name1 := args[0].(string)
 				name2 := args[1].(string)
 
-				return (bool)(rm.hasLink(name1, name2)), nil
+				return (bool)(rm.HasLink(name1, name2)), nil
 			}
 		}
 	}
@@ -148,7 +148,7 @@ func (e *Enforcer) GetRoles(name string) []string {
 
 // Get the roles assigned to a subject, policy type can be specified.
 func (e *Enforcer) GetRolesForPolicyType(ptype string, name string) []string {
-	return e.model["g"][ptype].RM.getRoles(name)
+	return e.model["g"][ptype].RM.GetRoles(name)
 }
 
 // Get the list of subjects that show up in the current policy.

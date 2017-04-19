@@ -6,7 +6,7 @@ import (
 )
 
 func testRole(t *testing.T, rm *RoleManager, name1 string, name2 string, res bool) {
-	myRes := rm.hasLink(name1, name2)
+	myRes := rm.HasLink(name1, name2)
 	log.Printf("%s, %s: %t", name1, name2, myRes)
 
 	if myRes != res {
@@ -15,7 +15,7 @@ func testRole(t *testing.T, rm *RoleManager, name1 string, name2 string, res boo
 }
 
 func testPrintRoles(rm *RoleManager, name string) {
-	log.Print(name, ": ", rm.getRoles(name))
+	log.Print(name, ": ", rm.GetRoles(name))
 }
 
 func TestRole(t *testing.T) {
