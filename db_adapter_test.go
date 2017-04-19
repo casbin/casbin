@@ -20,7 +20,7 @@ func TestDBSaveAndLoadPolicy(t *testing.T) {
 	a.open()
 	a.SavePolicy(e.model)
 
-	clearPolicy(e.model)
+	e.model.ClearPolicy()
 	testGetPolicy(t, e, [][]string{})
 
 	a.LoadPolicy(e.model)

@@ -72,7 +72,8 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 	}
 }
 
-func loadModel(path string) Model {
+// Load the model from model CONF file.
+func LoadModel(path string) Model {
 	cfg, _ := config.NewConfig(path)
 
 	model := make(Model)
@@ -87,7 +88,8 @@ func loadModel(path string) Model {
 	return model
 }
 
-func printModel(model Model) {
+// Print the model.
+func (model Model) PrintModel() {
 	log.Print("Model:")
 	for k, v := range model {
 		for i, j := range v {
