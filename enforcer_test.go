@@ -169,29 +169,6 @@ func TestABACModel2(t *testing.T) {
 	log.Println(data2.getAttribute("domain"))
 }
 
-func testKeyMatch(t *testing.T, e *Enforcer, key1 string, key2 string, res bool) {
-	myRes := util.KeyMatch(key1, key2)
-	log.Printf("%s < %s: %t", key1, key2, myRes)
-
-	if myRes != res {
-		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)
-	}
-}
-
-func TestKeyMatch(t *testing.T) {
-	e := &Enforcer{}
-
-	testKeyMatch(t, e, "/foo", "/foo", true)
-	testKeyMatch(t, e, "/foo", "/foo*", true)
-	testKeyMatch(t, e, "/foo", "/foo/*", false)
-	testKeyMatch(t, e, "/foo/bar", "/foo", false)
-	testKeyMatch(t, e, "/foo/bar", "/foo*", true)
-	testKeyMatch(t, e, "/foo/bar", "/foo/*", true)
-	testKeyMatch(t, e, "/foobar", "/foo", false)
-	testKeyMatch(t, e, "/foobar", "/foo*", true)
-	testKeyMatch(t, e, "/foobar", "/foo/*", false)
-}
-
 func TestKeymatchModel(t *testing.T) {
 	e := &Enforcer{}
 	e.Init("examples/keymatch_model.conf", "examples/keymatch_policy.csv")
