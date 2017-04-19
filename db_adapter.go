@@ -5,20 +5,23 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type dbAdapter struct {
+// The database adapter for policy persistence, can load policy from database or save policy to database.
+// For now, only MySQL is tested, but it should work for other RDBMS.
+type DBAdapter struct {
 	driverName     string
 	dataSourceName string
 	db             *sql.DB
 }
 
-func newDbAdapter(driverName string, dataSourceName string) *dbAdapter {
-	a := dbAdapter{}
+// The constructor for DBAdapter.
+func NewDBAdapter(driverName string, dataSourceName string) *DBAdapter {
+	a := DBAdapter{}
 	a.driverName = driverName
 	a.dataSourceName = dataSourceName
 	return &a
 }
 
-func (a *dbAdapter) open() {
+func (a *DBAdapter) open() {
 	db, err := sql.Open(a.driverName, a.dataSourceName)
 	if err != nil {
 		panic(err)
@@ -39,25 +42,29 @@ func (a *dbAdapter) open() {
 	a.createTable()
 }
 
-func (a *dbAdapter) close() {
+func (a *DBAdapter) close() {
 	a.db.Close()
 }
 
-func (a *dbAdapter) createTable() {
+func (a *DBAdapter) createTable() {
 	_, err := a.db.Exec("CREATE table IF NOT EXISTS policy (ptype VARCHAR(10), v1 VARCHAR(256), v2 VARCHAR(256), v3 VARCHAR(256), v4 VARCHAR(256))")
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (a *dbAdapter) dropTable() {
+func (a *DBAdapter) dropTable() {
 	_, err := a.db.Exec("DROP table policy")
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (a *dbAdapter) loadPolicy(model Model) {
+// Load policy from database.
+func (a *DBAdapter) LoadPolicy(model Model) {
+	a.open()
+	defer a.close()
+
 	var (
 		ptype string
 		v1    string
@@ -100,7 +107,7 @@ func (a *dbAdapter) loadPolicy(model Model) {
 	}
 }
 
-func (a *dbAdapter) writeTableLine(ptype string, rule []string) {
+func (a *DBAdapter) writeTableLine(ptype string, rule []string) {
 	line := "'" + ptype + "'"
 	for i := range rule {
 		line += ",'" + rule[i] + "'"
@@ -115,7 +122,11 @@ func (a *dbAdapter) writeTableLine(ptype string, rule []string) {
 	}
 }
 
-func (a *dbAdapter) savePolicy(model Model) {
+// Save policy to database.
+func (a *DBAdapter) SavePolicy(model Model) {
+	a.open()
+	defer a.close()
+
 	a.dropTable()
 	a.createTable()
 

@@ -3,7 +3,6 @@ package casbin
 import (
 	"github.com/hsluoyz/casbin/util"
 	"log"
-	"strings"
 )
 
 func buildRoleLinks(model Model) {
@@ -30,18 +29,6 @@ func clearPolicy(model Model) {
 	for _, ast := range model["g"] {
 		ast.Policy = nil
 	}
-}
-
-func loadPolicyLine(line string, model Model) {
-	if line == "" {
-		return
-	}
-
-	tokens := strings.Split(line, ", ")
-
-	key := tokens[0]
-	sec := key[:1]
-	model[sec][key].Policy = append(model[sec][key].Policy, tokens[1:])
 }
 
 func getPolicy(model Model, sec string, ptype string) [][]string {

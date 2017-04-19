@@ -9,21 +9,25 @@ import (
 	"strings"
 )
 
-type fileAdapter struct {
+// The file adapter for policy persistence, can load policy from file or save policy to file.
+type FileAdapter struct {
 	filePath string
 }
 
-func newFileAdapter(filePath string) *fileAdapter {
-	a := fileAdapter{}
+// The constructor for FileAdapter.
+func NewFileAdapter(filePath string) *FileAdapter {
+	a := FileAdapter{}
 	a.filePath = filePath
 	return &a
 }
 
-func (a *fileAdapter) loadPolicy(model Model) {
+// Load policy from file.
+func (a *FileAdapter) LoadPolicy(model Model) {
 	a.loadPolicyFile(model, loadPolicyLine)
 }
 
-func (a *fileAdapter) savePolicy(model Model) {
+// Save policy to file.
+func (a *FileAdapter) SavePolicy(model Model) {
 	var tmp bytes.Buffer
 
 	for ptype, ast := range model["p"] {
@@ -45,7 +49,7 @@ func (a *fileAdapter) savePolicy(model Model) {
 	a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
 }
 
-func (a *fileAdapter) loadPolicyFile(model Model, handler func(string, Model)) error {
+func (a *FileAdapter) loadPolicyFile(model Model, handler func(string, Model)) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
@@ -64,7 +68,7 @@ func (a *fileAdapter) loadPolicyFile(model Model, handler func(string, Model)) e
 	}
 }
 
-func (a *fileAdapter) savePolicyFile(text string) error {
+func (a *FileAdapter) savePolicyFile(text string) error {
 	f, err := os.Create(a.filePath)
 	if err != nil {
 		return err

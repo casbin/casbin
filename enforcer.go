@@ -8,7 +8,7 @@ import (
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath string
-	adapter   *fileAdapter
+	adapter   *FileAdapter
 
 	model Model
 	fm    FunctionMap
@@ -19,7 +19,7 @@ type Enforcer struct {
 // Initialize an enforcer with a model file and a policy file.
 func (e *Enforcer) Init(modelPath string, policyPath string) {
 	e.modelPath = modelPath
-	e.adapter = newFileAdapter(policyPath)
+	e.adapter = NewFileAdapter(policyPath)
 
 	e.enabled = true
 
@@ -38,7 +38,7 @@ func (e *Enforcer) LoadModel() {
 // Reload the policy.
 func (e *Enforcer) LoadPolicy() {
 	clearPolicy(e.model)
-	e.adapter.loadPolicy(e.model)
+	e.adapter.LoadPolicy(e.model)
 
 	log.Print("Policy:")
 	printPolicy(e.model)
@@ -48,7 +48,7 @@ func (e *Enforcer) LoadPolicy() {
 
 // Save the current policy (usually changed with casbin API) back to the policy file.
 func (e *Enforcer) SavePolicy() {
-	e.adapter.savePolicy(e.model)
+	e.adapter.SavePolicy(e.model)
 }
 
 // Change the enforcing state of casbin, when casbin is disabled, all access will be allowed by the Enforce() function.
