@@ -10,18 +10,31 @@ import (
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath string
-	adapter   *persist.FileAdapter
-
 	model casbin.Model
 	fm    casbin.FunctionMap
+
+	adapter   persist.Adapter
 
 	enabled bool
 }
 
 // Initialize an enforcer with a model file and a policy file.
-func (e *Enforcer) Init(modelPath string, policyPath string) {
+func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 	e.modelPath = modelPath
+
 	e.adapter = persist.NewFileAdapter(policyPath)
+
+	e.enabled = true
+
+	e.LoadModel()
+	e.LoadPolicy()
+}
+
+// Initialize an enforcer with a model file and a policy from database.
+func (e *Enforcer) InitWithDB(modelPath string, driverName string, dataSourceName string) {
+	e.modelPath = modelPath
+
+	e.adapter = persist.NewDBAdapter(driverName, dataSourceName)
 
 	e.enabled = true
 

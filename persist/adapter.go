@@ -16,3 +16,8 @@ func loadPolicyLine(line string, model casbin.Model) {
 	sec := key[:1]
 	model[sec][key].Policy = append(model[sec][key].Policy, tokens[1:])
 }
+
+type Adapter interface {
+	LoadPolicy(model casbin.Model)
+	SavePolicy(model casbin.Model)
+}
