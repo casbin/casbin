@@ -50,6 +50,11 @@ func (e *Enforcer) LoadModel() {
 	e.fm = casbin.LoadFunctionMap()
 }
 
+// Get the current model.
+func (e *Enforcer) GetModel() casbin.Model {
+	return e.model
+}
+
 // Clear all policy.
 func (e *Enforcer) ClearPolicy() {
 	e.model.ClearPolicy()
