@@ -70,19 +70,44 @@ go get github.com/hsluoyz/casbin
 
 ## Get started
 
-1. Initialize an enforcer by specifying a model CONF file and the policy file.
+1. Customize the casbin config file ``casbin.conf`` to your need. Its default content is:
+
+```conf
+[default]
+# The file path to the model:
+model_path = ../examples/basic_model.conf
+
+# The persistent method for policy, can be two values: file or database.
+# policy_backend = file
+# policy_backend = database
+policy_backend = file
+
+[file]
+# The file path to the policy:
+policy_path = ../examples/basic_policy.csv
+
+[database]
+driver = mysql
+data_source = root:@tcp(127.0.0.1:3306)/
+```
+
+It means uses ``basic_model.conf`` as the model and ``basic_policy.csv`` as the policy.
+
+2. Initialize an enforcer by specifying the config file:
 
 ```golang
 e := &api.Enforcer{}
-e.InitWithFile("examples/basic_model.conf", "examples/basic_policy.csv")
+e.InitWithConfig("path/to/casbin.conf")
 ```
 
-2. Add the enforcement hook into your code before the access happens.
+Note: you can also initialize an enforcer without a config file by directly using ``e.InitWithFile()`` or ``e.InitWithDB()``.
+
+3. Add an enforcement hook into your code right before the access happens:
 
 ```golang
-sub := "alice"
-obj := "data1"
-act := "read"
+sub := "alice" // the user that wants to access a resource.
+obj := "data1" // the resource that is going to be accessed.
+act := "read" // the operation that the user performs on the resource.
 
 if e.Enforce(sub, obj, act) == true {
     // permit alice to read data1
@@ -91,13 +116,13 @@ if e.Enforce(sub, obj, act) == true {
 }
 ```
 
-3. You can get the roles for a user with our management API.
+4. Besides the static policy file, casbin also provides API for permission management at run-time. For example, You can get all the roles assigned to a user as below:
 
 ```golang
 roles := e.GetRoles("alice")
 ```
 
-4. Please refer to the ``_test.go`` files for more usage.
+5. Please refer to the ``_test.go`` files for more usage.
 
 ## Persistence
 
@@ -151,12 +176,12 @@ e.SavePolicy()
 
 Model | Model file | Policy file
 ----|------|----
-basic | [basic_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/basic_model.conf) | [basic_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/basic_policy.csv)
-basic with root | [basic_model_with_root.conf](https://github.com/hsluoyz/casbin/blob/master/examples/basic_model_with_root.conf) | [basic_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/basic_policy.csv)
-RESTful | [keymatch_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/keymatch_model.conf)  | [keymatch_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/keymatch_policy.csv)
+ACL | [basic_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/basic_model.conf) | [basic_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/basic_policy.csv)
+ACL with superuser | [basic_model_with_root.conf](https://github.com/hsluoyz/casbin/blob/master/examples/basic_model_with_root.conf) | [basic_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/basic_policy.csv)
 RBAC | [rbac_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_model.conf)  | [rbac_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_policy.csv)
 RBAC with resource roles | [rbac_model_with_resource_roles.conf](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_model_with_resource_roles.conf)  | [rbac_policy_with_resource_roles.csv](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_policy_with_resource_roles.csv)
 ABAC | [abac_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/abac_model.conf)  | N/A
+RESTful | [keymatch_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/keymatch_model.conf)  | [keymatch_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/keymatch_policy.csv)
 
 ## Our users
 
