@@ -158,10 +158,9 @@ RBAC | [rbac_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/
 RBAC with resource roles | [rbac_model_with_resource_roles.conf](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_model_with_resource_roles.conf)  | [rbac_policy_with_resource_roles.csv](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_policy_with_resource_roles.csv)
 ABAC | [abac_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/abac_model.conf)  | N/A
 
-## Credits
+## Our users
 
-- [github.com/lxmgo/config](https://github.com/lxmgo/config)
-- [github.com/Knetic/govaluate](https://github.com/Knetic/govaluate)
+- [Tango](https://github.com/lunny/tango): Micro & pluggable web framework for Go, via plugin: [Authz](https://github.com/tango-contrib/authz)
 
 ## License
 
