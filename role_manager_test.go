@@ -19,13 +19,13 @@ func testPrintRoles(rm *RoleManager, name string) {
 }
 
 func TestRole(t *testing.T) {
-	rm := newRoleManager(3)
-	rm.addLink("u1", "g1")
-	rm.addLink("u2", "g1")
-	rm.addLink("u3", "g2")
-	rm.addLink("u4", "g2")
-	rm.addLink("u4", "g3")
-	rm.addLink("g1", "g3")
+	rm := NewRoleManager(3)
+	rm.AddLink("u1", "g1")
+	rm.AddLink("u2", "g1")
+	rm.AddLink("u3", "g2")
+	rm.AddLink("u4", "g2")
+	rm.AddLink("u4", "g3")
+	rm.AddLink("g1", "g3")
 
 	testRole(t, rm, "u1", "g1", true)
 	testRole(t, rm, "u1", "g2", false)

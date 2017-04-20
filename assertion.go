@@ -11,11 +11,11 @@ type Assertion struct {
 }
 
 func (ast *Assertion) buildRoleLinks() {
-	ast.RM = newRoleManager(1)
+	ast.RM = NewRoleManager(1)
 	for _, rule := range ast.Policy {
-		ast.RM.addLink(rule[0], rule[1])
+		ast.RM.AddLink(rule[0], rule[1])
 	}
 
 	log.Print("Role links for: " + ast.Key)
-	ast.RM.printRoles()
+	ast.RM.PrintRoles()
 }

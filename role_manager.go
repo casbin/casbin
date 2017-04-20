@@ -10,7 +10,8 @@ type RoleManager struct {
 	level    int
 }
 
-func newRoleManager(level int) *RoleManager {
+// The constructor for RoleManager.
+func NewRoleManager(level int) *RoleManager {
 	rm := RoleManager{}
 	rm.allRoles = make(map[string]*Role)
 	rm.level = level
@@ -30,13 +31,15 @@ func (rm *RoleManager) createRole(name string) *Role {
 	return rm.allRoles[name]
 }
 
-func (rm *RoleManager) addLink(name1 string, name2 string) {
+// Add the link between role: name1 and role: name2.
+// aka name1 inherits role: name2.
+func (rm *RoleManager) AddLink(name1 string, name2 string) {
 	role1 := rm.createRole(name1)
 	role2 := rm.createRole(name2)
 	role1.addRole(role2)
 }
 
-// Whether role: name1 has (aka inherits) role: name2.
+// Whether role: name1 inherits role: name2.
 func (rm *RoleManager) HasLink(name1 string, name2 string) bool {
 	if name1 == name2 {
 		return true
@@ -50,7 +53,7 @@ func (rm *RoleManager) HasLink(name1 string, name2 string) bool {
 	return role1.hasRole(name2, rm.level)
 }
 
-// Get the roles that a subject has (aka inherits).
+// Get the roles that a subject inherits.
 func (rm *RoleManager) GetRoles(name string) []string {
 	if rm.hasRole(name) {
 		return rm.createRole(name).getRoles()
@@ -59,7 +62,8 @@ func (rm *RoleManager) GetRoles(name string) []string {
 	}
 }
 
-func (rm *RoleManager) printRoles() {
+// Print all the roles.
+func (rm *RoleManager) PrintRoles() {
 	for _, role := range rm.allRoles {
 		log.Print(role.toString())
 	}
