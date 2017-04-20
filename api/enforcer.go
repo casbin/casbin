@@ -42,6 +42,24 @@ func (e *Enforcer) InitWithDB(modelPath string, driverName string, dataSourceNam
 	e.LoadPolicy()
 }
 
+// Initialize an enforcer with a configuration file, by default is casbin.conf.
+func (e *Enforcer) InitWithConfig(cfgPath string) {
+	cfg := loadConfig(cfgPath)
+
+	e.modelPath = cfg.modelPath
+
+	if cfg.policyBackend == "file" {
+		e.adapter = persist.NewFileAdapter(cfg.policyPath)
+	} else if cfg.policyBackend == "database" {
+		e.adapter = persist.NewDBAdapter(cfg.dbDriver, cfg.dbDataSource)
+	}
+
+	e.enabled = true
+
+	e.LoadModel()
+	e.LoadPolicy()
+}
+
 // Reload the model from the model CONF file.
 // Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
 func (e *Enforcer) LoadModel() {

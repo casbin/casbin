@@ -367,6 +367,20 @@ func TestDBSaveAndLoadPolicy(t *testing.T) {
 
 }
 
+func TestConfigLoadPolicy(t *testing.T) {
+	e := &Enforcer{}
+	e.InitWithConfig("../casbin.conf")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
 func benchmarkEnforce(b *testing.B, e *Enforcer, sub string, obj string, act string, res bool) {
 	if e.Enforce(sub, obj, act) != res {
 		b.Errorf("%s, %s, %s: %t, supposed to be %t", sub, obj, act, !res, res)
