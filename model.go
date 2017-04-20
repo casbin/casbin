@@ -74,7 +74,10 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 
 // Load the model from model CONF file.
 func LoadModel(path string) Model {
-	cfg, _ := config.NewConfig(path)
+	cfg, err := config.NewConfig(path)
+	if err != nil {
+		panic(err)
+	}
 
 	model := make(Model)
 

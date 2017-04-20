@@ -14,7 +14,10 @@ type casbinConfig struct {
 
 func loadConfig(cfgPath string) *casbinConfig {
 	ccfg := casbinConfig{}
-	cfg, _ := config.NewConfig(cfgPath)
+	cfg, err := config.NewConfig(cfgPath)
+	if err != nil {
+		panic(err)
+	}
 
 	ccfg.modelPath = cfg.String("default::model_path")
 	ccfg.policyBackend = cfg.String("default::policy_backend")

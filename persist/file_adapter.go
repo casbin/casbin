@@ -24,11 +24,22 @@ func NewFileAdapter(filePath string) *FileAdapter {
 
 // Load policy from file.
 func (a *FileAdapter) LoadPolicy(model casbin.Model) {
-	a.loadPolicyFile(model, loadPolicyLine)
+	if a.filePath == "" {
+		return
+	}
+
+	err := a.loadPolicyFile(model, loadPolicyLine)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Save policy to file.
 func (a *FileAdapter) SavePolicy(model casbin.Model) {
+	if a.filePath == "" {
+		return
+	}
+
 	var tmp bytes.Buffer
 
 	for ptype, ast := range model["p"] {
@@ -47,7 +58,10 @@ func (a *FileAdapter) SavePolicy(model casbin.Model) {
 		}
 	}
 
-	a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
+	err := a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (a *FileAdapter) loadPolicyFile(model casbin.Model, handler func(string, casbin.Model)) error {
