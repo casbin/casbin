@@ -12,10 +12,11 @@ casbin is a powerful and efficient open-source access control library for Golang
 
 1. [ACL (Access Control List)](https://en.wikipedia.org/wiki/Access_control_list)
 2. ACL with [superuser](https://en.wikipedia.org/wiki/Superuser)
-3. [RBAC (Role-Based Access Control)](https://en.wikipedia.org/wiki/Role-based_access_control)
-4. RBAC with resource roles
-5. [ABAC (Attribute-Based Access Control)](https://en.wikipedia.org/wiki/Attribute-Based_Access_Control)
-6. [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer)
+3. ACL without users: especially useful for systems that don't have authentication or user log-ins.
+4. [RBAC (Role-Based Access Control)](https://en.wikipedia.org/wiki/Role-based_access_control)
+5. RBAC with resource roles: both users and resources can have roles (or groups) at the same time.
+6. [ABAC (Attribute-Based Access Control)](https://en.wikipedia.org/wiki/Attribute-Based_Access_Control)
+7. [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer)
 
 In casbin, an access control model is abstracted into a CONF file based on the **PERM metamodel (Policy, Effect, Request, Matchers)**. So switching or upgrading the authorization mechanism for a project is just as simple as modifying a configuration. You can customize your own access control model by combining the available models. For example, you can get RBAC roles and ABAC attributes together inside one model and share one set of policy rules.
 
@@ -178,6 +179,7 @@ Model | Model file | Policy file
 ----|------|----
 ACL | [basic_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/basic_model.conf) | [basic_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/basic_policy.csv)
 ACL with superuser | [basic_model_with_root.conf](https://github.com/hsluoyz/casbin/blob/master/examples/basic_model_with_root.conf) | [basic_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/basic_policy.csv)
+ACL without users | [basic_model_without_users.conf](https://github.com/hsluoyz/casbin/blob/master/examples/basic_model_without_users.conf) | [basic_policy_without_users.csv](https://github.com/hsluoyz/casbin/blob/master/examples/basic_policy_without_users.csv)
 RBAC | [rbac_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_model.conf)  | [rbac_policy.csv](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_policy.csv)
 RBAC with resource roles | [rbac_model_with_resource_roles.conf](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_model_with_resource_roles.conf)  | [rbac_policy_with_resource_roles.csv](https://github.com/hsluoyz/casbin/blob/master/examples/rbac_policy_with_resource_roles.csv)
 ABAC | [abac_model.conf](https://github.com/hsluoyz/casbin/blob/master/examples/abac_model.conf)  | N/A
