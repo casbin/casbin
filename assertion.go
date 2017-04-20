@@ -1,17 +1,20 @@
 package casbin
 
-import "log"
+import (
+	"log"
+	"github.com/hsluoyz/casbin/rbac"
+)
 
 type Assertion struct {
 	Key    string
 	Value  string
 	Tokens []string
 	Policy [][]string
-	RM     *RoleManager
+	RM     *rbac.RoleManager
 }
 
 func (ast *Assertion) buildRoleLinks() {
-	ast.RM = NewRoleManager(1)
+	ast.RM = rbac.NewRoleManager(1)
 	for _, rule := range ast.Policy {
 		ast.RM.AddLink(rule[0], rule[1])
 	}
