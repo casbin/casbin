@@ -14,6 +14,12 @@ func testEnforce(t *testing.T, e *Enforcer, sub string, obj string, act string, 
 	}
 }
 
+func testEnforceWithoutUsers(t *testing.T, e *Enforcer, obj string, act string, res bool) {
+	if e.Enforce(obj, act) != res {
+		t.Errorf("%s, %s: %t, supposed to be %t", obj, act, !res, res)
+	}
+}
+
 func TestBasicModel(t *testing.T) {
 	e := &Enforcer{}
 	e.InitWithFile("../examples/basic_model.conf", "../examples/basic_policy.csv")
@@ -44,6 +50,16 @@ func TestBasicModelWithRoot(t *testing.T) {
 	testEnforce(t, e, "root", "data1", "write", true)
 	testEnforce(t, e, "root", "data2", "read", true)
 	testEnforce(t, e, "root", "data2", "write", true)
+}
+
+func TestBasicModelWithoutUsers(t *testing.T) {
+	e := &Enforcer{}
+	e.InitWithFile("../examples/basic_model_without_users.conf", "../examples/basic_policy_without_users.csv")
+
+	testEnforceWithoutUsers(t, e, "data1", "read", true)
+	testEnforceWithoutUsers(t, e, "data1", "write", false)
+	testEnforceWithoutUsers(t, e, "data2", "read", false)
+	testEnforceWithoutUsers(t, e, "data2", "write", true)
 }
 
 func TestRBACModel(t *testing.T) {
