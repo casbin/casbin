@@ -1,7 +1,6 @@
 package util
 
 import (
-	"bytes"
 	"regexp"
 	"strings"
 )
@@ -66,13 +65,5 @@ func ArrayRemoveDuplicates(s *[]string) {
 
 // Get a printable string for a string array.
 func ArrayToString(s []string) string {
-	var tmp bytes.Buffer
-	for i, v := range s {
-		if i != len(s)-1 {
-			tmp.WriteString(v + ", ")
-		} else {
-			tmp.WriteString(v)
-		}
-	}
-	return tmp.String()
+	return strings.Join(s, ", ")
 }

@@ -110,8 +110,12 @@ func (r *Role) hasRole(name string, level int) bool {
 
 func (r *Role) toString() string {
 	names := ""
-	for _, role := range r.roles {
-		names += role.name + ", "
+	for i, role := range r.roles {
+		if i == 0 {
+			names += role.name
+		} else {
+			names += ", " + role.name
+		}
 	}
 	return r.name + " < " + names
 }
