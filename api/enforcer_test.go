@@ -62,6 +62,16 @@ func TestBasicModelWithoutUsers(t *testing.T) {
 	testEnforceWithoutUsers(t, e, "data2", "write", true)
 }
 
+func TestBasicModelWithoutResources(t *testing.T) {
+	e := &Enforcer{}
+	e.InitWithFile("../examples/basic_model_without_resources.conf", "../examples/basic_policy_without_resources.csv")
+
+	testEnforceWithoutUsers(t, e, "alice", "read", true)
+	testEnforceWithoutUsers(t, e, "alice", "write", false)
+	testEnforceWithoutUsers(t, e, "bob", "read", false)
+	testEnforceWithoutUsers(t, e, "bob", "write", true)
+}
+
 func TestRBACModel(t *testing.T) {
 	e := &Enforcer{}
 	e.InitWithFile("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
