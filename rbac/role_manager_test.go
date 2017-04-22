@@ -1,6 +1,7 @@
 package rbac
 
 import (
+	"github.com/hsluoyz/casbin/util"
 	"log"
 	"testing"
 )
@@ -14,8 +15,13 @@ func testRole(t *testing.T, rm *RoleManager, name1 string, name2 string, res boo
 	}
 }
 
-func testPrintRoles(rm *RoleManager, name string) {
-	log.Print(name, ": ", rm.GetRoles(name))
+func testPrintRoles(t *testing.T, rm *RoleManager, name string, res []string) {
+	myRes := rm.GetRoles(name)
+	log.Printf("%s: %s", name, myRes)
+
+	if !util.ArrayEquals(myRes, res) {
+		t.Errorf("%s: %s, supposed to be %s", name, myRes, res)
+	}
 }
 
 func TestRole(t *testing.T) {
@@ -40,11 +46,11 @@ func TestRole(t *testing.T) {
 	testRole(t, rm, "u4", "g2", true)
 	testRole(t, rm, "u4", "g3", true)
 
-	testPrintRoles(rm, "u1")
-	testPrintRoles(rm, "u2")
-	testPrintRoles(rm, "u3")
-	testPrintRoles(rm, "u4")
-	testPrintRoles(rm, "g1")
-	testPrintRoles(rm, "g2")
-	testPrintRoles(rm, "g3")
+	testPrintRoles(t, rm, "u1", []string{"g1"})
+	testPrintRoles(t, rm, "u2", []string{"g1"})
+	testPrintRoles(t, rm, "u3", []string{"g2"})
+	testPrintRoles(t, rm, "u4", []string{"g2", "g3"})
+	testPrintRoles(t, rm, "g1", []string{"g3"})
+	testPrintRoles(t, rm, "g2", []string{})
+	testPrintRoles(t, rm, "g3", []string{})
 }
