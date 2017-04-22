@@ -53,7 +53,7 @@ func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, f
 	return res
 }
 
-// Determine whether a model has the specified policy.
+// Determine whether a model has the specified policy rule.
 func (model Model) HasPolicy(sec string, ptype string, policy []string) bool {
 	for _, rule := range model[sec][ptype].Policy {
 		if util.ArrayEquals(policy, rule) {
@@ -64,7 +64,7 @@ func (model Model) HasPolicy(sec string, ptype string, policy []string) bool {
 	return false
 }
 
-// Add a policy to the model.
+// Add a policy rule to the model.
 func (model Model) AddPolicy(sec string, ptype string, policy []string) bool {
 	if !model.HasPolicy(sec, ptype, policy) {
 		model[sec][ptype].Policy = append(model[sec][ptype].Policy, policy)
@@ -74,7 +74,7 @@ func (model Model) AddPolicy(sec string, ptype string, policy []string) bool {
 	}
 }
 
-// Remove a policy from the model.
+// Remove a policy rule from the model.
 func (model Model) RemovePolicy(sec string, ptype string, policy []string) bool {
 	for i, rule := range model[sec][ptype].Policy {
 		if util.ArrayEquals(policy, rule) {
@@ -84,6 +84,20 @@ func (model Model) RemovePolicy(sec string, ptype string, policy []string) bool 
 	}
 
 	return false
+}
+
+// Remove policy rules based on a field filter from the model.
+func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValue string) bool {
+	res := false
+	for i := range model[sec][ptype].Policy {
+		if model[sec][ptype].Policy[i][fieldIndex] == fieldValue {
+			model[sec][ptype].Policy = append(model[sec][ptype].Policy[:i], model[sec][ptype].Policy[i+1:]...)
+			i -= 1
+			res = true
+		}
+	}
+
+	return res
 }
 
 // Get all values for a field for all rules in a policy, duplicated values are removed.
