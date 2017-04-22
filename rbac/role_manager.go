@@ -31,12 +31,24 @@ func (rm *RoleManager) createRole(name string) *Role {
 	return rm.allRoles[name]
 }
 
-// Add the link between role: name1 and role: name2.
-// aka name1 inherits role: name2.
+// Add the inheritance link between role: name1 and role: name2.
+// aka role: name1 inherits role: name2.
 func (rm *RoleManager) AddLink(name1 string, name2 string) {
 	role1 := rm.createRole(name1)
 	role2 := rm.createRole(name2)
 	role1.addRole(role2)
+}
+
+// Delete the inheritance link between role: name1 and role: name2.
+// aka role: name1 does not inherit role: name2 any more.
+func (rm *RoleManager) DeleteLink(name1 string, name2 string) {
+	if !rm.hasRole(name1) || !rm.hasRole(name2) {
+		return
+	}
+
+	role1 := rm.createRole(name1)
+	role2 := rm.createRole(name2)
+	role1.deleteRole(role2)
 }
 
 // Whether role: name1 inherits role: name2.
@@ -89,6 +101,15 @@ func (r *Role) addRole(role *Role) {
 	}
 
 	r.roles = append(r.roles, role)
+}
+
+func (r *Role) deleteRole(role *Role) {
+	for i, rr := range r.roles {
+		if rr.name == role.name {
+			r.roles = append(r.roles[:i], r.roles[i+1:]...)
+			return
+		}
+	}
 }
 
 func (r *Role) hasRole(name string, level int) bool {
