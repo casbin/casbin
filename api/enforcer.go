@@ -142,10 +142,14 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 				parameters[token] = pvals[j]
 			}
 
-			result, _ := expression.Evaluate(parameters)
+			result, err := expression.Evaluate(parameters)
 			//log.Print("Result: ", result)
 
-			policyResults[i] = result.(bool)
+			if err != nil {
+				policyResults[i] = false
+			} else {
+				policyResults[i] = result.(bool)
+			}
 		}
 	} else {
 		policyResults = make([]bool, 1)
@@ -153,6 +157,9 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 		parameters := make(map[string]interface{}, 8)
 		for j, token := range e.model["r"]["r"].Tokens {
 			parameters[token] = rvals[j]
+		}
+		for _, token := range e.model["p"]["p"].Tokens {
+			parameters[token] = ""
 		}
 
 		result, err := expression.Evaluate(parameters)

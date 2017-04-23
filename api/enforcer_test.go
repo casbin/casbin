@@ -20,20 +20,6 @@ func testEnforceWithoutUsers(t *testing.T, e *Enforcer, obj string, act string, 
 	}
 }
 
-func TestBasicModelNoPolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/basic_model.conf", "")
-
-	testEnforce(t, e, "alice", "data1", "read", false)
-	testEnforce(t, e, "alice", "data1", "write", false)
-	testEnforce(t, e, "alice", "data2", "read", false)
-	testEnforce(t, e, "alice", "data2", "write", false)
-	testEnforce(t, e, "bob", "data1", "read", false)
-	testEnforce(t, e, "bob", "data1", "write", false)
-	testEnforce(t, e, "bob", "data2", "read", false)
-	testEnforce(t, e, "bob", "data2", "write", false)
-}
-
 func TestBasicModel(t *testing.T) {
 	e := &Enforcer{}
 	e.InitWithFile("../examples/basic_model.conf", "../examples/basic_policy.csv")
@@ -48,6 +34,20 @@ func TestBasicModel(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestBasicModelNoPolicy(t *testing.T) {
+	e := &Enforcer{}
+	e.InitWithFile("../examples/basic_model.conf", "")
+
+	testEnforce(t, e, "alice", "data1", "read", false)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", false)
+}
+
 func TestBasicModelWithRoot(t *testing.T) {
 	e := &Enforcer{}
 	e.InitWithFile("../examples/basic_model_with_root.conf", "../examples/basic_policy.csv")
@@ -60,6 +60,24 @@ func TestBasicModelWithRoot(t *testing.T) {
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", false)
 	testEnforce(t, e, "bob", "data2", "write", true)
+	testEnforce(t, e, "root", "data1", "read", true)
+	testEnforce(t, e, "root", "data1", "write", true)
+	testEnforce(t, e, "root", "data2", "read", true)
+	testEnforce(t, e, "root", "data2", "write", true)
+}
+
+func TestBasicModelWithRootNoPolicy(t *testing.T) {
+	e := &Enforcer{}
+	e.InitWithFile("../examples/basic_model_with_root.conf", "")
+
+	testEnforce(t, e, "alice", "data1", "read", false)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", false)
 	testEnforce(t, e, "root", "data1", "read", true)
 	testEnforce(t, e, "root", "data1", "write", true)
 	testEnforce(t, e, "root", "data2", "read", true)
