@@ -325,6 +325,10 @@ func TestModifyPolicy(t *testing.T) {
 	e.AddPolicy([]string{"eve", "data3", "read"})
 
 	testGetPolicy(t, e, [][]string{{"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}, {"eve", "data3", "read"}})
+
+	e.RemoveFilteredPolicy(1, "data2")
+
+	testGetPolicy(t, e, [][]string{{"eve", "data3", "read"}})
 }
 
 func TestModifyGroupingPolicy(t *testing.T) {
@@ -337,6 +341,13 @@ func TestModifyGroupingPolicy(t *testing.T) {
 
 	testGetRoles(t, e, "alice", []string{})
 	testGetRoles(t, e, "bob", []string{"data1_admin"})
+	testGetRoles(t, e, "eve", []string{"data3_admin"})
+	testGetRoles(t, e, "non_exist", []string{})
+
+	e.RemoveFilteredGroupingPolicy(0, "bob")
+
+	testGetRoles(t, e, "alice", []string{})
+	testGetRoles(t, e, "bob", []string{})
 	testGetRoles(t, e, "eve", []string{"data3_admin"})
 	testGetRoles(t, e, "non_exist", []string{})
 }

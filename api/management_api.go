@@ -50,6 +50,11 @@ func (e *Enforcer) RemovePolicy(policy []string) {
 	e.model.RemovePolicy("p", "p", policy)
 }
 
+// Remove an authorization rule from the current policy, a field filter can be specified.
+func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValue string) {
+	e.model.RemoveFilteredPolicy("p", "p", fieldIndex, fieldValue)
+}
+
 // Add a role inheritance rule to the current policy.
 func (e *Enforcer) AddGroupingPolicy(policy []string) {
 	e.model.AddPolicy("g", "g", policy)
@@ -59,6 +64,12 @@ func (e *Enforcer) AddGroupingPolicy(policy []string) {
 // Remove a role inheritance rule from the current policy.
 func (e *Enforcer) RemoveGroupingPolicy(policy []string) {
 	e.model.RemovePolicy("g", "g", policy)
+	e.model.BuildRoleLinks()
+}
+
+// Remove a role inheritance rule from the current policy, a field filter can be specified.
+func (e *Enforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValue string) {
+	e.model.RemoveFilteredPolicy("g", "g", fieldIndex, fieldValue)
 	e.model.BuildRoleLinks()
 }
 
