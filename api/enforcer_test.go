@@ -20,6 +20,20 @@ func testEnforceWithoutUsers(t *testing.T, e *Enforcer, obj string, act string, 
 	}
 }
 
+func TestBasicModelNoPolicy(t *testing.T) {
+	e := &Enforcer{}
+	e.InitWithFile("../examples/basic_model.conf", "")
+
+	testEnforce(t, e, "alice", "data1", "read", false)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", false)
+}
+
 func TestBasicModel(t *testing.T) {
 	e := &Enforcer{}
 	e.InitWithFile("../examples/basic_model.conf", "../examples/basic_policy.csv")

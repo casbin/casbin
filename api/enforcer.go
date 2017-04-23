@@ -155,10 +155,14 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 			parameters[token] = rvals[j]
 		}
 
-		result, _ := expression.Evaluate(parameters)
+		result, err := expression.Evaluate(parameters)
 		//log.Print("Result: ", result)
 
-		policyResults[0] = result.(bool)
+		if err != nil {
+			policyResults[0] = false
+		} else {
+			policyResults[0] = result.(bool)
+		}
 	}
 
 	//log.Print("Rule Results: ", policyResults)
