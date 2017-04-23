@@ -2,12 +2,7 @@ package api
 
 // Get the roles assigned to a subject.
 func (e *Enforcer) GetRoles(name string) []string {
-	return e.GetRolesForPolicyType("g", name)
-}
-
-// Get the roles assigned to a subject, policy type can be specified.
-func (e *Enforcer) GetRolesForPolicyType(ptype string, name string) []string {
-	return e.model["g"][ptype].RM.GetRoles(name)
+	return e.model["g"]["g"].RM.GetRoles(name)
 }
 
 // Get the list of subjects that show up in the current policy.
@@ -32,75 +27,38 @@ func (e *Enforcer) GetAllRoles() []string {
 
 // Get all the authorization rules in the policy.
 func (e *Enforcer) GetPolicy() [][]string {
-	return e.GetPolicyForPolicyType("p")
-}
-
-// Get all the authorization rules in the policy, policy type can be specified.
-func (e *Enforcer) GetPolicyForPolicyType(ptype string) [][]string {
-	return e.model.GetPolicy("p", ptype)
+	return e.model.GetPolicy("p", "p")
 }
 
 // Get all the authorization rules in the policy, a field filter can be specified.
 func (e *Enforcer) GetFilteredPolicy(fieldIndex int, fieldValue string) [][]string {
-	return e.GetFilteredPolicyForPolicyType("p", fieldIndex, fieldValue)
-}
-
-// Get all the authorization rules in the policy, a field filter can be specified, policy type can be specified.
-func (e *Enforcer) GetFilteredPolicyForPolicyType(ptype string, fieldIndex int, fieldValue string) [][]string {
-	return e.model.GetFilteredPolicy("p", ptype, fieldIndex, fieldValue)
+	return e.model.GetFilteredPolicy("p", "p", fieldIndex, fieldValue)
 }
 
 // Get all the role inheritance rules in the policy.
 func (e *Enforcer) GetGroupingPolicy() [][]string {
-	return e.GetGroupingPolicyForPolicyType("g")
-}
-
-// Get all the role inheritance rules in the policy, policy type can be specified.
-func (e *Enforcer) GetGroupingPolicyForPolicyType(ptype string) [][]string {
-	return e.model.GetPolicy("g", ptype)
+	return e.model.GetPolicy("g", "g")
 }
 
 // Add an authorization rule to the current policy.
 func (e *Enforcer) AddPolicy(policy []string) {
-	e.AddPolicyForPolicyType("p", policy)
+	e.model.AddPolicy("p", "p", policy)
 }
 
 // Remove an authorization rule from the current policy.
 func (e *Enforcer) RemovePolicy(policy []string) {
-	e.RemovePolicyForPolicyType("p", policy)
-}
-
-// Add an authorization rule to the current policy, policy type can be specified.
-func (e *Enforcer) AddPolicyForPolicyType(ptype string, policy []string) {
-	e.model.AddPolicy("p", ptype, policy)
-}
-
-// Remove an authorization rule from the current policy, policy type can be specified.
-func (e *Enforcer) RemovePolicyForPolicyType(ptype string, policy []string) {
-	e.model.RemovePolicy("p", ptype, policy)
+	e.model.RemovePolicy("p", "p", policy)
 }
 
 // Add a role inheritance rule to the current policy.
 func (e *Enforcer) AddGroupingPolicy(policy []string) {
-	e.AddGroupingPolicyForPolicyType("g", policy)
+	e.model.AddPolicy("g", "g", policy)
 	e.model.BuildRoleLinks()
 }
 
 // Remove a role inheritance rule from the current policy.
 func (e *Enforcer) RemoveGroupingPolicy(policy []string) {
-	e.RemoveGroupingPolicyForPolicyType("g", policy)
-	e.model.BuildRoleLinks()
-}
-
-// Add a role inheritance rule to the current policy, policy type can be specified.
-func (e *Enforcer) AddGroupingPolicyForPolicyType(ptype string, policy []string) {
-	e.model.AddPolicy("g", ptype, policy)
-	e.model.BuildRoleLinks()
-}
-
-// Remove a role inheritance rule from the current policy, policy type can be specified.
-func (e *Enforcer) RemoveGroupingPolicyForPolicyType(ptype string, policy []string) {
-	e.model.RemovePolicy("g", ptype, policy)
+	e.model.RemovePolicy("g", "g", policy)
 	e.model.BuildRoleLinks()
 }
 
