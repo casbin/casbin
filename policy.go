@@ -88,15 +88,17 @@ func (model Model) RemovePolicy(sec string, ptype string, policy []string) bool 
 
 // Remove policy rules based on a field filter from the model.
 func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValue string) bool {
+	tmp := [][]string{}
 	res := false
-	for i := range model[sec][ptype].Policy {
-		if model[sec][ptype].Policy[i][fieldIndex] == fieldValue {
-			model[sec][ptype].Policy = append(model[sec][ptype].Policy[:i], model[sec][ptype].Policy[i+1:]...)
-			i -= 1
+	for _, rule := range model[sec][ptype].Policy {
+		if rule[fieldIndex] != fieldValue {
+			tmp = append(tmp, rule)
+		} else {
 			res = true
 		}
 	}
 
+	model[sec][ptype].Policy = tmp
 	return res
 }
 
