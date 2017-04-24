@@ -12,11 +12,8 @@ func EscapeAssertion(s string) string {
 
 // Translate the ABAC attributes into functions.
 func FixAttribute(s string) string {
-	reg := regexp.MustCompile("r\\.sub\\.([A-Za-z0-9]*)")
-	res := reg.ReplaceAllString(s, "subAttr(r.sub, \"$1\")")
-
-	reg = regexp.MustCompile("r\\.obj\\.([A-Za-z0-9]*)")
-	res = reg.ReplaceAllString(res, "objAttr(r.obj, \"$1\")")
+	reg := regexp.MustCompile("(r|p)\\.(sub|obj|act)\\.([A-Za-z0-9]*)")
+	res := reg.ReplaceAllString(s, "${2}Attr($1.$2, \"$3\")")
 
 	return res
 }

@@ -77,3 +77,8 @@ func (e *Enforcer) AddSubjectAttributeFunction(function func(args ...interface{}
 func (e *Enforcer) AddObjectAttributeFunction(function func(args ...interface{}) (interface{}, error)) {
 	e.fm.AddFunction("objAttr", function)
 }
+
+// Add the function that gets attributes for a object in ABAC.
+func (e *Enforcer) AddActionAttributeFunction(function func(args ...interface{}) (interface{}, error)) {
+	e.fm.AddFunction("actAttr", function)
+}
