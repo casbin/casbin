@@ -251,7 +251,7 @@ func TestKeymatchModel(t *testing.T) {
 }
 
 func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
-	myRes := e.GetRoles(name)
+	myRes := e.GetRolesForUser(name)
 	log.Print("Roles for ", name, ": ", myRes)
 
 	if !util.ArrayEquals(res, myRes) {

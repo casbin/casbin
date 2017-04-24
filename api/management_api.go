@@ -1,10 +1,5 @@
 package api
 
-// Get the roles assigned to a subject.
-func (e *Enforcer) GetRoles(name string) []string {
-	return e.model["g"]["g"].RM.GetRoles(name)
-}
-
 // Get the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() []string {
 	return e.model.GetValuesForFieldInPolicy("p", "p", 0)
