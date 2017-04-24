@@ -1,6 +1,7 @@
 package util
 
 import (
+	"regexp"
 	"strings"
 )
 
@@ -25,4 +26,21 @@ func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 	name2 := args[1].(string)
 
 	return (bool)(KeyMatch(name1, name2)), nil
+}
+
+// Determine whether key1 matches the pattern of key2 in regular expression.
+func RegexMatch(key1 string, key2 string) bool {
+	res, err := regexp.MatchString(key2, key1)
+	if err != nil {
+		panic(err)
+	}
+	return res
+}
+
+// The wrapper for RegexMatch.
+func RegexMatchFunc(args ...interface{}) (interface{}, error) {
+	name1 := args[0].(string)
+	name2 := args[1].(string)
+
+	return (bool)(RegexMatch(name1, name2)), nil
 }

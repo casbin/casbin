@@ -18,6 +18,7 @@ func LoadFunctionMap() FunctionMap {
 	fm := make(FunctionMap)
 
 	fm.AddFunction("keyMatch", util.KeyMatchFunc)
+	fm.AddFunction("regexMatch", util.RegexMatchFunc)
 
 	return fm
 }
