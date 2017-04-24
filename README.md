@@ -191,6 +191,7 @@ RESTful | [keymatch_model.conf](https://github.com/hsluoyz/casbin/blob/master/ex
 
 - [Docker](https://github.com/docker/docker): The world's leading software container platform, via plugin: [casbin-authz-plugin](https://github.com/hsluoyz/casbin-authz-plugin)
 - [Tango](https://github.com/lunny/tango): Micro & pluggable web framework for Go, via plugin: [Authz](https://github.com/tango-contrib/authz)
+- [pybbs-go](https://github.com/tomoya92/pybbs-go): A simple BBS with strong Admin permission management.
 
 ## License
 
