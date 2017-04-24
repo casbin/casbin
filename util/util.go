@@ -3,6 +3,7 @@ package util
 import (
 	"regexp"
 	"strings"
+	"sort"
 )
 
 // Escape the dots in the assertion, because the expression evaluation doesn't support such variable names.
@@ -63,4 +64,21 @@ func ArrayRemoveDuplicates(s *[]string) {
 // Get a printable string for a string array.
 func ArrayToString(s []string) string {
 	return strings.Join(s, ", ")
+}
+
+// Determine whether two string sets are identical.
+func SetEquals(a []string, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	sort.Strings(a)
+	sort.Strings(b)
+
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
 }

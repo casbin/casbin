@@ -250,25 +250,6 @@ func TestKeymatchModel(t *testing.T) {
 	testEnforce(t, e, "bob", "/bob_data/resource2", "POST", true)
 }
 
-func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
-	myRes := e.GetRolesForUser(name)
-	log.Print("Roles for ", name, ": ", myRes)
-
-	if !util.ArrayEquals(res, myRes) {
-		t.Error("Roles for ", name, ": ", myRes, ", supposed to be ", res)
-	}
-}
-
-func TestGetRoles(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
-
-	testGetRoles(t, e, "alice", []string{"data2_admin"})
-	testGetRoles(t, e, "bob", []string{})
-	testGetRoles(t, e, "data2_admin", []string{})
-	testGetRoles(t, e, "non_exist", []string{})
-}
-
 func testStringList(t *testing.T, title string, f func() []string, res []string) {
 	myRes := f()
 	log.Print(title+": ", myRes)
