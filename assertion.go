@@ -19,6 +19,8 @@ import (
 	"log"
 )
 
+// Assertion represents an expression in a section of the model.
+// For example: r = sub, obj, act
 type Assertion struct {
 	Key    string
 	Value  string

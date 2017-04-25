@@ -19,14 +19,14 @@ import (
 	"log"
 )
 
-// Initialize the roles in RBAC.
+// BuildRoleLinks initializes the roles in RBAC.
 func (model Model) BuildRoleLinks() {
 	for _, ast := range model["g"] {
 		ast.buildRoleLinks()
 	}
 }
 
-// Print the policy.
+// PrintPolicy prints the policy to log.
 func (model Model) PrintPolicy() {
 	log.Print("Policy:")
 	for key, ast := range model["p"] {
@@ -38,7 +38,7 @@ func (model Model) PrintPolicy() {
 	}
 }
 
-// Clear all current policy.
+// ClearPolicy clears all current policy.
 func (model Model) ClearPolicy() {
 	for _, ast := range model["p"] {
 		ast.Policy = nil
@@ -49,12 +49,12 @@ func (model Model) ClearPolicy() {
 	}
 }
 
-// Get all rules in a policy.
+// GetPolicy gets all rules in a policy.
 func (model Model) GetPolicy(sec string, ptype string) [][]string {
 	return model[sec][ptype].Policy
 }
 
-// Get rules based on a field filter from a policy.
+// GetFilteredPolicy gets rules based on a field filter from a policy.
 func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValue string) [][]string {
 	res := [][]string{}
 
@@ -67,7 +67,7 @@ func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, f
 	return res
 }
 
-// Determine whether a model has the specified policy rule.
+// HasPolicy determines whether a model has the specified policy rule.
 func (model Model) HasPolicy(sec string, ptype string, policy []string) bool {
 	for _, rule := range model[sec][ptype].Policy {
 		if util.ArrayEquals(policy, rule) {
@@ -78,17 +78,16 @@ func (model Model) HasPolicy(sec string, ptype string, policy []string) bool {
 	return false
 }
 
-// Add a policy rule to the model.
+// AddPolicy adds a policy rule to the model.
 func (model Model) AddPolicy(sec string, ptype string, policy []string) bool {
 	if !model.HasPolicy(sec, ptype, policy) {
 		model[sec][ptype].Policy = append(model[sec][ptype].Policy, policy)
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
-// Remove a policy rule from the model.
+// RemovePolicy removes a policy rule from the model.
 func (model Model) RemovePolicy(sec string, ptype string, policy []string) bool {
 	for i, rule := range model[sec][ptype].Policy {
 		if util.ArrayEquals(policy, rule) {
@@ -100,7 +99,7 @@ func (model Model) RemovePolicy(sec string, ptype string, policy []string) bool 
 	return false
 }
 
-// Remove policy rules based on a field filter from the model.
+// RemoveFilteredPolicy removes policy rules based on a field filter from the model.
 func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValue string) bool {
 	tmp := [][]string{}
 	res := false
@@ -116,7 +115,7 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 	return res
 }
 
-// Get all values for a field for all rules in a policy, duplicated values are removed.
+// GetValuesForFieldInPolicy gets all values for a field for all rules in a policy, duplicated values are removed.
 func (model Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldIndex int) []string {
 	users := []string{}
 

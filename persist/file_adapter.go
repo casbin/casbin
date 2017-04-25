@@ -24,19 +24,19 @@ import (
 	"strings"
 )
 
-// The file adapter for policy persistence, can load policy from file or save policy to file.
+// FileAdapter represents the file adapter for policy persistence, can load policy from file or save policy to file.
 type FileAdapter struct {
 	filePath string
 }
 
-// The constructor for FileAdapter.
+// NewFileAdapter is the constructor for FileAdapter.
 func NewFileAdapter(filePath string) *FileAdapter {
 	a := FileAdapter{}
 	a.filePath = filePath
 	return &a
 }
 
-// Load policy from file.
+// LoadPolicy loads policy from file.
 func (a *FileAdapter) LoadPolicy(model casbin.Model) {
 	if a.filePath == "" {
 		return
@@ -48,7 +48,7 @@ func (a *FileAdapter) LoadPolicy(model casbin.Model) {
 	}
 }
 
-// Save policy to file.
+// SavePolicy saves policy to file.
 func (a *FileAdapter) SavePolicy(model casbin.Model) {
 	if a.filePath == "" {
 		return

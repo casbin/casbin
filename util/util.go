@@ -20,12 +20,12 @@ import (
 	"strings"
 )
 
-// Escape the dots in the assertion, because the expression evaluation doesn't support such variable names.
+// EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
 func EscapeAssertion(s string) string {
 	return strings.Replace(s, ".", "_", -1)
 }
 
-// Translate the ABAC attributes into functions.
+// FixAttribute translates the ABAC attributes into functions.
 func FixAttribute(s string) string {
 	reg := regexp.MustCompile("(r|p)\\.(sub|obj|act)\\.([A-Za-z0-9]*)")
 	res := reg.ReplaceAllString(s, "${2}Attr($1.$2, \"$3\")")
@@ -33,7 +33,7 @@ func FixAttribute(s string) string {
 	return res
 }
 
-// Determine whether two string arrays are identical.
+// ArrayEquals determines whether two string arrays are identical.
 func ArrayEquals(a []string, b []string) bool {
 	if len(a) != len(b) {
 		return false
@@ -47,7 +47,7 @@ func ArrayEquals(a []string, b []string) bool {
 	return true
 }
 
-// Determine whether two 2-dimensional string arrays are identical.
+// Array2DEquals determines whether two 2-dimensional string arrays are identical.
 func Array2DEquals(a [][]string, b [][]string) bool {
 	if len(a) != len(b) {
 		return false
@@ -61,7 +61,7 @@ func Array2DEquals(a [][]string, b [][]string) bool {
 	return true
 }
 
-// Remove any duplicated elements in a string array.
+// ArrayRemoveDuplicates removes any duplicated elements in a string array.
 func ArrayRemoveDuplicates(s *[]string) {
 	found := make(map[string]bool)
 	j := 0
@@ -75,12 +75,12 @@ func ArrayRemoveDuplicates(s *[]string) {
 	*s = (*s)[:j]
 }
 
-// Get a printable string for a string array.
+// ArrayToString gets a printable string for a string array.
 func ArrayToString(s []string) string {
 	return strings.Join(s, ", ")
 }
 
-// Determine whether two string sets are identical.
+// SetEquals determines whether two string sets are identical.
 func SetEquals(a []string, b []string) bool {
 	if len(a) != len(b) {
 		return false

@@ -19,7 +19,7 @@ import (
 	"strings"
 )
 
-// Determine whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
+// KeyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, /foo/bar matches /foo/*
 func KeyMatch(key1 string, key2 string) bool {
 	i := strings.Index(key2, "*")
@@ -29,12 +29,11 @@ func KeyMatch(key1 string, key2 string) bool {
 
 	if len(key1) > i {
 		return key1[:i] == key2[:i]
-	} else {
-		return key1 == key2[:i]
 	}
+	return key1 == key2[:i]
 }
 
-// The wrapper for KeyMatch.
+// KeyMatchFunc is the wrapper for KeyMatch.
 func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
@@ -42,7 +41,7 @@ func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 	return (bool)(KeyMatch(name1, name2)), nil
 }
 
-// Determine whether key1 matches the pattern of key2 in regular expression.
+// RegexMatch determines whether key1 matches the pattern of key2 in regular expression.
 func RegexMatch(key1 string, key2 string) bool {
 	res, err := regexp.MatchString(key2, key1)
 	if err != nil {
@@ -51,7 +50,7 @@ func RegexMatch(key1 string, key2 string) bool {
 	return res
 }
 
-// The wrapper for RegexMatch.
+// RegexMatchFunc is the wrapper for RegexMatch.
 func RegexMatchFunc(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)

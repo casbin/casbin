@@ -31,7 +31,7 @@ func loadPolicyLine(line string, model casbin.Model) {
 	model[sec][key].Policy = append(model[sec][key].Policy, tokens[1:])
 }
 
-// The abstract adapter interface for policy persistence.
+// Adapter represents the abstract adapter interface for policy persistence.
 // FileAdapter, DBAdapter inherits this interface.
 type Adapter interface {
 	LoadPolicy(model casbin.Model)

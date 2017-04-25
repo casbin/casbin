@@ -70,9 +70,9 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 func getKeySuffix(i int) string {
 	if i == 1 {
 		return ""
-	} else {
-		return strconv.Itoa(i)
 	}
+
+	return strconv.Itoa(i)
 }
 
 func loadSection(model Model, cfg config.ConfigInterface, sec string) {
@@ -86,7 +86,7 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 	}
 }
 
-// Load the model from model CONF file.
+// LoadModel loads the model from model CONF file.
 func LoadModel(path string) Model {
 	cfg, err := config.NewConfig(path)
 	if err != nil {
@@ -105,7 +105,7 @@ func LoadModel(path string) Model {
 	return model
 }
 
-// Print the model.
+// PrintModel prints the model to the log.
 func (model Model) PrintModel() {
 	log.Print("Model:")
 	for k, v := range model {

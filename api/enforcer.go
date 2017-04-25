@@ -32,7 +32,7 @@ type Enforcer struct {
 	enabled bool
 }
 
-// Initialize an enforcer with a model file and a policy file.
+// InitWithFile initializes an enforcer with a model file and a policy file.
 func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 	e.modelPath = modelPath
 
@@ -44,7 +44,7 @@ func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 	e.LoadPolicy()
 }
 
-// Initialize an enforcer with a model file and a policy from database.
+// InitWithDB initializes an enforcer with a model file and a policy from database.
 func (e *Enforcer) InitWithDB(modelPath string, driverName string, dataSourceName string) {
 	e.modelPath = modelPath
 
@@ -56,7 +56,7 @@ func (e *Enforcer) InitWithDB(modelPath string, driverName string, dataSourceNam
 	e.LoadPolicy()
 }
 
-// Initialize an enforcer with a configuration file, by default is casbin.conf.
+// InitWithConfig initializes an enforcer with a configuration file, by default is casbin.conf.
 func (e *Enforcer) InitWithConfig(cfgPath string) {
 	cfg := loadConfig(cfgPath)
 
@@ -74,7 +74,7 @@ func (e *Enforcer) InitWithConfig(cfgPath string) {
 	e.LoadPolicy()
 }
 
-// Reload the model from the model CONF file.
+// LoadModel reloads the model from the model CONF file.
 // Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
 func (e *Enforcer) LoadModel() {
 	e.model = casbin.LoadModel(e.modelPath)
@@ -82,17 +82,17 @@ func (e *Enforcer) LoadModel() {
 	e.fm = casbin.LoadFunctionMap()
 }
 
-// Get the current model.
+// GetModel gets the current model.
 func (e *Enforcer) GetModel() casbin.Model {
 	return e.model
 }
 
-// Clear all policy.
+// ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() {
 	e.model.ClearPolicy()
 }
 
-// Reload the policy from file/database.
+// LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() {
 	e.model.ClearPolicy()
 	e.adapter.LoadPolicy(e.model)
@@ -102,17 +102,17 @@ func (e *Enforcer) LoadPolicy() {
 	e.model.BuildRoleLinks()
 }
 
-// Save the current policy (usually after changed with casbin API) back to file/database.
+// SavePolicy saves the current policy (usually after changed with casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() {
 	e.adapter.SavePolicy(e.model)
 }
 
-// Change the enforcing state of casbin, when casbin is disabled, all access will be allowed by the Enforce() function.
+// Enable changes the enforcing state of casbin, when casbin is disabled, all access will be allowed by the Enforce() function.
 func (e *Enforcer) Enable(enable bool) {
 	e.enabled = enable
 }
 
-// Decide whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
+// Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
 func (e *Enforcer) Enforce(rvals ...string) bool {
 	if !e.enabled {
 		return true

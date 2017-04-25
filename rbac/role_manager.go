@@ -18,13 +18,13 @@ import (
 	"log"
 )
 
-// RoleManager is the interface to manage the roles in RBAC.
+// RoleManager represents the interface to manage the roles in RBAC.
 type RoleManager struct {
 	allRoles map[string]*Role
 	level    int
 }
 
-// The constructor for RoleManager.
+// NewRoleManager is the constructor for RoleManager.
 func NewRoleManager(level int) *RoleManager {
 	rm := RoleManager{}
 	rm.allRoles = make(map[string]*Role)
@@ -45,7 +45,7 @@ func (rm *RoleManager) createRole(name string) *Role {
 	return rm.allRoles[name]
 }
 
-// Add the inheritance link between role: name1 and role: name2.
+// AddLink adds the inheritance link between role: name1 and role: name2.
 // aka role: name1 inherits role: name2.
 func (rm *RoleManager) AddLink(name1 string, name2 string) {
 	role1 := rm.createRole(name1)
@@ -53,7 +53,7 @@ func (rm *RoleManager) AddLink(name1 string, name2 string) {
 	role1.addRole(role2)
 }
 
-// Delete the inheritance link between role: name1 and role: name2.
+// DeleteLink deletes the inheritance link between role: name1 and role: name2.
 // aka role: name1 does not inherit role: name2 any more.
 func (rm *RoleManager) DeleteLink(name1 string, name2 string) {
 	if !rm.hasRole(name1) || !rm.hasRole(name2) {
@@ -65,7 +65,7 @@ func (rm *RoleManager) DeleteLink(name1 string, name2 string) {
 	role1.deleteRole(role2)
 }
 
-// Whether role: name1 inherits role: name2.
+// HasLink determines whether role: name1 inherits role: name2.
 func (rm *RoleManager) HasLink(name1 string, name2 string) bool {
 	if name1 == name2 {
 		return true
@@ -79,23 +79,23 @@ func (rm *RoleManager) HasLink(name1 string, name2 string) bool {
 	return role1.hasRole(name2, rm.level)
 }
 
-// Get the roles that a subject inherits.
+// GetRoles gets the roles that a subject inherits.
 func (rm *RoleManager) GetRoles(name string) []string {
 	if rm.hasRole(name) {
 		return rm.createRole(name).getRoles()
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
-// Print all the roles.
+// PrintRoles prints all the roles to log.
 func (rm *RoleManager) PrintRoles() {
 	for _, role := range rm.allRoles {
 		log.Print(role.toString())
 	}
 }
 
-// Role is the data structure for a role in RBAC.
+// Role represents the data structure for a role in RBAC.
 type Role struct {
 	name  string
 	roles []*Role

@@ -16,11 +16,11 @@ package persist
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // This is for MySQL initialization.
 	"github.com/hsluoyz/casbin"
 )
 
-// The database adapter for policy persistence, can load policy from database or save policy to database.
+// DBAdapter represents the database adapter for policy persistence, can load policy from database or save policy to database.
 // For now, only MySQL is tested, but it should work for other RDBMS.
 type DBAdapter struct {
 	driverName     string
@@ -28,7 +28,7 @@ type DBAdapter struct {
 	db             *sql.DB
 }
 
-// The constructor for DBAdapter.
+// NewDBAdapter is the constructor for DBAdapter.
 func NewDBAdapter(driverName string, dataSourceName string) *DBAdapter {
 	a := DBAdapter{}
 	a.driverName = driverName
@@ -75,7 +75,7 @@ func (a *DBAdapter) dropTable() {
 	}
 }
 
-// Load policy from database.
+// LoadPolicy loads policy from database.
 func (a *DBAdapter) LoadPolicy(model casbin.Model) {
 	a.open()
 	defer a.close()
@@ -137,7 +137,7 @@ func (a *DBAdapter) writeTableLine(ptype string, rule []string) {
 	}
 }
 
-// Save policy to database.
+// SavePolicy saves policy to database.
 func (a *DBAdapter) SavePolicy(model casbin.Model) {
 	a.open()
 	defer a.close()

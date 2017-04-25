@@ -14,48 +14,48 @@
 
 package api
 
-// Get roles for a user.
+// GetRolesForUser gets roles for a user.
 func (e *Enforcer) GetRolesForUser(name string) []string {
 	return e.model["g"]["g"].RM.GetRoles(name)
 }
 
-// Add a role for a user.
+// AddRoleForUser adds a role for a user.
 func (e *Enforcer) AddRoleForUser(user string, role string) {
 	e.AddGroupingPolicy([]string{user, role})
 }
 
-// Delete all roles for a user.
+// DeleteRolesForUser deletes all roles for a user.
 func (e *Enforcer) DeleteRolesForUser(user string) {
 	e.RemoveFilteredGroupingPolicy(0, user)
 }
 
-// Delete a user.
+// DeleteUser deletes a user.
 func (e *Enforcer) DeleteUser(user string) {
 	e.RemoveFilteredGroupingPolicy(0, user)
 }
 
-// Delete a role.
+// DeleteRole deletes a role.
 func (e *Enforcer) DeleteRole(role string) {
 	e.RemoveFilteredGroupingPolicy(1, role)
 	e.RemoveFilteredPolicy(0, role)
 }
 
-// Delete a permission.
+// DeletePermission deletes a permission.
 func (e *Enforcer) DeletePermission(permission string) {
 	e.RemoveFilteredPolicy(1, permission)
 }
 
-// Add a permission for a user or role.
+// AddPermissionForUser adds a permission for a user or role.
 func (e *Enforcer) AddPermissionForUser(user string, permission string) {
 	e.AddPolicy([]string{user, permission})
 }
 
-// Delete permissions for a user or role.
+// DeletePermissionsForUser deletes permissions for a user or role.
 func (e *Enforcer) DeletePermissionsForUser(user string) {
 	e.RemoveFilteredPolicy(0, user)
 }
 
-// Get permissions for a user or role.
+// GetPermissionsForUser gets permissions for a user or role.
 func (e *Enforcer) GetPermissionsForUser(user string) []string {
 	res := []string{}
 
