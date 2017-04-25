@@ -15,9 +15,9 @@
 package api
 
 import (
-	"testing"
 	"github.com/hsluoyz/casbin/util"
 	"log"
+	"testing"
 )
 
 func testStringList(t *testing.T, title string, f func() []string, res []string) {

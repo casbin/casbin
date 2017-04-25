@@ -75,7 +75,6 @@ func TestRole(t *testing.T) {
 	testPrintRoles(t, rm, "g2", []string{})
 	testPrintRoles(t, rm, "g3", []string{})
 
-
 	rm.DeleteLink("g1", "g3")
 	rm.DeleteLink("u4", "g2")
 

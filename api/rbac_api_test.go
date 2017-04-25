@@ -15,9 +15,9 @@
 package api
 
 import (
-	"testing"
-	"log"
 	"github.com/hsluoyz/casbin/util"
+	"log"
+	"testing"
 )
 
 func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {

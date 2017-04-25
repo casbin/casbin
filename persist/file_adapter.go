@@ -17,11 +17,11 @@ package persist
 import (
 	"bufio"
 	"bytes"
+	"github.com/hsluoyz/casbin"
 	"github.com/hsluoyz/casbin/util"
 	"io"
 	"os"
 	"strings"
-	"github.com/hsluoyz/casbin"
 )
 
 // The file adapter for policy persistence, can load policy from file or save policy to file.

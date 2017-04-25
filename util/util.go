@@ -16,8 +16,8 @@ package util
 
 import (
 	"regexp"
-	"strings"
 	"sort"
+	"strings"
 )
 
 // Escape the dots in the assertion, because the expression evaluation doesn't support such variable names.

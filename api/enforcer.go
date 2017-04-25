@@ -16,18 +16,18 @@ package api
 
 import (
 	"github.com/Knetic/govaluate"
-	"log"
 	"github.com/hsluoyz/casbin"
 	"github.com/hsluoyz/casbin/persist"
+	"log"
 )
 
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath string
-	model casbin.Model
-	fm    casbin.FunctionMap
+	model     casbin.Model
+	fm        casbin.FunctionMap
 
-	adapter   persist.Adapter
+	adapter persist.Adapter
 
 	enabled bool
 }

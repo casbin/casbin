@@ -19,11 +19,11 @@ import (
 )
 
 type casbinConfig struct {
-	modelPath string
+	modelPath     string
 	policyBackend string
-	policyPath string
-	dbDriver string
-	dbDataSource string
+	policyPath    string
+	dbDriver      string
+	dbDataSource  string
 }
 
 func loadConfig(cfgPath string) *casbinConfig {

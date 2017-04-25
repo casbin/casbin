@@ -15,8 +15,8 @@
 package casbin
 
 import (
-	"log"
 	"github.com/hsluoyz/casbin/rbac"
+	"log"
 )
 
 type Assertion struct {

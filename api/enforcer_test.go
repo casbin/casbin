@@ -15,10 +15,10 @@
 package api
 
 import (
+	"github.com/hsluoyz/casbin/persist"
 	"log"
 	"reflect"
 	"testing"
-	"github.com/hsluoyz/casbin/persist"
 )
 
 func testEnforce(t *testing.T, e *Enforcer, sub string, obj string, act string, res bool) {
