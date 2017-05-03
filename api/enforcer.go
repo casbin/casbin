@@ -17,6 +17,7 @@ package api
 import (
 	"github.com/Knetic/govaluate"
 	"github.com/hsluoyz/casbin"
+	"github.com/hsluoyz/casbin/config"
 	"github.com/hsluoyz/casbin/persist"
 	"log"
 )
@@ -78,14 +79,14 @@ func (e *Enforcer) InitWithDB(modelPath string, driverName string, dataSourceNam
 
 // InitWithConfig initializes an enforcer with a configuration file, by default is casbin.conf.
 func (e *Enforcer) InitWithConfig(cfgPath string) {
-	cfg := loadConfig(cfgPath)
+	cfg := config.LoadConfig(cfgPath)
 
-	e.modelPath = cfg.modelPath
+	e.modelPath = cfg.ModelPath
 
-	if cfg.policyBackend == "file" {
-		e.adapter = persist.NewFileAdapter(cfg.policyPath)
-	} else if cfg.policyBackend == "database" {
-		e.adapter = persist.NewDBAdapter(cfg.dbDriver, cfg.dbDataSource)
+	if cfg.PolicyBackend == "file" {
+		e.adapter = persist.NewFileAdapter(cfg.PolicyPath)
+	} else if cfg.PolicyBackend == "database" {
+		e.adapter = persist.NewDBAdapter(cfg.DBDriver, cfg.DBDataSource)
 	}
 
 	e.enabled = true

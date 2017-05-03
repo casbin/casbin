@@ -12,35 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package api
+package config
 
 import (
 	"github.com/lxmgo/config"
 )
 
 type casbinConfig struct {
-	modelPath     string
-	policyBackend string
-	policyPath    string
-	dbDriver      string
-	dbDataSource  string
+	ModelPath     string
+	PolicyBackend string
+	PolicyPath    string
+	DBDriver      string
+	DBDataSource  string
 }
 
-func loadConfig(cfgPath string) *casbinConfig {
+// LoadConfig loads the casbin config file: casbin.conf
+func LoadConfig(cfgPath string) *casbinConfig {
 	ccfg := casbinConfig{}
 	cfg, err := config.NewConfig(cfgPath)
 	if err != nil {
 		panic(err)
 	}
 
-	ccfg.modelPath = cfg.String("default::model_path")
-	ccfg.policyBackend = cfg.String("default::policy_backend")
+	ccfg.ModelPath = cfg.String("default::model_path")
+	ccfg.PolicyBackend = cfg.String("default::policy_backend")
 
-	if ccfg.policyBackend == "file" {
-		ccfg.policyPath = cfg.String("file::policy_path")
-	} else if ccfg.policyBackend == "database" {
-		ccfg.dbDriver = cfg.String("database::driver")
-		ccfg.dbDataSource = cfg.String("database::data_source")
+	if ccfg.PolicyBackend == "file" {
+		ccfg.PolicyPath = cfg.String("file::policy_path")
+	} else if ccfg.PolicyBackend == "database" {
+		ccfg.DBDriver = cfg.String("database::driver")
+		ccfg.DBDataSource = cfg.String("database::data_source")
 	}
 
 	return &ccfg
