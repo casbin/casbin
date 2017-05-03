@@ -15,8 +15,8 @@
 package casbin
 
 import (
+	"github.com/hsluoyz/casbin/config"
 	"github.com/hsluoyz/casbin/util"
-	"github.com/lxmgo/config"
 	"log"
 	"strconv"
 	"strings"

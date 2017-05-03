@@ -14,10 +14,6 @@
 
 package config
 
-import (
-	"github.com/lxmgo/config"
-)
-
 type casbinConfig struct {
 	ModelPath     string
 	PolicyBackend string
@@ -29,7 +25,7 @@ type casbinConfig struct {
 // LoadConfig loads the casbin config file: casbin.conf
 func LoadConfig(cfgPath string) *casbinConfig {
 	ccfg := casbinConfig{}
-	cfg, err := config.NewConfig(cfgPath)
+	cfg, err := NewConfig(cfgPath)
 	if err != nil {
 		panic(err)
 	}
