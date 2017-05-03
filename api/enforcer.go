@@ -32,6 +32,26 @@ type Enforcer struct {
 	enabled bool
 }
 
+// NewEnforcer gets an enforcer via CONF, file or DB.
+// e := NewEnforcer("path/to/casbin.conf")
+// e := NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.conf")
+// e := NewEnforcer("path/to/rbac_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
+func NewEnforcer(params ...string) *Enforcer {
+	e := &Enforcer{}
+
+	if len(params) == 1 {
+		e.InitWithConfig(params[0])
+	} else if len(params) == 2 {
+		e.InitWithFile(params[0], params[1])
+	} else if len(params) == 3 {
+		e.InitWithDB(params[0], params[1], params[2])
+	} else {
+		panic("Invalid parameters for enforcer.")
+	}
+
+	return e
+}
+
 // InitWithFile initializes an enforcer with a model file and a policy file.
 func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 	e.modelPath = modelPath

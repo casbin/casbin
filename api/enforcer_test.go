@@ -16,7 +16,6 @@ package api
 
 import (
 	"github.com/hsluoyz/casbin/persist"
-	"log"
 	"reflect"
 	"testing"
 )
@@ -34,8 +33,7 @@ func testEnforceWithoutUsers(t *testing.T, e *Enforcer, obj string, act string, 
 }
 
 func TestBasicModel(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/basic_model.conf", "../examples/basic_policy.csv")
+	e := NewEnforcer("../examples/basic_model.conf", "../examples/basic_policy.csv")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -48,8 +46,7 @@ func TestBasicModel(t *testing.T) {
 }
 
 func TestBasicModelNoPolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/basic_model.conf", "")
+	e := NewEnforcer("../examples/basic_model.conf", "")
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -62,8 +59,7 @@ func TestBasicModelNoPolicy(t *testing.T) {
 }
 
 func TestBasicModelWithRoot(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/basic_model_with_root.conf", "../examples/basic_policy.csv")
+	e := NewEnforcer("../examples/basic_model_with_root.conf", "../examples/basic_policy.csv")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -80,8 +76,7 @@ func TestBasicModelWithRoot(t *testing.T) {
 }
 
 func TestBasicModelWithRootNoPolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/basic_model_with_root.conf", "")
+	e := NewEnforcer("../examples/basic_model_with_root.conf", "")
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -98,8 +93,7 @@ func TestBasicModelWithRootNoPolicy(t *testing.T) {
 }
 
 func TestBasicModelWithoutUsers(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/basic_model_without_users.conf", "../examples/basic_policy_without_users.csv")
+	e := NewEnforcer("../examples/basic_model_without_users.conf", "../examples/basic_policy_without_users.csv")
 
 	testEnforceWithoutUsers(t, e, "data1", "read", true)
 	testEnforceWithoutUsers(t, e, "data1", "write", false)
@@ -108,8 +102,7 @@ func TestBasicModelWithoutUsers(t *testing.T) {
 }
 
 func TestBasicModelWithoutResources(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/basic_model_without_resources.conf", "../examples/basic_policy_without_resources.csv")
+	e := NewEnforcer("../examples/basic_model_without_resources.conf", "../examples/basic_policy_without_resources.csv")
 
 	testEnforceWithoutUsers(t, e, "alice", "read", true)
 	testEnforceWithoutUsers(t, e, "alice", "write", false)
@@ -118,8 +111,7 @@ func TestBasicModelWithoutResources(t *testing.T) {
 }
 
 func TestRBACModel(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
+	e := NewEnforcer("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -132,8 +124,7 @@ func TestRBACModel(t *testing.T) {
 }
 
 func TestRBACModelWithResourceRoles(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/rbac_model_with_resource_roles.conf", "../examples/rbac_policy_with_resource_roles.csv")
+	e := NewEnforcer("../examples/rbac_model_with_resource_roles.conf", "../examples/rbac_policy_with_resource_roles.csv")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", true)
@@ -174,8 +165,7 @@ func getAttrFunc(args ...interface{}) (interface{}, error) {
 }
 
 func TestABACModel(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/abac_model.conf", "")
+	e := NewEnforcer("../examples/abac_model.conf", "")
 
 	e.AddSubjectAttributeFunction(getAttrFunc)
 	e.AddObjectAttributeFunction(getAttrFunc)
@@ -226,24 +216,22 @@ func (u *testResource) getAttribute(attributeName string) string {
 	return f.String()
 }
 
-func TestABACModel2(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/abac_model.conf", "")
-
-	alice := newTestUser("alice", "domain1")
-	bob := newTestUser("bob", "domain2")
-	data1 := newTestResource("data1", "domain1")
-	data2 := newTestResource("data2", "domain2")
-
-	log.Println(alice.getAttribute("domain"))
-	log.Println(bob.getAttribute("domain"))
-	log.Println(data1.getAttribute("domain"))
-	log.Println(data2.getAttribute("domain"))
-}
+//func TestABACModel2(t *testing.T) {
+//	e := NewEnforcer("../examples/abac_model.conf", "")
+//
+//	alice := newTestUser("alice", "domain1")
+//	bob := newTestUser("bob", "domain2")
+//	data1 := newTestResource("data1", "domain1")
+//	data2 := newTestResource("data2", "domain2")
+//
+//	log.Println(alice.getAttribute("domain"))
+//	log.Println(bob.getAttribute("domain"))
+//	log.Println(data1.getAttribute("domain"))
+//	log.Println(data2.getAttribute("domain"))
+//}
 
 func TestKeymatchModel(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/keymatch_model.conf", "../examples/keymatch_policy.csv")
+	e := NewEnforcer("../examples/keymatch_model.conf", "../examples/keymatch_policy.csv")
 
 	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
 	testEnforce(t, e, "alice", "/alice_data/resource1", "POST", true)
@@ -264,23 +252,20 @@ func TestKeymatchModel(t *testing.T) {
 }
 
 func TestReloadPolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
+	e := NewEnforcer("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
 
 	e.LoadPolicy()
 	testGetPolicy(t, e, [][]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
 }
 
 func TestSavePolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
+	e := NewEnforcer("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
 
 	e.SavePolicy()
 }
 
 func TestEnable(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/basic_model.conf", "../examples/basic_policy.csv")
+	e := NewEnforcer("../examples/basic_model.conf", "../examples/basic_policy.csv")
 
 	e.Enable(false)
 	testEnforce(t, e, "alice", "data1", "read", true)
@@ -304,8 +289,7 @@ func TestEnable(t *testing.T) {
 }
 
 func TestDBSavePolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
+	e := NewEnforcer("../examples/rbac_model.conf", "../examples/rbac_policy.csv")
 
 	a := persist.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
 	a.SavePolicy(e.model)
@@ -331,8 +315,7 @@ func TestDBSaveAndLoadPolicy(t *testing.T) {
 }
 
 func TestConfigLoadPolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithConfig("../casbin.conf")
+	e := NewEnforcer("../casbin.conf")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -351,8 +334,7 @@ func benchmarkEnforce(b *testing.B, e *Enforcer, sub string, obj string, act str
 }
 
 func BenchmarkBasicModel(b *testing.B) {
-	e := &Enforcer{}
-	e.InitWithFile("../examples/basic_model.conf", "../examples/basic_policy.csv")
+	e := NewEnforcer("../examples/basic_model.conf", "../examples/basic_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -361,8 +343,7 @@ func BenchmarkBasicModel(b *testing.B) {
 }
 
 func BenchmarkRBACModel(b *testing.B) {
-	e := &Enforcer{}
-	e.InitWithFile("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
