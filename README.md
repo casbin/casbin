@@ -95,14 +95,13 @@ data_source = root:@tcp(127.0.0.1:3306)/
 
 It means uses ``basic_model.conf`` as the model and ``basic_policy.csv`` as the policy.
 
-2. Initialize an enforcer by specifying the config file:
+2. Initialize an enforcer by specifying the path to the casbin configuration file:
 
 ```golang
-e := &api.Enforcer{}
-e.InitWithConfig("path/to/casbin.conf")
+e := api.NewEnforcer("path/to/casbin.conf")
 ```
 
-Note: you can also initialize an enforcer without a config file by directly using ``e.InitWithFile()`` or ``e.InitWithDB()``.
+Note: you can also initialize an enforcer directly with a file path or database, see ``Persistence`` section for details.
 
 3. Add an enforcement hook into your code right before the access happens:
 
@@ -144,9 +143,8 @@ The policy is much more dynamic than model and can be loaded from a file/databas
 Below shows how to initialize an enforcer from file:
 
 ```golang
-e := &api.Enforcer{}
 // Initialize an enforcer with a model file and a policy file.
-e.InitWithFile("examples/basic_model.conf", "examples/basic_policy.csv")
+e := api.NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 ```
 
 ### Database
@@ -154,9 +152,8 @@ e.InitWithFile("examples/basic_model.conf", "examples/basic_policy.csv")
 Below shows how to initialize an enforcer from database. it connects to a MySQL DB on 127.0.0.1:3306 with root and blank password.
 
 ```golang
-e := &api.Enforcer{}
 // Initialize an enforcer with a model file and policy from database.
-e.InitWithDB("examples/basic_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
+e := api.NewEnforcer("examples/basic_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
 ```
 
 ### Load/Save
