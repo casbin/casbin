@@ -8,6 +8,8 @@ casbin
 [![Release](https://img.shields.io/github/release/hsluoyz/casbin.svg)](https://github.com/hsluoyz/casbin/releases/latest)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
 
+**Note**: The plugins and middleware based on casbin can be found at: https://github.com/casbin
+
 ![Npcap Logo](casbin-logo.png)
 
 casbin is a powerful and efficient open-source access control library for Golang projects. It provides support for enforcing authorization based on various models. By far, the access control models supported by casbin are:
@@ -188,8 +190,8 @@ RESTful | [keymatch_model.conf](https://github.com/hsluoyz/casbin/blob/master/ex
 
 ## Our users
 
-- [Docker](https://github.com/docker/docker): The world's leading software container platform, via plugin: [casbin-authz-plugin](https://github.com/hsluoyz/casbin-authz-plugin)
-- [Beego](https://github.com/astaxie/beego): An open-source, high-performance web framework for Go, via plugin: [BeeAuthz](https://github.com/hsluoyz/beeauthz)
+- [Docker](https://github.com/docker/docker): The world's leading software container platform, via plugin: [casbin-authz-plugin](https://github.com/casbin/casbin-authz-plugin)
+- [Beego](https://github.com/astaxie/beego): An open-source, high-performance web framework for Go, via plugin: [BeeAuthz](https://github.com/casbin/beeauthz)
 - [pybbs-go](https://github.com/tomoya92/pybbs-go): A simple BBS with fine-grained permission management based on [Beego](https://github.com/astaxie/beego)
 - [Tango](https://github.com/lunny/tango): Micro & pluggable web framework for Go, via plugin: [Authz](https://github.com/tango-contrib/authz)
 
@@ -199,6 +201,6 @@ This project is licensed under the [Apache 2.0 license](https://github.com/hsluo
 
 ## Contact
 
-If you have any issues or feature requests, please feel free to contact me at:
+If you have any issues or feature requests, please contact us. PR is welcomed.
 - https://github.com/hsluoyz/casbin/issues
-- hsluoyz@gmail.com (Yang Luo's email, if your issue needs to be kept private, please contact me via this mail)
+- hsluoyz@gmail.com
