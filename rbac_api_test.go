@@ -30,8 +30,7 @@ func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
 }
 
 func TestRoleAPI(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	testGetRoles(t, e, "alice", []string{"data2_admin"})
 	testGetRoles(t, e, "bob", []string{})
@@ -90,8 +89,7 @@ func testGetPermissions(t *testing.T, e *Enforcer, name string, res []string) {
 }
 
 func TestPermissionAPI(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("examples/basic_model_without_resources.conf", "examples/basic_policy_without_resources.csv")
+	e := NewEnforcer("examples/basic_model_without_resources.conf", "examples/basic_policy_without_resources.csv")
 
 	testEnforceWithoutUsers(t, e, "alice", "read", true)
 	testEnforceWithoutUsers(t, e, "alice", "write", false)

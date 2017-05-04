@@ -313,8 +313,7 @@ func TestDBSaveAndLoadPolicy(t *testing.T) {
 	a.LoadPolicy(e.model)
 	testGetPolicy(t, e, [][]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
 
-	e = &Enforcer{}
-	e.InitWithDB("examples/rbac_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
+	e = NewEnforcer("examples/rbac_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
 	testGetPolicy(t, e, [][]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
 
 }

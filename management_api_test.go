@@ -30,8 +30,7 @@ func testStringList(t *testing.T, title string, f func() []string, res []string)
 }
 
 func TestGetList(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	testStringList(t, "Subjects", e.GetAllSubjects, []string{"alice", "bob", "data2_admin"})
 	testStringList(t, "Objeccts", e.GetAllObjects, []string{"data1", "data2"})
@@ -67,8 +66,7 @@ func testGetGroupingPolicy(t *testing.T, e *Enforcer, res [][]string) {
 }
 
 func TestGetPolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	testGetPolicy(t, e, [][]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
 
@@ -84,8 +82,7 @@ func TestGetPolicy(t *testing.T) {
 }
 
 func TestModifyPolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	e.RemovePolicy([]string{"alice", "data1", "read"})
 	e.RemovePolicy([]string{"bob", "data2", "write"})
@@ -100,8 +97,7 @@ func TestModifyPolicy(t *testing.T) {
 }
 
 func TestModifyGroupingPolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	e.RemoveGroupingPolicy([]string{"alice", "data2_admin"})
 	e.AddGroupingPolicy([]string{"bob", "data1_admin"})
