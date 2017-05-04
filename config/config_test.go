@@ -60,8 +60,18 @@ func TestGet(t *testing.T){
 		t.Errorf("Get failure: expected different value for other::name (expected: [%#v] got: [%#v])","ATC自动化测试^-^&($#……#",v)
 		t.Fatalf("err: %v",err)
 	}
+
 	if v := config.String("other::key1"); v != "test key" {
 		t.Errorf("Get failure: expected different value for other::key1 (expected: [%#v] got: [%#v])","test key",v)
 		t.Fatalf("err: %v",err)
 	}
+
+	config.Set("other::key1", "new test key")
+
+	if v := config.String("other::key1"); v != "new test key" {
+		t.Errorf("Get failure: expected different value for other::key1 (expected: [%#v] got: [%#v])","new test key",v)
+		t.Fatalf("err: %v",err)
+	}
+
+	config.Set("other::key1", "test key")
 }

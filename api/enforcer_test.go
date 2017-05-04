@@ -241,6 +241,7 @@ func TestKeymatchModel(t *testing.T) {
 	testEnforce(t, e, "alice", "/bob_data/resource1", "POST", false)
 	testEnforce(t, e, "alice", "/bob_data/resource2", "GET", false)
 	testEnforce(t, e, "alice", "/bob_data/resource2", "POST", false)
+
 	testEnforce(t, e, "bob", "/alice_data/resource1", "GET", false)
 	testEnforce(t, e, "bob", "/alice_data/resource1", "POST", false)
 	testEnforce(t, e, "bob", "/alice_data/resource2", "GET", true)
@@ -249,6 +250,10 @@ func TestKeymatchModel(t *testing.T) {
 	testEnforce(t, e, "bob", "/bob_data/resource1", "POST", true)
 	testEnforce(t, e, "bob", "/bob_data/resource2", "GET", false)
 	testEnforce(t, e, "bob", "/bob_data/resource2", "POST", true)
+
+	testEnforce(t, e, "cathy", "/cathy_data", "GET", true)
+	testEnforce(t, e, "cathy", "/cathy_data", "POST", true)
+	testEnforce(t, e, "cathy", "/cathy_data", "DELETE", false)
 }
 
 func TestReloadPolicy(t *testing.T) {
