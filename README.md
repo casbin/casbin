@@ -8,6 +8,8 @@ casbin
 [![Release](https://img.shields.io/github/release/hsluoyz/casbin.svg)](https://github.com/hsluoyz/casbin/releases/latest)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
 
+![Npcap Logo](casbin-logo.png)
+
 casbin is a powerful and efficient open-source access control library for Golang projects. It provides support for enforcing authorization based on various models. By far, the access control models supported by casbin are:
 
 1. [**ACL (Access Control List)**](https://en.wikipedia.org/wiki/Access_control_list)
