@@ -15,11 +15,11 @@
 package persist
 
 import (
-	"github.com/hsluoyz/casbin"
+	"github.com/hsluoyz/casbin/model"
 	"strings"
 )
 
-func loadPolicyLine(line string, model casbin.Model) {
+func loadPolicyLine(line string, model model.Model) {
 	if line == "" {
 		return
 	}
@@ -34,6 +34,6 @@ func loadPolicyLine(line string, model casbin.Model) {
 // Adapter represents the abstract adapter interface for policy persistence.
 // FileAdapter, DBAdapter inherits this interface.
 type Adapter interface {
-	LoadPolicy(model casbin.Model)
-	SavePolicy(model casbin.Model)
+	LoadPolicy(model model.Model)
+	SavePolicy(model model.Model)
 }

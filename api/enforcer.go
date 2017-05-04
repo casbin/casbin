@@ -16,8 +16,8 @@ package api
 
 import (
 	"github.com/Knetic/govaluate"
-	"github.com/hsluoyz/casbin"
 	"github.com/hsluoyz/casbin/config"
+	"github.com/hsluoyz/casbin/model"
 	"github.com/hsluoyz/casbin/persist"
 	"log"
 )
@@ -25,8 +25,8 @@ import (
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath string
-	model     casbin.Model
-	fm        casbin.FunctionMap
+	model     model.Model
+	fm        model.FunctionMap
 
 	adapter persist.Adapter
 
@@ -98,13 +98,13 @@ func (e *Enforcer) InitWithConfig(cfgPath string) {
 // LoadModel reloads the model from the model CONF file.
 // Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
 func (e *Enforcer) LoadModel() {
-	e.model = casbin.LoadModel(e.modelPath)
+	e.model = model.LoadModel(e.modelPath)
 	e.model.PrintModel()
-	e.fm = casbin.LoadFunctionMap()
+	e.fm = model.LoadFunctionMap()
 }
 
 // GetModel gets the current model.
-func (e *Enforcer) GetModel() casbin.Model {
+func (e *Enforcer) GetModel() model.Model {
 	return e.model
 }
 

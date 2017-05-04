@@ -17,7 +17,7 @@ package persist
 import (
 	"bufio"
 	"bytes"
-	"github.com/hsluoyz/casbin"
+	"github.com/hsluoyz/casbin/model"
 	"github.com/hsluoyz/casbin/util"
 	"io"
 	"os"
@@ -37,7 +37,7 @@ func NewFileAdapter(filePath string) *FileAdapter {
 }
 
 // LoadPolicy loads policy from file.
-func (a *FileAdapter) LoadPolicy(model casbin.Model) {
+func (a *FileAdapter) LoadPolicy(model model.Model) {
 	if a.filePath == "" {
 		return
 	}
@@ -49,7 +49,7 @@ func (a *FileAdapter) LoadPolicy(model casbin.Model) {
 }
 
 // SavePolicy saves policy to file.
-func (a *FileAdapter) SavePolicy(model casbin.Model) {
+func (a *FileAdapter) SavePolicy(model model.Model) {
 	if a.filePath == "" {
 		return
 	}
@@ -78,7 +78,7 @@ func (a *FileAdapter) SavePolicy(model casbin.Model) {
 	}
 }
 
-func (a *FileAdapter) loadPolicyFile(model casbin.Model, handler func(string, casbin.Model)) error {
+func (a *FileAdapter) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
