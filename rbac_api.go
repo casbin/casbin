@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package api
+package casbin
 
 // GetRolesForUser gets roles for a user.
 func (e *Enforcer) GetRolesForUser(name string) []string {

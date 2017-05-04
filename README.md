@@ -77,7 +77,7 @@ go get github.com/hsluoyz/casbin
 ```conf
 [default]
 # The file path to the model:
-model_path = ../examples/basic_model.conf
+model_path = examples/basic_model.conf
 
 # The persistent method for policy, can be two values: file or database.
 # policy_backend = file
@@ -86,7 +86,7 @@ policy_backend = file
 
 [file]
 # The file path to the policy:
-policy_path = ../examples/basic_policy.csv
+policy_path = examples/basic_policy.csv
 
 [database]
 driver = mysql
@@ -98,7 +98,7 @@ It means uses ``basic_model.conf`` as the model and ``basic_policy.csv`` as the 
 2. Initialize an enforcer by specifying the path to the casbin configuration file:
 
 ```golang
-e := api.NewEnforcer("path/to/casbin.conf")
+e := casbin.NewEnforcer("path/to/casbin.conf")
 ```
 
 Note: you can also initialize an enforcer directly with a file path or database, see ``Persistence`` section for details.
@@ -144,7 +144,7 @@ Below shows how to initialize an enforcer from file:
 
 ```golang
 // Initialize an enforcer with a model file and a policy file.
-e := api.NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+e := casbin.NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 ```
 
 ### Database
@@ -153,7 +153,7 @@ Below shows how to initialize an enforcer from database. it connects to a MySQL 
 
 ```golang
 // Initialize an enforcer with a model file and policy from database.
-e := api.NewEnforcer("examples/basic_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
+e := casbin.NewEnforcer("examples/basic_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
 ```
 
 ### Load/Save
