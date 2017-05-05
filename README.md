@@ -133,10 +133,11 @@ roles := e.GetRoles("alice")
 
 The model and policy can be persisted in casbin with the following restrictions:
 
-Persist Method | casbin Model | casbin Policy
-----|------|----
-File | Load only | Load/Save
-Database (RDBMS) | Not supported | Load/Save
+Persist Method | casbin Model | casbin Policy | Usage
+----|------|----|----
+File | Load only | Load/Save | [Details](https://github.com/hsluoyz/casbin#file)
+Database (tested with [MySQL](https://www.mysql.com)) | Not supported | Load/Save | [Details](https://github.com/hsluoyz/casbin#database)
+[Cassandra](http://cassandra.apache.org) (NoSQL) | Not supported | Load/Save | [Details](https://github.com/casbin/cassandra_adapter)
 
 We think the model represents the access control model that our customer uses and is not often modified at run-time, so we don't implement an API to modify the current model or save the model into a file. And the model cannot be loaded from or saved into a database. The model file should be in .CONF format.
 
