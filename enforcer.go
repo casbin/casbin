@@ -20,6 +20,7 @@ import (
 	"github.com/hsluoyz/casbin/model"
 	"github.com/hsluoyz/casbin/persist"
 	"log"
+	"reflect"
 )
 
 // Enforcer is the main interface for authorization enforcement and policy management.
@@ -37,15 +38,19 @@ type Enforcer struct {
 // e := NewEnforcer("path/to/casbin.conf")
 // e := NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.conf")
 // e := NewEnforcer("path/to/rbac_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
-func NewEnforcer(params ...string) *Enforcer {
+func NewEnforcer(params ...interface{}) *Enforcer {
 	e := &Enforcer{}
 
 	if len(params) == 1 {
-		e.InitWithConfig(params[0])
+		e.InitWithConfig(params[0].(string))
 	} else if len(params) == 2 {
-		e.InitWithFile(params[0], params[1])
+		if reflect.TypeOf(params[1]).Kind() == reflect.String {
+			e.InitWithFile(params[0].(string), params[1].(string))
+		} else {
+			e.InitWithAdapter(params[0].(string), params[1].(persist.Adapter))
+		}
 	} else if len(params) == 3 {
-		e.InitWithDB(params[0], params[1], params[2])
+		e.InitWithDB(params[0].(string), params[1].(string), params[2].(string))
 	} else {
 		panic("Invalid parameters for enforcer.")
 	}
@@ -88,6 +93,18 @@ func (e *Enforcer) InitWithConfig(cfgPath string) {
 	} else if cfg.PolicyBackend == "database" {
 		e.adapter = persist.NewDBAdapter(cfg.DBDriver, cfg.DBDataSource)
 	}
+
+	e.enabled = true
+
+	e.LoadModel()
+	e.LoadPolicy()
+}
+
+// InitWithAdapter initializes an enforcer with an adapter.
+func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
+	e.modelPath = modelPath
+
+	e.adapter = adapter
 
 	e.enabled = true
 

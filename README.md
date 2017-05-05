@@ -160,7 +160,19 @@ Below shows how to initialize an enforcer from database. it connects to a MySQL 
 e := casbin.NewEnforcer("examples/basic_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
 ```
 
-### Load/Save
+### Use your own storage adapter
+
+In casbin, both the above file and database storage is implemented as an adapter. You can use your own adapter like below:
+
+```golang
+// Initialize an enforcer with an adapter.
+adapter := persist.NewFileAdapter("examples/basic_policy.csv") // or replace with your own adapter.
+e := casbin.NewEnforcer("examples/basic_model.conf", adapter)
+```
+
+An adapter should implement two methods:``LoadPolicy(model model.Model)`` and ``SavePolicy(model model.Model)``. To keep light-weight, we don't put all adapters' code in this main library. You can choose officially supported adapters from: https://github.com/casbin and use it like a plugin as above.
+
+### Load/Save at run-time
 
 You may also want to reload the model, reload the policy or save the policy after initialization:
 
