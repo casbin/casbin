@@ -36,3 +36,52 @@ func TestFixAttribute(t *testing.T) {
 	testFixAttribute(t, "p.obj.role", "objAttr(p.obj, \"role\")")
 	testFixAttribute(t, "p.act.url", "actAttr(p.act, \"url\")")
 }
+
+func testArrayEquals(t *testing.T, a []string, b []string, res bool) {
+	myRes := ArrayEquals(a, b)
+	log.Printf("%s == %s: %t", a, b, myRes)
+
+	if myRes != res {
+		t.Errorf("%s == %s: %t, supposed to be %t", a, b, myRes, res)
+	}
+}
+
+func TestArrayEquals(t *testing.T) {
+	testArrayEquals(t, []string{"a", "b", "c"}, []string{"a", "b", "c"}, true)
+	testArrayEquals(t, []string{"a", "b", "c"}, []string{"a", "b"}, false)
+	testArrayEquals(t, []string{"a", "b", "c"}, []string{"a", "c", "b"}, false)
+	testArrayEquals(t, []string{"a", "b", "c"}, []string{}, false)
+}
+
+func testArray2DEquals(t *testing.T, a [][]string, b [][]string, res bool) {
+	myRes := Array2DEquals(a, b)
+	log.Printf("%s == %s: %t", a, b, myRes)
+
+	if myRes != res {
+		t.Errorf("%s == %s: %t, supposed to be %t", a, b, myRes, res)
+	}
+}
+
+func TestArray2DEquals(t *testing.T) {
+	testArray2DEquals(t, [][]string{{"a", "b", "c"}, {"1", "2", "3"}}, [][]string{{"a", "b", "c"}, {"1", "2", "3"}}, true)
+	testArray2DEquals(t, [][]string{{"a", "b", "c"}, {"1", "2", "3"}}, [][]string{{"a", "b", "c"}}, false)
+	testArray2DEquals(t, [][]string{{"a", "b", "c"}, {"1", "2", "3"}}, [][]string{{"a", "b", "c"}, {"1", "2"}}, false)
+	testArray2DEquals(t, [][]string{{"a", "b", "c"}, {"1", "2", "3"}}, [][]string{{"1", "2", "3"}, {"a", "b", "c"}}, false)
+	testArray2DEquals(t, [][]string{{"a", "b", "c"}, {"1", "2", "3"}}, [][]string{}, false)
+}
+
+func testSetEquals(t *testing.T, a []string, b []string, res bool) {
+	myRes := SetEquals(a, b)
+	log.Printf("%s == %s: %t", a, b, myRes)
+
+	if myRes != res {
+		t.Errorf("%s == %s: %t, supposed to be %t", a, b, myRes, res)
+	}
+}
+
+func TestSetEquals(t *testing.T) {
+	testSetEquals(t, []string{"a", "b", "c"}, []string{"a", "b", "c"}, true)
+	testSetEquals(t, []string{"a", "b", "c"}, []string{"a", "b"}, false)
+	testSetEquals(t, []string{"a", "b", "c"}, []string{"a", "c", "b"}, true)
+	testSetEquals(t, []string{"a", "b", "c"}, []string{}, false)
+}
