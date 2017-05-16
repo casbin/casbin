@@ -206,7 +206,8 @@ RESTful | [keymatch_model.conf](https://github.com/hsluoyz/casbin/blob/master/ex
 - [Docker](https://github.com/docker/docker): The world's leading software container platform, via plugin: [casbin-authz-plugin](https://github.com/casbin/casbin-authz-plugin)
 - [Beego](https://github.com/astaxie/beego): An open-source, high-performance web framework for Go, via plugin: [beego-authz](https://github.com/casbin/beego-authz)
 - [pybbs-go](https://github.com/tomoya92/pybbs-go): A simple BBS with fine-grained permission management based on [Beego](https://github.com/astaxie/beego)
-- [Tango](https://github.com/lunny/tango): Micro & pluggable web framework for Go, via plugin: [Authz](https://github.com/tango-contrib/authz)
+- [Tango](https://github.com/lunny/tango): Micro & pluggable web framework for Go, via plugin: [authz](https://github.com/tango-contrib/authz)
+- [chi](https://github.com/pressly/chi): A lightweight, idiomatic and composable router for building HTTP services, via plugin: [chi-authz](https://github.com/casbin/chi-authz)
 
 ## License
 
