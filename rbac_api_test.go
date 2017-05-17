@@ -15,7 +15,7 @@
 package casbin
 
 import (
-	"github.com/hsluoyz/casbin/util"
+	"github.com/casbin/casbin/util"
 	"log"
 	"testing"
 )

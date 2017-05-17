@@ -15,7 +15,7 @@
 package model
 
 import (
-	"github.com/hsluoyz/casbin/rbac"
+	"github.com/casbin/casbin/rbac"
 	"log"
 )
 

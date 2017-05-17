@@ -15,7 +15,7 @@
 package model
 
 import (
-	"github.com/hsluoyz/casbin/util"
+	"github.com/casbin/casbin/util"
 	"log"
 )
 

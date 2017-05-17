@@ -17,8 +17,8 @@ package persist
 import (
 	"bufio"
 	"bytes"
-	"github.com/hsluoyz/casbin/model"
-	"github.com/hsluoyz/casbin/util"
+	"github.com/casbin/casbin/model"
+	"github.com/casbin/casbin/util"
 	"io"
 	"os"
 	"strings"

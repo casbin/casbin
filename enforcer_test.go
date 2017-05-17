@@ -15,7 +15,7 @@
 package casbin
 
 import (
-	"github.com/hsluoyz/casbin/persist"
+	"github.com/casbin/casbin/persist"
 	"reflect"
 	"testing"
 )

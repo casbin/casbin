@@ -16,9 +16,9 @@ package casbin
 
 import (
 	"github.com/Knetic/govaluate"
-	"github.com/hsluoyz/casbin/config"
-	"github.com/hsluoyz/casbin/model"
-	"github.com/hsluoyz/casbin/persist"
+	"github.com/casbin/casbin/config"
+	"github.com/casbin/casbin/model"
+	"github.com/casbin/casbin/persist"
 	"log"
 	"reflect"
 )

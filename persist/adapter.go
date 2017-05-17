@@ -15,7 +15,7 @@
 package persist
 
 import (
-	"github.com/hsluoyz/casbin/model"
+	"github.com/casbin/casbin/model"
 	"strings"
 )
 

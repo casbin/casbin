@@ -15,8 +15,8 @@
 package model
 
 import (
-	"github.com/hsluoyz/casbin/config"
-	"github.com/hsluoyz/casbin/util"
+	"github.com/casbin/casbin/config"
+	"github.com/casbin/casbin/util"
 	"log"
 	"strconv"
 	"strings"
