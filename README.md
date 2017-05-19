@@ -27,7 +27,7 @@ In casbin, an access control model is abstracted into a CONF file based on the *
 
 The most basic and simplest model in casbin is ACL. ACL's model CONF is:
 
-```
+```ini
 [request_definition]
 r = sub, obj, act
 
@@ -43,7 +43,7 @@ m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
 
 An example policy for ACL model is like:
 
-```csv
+```
 p, alice, data1, read
 p, bob, data2, write
 ```
@@ -78,7 +78,7 @@ go get github.com/casbin/casbin
 
 1. Customize the casbin config file ``casbin.conf`` to your need. Its default content is:
 
-```conf
+```ini
 [default]
 # The file path to the model:
 model_path = examples/basic_model.conf
@@ -101,7 +101,7 @@ It means uses ``basic_model.conf`` as the model and ``basic_policy.csv`` as the 
 
 2. Initialize an enforcer by specifying the path to the casbin configuration file:
 
-```golang
+```go
 e := casbin.NewEnforcer("path/to/casbin.conf")
 ```
 
@@ -109,7 +109,7 @@ Note: you can also initialize an enforcer directly with a file path or database,
 
 3. Add an enforcement hook into your code right before the access happens:
 
-```golang
+```go
 sub := "alice" // the user that wants to access a resource.
 obj := "data1" // the resource that is going to be accessed.
 act := "read" // the operation that the user performs on the resource.
@@ -123,7 +123,7 @@ if e.Enforce(sub, obj, act) == true {
 
 4. Besides the static policy file, casbin also provides API for permission management at run-time. For example, You can get all the roles assigned to a user as below:
 
-```golang
+```go
 roles := e.GetRoles("alice")
 ```
 
@@ -147,7 +147,7 @@ The policy is much more dynamic than model and can be loaded from a file/databas
 
 Below shows how to initialize an enforcer from file:
 
-```golang
+```go
 // Initialize an enforcer with a model file and a policy file.
 e := casbin.NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 ```
@@ -156,7 +156,7 @@ e := casbin.NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv"
 
 Below shows how to initialize an enforcer from database. it connects to a MySQL DB on 127.0.0.1:3306 with root and blank password.
 
-```golang
+```go
 // Initialize an enforcer with a model file and policy from database.
 e := casbin.NewEnforcer("examples/basic_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
 ```
@@ -165,7 +165,7 @@ e := casbin.NewEnforcer("examples/basic_model.conf", "mysql", "root:@tcp(127.0.0
 
 In casbin, both the above file and database storage is implemented as an adapter. You can use your own adapter like below:
 
-```golang
+```go
 // Initialize an enforcer with an adapter.
 adapter := persist.NewFileAdapter("examples/basic_policy.csv") // or replace with your own adapter.
 e := casbin.NewEnforcer("examples/basic_model.conf", adapter)
@@ -177,7 +177,7 @@ An adapter should implement two methods:``LoadPolicy(model model.Model)`` and ``
 
 You may also want to reload the model, reload the policy or save the policy after initialization:
 
-```golang
+```go
 // Reload the model from the model CONF file.
 e.LoadModel()
 
