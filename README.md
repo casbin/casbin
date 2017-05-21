@@ -129,6 +129,80 @@ roles := e.GetRoles("alice")
 
 5. Please refer to the ``_test.go`` files for more usage.
 
+## Syntax for models
+
+A model CONF should have at least four sections: ``[request_definition], [policy_definition], [policy_effect], [matchers]``. If the model uses RBAC, it should also add ``[role_definition]``.
+
+1. [request_definition]: Definition for the access request. It defines the arguments in ``e.Enforce(...)`` function.
+
+```
+[request_definition]
+r = sub, obj, act
+```
+
+``sub, obj, act`` represents the classic triple: accessing entity (Subject), accessed resource (Object) and the access method (Action). However, you can customize your own request form, like ``sub, act`` if you don't need to specify an particular resource, or ``sub, sub2, obj, act`` if you somehow have two accessing entities.
+
+2. [policy_definition]: Definition for the policy. It defines the meaning of the policy. For example, we have the following model:
+
+```
+[policy_definition]
+p = sub, obj, act
+p2 = sub, act
+```
+
+And we have the following policy (if in a policy file)
+
+```
+p, alice, data1, read
+p2, bob, write-all-objects
+```
+
+Each line in a policy is called a policy rule. Each policy rule starts with a ``policy type``, e.g., `p`, `p2`. It is used to match the policy definition if there are multiple definitions. The above policy shows this mapping:
+
+(alice, data1, read) -> (p.sub, p.obj, p.act)
+(bob, write-all-objects) -> (p2.sub, p2.act)
+
+For common cases, the user doesn't have multiple policy definitions, so probably you will only use policy type ``p``.
+
+3. [policy_effect]: Definition for the policy effect. It defines whether the access request should be approved if multiple policy rules match the request. For example, one rule permits and the other denies.
+
+```
+[policy_effect]
+e = some(where (p.eft == allow))
+```
+e = !any(where (p.eft == deny))
+The above policy effect means if there's any matched policy rule of ``allow``, the final effect is ``allow`` (aka allow-override). ``p.eft`` is the effect for a policy, it can be ``allow`` or ``deny``. It's optional and the default value is ``allow``. So as we didn't specify it above, it uses the default value.
+
+Another example for policy effect is:
+
+```
+e = !any(where (p.eft == deny))
+```
+
+It means if there should be no matched policy rules of``deny`` (aka deny-override). ``some`` means: if there exists one matched policy rule. ``any`` means: all matched policy rules. The policy effect can even be connected with logic expressions:
+
+```
+e = some(where (p.eft == allow)) && !any(where (p.eft == deny))
+```
+
+It means at least one matched policy rule of``allow``, and there should be matched policy rules of``deny``.
+
+4. [matchers]: Definition for policy matchers. The matchers are expressions. It defines how the policy rules are evaluated against the request.
+
+```
+[matchers]
+m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
+```
+
+The above matcher is the simplest, it means that the subject, object and action in a request should match the ones in a policy rule.
+
+You can use arithmetic like ``+, -, *, /`` and logical operators like ``&&, ||, !`` in matchers. You can even specify functions in it. You can use the built-in functions or specify your own function. The supported built-in functions are:
+
+- ``keyMatch(arg1, arg2)``: arg1 and arg2 are usually paths or URLs. arg2 can have pattern (*). It returns whether arg1 matches arg2.
+- ``regexMatch(arg1, arg2)``: arg1 can be any string. arg2 is a regular expression. It returns whether arg1 matches arg2.
+
+Please refer to ``keymatch_model.conf`` and ``keymatch_policy.csv`` for examples.
+
 ## Persistence
 
 The model and policy can be persisted in casbin with the following restrictions:
