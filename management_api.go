@@ -96,3 +96,8 @@ func (e *Enforcer) AddObjectAttributeFunction(function func(args ...interface{})
 func (e *Enforcer) AddActionAttributeFunction(function func(args ...interface{}) (interface{}, error)) {
 	e.fm.AddFunction("actAttr", function)
 }
+
+// AddFunction adds a customized function.
+func (e *Enforcer) AddFunction(name string, function func(args ...interface{}) (interface{}, error)) {
+	e.fm.AddFunction(name, function)
+}

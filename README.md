@@ -133,7 +133,9 @@ roles := e.GetRoles("alice")
 
 A model CONF should have at least four sections: ``[request_definition], [policy_definition], [policy_effect], [matchers]``. If the model uses RBAC, it should also add ``[role_definition]``.
 
-1. [request_definition]: Definition for the access request. It defines the arguments in ``e.Enforce(...)`` function.
+### Request definition
+
+``[request_definition]`` is the definition for the access request. It defines the arguments in ``e.Enforce(...)`` function.
 
 ```
 [request_definition]
@@ -142,7 +144,9 @@ r = sub, obj, act
 
 ``sub, obj, act`` represents the classic triple: accessing entity (Subject), accessed resource (Object) and the access method (Action). However, you can customize your own request form, like ``sub, act`` if you don't need to specify an particular resource, or ``sub, sub2, obj, act`` if you somehow have two accessing entities.
 
-2. [policy_definition]: Definition for the policy. It defines the meaning of the policy. For example, we have the following model:
+### Policy definition
+
+``[policy_definition]`` is the definition for the policy. It defines the meaning of the policy. For example, we have the following model:
 
 ```
 [policy_definition]
@@ -164,7 +168,9 @@ Each line in a policy is called a policy rule. Each policy rule starts with a ``
 
 For common cases, the user doesn't have multiple policy definitions, so probably you will only use policy type ``p``.
 
-3. [policy_effect]: Definition for the policy effect. It defines whether the access request should be approved if multiple policy rules match the request. For example, one rule permits and the other denies.
+### Policy effect
+
+``[policy_effect]`` is the definition for the policy effect. It defines whether the access request should be approved if multiple policy rules match the request. For example, one rule permits and the other denies.
 
 ```
 [policy_effect]
@@ -187,7 +193,9 @@ e = some(where (p.eft == allow)) && !any(where (p.eft == deny))
 
 It means at least one matched policy rule of``allow``, and there should be matched policy rules of``deny``.
 
-4. [matchers]: Definition for policy matchers. The matchers are expressions. It defines how the policy rules are evaluated against the request.
+### Matchers
+
+``[matchers]`` is the definition for policy matchers. The matchers are expressions. It defines how the policy rules are evaluated against the request.
 
 ```
 [matchers]
@@ -196,12 +204,58 @@ m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
 
 The above matcher is the simplest, it means that the subject, object and action in a request should match the ones in a policy rule.
 
-You can use arithmetic like ``+, -, *, /`` and logical operators like ``&&, ||, !`` in matchers. You can even specify functions in it. You can use the built-in functions or specify your own function. The supported built-in functions are:
+You can use arithmetic like ``+, -, *, /`` and logical operators like ``&&, ||, !`` in matchers.
+
+#### Functions in matchers
+
+You can even specify functions in a matcher. You can use the built-in functions or specify your own function. The supported built-in functions are:
 
 - ``keyMatch(arg1, arg2)``: arg1 and arg2 are usually paths or URLs. arg2 can have pattern (*). It returns whether arg1 matches arg2.
 - ``regexMatch(arg1, arg2)``: arg1 can be any string. arg2 is a regular expression. It returns whether arg1 matches arg2.
 
 Please refer to ``keymatch_model.conf`` and ``keymatch_policy.csv`` for examples.
+
+#### How to add a customized function
+
+First prepare your function. It takes several parameters and return a bool:
+
+```go
+func KeyMatch(key1 string, key2 string) bool {
+	i := strings.Index(key2, "*")
+	if i == -1 {
+		return key1 == key2
+	}
+
+	if len(key1) > i {
+		return key1[:i] == key2[:i]
+	}
+	return key1 == key2[:i]
+}
+```
+
+Then wrap it with ``interface{}`` types:
+
+```go
+func KeyMatchFunc(args ...interface{}) (interface{}, error) {
+	name1 := args[0].(string)
+	name2 := args[1].(string)
+
+	return (bool)(KeyMatch(name1, name2)), nil
+}
+```
+
+At last, register the function to the casbin enforcer:
+
+```go
+e.AddFunction("my_func", KeyMatchFunc)
+```
+
+Now, you can use the function in your model CONF like this:
+
+```
+[matchers]
+m = r.sub == p.sub && my_func(r.obj, p.obj) && r.act == p.act
+```
 
 ## Persistence
 
