@@ -217,7 +217,7 @@ You can even specify functions in a matcher. You can use the built-in functions 
 - ``keyMatch(arg1, arg2)``: arg1 and arg2 are usually paths or URLs. arg2 can have pattern (*). It returns whether arg1 matches arg2.
 - ``regexMatch(arg1, arg2)``: arg1 can be any string. arg2 is a regular expression. It returns whether arg1 matches arg2.
 
-Please refer to ``keymatch_model.conf`` and ``keymatch_policy.csv`` for examples.
+Please refer to [keymatch_model.conf](https://github.com/casbin/casbin/blob/master/examples/keymatch_model.conf) for examples.
 
 #### How to add a customized function
 
@@ -260,6 +260,44 @@ Now, you can use the function in your model CONF like this:
 [matchers]
 m = r.sub == p.sub && my_func(r.obj, p.obj) && r.act == p.act
 ```
+
+### Role definition (optional)
+
+``[role_definition]`` is the definition for the RBAC role inheritance relations. Casbin supports multiple instances of RBAC systems, e.g., users can have roles and their inheritance relations, and resources can have roles and their inheritance relations too. These two RBAC systems won't interfere.
+
+This section is optional. If you don't use RBAC roles in the model, then omit this section.
+
+```ini
+[role_definition]
+g = _, _
+g2 = _, _
+```
+
+The above role definition shows that ``g`` is a RBAC system, and ``g2`` is another RBAC system. ``_, _`` only means there are two parties inside an inheritance relation. It is currently hard-coded and should not be modified. As a common case, you usually use ``g`` alone if you only need roles on users. and you can use ``g`` and ``g2`` when you need roles (or groups) on both users and resources. Please see the [rbac_model.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_model.conf) and [rbac_model_with_resource_roles.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_model_with_resource_roles.conf) for examples.
+
+Casbin stores the actual user-role mapping (or resource-role mapping if you are using roles on resources) in the policy, for example:
+
+```
+g, alice, data2_admin
+```
+
+It means ``alice`` inherits/is a member of role ``data2_admin``. ``alice`` here can be a user, a resource or a role. Casbin only recognizes it as a string.
+
+Then in a matcher, you should check the role as below:
+
+```ini
+[matchers]
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+```
+
+It means ``sub`` in the request should has the role ``sub`` in the policy.
+
+There are several things to note:
+
+1. Casbin only stores the user-role mapping.
+2. Casbin doesn't verify whether a user is a valid user, or role is a valid role. That should be taken care of by authentication.
+3. Do not use the same name for a user and a role inside a RBAC system, because Casbin recognizes users and roles as strings, and there's no way for Casbin to know whether you are specifying user ``alice`` or role ``alice``. You can simply solve it by using ``role_alice``.
+4. If ``A`` has role ``B``, ``B`` has role ``C``, then ``A`` has role ``C``. This transitivity is infinite for now.
 
 ## Persistence
 
