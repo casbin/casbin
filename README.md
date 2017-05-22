@@ -141,7 +141,7 @@ A model CONF should have at least four sections: ``[request_definition], [policy
 
 ``[request_definition]`` is the definition for the access request. It defines the arguments in ``e.Enforce(...)`` function.
 
-```
+```ini
 [request_definition]
 r = sub, obj, act
 ```
@@ -152,7 +152,7 @@ r = sub, obj, act
 
 ``[policy_definition]`` is the definition for the policy. It defines the meaning of the policy. For example, we have the following model:
 
-```
+```ini
 [policy_definition]
 p = sub, obj, act
 p2 = sub, act
@@ -176,7 +176,7 @@ For common cases, the user doesn't have multiple policy definitions, so probably
 
 ``[policy_effect]`` is the definition for the policy effect. It defines whether the access request should be approved if multiple policy rules match the request. For example, one rule permits and the other denies.
 
-```
+```ini
 [policy_effect]
 e = some(where (p.eft == allow))
 ```
@@ -185,13 +185,13 @@ The above policy effect means if there's any matched policy rule of ``allow``, t
 
 Another example for policy effect is:
 
-```
+```ini
 e = !any(where (p.eft == deny))
 ```
 
 It means if there should be no matched policy rules of``deny`` (aka deny-override). ``some`` means: if there exists one matched policy rule. ``any`` means: all matched policy rules. The policy effect can even be connected with logic expressions:
 
-```
+```ini
 e = some(where (p.eft == allow)) && !any(where (p.eft == deny))
 ```
 
@@ -201,7 +201,7 @@ It means at least one matched policy rule of``allow``, and there should be match
 
 ``[matchers]`` is the definition for policy matchers. The matchers are expressions. It defines how the policy rules are evaluated against the request.
 
-```
+```ini
 [matchers]
 m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
 ```
@@ -256,7 +256,7 @@ e.AddFunction("my_func", KeyMatchFunc)
 
 Now, you can use the function in your model CONF like this:
 
-```
+```ini
 [matchers]
 m = r.sub == p.sub && my_func(r.obj, p.obj) && r.act == p.act
 ```
