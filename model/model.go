@@ -55,7 +55,7 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 			ast.Tokens[i] = key + "_" + ast.Tokens[i]
 		}
 	} else {
-		ast.Value = util.EscapeAssertion(ast.Value)
+		ast.Value = util.RemoveComments(util.EscapeAssertion(ast.Value))
 	}
 
 	_, ok := model[sec]

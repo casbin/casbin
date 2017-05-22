@@ -28,15 +28,19 @@ In casbin, an access control model is abstracted into a CONF file based on the *
 The most basic and simplest model in casbin is ACL. ACL's model CONF is:
 
 ```ini
+# Request definition
 [request_definition]
 r = sub, obj, act
 
+# Policy definition
 [policy_definition]
 p = sub, obj, act
 
+# Policy effect
 [policy_effect]
 e = some(where (p.eft == allow))
 
+# Matchers
 [matchers]
 m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
 ```
@@ -131,7 +135,7 @@ roles := e.GetRoles("alice")
 
 ## Syntax for models
 
-A model CONF should have at least four sections: ``[request_definition], [policy_definition], [policy_effect], [matchers]``. If the model uses RBAC, it should also add ``[role_definition]``.
+A model CONF should have at least four sections: ``[request_definition], [policy_definition], [policy_effect], [matchers]``. If the model uses RBAC, it should also add ``[role_definition]``. The comments start with ``#``.
 
 ### Request definition
 

@@ -19,6 +19,23 @@ import (
 	"testing"
 )
 
+func testRemoveComments(t *testing.T, s string, res string) {
+	myRes := RemoveComments(s)
+	log.Printf("%s: %s", s, myRes)
+
+	if myRes != res {
+		t.Errorf("%s: %s, supposed to be %s", s, myRes, res)
+	}
+}
+
+func TestRemoveComments(t *testing.T) {
+	testRemoveComments(t, "r.act == p.act # comments", "r.act == p.act")
+	testRemoveComments(t, "r.act == p.act#comments", "r.act == p.act")
+	testRemoveComments(t, "r.act == p.act###", "r.act == p.act")
+	testRemoveComments(t, "### comments", "")
+	testRemoveComments(t, "r.act == p.act", "r.act == p.act")
+}
+
 func testFixAttribute(t *testing.T, s string, res string) {
 	myRes := FixAttribute(s)
 	log.Printf("%s: %s", s, myRes)
