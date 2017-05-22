@@ -47,7 +47,13 @@ func (rm *RoleManager) createRole(name string) *Role {
 
 // AddLink adds the inheritance link between role: name1 and role: name2.
 // aka role: name1 inherits role: name2.
-func (rm *RoleManager) AddLink(name1 string, name2 string) {
+// domain is a prefix to the roles.
+func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) {
+	if len(domain) == 1 {
+		name1 = domain[0] + "::" + name1
+		name2 = domain[0] + "::" + name2
+	}
+
 	role1 := rm.createRole(name1)
 	role2 := rm.createRole(name2)
 	role1.addRole(role2)
@@ -55,7 +61,13 @@ func (rm *RoleManager) AddLink(name1 string, name2 string) {
 
 // DeleteLink deletes the inheritance link between role: name1 and role: name2.
 // aka role: name1 does not inherit role: name2 any more.
-func (rm *RoleManager) DeleteLink(name1 string, name2 string) {
+// domain is a prefix to the roles.
+func (rm *RoleManager) DeleteLink(name1 string, name2 string, domain ...string) {
+	if len(domain) == 1 {
+		name1 = domain[0] + "::" + name1
+		name2 = domain[0] + "::" + name2
+	}
+
 	if !rm.hasRole(name1) || !rm.hasRole(name2) {
 		return
 	}
@@ -66,7 +78,13 @@ func (rm *RoleManager) DeleteLink(name1 string, name2 string) {
 }
 
 // HasLink determines whether role: name1 inherits role: name2.
-func (rm *RoleManager) HasLink(name1 string, name2 string) bool {
+// domain is a prefix to the roles.
+func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) bool {
+	if len(domain) == 1 {
+		name1 = domain[0] + "::" + name1
+		name2 = domain[0] + "::" + name2
+	}
+
 	if name1 == name2 {
 		return true
 	}

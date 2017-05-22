@@ -170,10 +170,18 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 		for key, ast := range e.model["g"] {
 			rm := ast.RM
 			functions[key] = func(args ...interface{}) (interface{}, error) {
-				name1 := args[0].(string)
-				name2 := args[1].(string)
+				if len(args) == 2 {
+					name1 := args[0].(string)
+					name2 := args[1].(string)
 
-				return (bool)(rm.HasLink(name1, name2)), nil
+					return (bool)(rm.HasLink(name1, name2)), nil
+				} else {
+					name1 := args[0].(string)
+					name2 := args[1].(string)
+					domain := args[2].(string)
+
+					return (bool)(rm.HasLink(name1, name2, domain)), nil
+				}
 			}
 		}
 	}

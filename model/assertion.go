@@ -32,7 +32,11 @@ type Assertion struct {
 func (ast *Assertion) buildRoleLinks() {
 	ast.RM = rbac.NewRoleManager(1)
 	for _, rule := range ast.Policy {
-		ast.RM.AddLink(rule[0], rule[1])
+		if len(rule) == 2 {
+			ast.RM.AddLink(rule[0], rule[1])
+		} else if len(rule) == 3 {
+			ast.RM.AddLink(rule[0], rule[1], rule[2])
+		}
 	}
 
 	log.Print("Role links for: " + ast.Key)

@@ -32,6 +32,12 @@ func testEnforceWithoutUsers(t *testing.T, e *Enforcer, obj string, act string, 
 	}
 }
 
+func testDomainEnforce(t *testing.T, e *Enforcer, sub string, dom string, obj string, act string, res bool) {
+	if e.Enforce(sub, dom, obj, act) != res {
+		t.Errorf("%s, %s, %s, %s: %t, supposed to be %t", sub, dom, obj, act, !res, res)
+	}
+}
+
 func TestBasicModel(t *testing.T) {
 	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 
@@ -134,6 +140,19 @@ func TestRBACModelWithResourceRoles(t *testing.T) {
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", false)
 	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
+func TestRBACModelWithDomains(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model_with_domains.conf", "examples/rbac_policy_with_domains.csv")
+
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "read", false)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "write", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data1", "read", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data1", "write", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
 }
 
 func getAttr(name string, attr string) string {
