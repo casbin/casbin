@@ -1,8 +1,19 @@
-## User guide for models in Casbin
+# Access control models in Casbin
 
+## Table of Contents
+
+- [Request definition](#request-definition)
+- [Policy definition](#policy-definition)
+- [Policy effect](#policy-effect)
+- [Matchers](#matchers)
+  * [Functions in matchers](#functions-in-matchers)
+  * [How to add a customized function](#how-to-add-a-customized-function)
+- [Role definition (optional)](#role-definition--optional-)
+- [Role definition with domains/tenants (optional)](#role-definition-with-domains-tenants--optional-)
+  
 A model CONF should have at least four sections: ``[request_definition], [policy_definition], [policy_effect], [matchers]``. If the model uses RBAC, it should also add ``[role_definition]``. The comments start with ``#``.
 
-### Request definition
+## Request definition
 
 ``[request_definition]`` is the definition for the access request. It defines the arguments in ``e.Enforce(...)`` function.
 
@@ -13,7 +24,7 @@ r = sub, obj, act
 
 ``sub, obj, act`` represents the classic triple: accessing entity (Subject), accessed resource (Object) and the access method (Action). However, you can customize your own request form, like ``sub, act`` if you don't need to specify an particular resource, or ``sub, sub2, obj, act`` if you somehow have two accessing entities.
 
-### Policy definition
+## Policy definition
 
 ``[policy_definition]`` is the definition for the policy. It defines the meaning of the policy. For example, we have the following model:
 
@@ -37,7 +48,7 @@ Each line in a policy is called a policy rule. Each policy rule starts with a ``
 
 For common cases, the user doesn't have multiple policy definitions, so probably you will only use policy type ``p``.
 
-### Policy effect
+## Policy effect
 
 ``[policy_effect]`` is the definition for the policy effect. It defines whether the access request should be approved if multiple policy rules match the request. For example, one rule permits and the other denies.
 
@@ -62,7 +73,7 @@ e = some(where (p.eft == allow)) && !any(where (p.eft == deny))
 
 It means at least one matched policy rule of``allow``, and there should be matched policy rules of``deny``.
 
-### Matchers
+## Matchers
 
 ``[matchers]`` is the definition for policy matchers. The matchers are expressions. It defines how the policy rules are evaluated against the request.
 
@@ -75,7 +86,7 @@ The above matcher is the simplest, it means that the subject, object and action 
 
 You can use arithmetic like ``+, -, *, /`` and logical operators like ``&&, ||, !`` in matchers.
 
-#### Functions in matchers
+### Functions in matchers
 
 You can even specify functions in a matcher. You can use the built-in functions or specify your own function. The supported built-in functions are:
 
@@ -84,7 +95,7 @@ You can even specify functions in a matcher. You can use the built-in functions 
 
 Please refer to [keymatch_model.conf](https://github.com/casbin/casbin/blob/master/examples/keymatch_model.conf) for examples.
 
-#### How to add a customized function
+### How to add a customized function
 
 First prepare your function. It takes several parameters and return a bool:
 
@@ -126,7 +137,7 @@ Now, you can use the function in your model CONF like this:
 m = r.sub == p.sub && my_func(r.obj, p.obj) && r.act == p.act
 ```
 
-### Role definition (optional)
+## Role definition (optional)
 
 ``[role_definition]`` is the definition for the RBAC role inheritance relations. Casbin supports multiple instances of RBAC systems, e.g., users can have roles and their inheritance relations, and resources can have roles and their inheritance relations too. These two RBAC systems won't interfere.
 
@@ -165,7 +176,7 @@ There are several things to note:
 3. Do not use the same name for a user and a role inside a RBAC system, because Casbin recognizes users and roles as strings, and there's no way for Casbin to know whether you are specifying user ``alice`` or role ``alice``. You can simply solve it by using ``role_alice``.
 4. If ``A`` has role ``B``, ``B`` has role ``C``, then ``A`` has role ``C``. This transitivity is infinite for now.
 
-### Role definition with domains/tenants (optional)
+## Role definition with domains/tenants (optional)
 
 The RBAC roles in Casbin can be global or domain-specific. Domain-specify roles mean that the roles for a user can be different when the user is at different domains/tenants. This is very useful for large systems like a cloud, as the users are usually in different tenants.
 
