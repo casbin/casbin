@@ -23,6 +23,15 @@ import (
 	"reflect"
 )
 
+// Effect is the result for a policy rule.
+type Effect int
+
+const (
+	EFFECT_ALLOW Effect = iota
+	EFFECT_INDETERMINATE
+	EFFECT_DENY
+)
+
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath string
@@ -187,9 +196,9 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 	}
 	expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 
-	var policyResults []bool
+	var policyResults []Effect
 	if len(e.model["p"]["p"].Policy) != 0 {
-		policyResults = make([]bool, len(e.model["p"]["p"].Policy))
+		policyResults = make([]Effect, len(e.model["p"]["p"].Policy))
 
 		for i, pvals := range e.model["p"]["p"].Policy {
 			//log.Print("Policy Rule: ", pvals)
@@ -206,13 +215,27 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 			//log.Print("Result: ", result)
 
 			if err != nil {
-				policyResults[i] = false
+				policyResults[i] = EFFECT_INDETERMINATE
 			} else {
-				policyResults[i] = result.(bool)
+				if !result.(bool) {
+					policyResults[i] = EFFECT_INDETERMINATE
+				} else {
+					if effect, ok := parameters["p_eft"]; ok {
+						if effect == "allow" {
+							policyResults[i] = EFFECT_ALLOW
+						} else if effect == "deny" {
+							policyResults[i] = EFFECT_DENY
+						} else {
+							policyResults[i] = EFFECT_INDETERMINATE
+						}
+					} else {
+						policyResults[i] = EFFECT_ALLOW
+					}
+				}
 			}
 		}
 	} else {
-		policyResults = make([]bool, 1)
+		policyResults = make([]Effect, 1)
 
 		parameters := make(map[string]interface{}, 8)
 		for j, token := range e.model["r"]["r"].Tokens {
@@ -226,9 +249,13 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 		//log.Print("Result: ", result)
 
 		if err != nil {
-			policyResults[0] = false
+			policyResults[0] = EFFECT_INDETERMINATE
 		} else {
-			policyResults[0] = result.(bool)
+			if result.(bool) {
+				policyResults[0] = EFFECT_ALLOW
+			} else {
+				policyResults[0] = EFFECT_INDETERMINATE
+			}
 		}
 	}
 
@@ -237,9 +264,27 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 	result := false
 	if e.model["e"]["e"].Value == "some(where (p_eft == allow))" {
 		result = false
-		for _, res := range policyResults {
-			if res {
+		for _, eft := range policyResults {
+			if eft == EFFECT_ALLOW {
 				result = true
+				break
+			}
+		}
+	} else if e.model["e"]["e"].Value == "!some(where (p_eft == deny))" {
+		result = true
+		for _, eft := range policyResults {
+			if eft == EFFECT_DENY {
+				result = false
+				break
+			}
+		}
+	} else if e.model["e"]["e"].Value == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" {
+		result = false
+		for _, eft := range policyResults {
+			if eft == EFFECT_ALLOW {
+				result = true
+			} else if eft == EFFECT_DENY {
+				result = false
 				break
 			}
 		}

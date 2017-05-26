@@ -155,6 +155,19 @@ func TestRBACModelWithDomains(t *testing.T) {
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
 }
 
+func TestRBACModelWithDeny(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model_with_deny.conf", "examples/rbac_policy_with_deny.csv")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", true)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
 func getAttr(name string, attr string) string {
 	// This is the same as:
 	//
