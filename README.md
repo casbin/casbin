@@ -23,6 +23,7 @@ casbin is a powerful and efficient open-source access control library for Golang
 6. **RBAC with domains/tenants**: users can have different role sets for different domains/tenants.
 7. **[ABAC (Attribute-Based Access Control)](https://en.wikipedia.org/wiki/Attribute-Based_Access_Control)**
 8. **[RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer)**
+9. **Deny-override**: both allow and deny authorizations are supported, deny overrides the allow.
 
 In casbin, an access control model is abstracted into a CONF file based on the **PERM metamodel (Policy, Effect, Request, Matchers)**. So switching or upgrading the authorization mechanism for a project is just as simple as modifying a configuration. You can customize your own access control model by combining the available models. For example, you can get RBAC roles and ABAC attributes together inside one model and share one set of policy rules.
 
@@ -62,7 +63,7 @@ It means:
 
 What casbin does:
 
-1. enforce the policy in the classic ``{subject, object, action}`` form or a customized form as you defined.
+1. enforce the policy in the classic ``{subject, object, action}`` form or a customized form as you defined, both allow and deny authorizations are supported.
 2. handle the storage of the access control model and its policy.
 3. manage the role-user mappings and role-role mappings (aka role hierarchy in RBAC).
 4. support built-in superuser like ``root`` or ``administrator``. A superuser can do anything without explict permissions.
@@ -210,6 +211,7 @@ RBAC with resource roles | [rbac_model_with_resource_roles.conf](https://github.
 RBAC with domains/tenants | [rbac_model_with_domains.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_model_with_domains.conf)  | [rbac_policy_with_domains.csv](https://github.com/casbin/casbin/blob/master/examples/rbac_policy_with_domains.csv)
 ABAC | [abac_model.conf](https://github.com/casbin/casbin/blob/master/examples/abac_model.conf)  | N/A
 RESTful | [keymatch_model.conf](https://github.com/casbin/casbin/blob/master/examples/keymatch_model.conf)  | [keymatch_policy.csv](https://github.com/casbin/casbin/blob/master/examples/keymatch_policy.csv)
+Deny-override | [rbac_model_with_deny.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_model_with_deny.conf)  | [rbac_policy_with_deny.csv](https://github.com/casbin/casbin/blob/master/examples/rbac_policy_with_deny.csv)
 
 ## Our users
 
