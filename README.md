@@ -1,4 +1,4 @@
-casbin
+Casbin
 ====
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/casbin/casbin)](https://goreportcard.com/report/github.com/casbin/casbin)
@@ -8,11 +8,11 @@ casbin
 [![Release](https://img.shields.io/github/release/casbin/casbin.svg)](https://github.com/casbin/casbin/releases/latest)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
 
-**Note**: The plugins and middleware based on casbin can be found at: https://github.com/casbin
+**Note**: The plugins and middleware based on Casbin can be found at: https://github.com/casbin
 
 ![casbin Logo](casbin-logo.png)
 
-casbin is a powerful and efficient open-source access control library for Golang projects. It provides support for enforcing authorization based on various models. By far, the access control models supported by casbin are:
+Casbin is a powerful and efficient open-source access control library for Golang projects. It provides support for enforcing authorization based on various models. By far, the access control models supported by Casbin are:
 
 1. [**ACL (Access Control List)**](https://en.wikipedia.org/wiki/Access_control_list)
 2. **ACL with [superuser](https://en.wikipedia.org/wiki/Superuser)**
@@ -25,9 +25,9 @@ casbin is a powerful and efficient open-source access control library for Golang
 8. **[RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer)**
 9. **Deny-override**: both allow and deny authorizations are supported, deny overrides the allow.
 
-In casbin, an access control model is abstracted into a CONF file based on the **PERM metamodel (Policy, Effect, Request, Matchers)**. So switching or upgrading the authorization mechanism for a project is just as simple as modifying a configuration. You can customize your own access control model by combining the available models. For example, you can get RBAC roles and ABAC attributes together inside one model and share one set of policy rules.
+In Casbin, an access control model is abstracted into a CONF file based on the **PERM metamodel (Policy, Effect, Request, Matchers)**. So switching or upgrading the authorization mechanism for a project is just as simple as modifying a configuration. You can customize your own access control model by combining the available models. For example, you can get RBAC roles and ABAC attributes together inside one model and share one set of policy rules.
 
-The most basic and simplest model in casbin is ACL. ACL's model CONF is:
+The most basic and simplest model in Casbin is ACL. ACL's model CONF is:
 
 ```ini
 # Request definition
@@ -61,7 +61,7 @@ It means:
 
 ## Features
 
-What casbin does:
+What Casbin does:
 
 1. enforce the policy in the classic ``{subject, object, action}`` form or a customized form as you defined, both allow and deny authorizations are supported.
 2. handle the storage of the access control model and its policy.
@@ -69,10 +69,10 @@ What casbin does:
 4. support built-in superuser like ``root`` or ``administrator``. A superuser can do anything without explict permissions.
 5. multiple built-in operators to support the rule matching. For example, ``keyMatch`` can map a resource key ``/foo/bar`` to the pattern ``/foo*``.
 
-What casbin does NOT do:
+What Casbin does NOT do:
 
 1. authentication (aka verify ``username`` and ``password`` when a user logs in)
-2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and casbin is not designed as a password container. However, casbin stores the user-role mapping for the RBAC scenario. 
+2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and Casbin is not designed as a password container. However, Casbin stores the user-role mapping for the RBAC scenario. 
 
 ## Installation
 
@@ -82,7 +82,7 @@ go get github.com/casbin/casbin
 
 ## Get started
 
-1. Customize the casbin config file ``casbin.conf`` to your need. Its default content is:
+1. Customize the Casbin config file ``casbin.conf`` to your need. Its default content is:
 
 ```ini
 [default]
@@ -105,7 +105,7 @@ data_source = root:@tcp(127.0.0.1:3306)/
 
 It means uses ``basic_model.conf`` as the model and ``basic_policy.csv`` as the policy.
 
-2. Initialize an enforcer by specifying the path to the casbin configuration file:
+2. Initialize an enforcer by specifying the path to the Casbin configuration file:
 
 ```go
 e := casbin.NewEnforcer("path/to/casbin.conf")
@@ -127,7 +127,7 @@ if e.Enforce(sub, obj, act) == true {
 }
 ```
 
-4. Besides the static policy file, casbin also provides API for permission management at run-time. For example, You can get all the roles assigned to a user as below:
+4. Besides the static policy file, Casbin also provides API for permission management at run-time. For example, You can get all the roles assigned to a user as below:
 
 ```go
 roles := e.GetRoles("alice")
@@ -141,9 +141,9 @@ See: [model.md](https://github.com/casbin/casbin/blob/master/model.md)
 
 ## Persistence
 
-The model and policy can be persisted in casbin with the following restrictions:
+The model and policy can be persisted in Casbin with the following restrictions:
 
-Persist Method | casbin Model | casbin Policy | Usage
+Persist Method | Casbin Model | Casbin Policy | Usage
 ----|------|----|----
 File | Load only | Load/Save | [Details](https://github.com/casbin/casbin#file)
 Database (tested with [MySQL](https://www.mysql.com)) | Not supported | Load/Save | [Details](https://github.com/casbin/casbin#database)
@@ -151,7 +151,7 @@ Database (tested with [MySQL](https://www.mysql.com)) | Not supported | Load/Sav
 
 We think the model represents the access control model that our customer uses and is not often modified at run-time, so we don't implement an API to modify the current model or save the model into a file. And the model cannot be loaded from or saved into a database. The model file should be in .CONF format.
 
-The policy is much more dynamic than model and can be loaded from a file/database or saved to a file/database at any time. As for file persistence, the policy file should be in .CSV (Comma-Separated Values) format. As for the database backend, casbin should support all relational DBMSs but I only tested with MySQL. casbin has no built-in database with it, you have to setup a database on your own. Let me know if there are any compatibility issues here. casbin will automatically create a database named ``casbin`` and use it for policy storage. So make sure your provided credential has the related privileges for the database you use.
+The policy is much more dynamic than model and can be loaded from a file/database or saved to a file/database at any time. As for file persistence, the policy file should be in .CSV (Comma-Separated Values) format. As for the database backend, Casbin should support all relational DBMSs but I only tested with MySQL. Casbin has no built-in database with it, you have to setup a database on your own. Let me know if there are any compatibility issues here. Casbin will automatically create a database named ``casbin`` and use it for policy storage. So make sure your provided credential has the related privileges for the database you use.
 
 ### File
 
@@ -173,7 +173,7 @@ e := casbin.NewEnforcer("examples/basic_model.conf", "mysql", "root:@tcp(127.0.0
 
 ### Use your own storage adapter
 
-In casbin, both the above file and database storage is implemented as an adapter. You can use your own adapter like below:
+In Casbin, both the above file and database storage is implemented as an adapter. You can use your own adapter like below:
 
 ```go
 // Initialize an enforcer with an adapter.
@@ -194,7 +194,7 @@ e.LoadModel()
 // Reload the policy from file/database.
 e.LoadPolicy()
 
-// Save the current policy (usually after changed with casbin API) back to file/database.
+// Save the current policy (usually after changed with Casbin API) back to file/database.
 e.SavePolicy()
 ```
 

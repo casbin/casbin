@@ -124,7 +124,7 @@ func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 }
 ```
 
-At last, register the function to the casbin enforcer:
+At last, register the function to the Casbin enforcer:
 
 ```go
 e.AddFunction("my_func", KeyMatchFunc)
