@@ -219,7 +219,7 @@ Deny-override | [rbac_model_with_deny.conf](https://github.com/casbin/casbin/blo
 
 - [Beego](https://github.com/astaxie/beego): An open-source, high-performance web framework for Go, via built-in plugin: [plugins/authz](https://github.com/astaxie/beego/blob/master/plugins/authz)
 - [Caddy](https://github.com/mholt/caddy): Fast, cross-platform HTTP/2 web server with automatic HTTPS, via plugin: [caddy-authz](https://github.com/casbin/caddy-authz)
-- [Echo](https://github.com/mholt/caddy): High performance, minimalist Go web framework, via PR: [echo-authz](https://github.com/labstack/echo/pull/939)
+- [Echo](https://github.com/labstack/echo): High performance, minimalist Go web framework, via PR: [echo-authz](https://github.com/labstack/echo/pull/939)
 - [Tango](https://github.com/lunny/tango): Micro & pluggable web framework for Go, via plugin: [authz](https://github.com/tango-contrib/authz)
 - [Chi](https://github.com/pressly/chi): A lightweight, idiomatic and composable router for building HTTP services, via plugin: [chi-authz](https://github.com/casbin/chi-authz)
 
