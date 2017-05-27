@@ -137,7 +137,7 @@ roles := e.GetRoles("alice")
 
 ## Syntax for models
 
-See: [model.md](https://github.com/casbin/casbin/blob/master/model.md)
+See: [Model.md](https://github.com/casbin/casbin/blob/master/Model.md)
 
 ## Persistence
 
