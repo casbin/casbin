@@ -10,7 +10,7 @@
   * [How to add a customized function](#how-to-add-a-customized-function)
 - [Role definition (optional)](#role-definition--optional-)
 - [Role definition with domains/tenants (optional)](#role-definition-with-domains-tenants--optional-)
-  
+
 A model CONF should have at least four sections: ``[request_definition], [policy_definition], [policy_effect], [matchers]``. If the model uses RBAC, it should also add ``[role_definition]``. The comments start with ``#``.
 
 ## Request definition
@@ -56,7 +56,7 @@ For common cases, the user doesn't have multiple policy definitions, so probably
 [policy_effect]
 e = some(where (p.eft == allow))
 ```
-e = !any(where (p.eft == deny))
+
 The above policy effect means if there's any matched policy rule of ``allow``, the final effect is ``allow`` (aka allow-override). ``p.eft`` is the effect for a policy, it can be ``allow`` or ``deny``. It's optional and the default value is ``allow``. So as we didn't specify it above, it uses the default value.
 
 Another example for policy effect is:
