@@ -62,16 +62,18 @@ The above policy effect means if there's any matched policy rule of ``allow``, t
 Another example for policy effect is:
 
 ```ini
-e = !any(where (p.eft == deny))
+[policy_effect]
+e = !some(where (p.eft == deny))
 ```
 
-It means if there should be no matched policy rules of``deny`` (aka deny-override). ``some`` means: if there exists one matched policy rule. ``any`` means: all matched policy rules. The policy effect can even be connected with logic expressions:
+It means if there should be no matched policy rules of``deny`` (aka deny-override). ``some`` means: if there exists one matched policy rule. ``any`` means: all matched policy rules (not used here). The policy effect can even be connected with logic expressions:
 
 ```ini
-e = some(where (p.eft == allow)) && !any(where (p.eft == deny))
+[policy_effect]
+e = some(where (p.eft == allow)) && !some(where (p.eft == deny))
 ```
 
-It means at least one matched policy rule of``allow``, and there should be matched policy rules of``deny``.
+It means at least one matched policy rule of``allow``, and there is no matched policy rule of``deny``. So in this way, both the allow and deny authorizations are supported, and the deny overrides.
 
 ## Matchers
 
