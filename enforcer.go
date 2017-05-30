@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"errors"
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/config"
 	"github.com/casbin/casbin/model"
@@ -44,27 +45,40 @@ type Enforcer struct {
 }
 
 // NewEnforcer gets an enforcer via CONF, file or DB.
+// Note: this function will panic on errors, please use NewEnforcerSafe() instead if you want to get error.
 // e := NewEnforcer("path/to/casbin.conf")
 // e := NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.conf")
 // e := NewEnforcer("path/to/rbac_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
 func NewEnforcer(params ...interface{}) *Enforcer {
-	e := &Enforcer{}
-
-	if len(params) == 1 {
-		e.InitWithConfig(params[0].(string))
-	} else if len(params) == 2 {
-		if reflect.TypeOf(params[1]).Kind() == reflect.String {
-			e.InitWithFile(params[0].(string), params[1].(string))
-		} else {
-			e.InitWithAdapter(params[0].(string), params[1].(persist.Adapter))
-		}
-	} else if len(params) == 3 {
-		e.InitWithDB(params[0].(string), params[1].(string), params[2].(string))
-	} else {
-		panic("Invalid parameters for enforcer.")
+	e, err := NewEnforcerSafe(params...)
+	if err != nil {
+		panic(err)
 	}
 
 	return e
+}
+
+// NewEnforcerSafe gets an enforcer via CONF, file or DB.
+func NewEnforcerSafe(params ...interface{}) (*Enforcer, error) {
+	e := &Enforcer{}
+
+	if len(params) == 1 {
+		err := e.InitWithConfig(params[0].(string))
+		return e, err
+	} else if len(params) == 2 {
+		if reflect.TypeOf(params[1]).Kind() == reflect.String {
+			err := e.InitWithFile(params[0].(string), params[1].(string))
+			return e, err
+		} else {
+			err := e.InitWithAdapter(params[0].(string), params[1].(persist.Adapter))
+			return e, err
+		}
+	} else if len(params) == 3 {
+		err := e.InitWithDB(params[0].(string), params[1].(string), params[2].(string))
+		return e, err
+	} else {
+		return nil, errors.New("Invalid parameters for enforcer.")
+	}
 }
 
 // InitWithFile initializes an enforcer with a model file and a policy file.
@@ -190,9 +204,20 @@ func (e *Enforcer) Enable(enable bool) {
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
+// Note: this function will panic on errors, please use EnforceSafe() instead if you want to get error.
 func (e *Enforcer) Enforce(rvals ...string) bool {
+	result, err := e.EnforceSafe(rvals...)
+	if err != nil {
+		panic(err)
+	}
+
+	return result
+}
+
+// Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
+func (e *Enforcer) EnforceSafe(rvals ...string) (bool, error) {
 	if !e.enabled {
-		return true
+		return true, nil
 	}
 
 	expString := e.model["m"]["m"].Value
@@ -322,5 +347,5 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 
 	log.Print("Request ", rvals, ": ", result)
 
-	return result
+	return result, nil
 }
