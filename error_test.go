@@ -48,3 +48,15 @@ func TestPolicyError(t *testing.T) {
 		fmt.Print(err.Error())
 	}
 }
+
+func TestEnforceError(t *testing.T) {
+	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+
+	_, err := e.EnforceSafe("wrong", "wrong")
+	if err == nil {
+		t.Errorf("Should be error here.")
+	} else {
+		fmt.Print("Test on error: ")
+		fmt.Print(err.Error())
+	}
+}

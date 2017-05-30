@@ -317,3 +317,25 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 
 	return result
 }
+
+// EnforceSafe calls Enforce in a safe way, returns error instead of causing panic.
+func (e *Enforcer) EnforceSafe(rvals ...string) (result bool, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown panic")
+			}
+
+			result = false
+		}
+	}()
+
+	result = e.Enforce(rvals...)
+	err = nil
+	return
+}
