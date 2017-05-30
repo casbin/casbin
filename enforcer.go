@@ -68,27 +68,35 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 }
 
 // InitWithFile initializes an enforcer with a model file and a policy file.
-func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
+func (e *Enforcer) InitWithFile(modelPath string, policyPath string) error {
 	e.modelPath = modelPath
 
 	e.adapter = persist.NewFileAdapter(policyPath)
 
 	e.enabled = true
 
-	e.LoadModel()
-	e.LoadPolicy()
+	err := e.LoadModel()
+	if err != nil {
+		return err
+	}
+
+	return e.LoadPolicy()
 }
 
 // InitWithDB initializes an enforcer with a model file and a policy from database.
-func (e *Enforcer) InitWithDB(modelPath string, driverName string, dataSourceName string) {
+func (e *Enforcer) InitWithDB(modelPath string, driverName string, dataSourceName string) error {
 	e.modelPath = modelPath
 
 	e.adapter = persist.NewDBAdapter(driverName, dataSourceName)
 
 	e.enabled = true
 
-	e.LoadModel()
-	e.LoadPolicy()
+	err := e.LoadModel()
+	if err != nil {
+		return err
+	}
+
+	return e.LoadPolicy()
 }
 
 // InitWithConfig initializes an enforcer with a configuration file, by default is casbin.conf.
@@ -108,21 +116,28 @@ func (e *Enforcer) InitWithConfig(cfgPath string) error {
 
 	e.enabled = true
 
-	e.LoadModel()
-	e.LoadPolicy()
-	return nil
+	err = e.LoadModel()
+	if err != nil {
+		return err
+	}
+
+	return e.LoadPolicy()
 }
 
 // InitWithAdapter initializes an enforcer with an adapter.
-func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
+func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) error {
 	e.modelPath = modelPath
 
 	e.adapter = adapter
 
 	e.enabled = true
 
-	e.LoadModel()
-	e.LoadPolicy()
+	err := e.LoadModel()
+	if err != nil {
+		return err
+	}
+
+	return e.LoadPolicy()
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -150,18 +165,23 @@ func (e *Enforcer) ClearPolicy() {
 }
 
 // LoadPolicy reloads the policy from file/database.
-func (e *Enforcer) LoadPolicy() {
+func (e *Enforcer) LoadPolicy() error {
 	e.model.ClearPolicy()
-	e.adapter.LoadPolicy(e.model)
+	err := e.adapter.LoadPolicy(e.model)
+	if err != nil {
+		return err
+	}
 
 	e.model.PrintPolicy()
 
 	e.model.BuildRoleLinks()
+
+	return nil
 }
 
 // SavePolicy saves the current policy (usually after changed with casbin API) back to file/database.
-func (e *Enforcer) SavePolicy() {
-	e.adapter.SavePolicy(e.model)
+func (e *Enforcer) SavePolicy() error {
+	return e.adapter.SavePolicy(e.model)
 }
 
 // Enable changes the enforcing state of casbin, when casbin is disabled, all access will be allowed by the Enforce() function.
