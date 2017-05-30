@@ -60,3 +60,28 @@ func TestEnforceError(t *testing.T) {
 		fmt.Print(err.Error())
 	}
 }
+
+func TestNoError(t *testing.T) {
+	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+
+	err := e.LoadModelSafe()
+	if err != nil {
+		t.Errorf("Should be no error here.")
+		fmt.Print("Unexpected error: ")
+		fmt.Print(err.Error())
+	}
+
+	err = e.LoadPolicySafe()
+	if err != nil {
+		t.Errorf("Should be no error here.")
+		fmt.Print("Unexpected error: ")
+		fmt.Print(err.Error())
+	}
+
+	err = e.SavePolicySafe()
+	if err != nil {
+		t.Errorf("Should be no error here.")
+		fmt.Print("Unexpected error: ")
+		fmt.Print(err.Error())
+	}
+}

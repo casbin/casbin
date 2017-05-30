@@ -152,6 +152,26 @@ func (e *Enforcer) LoadModel() {
 	e.fm = model.LoadFunctionMap()
 }
 
+// LoadModelSafe calls LoadModel in a safe way, returns error instead of causing panic.
+func (e *Enforcer) LoadModelSafe() (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown panic")
+			}
+		}
+	}()
+
+	e.LoadModel()
+	err = nil
+	return
+}
+
 // GetModel gets the current model.
 func (e *Enforcer) GetModel() model.Model {
 	return e.model
@@ -172,9 +192,49 @@ func (e *Enforcer) LoadPolicy() {
 	e.model.BuildRoleLinks()
 }
 
+// LoadPolicySafe calls LoadPolicy in a safe way, returns error instead of causing panic.
+func (e *Enforcer) LoadPolicySafe() (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown panic")
+			}
+		}
+	}()
+
+	e.LoadPolicy()
+	err = nil
+	return
+}
+
 // SavePolicy saves the current policy (usually after changed with casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() {
 	e.adapter.SavePolicy(e.model)
+}
+
+// SavePolicySafe calls SavePolicy in a safe way, returns error instead of causing panic.
+func (e *Enforcer) SavePolicySafe() (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown panic")
+			}
+		}
+	}()
+
+	e.SavePolicy()
+	err = nil
+	return
 }
 
 // Enable changes the enforcing state of casbin, when casbin is disabled, all access will be allowed by the Enforce() function.
