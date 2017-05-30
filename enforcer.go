@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"errors"
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/config"
 	"github.com/casbin/casbin/model"
@@ -65,6 +66,28 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 	}
 
 	return e
+}
+
+// NewEnforcerSafe calls NewEnforcer in a safe way, returns error instead of causing panic.
+func NewEnforcerSafe(params ...interface{}) (e *Enforcer, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown panic")
+			}
+
+			e = nil
+		}
+	}()
+
+	e = NewEnforcer(params...)
+	err = nil
+	return
 }
 
 // InitWithFile initializes an enforcer with a model file and a policy file.
