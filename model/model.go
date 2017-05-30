@@ -87,10 +87,10 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 }
 
 // LoadModel loads the model from model CONF file.
-func LoadModel(path string) Model {
+func LoadModel(path string) (Model, error) {
 	cfg, err := config.NewConfig(path)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	model := make(Model)
@@ -102,7 +102,7 @@ func LoadModel(path string) Model {
 
 	loadSection(model, cfg, "g")
 
-	return model
+	return model, nil
 }
 
 // PrintModel prints the model to the log.

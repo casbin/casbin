@@ -23,11 +23,11 @@ type casbinConfig struct {
 }
 
 // LoadConfig loads the casbin config file: casbin.conf
-func LoadConfig(cfgPath string) *casbinConfig {
+func LoadConfig(cfgPath string) (*casbinConfig, error) {
 	ccfg := casbinConfig{}
 	cfg, err := NewConfig(cfgPath)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	ccfg.ModelPath = cfg.String("default::model_path")
@@ -40,5 +40,5 @@ func LoadConfig(cfgPath string) *casbinConfig {
 		ccfg.DBDataSource = cfg.String("database::data_source")
 	}
 
-	return &ccfg
+	return &ccfg, nil
 }

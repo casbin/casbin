@@ -92,8 +92,11 @@ func (e *Enforcer) InitWithDB(modelPath string, driverName string, dataSourceNam
 }
 
 // InitWithConfig initializes an enforcer with a configuration file, by default is casbin.conf.
-func (e *Enforcer) InitWithConfig(cfgPath string) {
-	cfg := config.LoadConfig(cfgPath)
+func (e *Enforcer) InitWithConfig(cfgPath string) error {
+	cfg, err := config.LoadConfig(cfgPath)
+	if err != nil {
+		return err
+	}
 
 	e.modelPath = cfg.ModelPath
 
@@ -107,6 +110,7 @@ func (e *Enforcer) InitWithConfig(cfgPath string) {
 
 	e.LoadModel()
 	e.LoadPolicy()
+	return nil
 }
 
 // InitWithAdapter initializes an enforcer with an adapter.
@@ -123,10 +127,16 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 
 // LoadModel reloads the model from the model CONF file.
 // Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
-func (e *Enforcer) LoadModel() {
-	e.model = model.LoadModel(e.modelPath)
+func (e *Enforcer) LoadModel() error {
+	var err error
+	e.model, err = model.LoadModel(e.modelPath)
+	if err != nil {
+		return err
+	}
+
 	e.model.PrintModel()
 	e.fm = model.LoadFunctionMap()
+	return nil
 }
 
 // GetModel gets the current model.
