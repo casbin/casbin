@@ -75,7 +75,7 @@ func (a *FileAdapter) SavePolicy(model model.Model) error {
 	return err
 }
 
-func (a *FileAdapter) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
+func (a *FileAdapter) loadPolicyFile(model model.Model, handler func(string, model.Model) error) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ func (a *FileAdapter) loadPolicyFile(model model.Model, handler func(string, mod
 	for {
 		line, err := buf.ReadString('\n')
 		line = strings.TrimSpace(line)
-		handler(line, model)
+		err = handler(line, model)
 		if err != nil {
 			if err == io.EOF {
 				return nil

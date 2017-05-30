@@ -19,16 +19,24 @@ import (
 	"strings"
 )
 
-func loadPolicyLine(line string, model model.Model) {
+func loadPolicyLine(line string, model model.Model) (err error) {
 	if line == "" {
-		return
+		return nil
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			err = r.(error)
+		}
+	} ()
 
 	tokens := strings.Split(line, ", ")
 
 	key := tokens[0]
 	sec := key[:1]
 	model[sec][key].Policy = append(model[sec][key].Policy, tokens[1:])
+
+	return
 }
 
 // Adapter represents the abstract adapter interface for policy persistence.
