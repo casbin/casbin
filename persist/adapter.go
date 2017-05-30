@@ -34,6 +34,6 @@ func loadPolicyLine(line string, model model.Model) {
 // Adapter represents the abstract adapter interface for policy persistence.
 // FileAdapter, DBAdapter inherits this interface.
 type Adapter interface {
-	LoadPolicy(model model.Model)
-	SavePolicy(model model.Model)
+	LoadPolicy(model model.Model) error
+	SavePolicy(model model.Model) error
 }

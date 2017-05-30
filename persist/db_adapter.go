@@ -36,48 +36,56 @@ func NewDBAdapter(driverName string, dataSourceName string) *DBAdapter {
 	return &a
 }
 
-func (a *DBAdapter) open() {
+func (a *DBAdapter) open() error {
 	db, err := sql.Open(a.driverName, a.dataSourceName)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	_, err = db.Exec("CREATE DATABASE IF NOT EXISTS casbin")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	db, err = sql.Open("mysql", a.dataSourceName+"casbin")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	a.db = db
 
-	a.createTable()
+	return a.createTable()
 }
 
 func (a *DBAdapter) close() {
 	a.db.Close()
 }
 
-func (a *DBAdapter) createTable() {
+func (a *DBAdapter) createTable() error {
 	_, err := a.db.Exec("CREATE table IF NOT EXISTS policy (ptype VARCHAR(10), v1 VARCHAR(256), v2 VARCHAR(256), v3 VARCHAR(256), v4 VARCHAR(256))")
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
-func (a *DBAdapter) dropTable() {
+func (a *DBAdapter) dropTable() error {
 	_, err := a.db.Exec("DROP table policy")
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
 // LoadPolicy loads policy from database.
-func (a *DBAdapter) LoadPolicy(model model.Model) {
-	a.open()
+func (a *DBAdapter) LoadPolicy(model model.Model) error {
+	err := a.open()
+	if err != nil {
+		return err
+	}
+
 	defer a.close()
 
 	var (
@@ -90,13 +98,13 @@ func (a *DBAdapter) LoadPolicy(model model.Model) {
 
 	rows, err := a.db.Query("select * from policy")
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&ptype, &v1, &v2, &v3, &v4)
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		line := ptype
@@ -118,11 +126,13 @@ func (a *DBAdapter) LoadPolicy(model model.Model) {
 	}
 	err = rows.Err()
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
-func (a *DBAdapter) writeTableLine(ptype string, rule []string) {
+func (a *DBAdapter) writeTableLine(ptype string, rule []string) error {
 	line := "'" + ptype + "'"
 	for i := range rule {
 		line += ",'" + rule[i] + "'"
@@ -133,27 +143,47 @@ func (a *DBAdapter) writeTableLine(ptype string, rule []string) {
 
 	_, err := a.db.Exec("insert into policy values(" + line + ")")
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
 // SavePolicy saves policy to database.
-func (a *DBAdapter) SavePolicy(model model.Model) {
-	a.open()
+func (a *DBAdapter) SavePolicy(model model.Model) error {
+	err := a.open()
+	if err != nil {
+		return err
+	}
+
 	defer a.close()
 
-	a.dropTable()
-	a.createTable()
+	err = a.dropTable()
+	if err != nil {
+		return err
+	}
+	err = a.createTable()
+	if err != nil {
+		return err
+	}
 
 	for ptype, ast := range model["p"] {
 		for _, rule := range ast.Policy {
-			a.writeTableLine(ptype, rule)
+			err = a.writeTableLine(ptype, rule)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	for ptype, ast := range model["g"] {
 		for _, rule := range ast.Policy {
-			a.writeTableLine(ptype, rule)
+			err = a.writeTableLine(ptype, rule)
+			if err != nil {
+				return err
+			}
 		}
 	}
+
+	return nil
 }

@@ -22,6 +22,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"github.com/pkg/errors"
 )
 
 // FileAdapter represents the file adapter for policy persistence, can load policy from file or save policy to file.
@@ -37,21 +38,19 @@ func NewFileAdapter(filePath string) *FileAdapter {
 }
 
 // LoadPolicy loads policy from file.
-func (a *FileAdapter) LoadPolicy(model model.Model) {
+func (a *FileAdapter) LoadPolicy(model model.Model) error {
 	if a.filePath == "" {
-		return
+		return errors.New("Empty policy path when loading policy.")
 	}
 
 	err := a.loadPolicyFile(model, loadPolicyLine)
-	if err != nil {
-		panic(err)
-	}
+	return err
 }
 
 // SavePolicy saves policy to file.
-func (a *FileAdapter) SavePolicy(model model.Model) {
+func (a *FileAdapter) SavePolicy(model model.Model) error {
 	if a.filePath == "" {
-		return
+		return errors.New("Empty policy path when saving policy.")
 	}
 
 	var tmp bytes.Buffer
@@ -73,9 +72,7 @@ func (a *FileAdapter) SavePolicy(model model.Model) {
 	}
 
 	err := a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
-	if err != nil {
-		panic(err)
-	}
+	return err
 }
 
 func (a *FileAdapter) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
