@@ -41,12 +41,14 @@ p, alice, data1, read
 p2, bob, write-all-objects
 ```
 
-Each line in a policy is called a policy rule. Each policy rule starts with a ``policy type``, e.g., `p`, `p2`. It is used to match the policy definition if there are multiple definitions. The above policy shows this mapping:
+Each line in a policy is called a policy rule. Each policy rule starts with a ``policy type``, e.g., `p`, `p2`. It is used to match the policy definition if there are multiple definitions. The above policy shows this binding:
 
+```
 (alice, data1, read) -> (p.sub, p.obj, p.act)
 (bob, write-all-objects) -> (p2.sub, p2.act)
+```
 
-For common cases, the user doesn't have multiple policy definitions, so probably you will only use policy type ``p``.
+The binding can be used in the matchers. For common cases, the user doesn't have multiple policy definitions, so probably you will only use policy type ``p``.
 
 ## Policy effect
 
