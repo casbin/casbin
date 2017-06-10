@@ -261,7 +261,7 @@ func (u *testResource) getAttribute(attributeName string) string {
 //	log.Println(data2.getAttribute("domain"))
 //}
 
-func TestKeymatchModel(t *testing.T) {
+func TestKeyMatchModel(t *testing.T) {
 	e := NewEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv")
 
 	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
@@ -285,4 +285,28 @@ func TestKeymatchModel(t *testing.T) {
 	testEnforce(t, e, "cathy", "/cathy_data", "GET", true)
 	testEnforce(t, e, "cathy", "/cathy_data", "POST", true)
 	testEnforce(t, e, "cathy", "/cathy_data", "DELETE", false)
+}
+
+func TestIPMatchModel(t *testing.T) {
+	e := NewEnforcer("examples/ipmatch_model.conf", "examples/ipmatch_policy.csv")
+
+	testEnforce(t, e, "192.168.2.123", "data1", "read", true)
+	testEnforce(t, e, "192.168.2.123", "data1", "write", false)
+	testEnforce(t, e, "192.168.2.123", "data2", "read", false)
+	testEnforce(t, e, "192.168.2.123", "data2", "write", false)
+
+	testEnforce(t, e, "192.168.0.123", "data1", "read", false)
+	testEnforce(t, e, "192.168.0.123", "data1", "write", false)
+	testEnforce(t, e, "192.168.0.123", "data2", "read", false)
+	testEnforce(t, e, "192.168.0.123", "data2", "write", false)
+
+	testEnforce(t, e, "10.0.0.5", "data1", "read", false)
+	testEnforce(t, e, "10.0.0.5", "data1", "write", false)
+	testEnforce(t, e, "10.0.0.5", "data2", "read", false)
+	testEnforce(t, e, "10.0.0.5", "data2", "write", true)
+
+	testEnforce(t, e, "192.168.0.1", "data1", "read", false)
+	testEnforce(t, e, "192.168.0.1", "data1", "write", false)
+	testEnforce(t, e, "192.168.0.1", "data2", "read", false)
+	testEnforce(t, e, "192.168.0.1", "data2", "write", false)
 }

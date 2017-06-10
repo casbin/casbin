@@ -17,6 +17,7 @@ package util
 import (
 	"regexp"
 	"strings"
+	"net"
 )
 
 // KeyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
@@ -56,4 +57,33 @@ func RegexMatchFunc(args ...interface{}) (interface{}, error) {
 	name2 := args[1].(string)
 
 	return (bool)(RegexMatch(name1, name2)), nil
+}
+
+// IPMatch determines whether IP address ip1 matches the pattern of IP address ip2, ip2 can be an IP address or a CIDR pattern.
+// For example, 192.168.2.123 matches 192.168.2.0/24
+func IPMatch(ip1 string, ip2 string) bool {
+	ip := net.ParseIP(ip1)
+	if ip == nil {
+		panic("invalid argument: ip1 in IPMatch() function is not an IP address.")
+	}
+
+	_, cidr, err := net.ParseCIDR(ip2)
+	if err != nil {
+		ip2_ip := net.ParseIP(ip2)
+		if ip2_ip == nil {
+			panic("invalid argument: ip2 in IPMatch() function is neither an IP address nor a CIDR.")
+		}
+
+		return ip.Equal(ip2_ip)
+	}
+
+	return cidr.Contains(ip)
+}
+
+// IPMatchFunc is the wrapper for IPMatch.
+func IPMatchFunc(args ...interface{}) (interface{}, error) {
+	ip1 := args[0].(string)
+	ip2 := args[1].(string)
+
+	return (bool)(IPMatch(ip1, ip2)), nil
 }

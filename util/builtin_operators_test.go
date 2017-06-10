@@ -60,3 +60,22 @@ func TestRegexMatch(t *testing.T) {
 	testRegexMatch(t, "/topic/delete/0", "/topic/delete/[0-9]+", true)
 	testRegexMatch(t, "/topic/edit/123s", "/topic/delete/[0-9]+", false)
 }
+
+func testIPMatch(t *testing.T, ip1 string, ip2 string, res bool) {
+	myRes := IPMatch(ip1, ip2)
+	log.Printf("%s < %s: %t", ip1, ip2, myRes)
+
+	if myRes != res {
+		t.Errorf("%s < %s: %t, supposed to be %t", ip1, ip2, !res, res)
+	}
+}
+
+func TestIPMatch(t *testing.T) {
+	testIPMatch(t, "192.168.2.123", "192.168.2.0/24", true)
+	testIPMatch(t, "192.168.2.123", "192.168.3.0/24", false)
+	testIPMatch(t, "192.168.2.123", "192.168.2.0/16", true)
+	testIPMatch(t, "192.168.2.123", "192.168.2.123", true)
+	testIPMatch(t, "192.168.2.123", "192.168.2.123/32", true)
+	testIPMatch(t, "10.0.0.11", "10.0.0.0/8", true)
+	testIPMatch(t, "11.0.0.123", "10.0.0.0/8", false)
+}
