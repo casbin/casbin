@@ -287,6 +287,15 @@ func TestKeyMatchModel(t *testing.T) {
 	testEnforce(t, e, "cathy", "/cathy_data", "DELETE", false)
 }
 
+func TestKeyMatch2Model(t *testing.T) {
+	e := NewEnforcer("examples/keymatch2_model.conf", "examples/keymatch2_policy.csv")
+
+	testEnforce(t, e, "alice", "/alice_data", "GET", false)
+	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
+	testEnforce(t, e, "alice", "/alice_data2/myid", "GET", false)
+	testEnforce(t, e, "alice", "/alice_data2/myid/using/res_id", "GET", true)
+}
+
 func TestIPMatchModel(t *testing.T) {
 	e := NewEnforcer("examples/ipmatch_model.conf", "examples/ipmatch_policy.csv")
 

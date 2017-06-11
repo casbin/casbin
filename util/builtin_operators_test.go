@@ -40,6 +40,32 @@ func TestKeyMatch(t *testing.T) {
 	testKeyMatch(t, "/foobar", "/foo/*", false)
 }
 
+func testKeyMatch2(t *testing.T, key1 string, key2 string, res bool) {
+	myRes := KeyMatch2(key1, key2)
+	log.Printf("%s < %s: %t", key1, key2, myRes)
+
+	if myRes != res {
+		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)
+	}
+}
+
+func TestKeyMatch2(t *testing.T) {
+	testKeyMatch2(t, "/foo", "/foo", true)
+	testKeyMatch2(t, "/foo", "/foo*", true)
+	testKeyMatch2(t, "/foo", "/foo/*", false)
+	testKeyMatch2(t, "/foo/bar", "/foo", true) // different with KeyMatch.
+	testKeyMatch2(t, "/foo/bar", "/foo*", true)
+	testKeyMatch2(t, "/foo/bar", "/foo/*", true)
+	testKeyMatch2(t, "/foobar", "/foo", true) // different with KeyMatch.
+	testKeyMatch2(t, "/foobar", "/foo*", true)
+	testKeyMatch2(t, "/foobar", "/foo/*", false)
+
+	testKeyMatch2(t, "/", "/:resource", false)
+	testKeyMatch2(t, "/resource1", "/:resource", true)
+	testKeyMatch2(t, "/myid", "/:id/using/:resId", false)
+	testKeyMatch2(t, "/myid/using/myresid", "/:id/using/:resId", true)
+}
+
 func testRegexMatch(t *testing.T, key1 string, key2 string, res bool) {
 	myRes := RegexMatch(key1, key2)
 	log.Printf("%s < %s: %t", key1, key2, myRes)
