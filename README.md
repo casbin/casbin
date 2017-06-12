@@ -83,38 +83,15 @@ go get github.com/casbin/casbin
 
 ## Get started
 
-1. Customize the Casbin config file ``casbin.conf`` to your need. Its default content is:
-
-```ini
-[default]
-# The file path to the model:
-model_path = examples/basic_model.conf
-
-# The persistent method for policy, can be two values: file or database.
-# policy_backend = file
-# policy_backend = database
-policy_backend = file
-
-[file]
-# The file path to the policy:
-policy_path = examples/basic_policy.csv
-
-[database]
-driver = mysql
-data_source = root:@tcp(127.0.0.1:3306)/
-```
-
-It means uses ``basic_model.conf`` as the model and ``basic_policy.csv`` as the policy.
-
-2. Initialize an enforcer by specifying the path to the Casbin configuration file:
+1. New a Casbin enforcer with a model file and a policy file:
 
 ```go
-e := casbin.NewEnforcer("path/to/casbin.conf")
+e := casbin.NewEnforcer("path/to/model.conf", "path/to/policy.csv")
 ```
 
-Note: you can also initialize an enforcer directly with a file path or database, see ``Persistence`` section for details.
+Note: you can also initialize an enforcer with policy in DB instead of file, see [Persistence](#persistence) section for details.
 
-3. Add an enforcement hook into your code right before the access happens:
+2. Add an enforcement hook into your code right before the access happens:
 
 ```go
 sub := "alice" // the user that wants to access a resource.
@@ -128,7 +105,7 @@ if e.Enforce(sub, obj, act) == true {
 }
 ```
 
-4. Besides the static policy file, Casbin also provides API for permission management at run-time. For example, You can get all the roles assigned to a user as below:
+3. Besides the static policy file, Casbin also provides API for permission management at run-time. For example, You can get all the roles assigned to a user as below:
 
 ```go
 roles := e.GetRoles("alice")
@@ -146,13 +123,13 @@ The model and policy can be persisted in Casbin with the following restrictions:
 
 Persist Method | Casbin Model | Casbin Policy | Usage
 ----|------|----|----
-File | Load only | Load/Save | [Details](https://github.com/casbin/casbin#file)
-Database (tested with [MySQL](https://www.mysql.com)) | Not supported | Load/Save | [Details](https://github.com/casbin/casbin#database)
+File | Load only | Load/Save | [Details](#file)
+Database (tested with [MySQL](https://www.mysql.com)) | Not supported | Load/Save | [Details](https://github.com/casbin/mysql_adapter)
 [Cassandra](http://cassandra.apache.org) (NoSQL) | Not supported | Load/Save | [Details](https://github.com/casbin/cassandra_adapter)
 
 We think the model represents the access control model that our customer uses and is not often modified at run-time, so we don't implement an API to modify the current model or save the model into a file. And the model cannot be loaded from or saved into a database. The model file should be in .CONF format.
 
-The policy is much more dynamic than model and can be loaded from a file/database or saved to a file/database at any time. As for file persistence, the policy file should be in .CSV (Comma-Separated Values) format. As for the database backend, Casbin should support all relational DBMSs but I only tested with MySQL. Casbin has no built-in database with it, you have to setup a database on your own. Let me know if there are any compatibility issues here. Casbin will automatically create a database named ``casbin`` and use it for policy storage. So make sure your provided credential has the related privileges for the database you use.
+The policy is much more dynamic than model and can be loaded from a file/database or saved to a file/database at any time. As for file persistence, the policy file should be in [.CSV (Comma-Separated Values)](https://en.wikipedia.org/wiki/Comma-separated_values) format. As for the database backend, Casbin should support all relational DBMSs but I only tested with MySQL. Casbin has no built-in database with it, you have to setup a database on your own. Let me know if there are any compatibility issues here. Casbin will automatically create a database named ``casbin`` and use it for policy storage. So make sure your provided credential has the related privileges for the database you use.
 
 ### File
 
@@ -169,7 +146,8 @@ Below shows how to initialize an enforcer from database. it connects to a MySQL 
 
 ```go
 // Initialize an enforcer with a model file and policy from database.
-e := casbin.NewEnforcer("examples/basic_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
+a := NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
+e := casbin.NewEnforcer("examples/basic_model.conf", a)
 ```
 
 ### Use your own storage adapter
@@ -178,11 +156,11 @@ In Casbin, both the above file and database storage is implemented as an adapter
 
 ```go
 // Initialize an enforcer with an adapter.
-adapter := persist.NewFileAdapter("examples/basic_policy.csv") // or replace with your own adapter.
-e := casbin.NewEnforcer("examples/basic_model.conf", adapter)
+a := persist.NewFileAdapter("examples/basic_policy.csv") // or replace with your own adapter.
+e := casbin.NewEnforcer("examples/basic_model.conf", a)
 ```
 
-An adapter should implement two methods:``LoadPolicy(model model.Model)`` and ``SavePolicy(model model.Model)``. To keep light-weight, we don't put all adapters' code in this main library. You can choose officially supported adapters from: https://github.com/casbin and use it like a plugin as above.
+An adapter should implement two methods:``LoadPolicy(model model.Model)`` and ``SavePolicy(model model.Model)``. To keep light-weight, we don't put adapter code in this main library. You can choose officially supported adapters from: https://github.com/casbin and use it like a plugin as above.
 
 ### Load/Save at run-time
 

@@ -20,7 +20,6 @@ import (
 	"reflect"
 
 	"github.com/Knetic/govaluate"
-	"github.com/casbin/casbin/config"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
 )
@@ -52,16 +51,12 @@ type Enforcer struct {
 func NewEnforcer(params ...interface{}) *Enforcer {
 	e := &Enforcer{}
 
-	if len(params) == 1 {
-		e.InitWithConfig(params[0].(string))
-	} else if len(params) == 2 {
+	if len(params) == 2 {
 		if reflect.TypeOf(params[1]).Kind() == reflect.String {
 			e.InitWithFile(params[0].(string), params[1].(string))
 		} else {
 			e.InitWithAdapter(params[0].(string), params[1].(persist.Adapter))
 		}
-	} else if len(params) == 3 {
-		e.InitWithDB(params[0].(string), params[1].(string), params[2].(string))
 	} else {
 		panic("Invalid parameters for enforcer.")
 	}
@@ -103,37 +98,7 @@ func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 	e.LoadPolicy()
 }
 
-// InitWithDB initializes an enforcer with a model file and a policy from database.
-func (e *Enforcer) InitWithDB(modelPath string, driverName string, dataSourceName string) {
-	e.modelPath = modelPath
-
-	e.adapter = persist.NewDBAdapter(driverName, dataSourceName)
-
-	e.enabled = true
-
-	e.LoadModel()
-	e.LoadPolicy()
-}
-
-// InitWithConfig initializes an enforcer with a configuration file, by default is casbin.conf.
-func (e *Enforcer) InitWithConfig(cfgPath string) {
-	cfg := config.LoadConfig(cfgPath)
-
-	e.modelPath = cfg.ModelPath
-
-	if cfg.PolicyBackend == "file" {
-		e.adapter = persist.NewFileAdapter(cfg.PolicyPath)
-	} else if cfg.PolicyBackend == "database" {
-		e.adapter = persist.NewDBAdapter(cfg.DBDriver, cfg.DBDataSource)
-	}
-
-	e.enabled = true
-
-	e.LoadModel()
-	e.LoadPolicy()
-}
-
-// InitWithAdapter initializes an enforcer with an adapter.
+// InitWithAdapter initializes an enforcer with a database adapter.
 func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 	e.modelPath = modelPath
 

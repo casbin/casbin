@@ -57,44 +57,6 @@ func TestEnable(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
-func TestDBSavePolicy(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
-
-	a := persist.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
-	a.SavePolicy(e.GetModel())
-}
-
-func TestDBSaveAndLoadPolicy(t *testing.T) {
-	e := &Enforcer{}
-	e.InitWithFile("examples/rbac_model.conf", "examples/rbac_policy.csv")
-
-	a := persist.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
-	a.SavePolicy(e.GetModel())
-
-	e.ClearPolicy()
-	testGetPolicy(t, e, [][]string{})
-
-	a.LoadPolicy(e.GetModel())
-	testGetPolicy(t, e, [][]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
-
-	e = NewEnforcer("examples/rbac_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
-	testGetPolicy(t, e, [][]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
-
-}
-
-func TestInitWithConfig(t *testing.T) {
-	e := NewEnforcer("casbin.conf")
-
-	testEnforce(t, e, "alice", "data1", "read", true)
-	testEnforce(t, e, "alice", "data1", "write", false)
-	testEnforce(t, e, "alice", "data2", "read", false)
-	testEnforce(t, e, "alice", "data2", "write", false)
-	testEnforce(t, e, "bob", "data1", "read", false)
-	testEnforce(t, e, "bob", "data1", "write", false)
-	testEnforce(t, e, "bob", "data2", "read", false)
-	testEnforce(t, e, "bob", "data2", "write", true)
-}
-
 func TestInitWithAdapter(t *testing.T) {
 	adapter := persist.NewFileAdapter("examples/basic_policy.csv")
 	e := NewEnforcer("examples/basic_model.conf", adapter)
