@@ -15,8 +15,9 @@
 package model
 
 import (
-	"github.com/casbin/casbin/rbac"
 	"log"
+
+	"github.com/casbin/casbin/rbac"
 )
 
 // Assertion represents an expression in a section of the model.

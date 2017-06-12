@@ -15,8 +15,9 @@
 package persist
 
 import (
-	"github.com/casbin/casbin/model"
 	"strings"
+
+	"github.com/casbin/casbin/model"
 )
 
 func loadPolicyLine(line string, model model.Model) {

@@ -15,11 +15,12 @@
 package model
 
 import (
-	"github.com/casbin/casbin/config"
-	"github.com/casbin/casbin/util"
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/casbin/casbin/config"
+	"github.com/casbin/casbin/util"
 )
 
 // Model represents the whole access control model.

@@ -15,8 +15,9 @@
 package casbin
 
 import (
-	"github.com/casbin/casbin/persist"
 	"testing"
+
+	"github.com/casbin/casbin/persist"
 )
 
 func TestReloadPolicy(t *testing.T) {

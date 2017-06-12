@@ -17,11 +17,12 @@ package persist
 import (
 	"bufio"
 	"bytes"
-	"github.com/casbin/casbin/model"
-	"github.com/casbin/casbin/util"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/casbin/casbin/model"
+	"github.com/casbin/casbin/util"
 )
 
 // FileAdapter represents the file adapter for policy persistence, can load policy from file or save policy to file.

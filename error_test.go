@@ -15,8 +15,8 @@
 package casbin
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestPathError(t *testing.T) {

@@ -16,6 +16,7 @@ package persist
 
 import (
 	"database/sql"
+
 	"github.com/casbin/casbin/model"
 	_ "github.com/go-sql-driver/mysql" // This is for MySQL initialization.
 )

@@ -15,9 +15,10 @@
 package rbac
 
 import (
-	"github.com/casbin/casbin/util"
 	"log"
 	"testing"
+
+	"github.com/casbin/casbin/util"
 )
 
 func testRole(t *testing.T, rm *RoleManager, name1 string, name2 string, res bool) {

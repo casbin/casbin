@@ -16,12 +16,13 @@ package casbin
 
 import (
 	"errors"
+	"log"
+	"reflect"
+
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/config"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
-	"log"
-	"reflect"
 )
 
 // Effect is the result for a policy rule.
