@@ -280,6 +280,10 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 					} else {
 						policyResults[i] = EFFECT_ALLOW
 					}
+
+					if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
+						break
+					}
 				}
 			}
 		}
@@ -334,6 +338,18 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 				result = true
 			} else if eft == EFFECT_DENY {
 				result = false
+				break
+			}
+		}
+	} else if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
+		result = false
+		for _, eft := range policyResults {
+			if eft != EFFECT_INDETERMINATE {
+				if eft == EFFECT_ALLOW {
+					result = true
+				} else {
+					result = false
+				}
 				break
 			}
 		}

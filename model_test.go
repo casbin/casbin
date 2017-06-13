@@ -319,3 +319,16 @@ func TestIPMatchModel(t *testing.T) {
 	testEnforce(t, e, "192.168.0.1", "data2", "read", false)
 	testEnforce(t, e, "192.168.0.1", "data2", "write", false)
 }
+
+func TestPriorityModel(t *testing.T) {
+	e := NewEnforcer("examples/priority_model.conf", "examples/priority_policy.csv")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", true)
+	testEnforce(t, e, "bob", "data2", "write", false)
+}
