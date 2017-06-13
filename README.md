@@ -210,6 +210,7 @@ Deny-override | [rbac_model_with_deny.conf](https://github.com/casbin/casbin/blo
 
 - [Docker](https://github.com/docker/docker): The world's leading software container platform, via plugin: [casbin-authz-plugin](https://github.com/casbin/casbin-authz-plugin) ([recommended by Docker](https://docs.docker.com/engine/extend/legacy_plugins/#authorization-plugins))
 - [pybbs-go](https://github.com/tomoya92/pybbs-go): A simple BBS with fine-grained permission management based on [Beego](https://github.com/astaxie/beego), via direct integration
+- [Zenpress](https://github.com/insionng/zenpress): A CMS system written in Golang, via direct integration
 
 ## License
 
