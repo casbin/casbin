@@ -25,6 +25,10 @@ func loadPolicyLine(line string, model model.Model) {
 		return
 	}
 
+	if strings.HasPrefix(line, "#") {
+		return
+	}
+
 	tokens := strings.Split(line, ", ")
 
 	key := tokens[0]
