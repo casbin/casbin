@@ -146,7 +146,7 @@ Below shows how to initialize an enforcer from database. it connects to a MySQL 
 
 ```go
 // Initialize an enforcer with a model file and policy from database.
-a := NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
+a := mysql_adapter.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
 e := casbin.NewEnforcer("examples/basic_model.conf", a)
 ```
 
