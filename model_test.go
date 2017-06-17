@@ -157,13 +157,13 @@ func TestRBACModelWithDomains(t *testing.T) {
 func TestRBACModelWithDomainsAtRuntime(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model_with_domains.conf")
 
-	e.AddPolicy([]string{"admin", "domain1", "data1", "read"})
-	e.AddPolicy([]string{"admin", "domain1", "data1", "write"})
-	e.AddPolicy([]string{"admin", "domain2", "data2", "read"})
-	e.AddPolicy([]string{"admin", "domain2", "data2", "write"})
+	e.AddPolicy("admin", "domain1", "data1", "read")
+	e.AddPolicy("admin", "domain1", "data1", "write")
+	e.AddPolicy("admin", "domain2", "data2", "read")
+	e.AddPolicy("admin", "domain2", "data2", "write")
 
-	e.AddGroupingPolicy([]string{"alice", "admin", "domain1"})
-	e.AddGroupingPolicy([]string{"bob", "admin", "domain2"})
+	e.AddGroupingPolicy("alice", "admin", "domain1")
+	e.AddGroupingPolicy("bob", "admin", "domain2")
 
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)

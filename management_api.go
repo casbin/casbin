@@ -14,6 +14,10 @@
 
 package casbin
 
+import (
+	"reflect"
+)
+
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() []string {
 	return e.model.GetValuesForFieldInPolicy("p", "p", 0)
@@ -50,13 +54,31 @@ func (e *Enforcer) GetGroupingPolicy() [][]string {
 }
 
 // AddPolicy adds an authorization rule to the current policy.
-func (e *Enforcer) AddPolicy(policy []string) {
-	e.model.AddPolicy("p", "p", policy)
+func (e *Enforcer) AddPolicy(params ...interface{}) {
+	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
+		e.model.AddPolicy("p", "p", params[0].([]string))
+	} else {
+		policy := make([]string, 0)
+		for _, param := range params {
+			policy = append(policy, param.(string))
+		}
+
+		e.model.AddPolicy("p", "p", policy)
+	}
 }
 
 // RemovePolicy removes an authorization rule from the current policy.
-func (e *Enforcer) RemovePolicy(policy []string) {
-	e.model.RemovePolicy("p", "p", policy)
+func (e *Enforcer) RemovePolicy(params ...interface{}) {
+	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
+		e.model.RemovePolicy("p", "p", params[0].([]string))
+	} else {
+		policy := make([]string, 0)
+		for _, param := range params {
+			policy = append(policy, param.(string))
+		}
+
+		e.model.RemovePolicy("p", "p", policy)
+	}
 }
 
 // RemoveFilteredPolicy removes an authorization rule from the current policy, a field filter can be specified.
@@ -65,14 +87,34 @@ func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValue string) {
 }
 
 // AddGroupingPolicy adds a role inheritance rule to the current policy.
-func (e *Enforcer) AddGroupingPolicy(policy []string) {
-	e.model.AddPolicy("g", "g", policy)
+func (e *Enforcer) AddGroupingPolicy(params ...interface{}) {
+	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
+		e.model.AddPolicy("g", "g", params[0].([]string))
+	} else {
+		policy := make([]string, 0)
+		for _, param := range params {
+			policy = append(policy, param.(string))
+		}
+
+		e.model.AddPolicy("g", "g", policy)
+	}
+
 	e.model.BuildRoleLinks()
 }
 
 // RemoveGroupingPolicy removes a role inheritance rule from the current policy.
-func (e *Enforcer) RemoveGroupingPolicy(policy []string) {
-	e.model.RemovePolicy("g", "g", policy)
+func (e *Enforcer) RemoveGroupingPolicy(params ...interface{}) {
+	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
+		e.model.RemovePolicy("g", "g", params[0].([]string))
+	} else {
+		policy := make([]string, 0)
+		for _, param := range params {
+			policy = append(policy, param.(string))
+		}
+
+		e.model.RemovePolicy("g", "g", policy)
+	}
+
 	e.model.BuildRoleLinks()
 }
 
