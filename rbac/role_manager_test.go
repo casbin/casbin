@@ -30,6 +30,15 @@ func testRole(t *testing.T, rm *RoleManager, name1 string, name2 string, res boo
 	}
 }
 
+func testDomainRole(t *testing.T, rm *RoleManager, name1 string, name2 string, domain string, res bool) {
+	myRes := rm.HasLink(name1, name2, domain)
+	log.Printf("%s :: %s, %s: %t", domain, name1, name2, myRes)
+
+	if myRes != res {
+		t.Errorf("%s :: %s < %s: %t, supposed to be %t", domain, name1, name2, !res, res)
+	}
+}
+
 func testPrintRoles(t *testing.T, rm *RoleManager, name string, res []string) {
 	myRes := rm.GetRoles(name)
 	log.Printf("%s: %s", name, myRes)
@@ -106,4 +115,71 @@ func TestRole(t *testing.T) {
 	testPrintRoles(t, rm, "g1", []string{})
 	testPrintRoles(t, rm, "g2", []string{})
 	testPrintRoles(t, rm, "g3", []string{})
+}
+
+func TestDomainRole(t *testing.T) {
+	rm := NewRoleManager(3)
+	rm.AddLink("u1", "g1", "domain1")
+	rm.AddLink("u2", "g1", "domain1")
+	rm.AddLink("u3", "admin", "domain2")
+	rm.AddLink("u4", "admin", "domain2")
+	rm.AddLink("u4", "admin", "domain1")
+	rm.AddLink("g1", "admin", "domain1")
+
+	// Current role inheritance tree:
+	//       domain1:admin    domain2:admin
+	//            /       \  /       \
+	//      domain1:g1     u4         u3
+	//         /  \
+	//       u1    u2
+
+	testDomainRole(t, rm, "u1", "g1", "domain1", true)
+	testDomainRole(t, rm, "u1", "g1", "domain2", false)
+	testDomainRole(t, rm, "u1", "admin", "domain1", true)
+	testDomainRole(t, rm, "u1", "admin", "domain2", false)
+
+	testDomainRole(t, rm, "u2", "g1", "domain1", true)
+	testDomainRole(t, rm, "u2", "g1", "domain2", false)
+	testDomainRole(t, rm, "u2", "admin", "domain1", true)
+	testDomainRole(t, rm, "u2", "admin", "domain2", false)
+
+	testDomainRole(t, rm, "u3", "g1", "domain1", false)
+	testDomainRole(t, rm, "u3", "g1", "domain2", false)
+	testDomainRole(t, rm, "u3", "admin", "domain1", false)
+	testDomainRole(t, rm, "u3", "admin", "domain2", true)
+
+	testDomainRole(t, rm, "u4", "g1", "domain1", false)
+	testDomainRole(t, rm, "u4", "g1", "domain2", false)
+	testDomainRole(t, rm, "u4", "admin", "domain1", true)
+	testDomainRole(t, rm, "u4", "admin", "domain2", true)
+
+	rm.DeleteLink("g1", "admin", "domain1")
+	rm.DeleteLink("u4", "admin", "domain2")
+
+	// Current role inheritance tree after deleting the links:
+	//       domain1:admin    domain2:admin
+	//                    \          \
+	//      domain1:g1     u4         u3
+	//         /  \
+	//       u1    u2
+
+	testDomainRole(t, rm, "u1", "g1", "domain1", true)
+	testDomainRole(t, rm, "u1", "g1", "domain2", false)
+	testDomainRole(t, rm, "u1", "admin", "domain1", false)
+	testDomainRole(t, rm, "u1", "admin", "domain2", false)
+
+	testDomainRole(t, rm, "u2", "g1", "domain1", true)
+	testDomainRole(t, rm, "u2", "g1", "domain2", false)
+	testDomainRole(t, rm, "u2", "admin", "domain1", false)
+	testDomainRole(t, rm, "u2", "admin", "domain2", false)
+
+	testDomainRole(t, rm, "u3", "g1", "domain1", false)
+	testDomainRole(t, rm, "u3", "g1", "domain2", false)
+	testDomainRole(t, rm, "u3", "admin", "domain1", false)
+	testDomainRole(t, rm, "u3", "admin", "domain2", true)
+
+	testDomainRole(t, rm, "u4", "g1", "domain1", false)
+	testDomainRole(t, rm, "u4", "g1", "domain2", false)
+	testDomainRole(t, rm, "u4", "admin", "domain1", true)
+	testDomainRole(t, rm, "u4", "admin", "domain2", false)
 }
