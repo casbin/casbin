@@ -154,6 +154,41 @@ func TestRBACModelWithDomains(t *testing.T) {
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
 }
 
+func TestRBACModelWithDomainsAtRuntime(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model_with_domains.conf", "")
+
+	e.AddPolicy([]string{"admin", "domain1", "data1", "read"})
+	e.AddPolicy([]string{"admin", "domain1", "data1", "write"})
+	e.AddPolicy([]string{"admin", "domain2", "data2", "read"})
+	e.AddPolicy([]string{"admin", "domain2", "data2", "write"})
+
+	e.AddGroupingPolicy([]string{"alice", "admin", "domain1"})
+	e.AddGroupingPolicy([]string{"bob", "admin", "domain2"})
+
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "read", false)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "write", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data1", "read", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data1", "write", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
+
+	// Remove all policy rules related to domain1.
+	e.RemoveFilteredPolicy(1, "domain1")
+	// Remove the specified policy rule.
+	e.RemovePolicy([]string{"admin", "domain2", "data2", "read"})
+
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", false)
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", false)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "read", false)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "write", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data1", "read", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data1", "write", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
+}
+
 func TestRBACModelWithDeny(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model_with_deny.conf", "examples/rbac_policy_with_deny.csv")
 
