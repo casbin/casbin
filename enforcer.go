@@ -57,6 +57,8 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 		} else {
 			e.InitWithAdapter(params[0].(string), params[1].(persist.Adapter))
 		}
+	} else if len(params) == 1 {
+		e.InitWithFile(params[0].(string), "")
 	} else {
 		panic("Invalid parameters for enforcer.")
 	}

@@ -51,7 +51,7 @@ func TestBasicModel(t *testing.T) {
 }
 
 func TestBasicModelNoPolicy(t *testing.T) {
-	e := NewEnforcer("examples/basic_model.conf", "")
+	e := NewEnforcer("examples/basic_model.conf")
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -81,7 +81,7 @@ func TestBasicModelWithRoot(t *testing.T) {
 }
 
 func TestBasicModelWithRootNoPolicy(t *testing.T) {
-	e := NewEnforcer("examples/basic_model_with_root.conf", "")
+	e := NewEnforcer("examples/basic_model_with_root.conf")
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -155,7 +155,7 @@ func TestRBACModelWithDomains(t *testing.T) {
 }
 
 func TestRBACModelWithDomainsAtRuntime(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model_with_domains.conf", "")
+	e := NewEnforcer("examples/rbac_model_with_domains.conf")
 
 	e.AddPolicy([]string{"admin", "domain1", "data1", "read"})
 	e.AddPolicy([]string{"admin", "domain1", "data1", "write"})
@@ -231,7 +231,7 @@ func getAttrFunc(args ...interface{}) (interface{}, error) {
 }
 
 func TestABACModel(t *testing.T) {
-	e := NewEnforcer("examples/abac_model.conf", "")
+	e := NewEnforcer("examples/abac_model.conf")
 
 	e.AddSubjectAttributeFunction(getAttrFunc)
 	e.AddObjectAttributeFunction(getAttrFunc)
@@ -283,7 +283,7 @@ func (u *testResource) getAttribute(attributeName string) string {
 }
 
 //func TestABACModel2(t *testing.T) {
-//	e := NewEnforcer("examples/abac_model.conf", "")
+//	e := NewEnforcer("examples/abac_model.conf")
 //
 //	alice := newTestUser("alice", "domain1")
 //	bob := newTestUser("bob", "domain2")
