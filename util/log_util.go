@@ -28,6 +28,6 @@ func LogPrint(v ...interface{}) {
 // LogPrintf prints the log with the format.
 func LogPrintf(format string, v ...interface{}) {
 	if EnableLog {
-		log.Printf(format, v)
+		log.Printf(format, v...)
 	}
 }
