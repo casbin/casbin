@@ -12,33 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package model
+package util
 
-import (
-	"github.com/casbin/casbin/rbac"
-	"github.com/casbin/casbin/util"
-)
+import "log"
 
-// Assertion represents an expression in a section of the model.
-// For example: r = sub, obj, act
-type Assertion struct {
-	Key    string
-	Value  string
-	Tokens []string
-	Policy [][]string
-	RM     *rbac.RoleManager
+var EnableLog bool = true
+
+// LogPrint prints the log.
+func LogPrint(v ...interface{}) {
+	if EnableLog {
+		log.Print(v)
+	}
 }
 
-func (ast *Assertion) buildRoleLinks() {
-	ast.RM = rbac.NewRoleManager(10)
-	for _, rule := range ast.Policy {
-		if len(rule) == 2 {
-			ast.RM.AddLink(rule[0], rule[1])
-		} else if len(rule) == 3 {
-			ast.RM.AddLink(rule[0], rule[1], rule[2])
-		}
+// LogPrintf prints the log with the format.
+func LogPrintf(format string, v ...interface{}) {
+	if EnableLog {
+		log.Printf(format, v)
 	}
-
-	util.LogPrint("Role links for: " + ast.Key)
-	ast.RM.PrintRoles()
 }

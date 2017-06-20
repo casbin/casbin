@@ -15,7 +15,7 @@
 package rbac
 
 import (
-	"log"
+	"github.com/casbin/casbin/util"
 )
 
 // RoleManager represents the interface to manage the roles in RBAC.
@@ -109,7 +109,7 @@ func (rm *RoleManager) GetRoles(name string) []string {
 // PrintRoles prints all the roles to log.
 func (rm *RoleManager) PrintRoles() {
 	for _, role := range rm.allRoles {
-		log.Print(role.toString())
+		util.LogPrint(role.toString())
 	}
 }
 

@@ -15,8 +15,6 @@
 package model
 
 import (
-	"log"
-
 	"github.com/casbin/casbin/util"
 )
 
@@ -29,13 +27,13 @@ func (model Model) BuildRoleLinks() {
 
 // PrintPolicy prints the policy to log.
 func (model Model) PrintPolicy() {
-	log.Print("Policy:")
+	util.LogPrint("Policy:")
 	for key, ast := range model["p"] {
-		log.Print(key, ": ", ast.Value, ": ", ast.Policy)
+		util.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
 	}
 
 	for key, ast := range model["g"] {
-		log.Print(key, ": ", ast.Value, ": ", ast.Policy)
+		util.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
 	}
 }
 

@@ -16,12 +16,12 @@ package casbin
 
 import (
 	"errors"
-	"log"
 	"reflect"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
+	"github.com/casbin/casbin/util"
 )
 
 // Effect is the result for a policy rule.
@@ -252,7 +252,7 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 		policyResults = make([]Effect, len(e.model["p"]["p"].Policy))
 
 		for i, pvals := range e.model["p"]["p"].Policy {
-			//log.Print("Policy Rule: ", pvals)
+			// util.LogPrint("Policy Rule: ", pvals)
 
 			parameters := make(map[string]interface{}, 8)
 			for j, token := range e.model["r"]["r"].Tokens {
@@ -263,7 +263,7 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 			}
 
 			result, err := expression.Evaluate(parameters)
-			//log.Print("Result: ", result)
+			// util.LogPrint("Result: ", result)
 
 			if err != nil {
 				policyResults[i] = EFFECT_INDETERMINATE
@@ -301,7 +301,7 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 		}
 
 		result, err := expression.Evaluate(parameters)
-		//log.Print("Result: ", result)
+		// util.LogPrint("Result: ", result)
 
 		if err != nil {
 			policyResults[0] = EFFECT_INDETERMINATE
@@ -314,7 +314,7 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 		}
 	}
 
-	//log.Print("Rule Results: ", policyResults)
+	// util.LogPrint("Rule Results: ", policyResults)
 
 	result := false
 	if e.model["e"]["e"].Value == "some(where (p_eft == allow))" {
@@ -357,7 +357,7 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 		}
 	}
 
-	log.Print("Request ", rvals, ": ", result)
+	util.LogPrint("Request ", rvals, ": ", result)
 
 	return result
 }

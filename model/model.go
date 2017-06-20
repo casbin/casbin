@@ -15,7 +15,6 @@
 package model
 
 import (
-	"log"
 	"strconv"
 	"strings"
 
@@ -108,10 +107,10 @@ func LoadModel(path string) Model {
 
 // PrintModel prints the model to the log.
 func (model Model) PrintModel() {
-	log.Print("Model:")
+	util.LogPrint("Model:")
 	for k, v := range model {
 		for i, j := range v {
-			log.Printf("%s.%s: %s", k, i, j.Value)
+			util.LogPrintf("%s.%s: %s", k, i, j.Value)
 		}
 	}
 }
