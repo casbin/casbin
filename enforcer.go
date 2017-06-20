@@ -51,13 +51,21 @@ type Enforcer struct {
 func NewEnforcer(params ...interface{}) *Enforcer {
 	e := &Enforcer{}
 
-	if len(params) == 2 {
+	parsedParamLen := 0
+	if len(params) >= 1 && reflect.TypeOf(params[len(params) - 1]).Kind() == reflect.Bool {
+		enableLog := params[len(params) - 1].(bool)
+		e.EnableLog(enableLog)
+
+		parsedParamLen ++
+	}
+
+	if len(params) - parsedParamLen == 2 {
 		if reflect.TypeOf(params[1]).Kind() == reflect.String {
 			e.InitWithFile(params[0].(string), params[1].(string))
 		} else {
 			e.InitWithAdapter(params[0].(string), params[1].(persist.Adapter))
 		}
-	} else if len(params) == 1 {
+	} else if len(params) - parsedParamLen == 1 {
 		e.InitWithFile(params[0].(string), "")
 	} else {
 		panic("Invalid parameters for enforcer.")
@@ -208,6 +216,11 @@ func (e *Enforcer) SavePolicySafe() (err error) {
 // Enable changes the enforcing state of casbin, when casbin is disabled, all access will be allowed by the Enforce() function.
 func (e *Enforcer) Enable(enable bool) {
 	e.enabled = enable
+}
+
+// EnableLog changes whether to print Casbin log to the standard output.
+func (e *Enforcer) EnableLog(enable bool) {
+	util.EnableLog = enable
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
