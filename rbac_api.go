@@ -19,6 +19,21 @@ func (e *Enforcer) GetRolesForUser(name string) []string {
 	return e.model["g"]["g"].RM.GetRoles(name)
 }
 
+// HasRoleForUser determines whether a user has a role.
+func (e *Enforcer) HasRoleForUser(name string, role string) bool {
+	roles := e.GetRolesForUser(name)
+
+	has_role := false
+	for _, r := range roles {
+		if r == role {
+			has_role = true
+			break
+		}
+	}
+
+	return has_role
+}
+
 // AddRoleForUser adds a role for a user.
 func (e *Enforcer) AddRoleForUser(user string, role string) {
 	e.AddGroupingPolicy([]string{user, role})

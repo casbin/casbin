@@ -30,6 +30,15 @@ func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
 	}
 }
 
+func testHasRole(t *testing.T, e *Enforcer, name string, role string, res bool) {
+	myRes := e.HasRoleForUser(name, role)
+	log.Print(name, " has role ", role, ": ", myRes)
+
+	if res != myRes {
+		t.Error(name, " has role ", role, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func TestRoleAPI(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
@@ -37,6 +46,9 @@ func TestRoleAPI(t *testing.T) {
 	testGetRoles(t, e, "bob", []string{})
 	testGetRoles(t, e, "data2_admin", []string{})
 	testGetRoles(t, e, "non_exist", []string{})
+
+	testHasRole(t, e, "alice", "data1_admin", false)
+	testHasRole(t, e, "alice", "data2_admin", true)
 
 	e.AddRoleForUser("alice", "data1_admin")
 
