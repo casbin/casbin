@@ -36,7 +36,7 @@ func (e *Enforcer) HasRoleForUser(name string, role string) bool {
 
 // AddRoleForUser adds a role for a user.
 func (e *Enforcer) AddRoleForUser(user string, role string) {
-	e.AddGroupingPolicy([]string{user, role})
+	e.AddGroupingPolicy(user, role)
 }
 
 // DeleteRoleForUser deletes a role for a user.
@@ -67,7 +67,7 @@ func (e *Enforcer) DeletePermission(permission string) {
 
 // AddPermissionForUser adds a permission for a user or role.
 func (e *Enforcer) AddPermissionForUser(user string, permission string) {
-	e.AddPolicy([]string{user, permission})
+	e.AddPolicy(user, permission)
 }
 
 // DeletePermissionForUser deletes a permission for a user or role.
