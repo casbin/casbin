@@ -53,13 +53,21 @@ func (model Model) GetPolicy(sec string, ptype string) [][]string {
 	return model[sec][ptype].Policy
 }
 
-// GetFilteredPolicy gets rules based on a field filter from a policy.
-func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValue string) [][]string {
+// GetFilteredPolicy gets rules based on field filters from a policy.
+func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues... string) [][]string {
 	res := [][]string{}
 
-	for _, v := range model[sec][ptype].Policy {
-		if v[fieldIndex] == fieldValue {
-			res = append(res, v)
+	for _, rule := range model[sec][ptype].Policy {
+		matched := true
+		for i, fieldValue := range fieldValues {
+			if rule[fieldIndex + i] != fieldValue {
+				matched = false
+				break
+			}
+		}
+
+		if matched {
+			res = append(res, rule)
 		}
 	}
 
@@ -98,15 +106,23 @@ func (model Model) RemovePolicy(sec string, ptype string, policy []string) bool 
 	return false
 }
 
-// RemoveFilteredPolicy removes policy rules based on a field filter from the model.
-func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValue string) bool {
+// RemoveFilteredPolicy removes policy rules based on field filters from the model.
+func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues... string) bool {
 	tmp := [][]string{}
 	res := false
 	for _, rule := range model[sec][ptype].Policy {
-		if rule[fieldIndex] != fieldValue {
-			tmp = append(tmp, rule)
-		} else {
+		matched := true
+		for i, fieldValue := range fieldValues {
+			if rule[fieldIndex + i] != fieldValue {
+				matched = false
+				break
+			}
+		}
+
+		if matched {
 			res = true
+		} else {
+			tmp = append(tmp, rule)
 		}
 	}
 

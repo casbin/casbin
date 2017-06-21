@@ -48,12 +48,12 @@ func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	}
 }
 
-func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, fieldValue string, res [][]string) {
-	myRes := e.GetFilteredPolicy(fieldIndex, fieldValue)
-	log.Print("Policy for ", fieldValue, ": ", myRes)
+func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]string, fieldValues... string) {
+	myRes := e.GetFilteredPolicy(fieldIndex, fieldValues...)
+	log.Print("Policy for ", util.ParamsToString(fieldValues...), ": ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
-		t.Error("Policy for ", fieldValue, ": ", myRes, ", supposed to be ", res)
+		t.Error("Policy for ", util.ParamsToString(fieldValues...), ": ", myRes, ", supposed to be ", res)
 	}
 }
 
@@ -69,15 +69,22 @@ func testGetGroupingPolicy(t *testing.T, e *Enforcer, res [][]string) {
 func TestGetPolicy(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	testGetPolicy(t, e, [][]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"}})
 
-	testGetFilteredPolicy(t, e, 0, "alice", [][]string{{"alice", "data1", "read"}})
-	testGetFilteredPolicy(t, e, 0, "bob", [][]string{{"bob", "data2", "write"}})
-	testGetFilteredPolicy(t, e, 0, "data2_admin", [][]string{{"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
-	testGetFilteredPolicy(t, e, 1, "data1", [][]string{{"alice", "data1", "read"}})
-	testGetFilteredPolicy(t, e, 1, "data2", [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
-	testGetFilteredPolicy(t, e, 2, "read", [][]string{{"alice", "data1", "read"}, {"data2_admin", "data2", "read"}})
-	testGetFilteredPolicy(t, e, 2, "write", [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "write"}})
+	testGetFilteredPolicy(t, e, 0, [][]string{{"alice", "data1", "read"}}, "alice")
+	testGetFilteredPolicy(t, e, 0, [][]string{{"bob", "data2", "write"}}, "bob")
+	testGetFilteredPolicy(t, e, 0, [][]string{{"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}}, "data2_admin")
+	testGetFilteredPolicy(t, e, 1, [][]string{{"alice", "data1", "read"}}, "data1")
+	testGetFilteredPolicy(t, e, 1, [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}}, "data2")
+	testGetFilteredPolicy(t, e, 2, [][]string{{"alice", "data1", "read"}, {"data2_admin", "data2", "read"}}, "read")
+	testGetFilteredPolicy(t, e, 2, [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "write"}}, "write")
+
+	testGetFilteredPolicy(t, e, 0, [][]string{{"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}}, "data2_admin", "data2")
+	testGetFilteredPolicy(t, e, 1, [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "write"}}, "data2", "write")
 
 	testGetGroupingPolicy(t, e, [][]string{{"alice", "data2_admin"}})
 }
@@ -90,7 +97,10 @@ func TestModifyPolicy(t *testing.T) {
 	e.RemovePolicy("alice", "data1", "read")
 	e.AddPolicy("eve", "data3", "read")
 
-	testGetPolicy(t, e, [][]string{{"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}, {"eve", "data3", "read"}})
+	testGetPolicy(t, e, [][]string{
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+		{"eve", "data3", "read"}})
 
 	e.RemoveFilteredPolicy(1, "data2")
 

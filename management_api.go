@@ -43,9 +43,9 @@ func (e *Enforcer) GetPolicy() [][]string {
 	return e.model.GetPolicy("p", "p")
 }
 
-// GetFilteredPolicy gets all the authorization rules in the policy, a field filter can be specified.
-func (e *Enforcer) GetFilteredPolicy(fieldIndex int, fieldValue string) [][]string {
-	return e.model.GetFilteredPolicy("p", "p", fieldIndex, fieldValue)
+// GetFilteredPolicy gets all the authorization rules in the policy, field filters can be specified.
+func (e *Enforcer) GetFilteredPolicy(fieldIndex int, fieldValues... string) [][]string {
+	return e.model.GetFilteredPolicy("p", "p", fieldIndex, fieldValues...)
 }
 
 // GetGroupingPolicy gets all the role inheritance rules in the policy.
@@ -81,9 +81,9 @@ func (e *Enforcer) RemovePolicy(params ...interface{}) {
 	}
 }
 
-// RemoveFilteredPolicy removes an authorization rule from the current policy, a field filter can be specified.
-func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValue string) {
-	e.model.RemoveFilteredPolicy("p", "p", fieldIndex, fieldValue)
+// RemoveFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
+func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues... string) {
+	e.model.RemoveFilteredPolicy("p", "p", fieldIndex, fieldValues...)
 }
 
 // AddGroupingPolicy adds a role inheritance rule to the current policy.
@@ -118,9 +118,9 @@ func (e *Enforcer) RemoveGroupingPolicy(params ...interface{}) {
 	e.model.BuildRoleLinks()
 }
 
-// RemoveFilteredGroupingPolicy removes a role inheritance rule from the current policy, a field filter can be specified.
-func (e *Enforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValue string) {
-	e.model.RemoveFilteredPolicy("g", "g", fieldIndex, fieldValue)
+// RemoveFilteredGroupingPolicy removes a role inheritance rule from the current policy, field filters can be specified.
+func (e *Enforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues... string) {
+	e.model.RemoveFilteredPolicy("g", "g", fieldIndex, fieldValues...)
 	e.model.BuildRoleLinks()
 }
 

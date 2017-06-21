@@ -174,8 +174,18 @@ func TestRBACModelWithDomainsAtRuntime(t *testing.T) {
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
 
-	// Remove all policy rules related to domain1.
-	e.RemoveFilteredPolicy(1, "domain1")
+	// Remove all policy rules related to domain1 and data1.
+	e.RemoveFilteredPolicy(1, "domain1", "data1")
+
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", false)
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", false)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "read", false)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "write", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data1", "read", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data1", "write", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
+
 	// Remove the specified policy rule.
 	e.RemovePolicy("admin", "domain2", "data2", "read")
 
