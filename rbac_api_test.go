@@ -44,6 +44,12 @@ func TestRoleAPI(t *testing.T) {
 	testGetRoles(t, e, "bob", []string{})
 	testGetRoles(t, e, "data2_admin", []string{})
 
+	e.DeleteRoleForUser("alice", "data1_admin")
+
+	testGetRoles(t, e, "alice", []string{"data2_admin"})
+	testGetRoles(t, e, "bob", []string{})
+	testGetRoles(t, e, "data2_admin", []string{})
+
 	e.DeleteRolesForUser("alice")
 
 	testGetRoles(t, e, "alice", []string{})
@@ -112,6 +118,13 @@ func TestPermissionAPI(t *testing.T) {
 	testEnforceWithoutUsers(t, e, "alice", "read", false)
 	testEnforceWithoutUsers(t, e, "alice", "write", false)
 	testEnforceWithoutUsers(t, e, "bob", "read", true)
+	testEnforceWithoutUsers(t, e, "bob", "write", true)
+
+	e.DeletePermissionForUser("bob", "read")
+
+	testEnforceWithoutUsers(t, e, "alice", "read", false)
+	testEnforceWithoutUsers(t, e, "alice", "write", false)
+	testEnforceWithoutUsers(t, e, "bob", "read", false)
 	testEnforceWithoutUsers(t, e, "bob", "write", true)
 
 	e.DeletePermissionsForUser("bob")

@@ -24,6 +24,11 @@ func (e *Enforcer) AddRoleForUser(user string, role string) {
 	e.AddGroupingPolicy([]string{user, role})
 }
 
+// DeleteRoleForUser deletes a role for a user.
+func (e *Enforcer) DeleteRoleForUser(user string, role string) {
+	e.RemoveGroupingPolicy(user, role)
+}
+
 // DeleteRolesForUser deletes all roles for a user.
 func (e *Enforcer) DeleteRolesForUser(user string) {
 	e.RemoveFilteredGroupingPolicy(0, user)
@@ -48,6 +53,11 @@ func (e *Enforcer) DeletePermission(permission string) {
 // AddPermissionForUser adds a permission for a user or role.
 func (e *Enforcer) AddPermissionForUser(user string, permission string) {
 	e.AddPolicy([]string{user, permission})
+}
+
+// DeletePermissionForUser deletes a permission for a user or role.
+func (e *Enforcer) DeletePermissionForUser(user string, permission string) {
+	e.RemovePolicy(user, permission)
 }
 
 // DeletePermissionsForUser deletes permissions for a user or role.
