@@ -66,6 +66,24 @@ func testGetGroupingPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	}
 }
 
+func testHasPolicy(t *testing.T, e *Enforcer, policy []string, res bool) {
+	myRes := e.HasPolicy(policy)
+	log.Print("Has policy ", util.ArrayToString(policy), ": ", myRes)
+
+	if res != myRes {
+		t.Error("Has policy ", util.ArrayToString(policy), ": ", myRes, ", supposed to be ", res)
+	}
+}
+
+func testHasGroupingPolicy(t *testing.T, e *Enforcer, policy []string, res bool) {
+	myRes := e.HasGroupingPolicy(policy)
+	log.Print("Has grouping policy ", util.ArrayToString(policy), ": ", myRes)
+
+	if res != myRes {
+		t.Error("Has grouping policy ", util.ArrayToString(policy), ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func TestGetPolicy(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
@@ -86,7 +104,16 @@ func TestGetPolicy(t *testing.T) {
 	testGetFilteredPolicy(t, e, 0, [][]string{{"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}}, "data2_admin", "data2")
 	testGetFilteredPolicy(t, e, 1, [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "write"}}, "data2", "write")
 
-	testGetGroupingPolicy(t, e, [][]string{{"alice", "data2_admin"}})
+	testHasPolicy(t, e, []string{"alice", "data1", "read"}, true)
+	testHasPolicy(t, e, []string{"bob", "data2", "write"}, true)
+	testHasPolicy(t, e, []string{"alice", "data2", "read"}, false)
+	testHasPolicy(t, e, []string{"bob", "data3", "write"}, false)
+
+	testGetGroupingPolicy(t, e, [][]string{
+		{"alice", "data2_admin"}})
+
+	testHasGroupingPolicy(t, e, []string{"alice", "data2_admin"}, true)
+	testHasGroupingPolicy(t, e, []string{"bob", "data2_admin"}, false)
 }
 
 func TestModifyPolicy(t *testing.T) {

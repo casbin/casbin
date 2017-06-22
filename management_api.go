@@ -53,6 +53,20 @@ func (e *Enforcer) GetGroupingPolicy() [][]string {
 	return e.model.GetPolicy("g", "g")
 }
 
+// HasPolicy determines whether an authorization rule exists.
+func (e *Enforcer) HasPolicy(params ...interface{}) bool {
+	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
+		return e.model.HasPolicy("p", "p", params[0].([]string))
+	} else {
+		policy := make([]string, 0)
+		for _, param := range params {
+			policy = append(policy, param.(string))
+		}
+
+		return e.model.HasPolicy("p", "p", policy)
+	}
+}
+
 // AddPolicy adds an authorization rule to the current policy.
 func (e *Enforcer) AddPolicy(params ...interface{}) {
 	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
@@ -84,6 +98,20 @@ func (e *Enforcer) RemovePolicy(params ...interface{}) {
 // RemoveFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) {
 	e.model.RemoveFilteredPolicy("p", "p", fieldIndex, fieldValues...)
+}
+
+// HasGroupingPolicy determines whether a role inheritance rule exists.
+func (e *Enforcer) HasGroupingPolicy(params ...interface{}) bool {
+	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
+		return e.model.HasPolicy("g", "g", params[0].([]string))
+	} else {
+		policy := make([]string, 0)
+		for _, param := range params {
+			policy = append(policy, param.(string))
+		}
+
+		return e.model.HasPolicy("g", "g", policy)
+	}
 }
 
 // AddGroupingPolicy adds a role inheritance rule to the current policy.
