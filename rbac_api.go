@@ -61,18 +61,32 @@ func (e *Enforcer) DeleteRole(role string) {
 }
 
 // DeletePermission deletes a permission.
-func (e *Enforcer) DeletePermission(permission string) {
-	e.RemoveFilteredPolicy(1, permission)
+func (e *Enforcer) DeletePermission(permission ...string) {
+	e.RemoveFilteredPolicy(1, permission...)
 }
 
 // AddPermissionForUser adds a permission for a user or role.
-func (e *Enforcer) AddPermissionForUser(user string, permission string) {
-	e.AddPolicy(user, permission)
+func (e *Enforcer) AddPermissionForUser(user string, permission ...string) {
+	params := make([]interface{}, 0, len(permission) + 1)
+
+	params= append(params, user)
+	for _, perm := range permission {
+		params = append(params, perm)
+	}
+
+	e.AddPolicy(params...)
 }
 
 // DeletePermissionForUser deletes a permission for a user or role.
-func (e *Enforcer) DeletePermissionForUser(user string, permission string) {
-	e.RemovePolicy(user, permission)
+func (e *Enforcer) DeletePermissionForUser(user string, permission ...string) {
+	params := make([]interface{}, 0, len(permission) + 1)
+
+	params= append(params, user)
+	for _, perm := range permission {
+		params = append(params, perm)
+	}
+
+	e.RemovePolicy(params...)
 }
 
 // DeletePermissionsForUser deletes permissions for a user or role.
