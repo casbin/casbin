@@ -98,11 +98,11 @@ func TestRoleAPI(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
-func testGetPermissions(t *testing.T, e *Enforcer, name string, res []string) {
+func testGetPermissions(t *testing.T, e *Enforcer, name string, res [][]string) {
 	myRes := e.GetPermissionsForUser(name)
 	log.Print("Permissions for ", name, ": ", myRes)
 
-	if !util.SetEquals(res, myRes) {
+	if !util.Array2DEquals(res, myRes) {
 		t.Error("Permissions for ", name, ": ", myRes, ", supposed to be ", res)
 	}
 }
@@ -124,8 +124,8 @@ func TestPermissionAPI(t *testing.T) {
 	testEnforceWithoutUsers(t, e, "bob", "read", false)
 	testEnforceWithoutUsers(t, e, "bob", "write", true)
 
-	testGetPermissions(t, e, "alice", []string{"read"})
-	testGetPermissions(t, e, "bob", []string{"write"})
+	testGetPermissions(t, e, "alice", [][]string{{"alice", "read"}})
+	testGetPermissions(t, e, "bob", [][]string{{"bob", "write"}})
 
 	testHasPermission(t, e, "alice", []string{"read"}, true)
 	testHasPermission(t, e, "alice", []string{"write"}, false)
