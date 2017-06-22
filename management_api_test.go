@@ -48,7 +48,7 @@ func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	}
 }
 
-func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]string, fieldValues... string) {
+func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]string, fieldValues ...string) {
 	myRes := e.GetFilteredPolicy(fieldIndex, fieldValues...)
 	log.Print("Policy for ", util.ParamsToString(fieldValues...), ": ", myRes)
 

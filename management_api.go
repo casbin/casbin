@@ -44,7 +44,7 @@ func (e *Enforcer) GetPolicy() [][]string {
 }
 
 // GetFilteredPolicy gets all the authorization rules in the policy, field filters can be specified.
-func (e *Enforcer) GetFilteredPolicy(fieldIndex int, fieldValues... string) [][]string {
+func (e *Enforcer) GetFilteredPolicy(fieldIndex int, fieldValues ...string) [][]string {
 	return e.model.GetFilteredPolicy("p", "p", fieldIndex, fieldValues...)
 }
 
@@ -82,7 +82,7 @@ func (e *Enforcer) RemovePolicy(params ...interface{}) {
 }
 
 // RemoveFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
-func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues... string) {
+func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) {
 	e.model.RemoveFilteredPolicy("p", "p", fieldIndex, fieldValues...)
 }
 
@@ -119,7 +119,7 @@ func (e *Enforcer) RemoveGroupingPolicy(params ...interface{}) {
 }
 
 // RemoveFilteredGroupingPolicy removes a role inheritance rule from the current policy, field filters can be specified.
-func (e *Enforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues... string) {
+func (e *Enforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) {
 	e.model.RemoveFilteredPolicy("g", "g", fieldIndex, fieldValues...)
 	e.model.BuildRoleLinks()
 }

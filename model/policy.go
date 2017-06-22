@@ -54,7 +54,7 @@ func (model Model) GetPolicy(sec string, ptype string) [][]string {
 }
 
 // GetFilteredPolicy gets rules based on field filters from a policy.
-func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues... string) [][]string {
+func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) [][]string {
 	res := [][]string{}
 
 	for _, rule := range model[sec][ptype].Policy {
@@ -107,7 +107,7 @@ func (model Model) RemovePolicy(sec string, ptype string, policy []string) bool 
 }
 
 // RemoveFilteredPolicy removes policy rules based on field filters from the model.
-func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues... string) bool {
+func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) bool {
 	tmp := [][]string{}
 	res := false
 	for _, rule := range model[sec][ptype].Policy {
