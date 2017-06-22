@@ -107,6 +107,15 @@ func testGetPermissions(t *testing.T, e *Enforcer, name string, res []string) {
 	}
 }
 
+func testHasPermission(t *testing.T, e *Enforcer, name string, permission []string, res bool) {
+	myRes := e.HasPermissionForUser(name, permission...)
+	log.Print(name, " has permission ", util.ArrayToString(permission), ": ", myRes)
+
+	if res != myRes {
+		t.Error(name, " has permission ", util.ArrayToString(permission), ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func TestPermissionAPI(t *testing.T) {
 	e := NewEnforcer("examples/basic_model_without_resources.conf", "examples/basic_policy_without_resources.csv")
 
@@ -117,6 +126,11 @@ func TestPermissionAPI(t *testing.T) {
 
 	testGetPermissions(t, e, "alice", []string{"read"})
 	testGetPermissions(t, e, "bob", []string{"write"})
+
+	testHasPermission(t, e, "alice", []string{"read"}, true)
+	testHasPermission(t, e, "alice", []string{"write"}, false)
+	testHasPermission(t, e, "bob", []string{"read"}, false)
+	testHasPermission(t, e, "bob", []string{"write"}, true)
 
 	e.DeletePermission("read")
 

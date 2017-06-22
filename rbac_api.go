@@ -105,3 +105,15 @@ func (e *Enforcer) GetPermissionsForUser(user string) []string {
 
 	return res
 }
+
+// HasPermissionForUser determines whether a user has a permission.
+func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool {
+	params := make([]interface{}, 0, len(permission) + 1)
+
+	params= append(params, user)
+	for _, perm := range permission {
+		params = append(params, perm)
+	}
+
+	return e.HasPolicy(params...)
+}
