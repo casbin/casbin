@@ -17,6 +17,7 @@ package persist
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"io"
 	"os"
 	"strings"
@@ -38,21 +39,22 @@ func NewFileAdapter(filePath string) *FileAdapter {
 }
 
 // LoadPolicy loads policy from file.
-func (a *FileAdapter) LoadPolicy(model model.Model) {
+func (a *FileAdapter) LoadPolicy(model model.Model) error {
 	if a.filePath == "" {
-		return
+		return errors.New("Invalid file path, file path cannot be empty")
 	}
 
 	err := a.loadPolicyFile(model, loadPolicyLine)
 	if err != nil {
-		panic(err)
+		return err
 	}
+	return nil
 }
 
 // SavePolicy saves policy to file.
-func (a *FileAdapter) SavePolicy(model model.Model) {
+func (a *FileAdapter) SavePolicy(model model.Model) error {
 	if a.filePath == "" {
-		return
+		return errors.New("Invalid file path, file path cannot be empty")
 	}
 
 	var tmp bytes.Buffer
@@ -75,8 +77,9 @@ func (a *FileAdapter) SavePolicy(model model.Model) {
 
 	err := a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
 	if err != nil {
-		panic(err)
+		return err
 	}
+	return nil
 }
 
 func (a *FileAdapter) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
