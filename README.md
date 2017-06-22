@@ -125,48 +125,51 @@ See: [Model.md](https://github.com/casbin/casbin/blob/master/Model.md)
 
 ## Persistence
 
-The model and policy can be persisted in Casbin with the following restrictions:
+In Casbin, the policy storage is implemented as an adapter (aka middleware for Casbin). To keep light-weight, we don't put adapter code in the main library. A complete list of Casbin adapters is provided as below. Any 3rd-party contribution on a new adapter is welcomed, please inform us and I will put it in this list:)
 
-Persist Method | Casbin Model | Casbin Policy | Usage
+Adapter | Type | Author | Description
 ----|------|----|----
-File | Load only | Load/Save | [Details](#file)
-Database (tested with [MySQL](https://www.mysql.com)) | Not supported | Load/Save | [Details](https://github.com/casbin/mysql_adapter)
-[Cassandra](http://cassandra.apache.org) (NoSQL) | Not supported | Load/Save | [Details](https://github.com/casbin/cassandra_adapter)
+[File Adapter (built-in)](#file) | File | Casbin | Persistence for [.CSV (Comma-Separated Values)](https://en.wikipedia.org/wiki/Comma-separated_values) files
+[MySQL Adapter](https://github.com/casbin/mysql_adapter) | RDBMS | Casbin | Persistence for [MySQL](https://www.mysql.com)
+[Cassandra Adapter](https://github.com/casbin/cassandra_adapter) | NoSQL | Casbin | Persistence for [Apache Cassandra DB](http://cassandra.apache.org)
+[Consul Adapter](https://github.com/ankitm123/consul_adapter) | KV store | [ankitm123](https://github.com/ankitm123) | Persistence for [HashiCorp Consul](https://www.consul.io/)
 
-We think the model represents the access control model that our customer uses and is not often modified at run-time, so we don't implement an API to modify the current model or save the model into a file. And the model cannot be loaded from or saved into a database. The model file should be in .CONF format.
+All adapters should implement the [Adapter interface](https://github.com/casbin/casbin/blob/master/persist/adapter.go) by providing two methods:``LoadPolicy(model model.Model)`` and ``SavePolicy(model model.Model)``. And as a convention, the adapter should be able to automatically create a database named ``casbin``  if it doesn't exist and use it for policy storage.
 
-The policy is much more dynamic than model and can be loaded from a file/database or saved to a file/database at any time. As for file persistence, the policy file should be in [.CSV (Comma-Separated Values)](https://en.wikipedia.org/wiki/Comma-separated_values) format. As for the database backend, Casbin should support all relational DBMSs but I only tested with MySQL. Casbin has no built-in database with it, you have to setup a database on your own. Let me know if there are any compatibility issues here. Casbin will automatically create a database named ``casbin`` and use it for policy storage. So make sure your provided credential has the related privileges for the database you use.
+Note: Unlike the policy, the model can be loaded from a CONF file only. Because we think the model is not a frequently modified part at run-time, so we don't implement an API to save the model into a file or database.
 
-### File
+### File adapter
 
-Below shows how to initialize an enforcer from file:
+Below shows how to initialize an enforcer from the built-in file adapter:
 
 ```go
-// Initialize an enforcer with a model file and a policy file.
 e := casbin.NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 ```
 
-### Database
-
-Below shows how to initialize an enforcer from database. it connects to a MySQL DB on 127.0.0.1:3306 with root and blank password.
+This is the same with:
 
 ```go
-// Initialize an enforcer with a model file and policy from database.
+a := persist.NewFileAdapter("examples/basic_policy.csv")
+e := casbin.NewEnforcer("examples/basic_model.conf", a)
+```
+
+### MySQL adapter
+
+Below shows how to initialize an enforcer from MySQL database. it connects to a MySQL DB on 127.0.0.1:3306 with root and blank password.
+
+```go
 a := mysql_adapter.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
 e := casbin.NewEnforcer("examples/basic_model.conf", a)
 ```
 
 ### Use your own storage adapter
 
-In Casbin, both the above file and database storage is implemented as an adapter. You can use your own adapter like below:
+You can use your own adapter like below:
 
 ```go
-// Initialize an enforcer with an adapter.
-a := persist.NewFileAdapter("examples/basic_policy.csv") // or replace with your own adapter.
+a := your_package.YourNewAdapter(your_params)
 e := casbin.NewEnforcer("examples/basic_model.conf", a)
 ```
-
-An adapter should implement two methods:``LoadPolicy(model model.Model)`` and ``SavePolicy(model model.Model)``. To keep light-weight, we don't put adapter code in this main library. You can choose officially supported adapters from: https://github.com/casbin and use it like a plugin as above.
 
 ### Load/Save at run-time
 
