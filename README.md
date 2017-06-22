@@ -130,11 +130,11 @@ In Casbin, the policy storage is implemented as an adapter (aka middleware for C
 Adapter | Type | Author | Description
 ----|------|----|----
 [File Adapter (built-in)](#file) | File | Casbin | Persistence for [.CSV (Comma-Separated Values)](https://en.wikipedia.org/wiki/Comma-separated_values) files
-[MySQL Adapter](https://github.com/casbin/mysql_adapter) | RDBMS | Casbin | Persistence for [MySQL](https://www.mysql.com)
-[Cassandra Adapter](https://github.com/casbin/cassandra_adapter) | NoSQL | Casbin | Persistence for [Apache Cassandra DB](http://cassandra.apache.org)
+[MySQL Adapter](https://github.com/casbin/mysql-adapter) | RDBMS | Casbin | Persistence for [MySQL](https://www.mysql.com)
+[Cassandra Adapter](https://github.com/casbin/cassandra-adapter) | NoSQL | Casbin | Persistence for [Apache Cassandra DB](http://cassandra.apache.org)
 [Consul Adapter](https://github.com/ankitm123/consul_adapter) | KV store | [ankitm123](https://github.com/ankitm123) | Persistence for [HashiCorp Consul](https://www.consul.io/)
 
-All adapters should implement the [Adapter interface](https://github.com/casbin/casbin/blob/master/persist/adapter.go) by providing two methods:``LoadPolicy(model model.Model)`` and ``SavePolicy(model model.Model)``. And as a convention, the adapter should be able to automatically create a database named ``casbin``  if it doesn't exist and use it for policy storage.
+All adapters should implement the [Adapter interface](https://github.com/casbin/casbin/blob/master/persist/adapter.go) by providing two methods:``LoadPolicy(model model.Model) error`` and ``SavePolicy(model model.Model) error``. And as a convention, the adapter should be able to automatically create a database named ``casbin``  if it doesn't exist and use it for policy storage.
 
 Note: Unlike the policy, the model can be loaded from a CONF file only. Because we think the model is not a frequently modified part at run-time, so we don't implement an API to save the model into a file or database.
 
@@ -158,7 +158,7 @@ e := casbin.NewEnforcer("examples/basic_model.conf", a)
 Below shows how to initialize an enforcer from MySQL database. it connects to a MySQL DB on 127.0.0.1:3306 with root and blank password.
 
 ```go
-a := mysql_adapter.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
+a := mysqladapter.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
 e := casbin.NewEnforcer("examples/basic_model.conf", a)
 ```
 
@@ -167,7 +167,7 @@ e := casbin.NewEnforcer("examples/basic_model.conf", a)
 You can use your own adapter like below:
 
 ```go
-a := your_package.YourNewAdapter(your_params)
+a := yourpackage.YourNewAdapter(your_params)
 e := casbin.NewEnforcer("examples/basic_model.conf", a)
 ```
 
