@@ -99,11 +99,26 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) boo
 
 // GetRoles gets the roles that a subject inherits.
 func (rm *RoleManager) GetRoles(name string) []string {
-	if rm.hasRole(name) {
-		return rm.createRole(name).getRoles()
+	if !rm.hasRole(name) {
+		return nil
 	}
 
-	return nil
+	return rm.createRole(name).getRoles()
+}
+
+// GetRoles gets the users that inherits a subject.
+func (rm *RoleManager) GetUsers(name string) []string {
+	if !rm.hasRole(name) {
+		return nil
+	}
+
+	names := []string{}
+	for _, role := range rm.allRoles {
+		if role.hasDirectRole(name) {
+			names = append(names, role.name)
+		}
+	}
+	return names
 }
 
 // PrintRoles prints all the roles to log.
@@ -158,6 +173,16 @@ func (r *Role) hasRole(name string, level int) bool {
 			return true
 		}
 	}
+	return false
+}
+
+func (r *Role) hasDirectRole(name string) bool {
+	for _, role := range r.roles {
+		if role.name == name {
+			return true
+		}
+	}
+
 	return false
 }
 

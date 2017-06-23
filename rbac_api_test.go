@@ -30,6 +30,15 @@ func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
 	}
 }
 
+func testGetUsers(t *testing.T, e *Enforcer, name string, res []string) {
+	myRes := e.GetUsersForRole(name)
+	log.Print("Users for ", name, ": ", myRes)
+
+	if !util.SetEquals(res, myRes) {
+		t.Error("Users for ", name, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func testHasRole(t *testing.T, e *Enforcer, name string, role string, res bool) {
 	myRes := e.HasRoleForUser(name, role)
 	log.Print(name, " has role ", role, ": ", myRes)
