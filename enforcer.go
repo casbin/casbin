@@ -112,6 +112,11 @@ func (e *Enforcer) GetModel() model.Model {
 	return e.model
 }
 
+// SetModel sets the current model.
+func (e *Enforcer) SetModel(model model.Model) {
+	e.model = model
+}
+
 // ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() {
 	e.model.ClearPolicy()

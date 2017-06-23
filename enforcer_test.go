@@ -20,6 +20,13 @@ import (
 	"github.com/casbin/casbin/persist"
 )
 
+func TestGetAndSetModel(t *testing.T) {
+	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+
+	model := e.GetModel()
+	e.SetModel(model)
+}
+
 func TestReloadPolicy(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
