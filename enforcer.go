@@ -199,6 +199,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 
 			if err != nil {
 				policyResults[i] = EFFECT_INDETERMINATE
+				panic(err)
 			} else {
 				if !result.(bool) {
 					policyResults[i] = EFFECT_INDETERMINATE
@@ -237,6 +238,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 
 		if err != nil {
 			policyResults[0] = EFFECT_INDETERMINATE
+			panic(err)
 		} else {
 			if result.(bool) {
 				policyResults[0] = EFFECT_ALLOW
