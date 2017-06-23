@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/casbin/casbin/persist"
+	"github.com/casbin/casbin/model"
 )
 
 func TestGetAndSetModel(t *testing.T) {
@@ -25,6 +26,29 @@ func TestGetAndSetModel(t *testing.T) {
 
 	model := e.GetModel()
 	e.SetModel(model)
+}
+
+func TestCreateModelManually(t *testing.T) {
+	e := NewEnforcer()
+
+	model := make(model.Model)
+	model.AddAssertion("r", "r", "sub, obj, act")
+	model.AddAssertion("p", "p", "sub, obj, act")
+	model.AddAssertion("e", "e", "some(where (p.eft == allow))")
+	model.AddAssertion("m", "m", "r.sub == p.sub && r.obj == p.obj && r.act == p.act")
+	e.SetModel(model)
+
+	a := persist.NewFileAdapter("examples/basic_policy.csv")
+	a.LoadPolicy(e.GetModel())
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
 func TestReloadPolicy(t *testing.T) {
