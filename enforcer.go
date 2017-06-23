@@ -15,7 +15,9 @@
 package casbin
 
 import (
+	"fmt"
 	"reflect"
+	"strconv"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/model"
@@ -141,7 +143,7 @@ func (e *Enforcer) EnableLog(enable bool) {
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
-func (e *Enforcer) Enforce(rvals ...string) bool {
+func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 	if !e.enabled {
 		return true
 	}
@@ -287,7 +289,16 @@ func (e *Enforcer) Enforce(rvals ...string) bool {
 		}
 	}
 
-	util.LogPrint("Request ", rvals, ": ", result)
+	reqStr := "Request: "
+	for i, rval := range rvals {
+		if i != len(rvals) - 1 {
+			reqStr += fmt.Sprintf("%v, ", rval)
+		} else {
+			reqStr += fmt.Sprintf("%v", rval)
+		}
+	}
+	reqStr += " ---> " + strconv.FormatBool(result)
+	util.LogPrint(reqStr)
 
 	return result
 }

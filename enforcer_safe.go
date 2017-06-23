@@ -99,7 +99,7 @@ func (e *Enforcer) SavePolicySafe() (err error) {
 }
 
 // EnforceSafe calls Enforce in a safe way, returns error instead of causing panic.
-func (e *Enforcer) EnforceSafe(rvals ...string) (result bool, err error) {
+func (e *Enforcer) EnforceSafe(rvals ...interface{}) (result bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			switch x := r.(type) {
