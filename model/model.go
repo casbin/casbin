@@ -38,10 +38,10 @@ var sectionNameMap = map[string]string{
 
 func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) bool {
 	value := cfg.String(sectionNameMap[sec] + "::" + key)
-	return AddAssertion(model, sec, key, value)
+	return model.AddAssertion(sec, key, value)
 }
 
-func AddAssertion(model Model, sec string, key string, value string) bool {
+func (model Model) AddAssertion(sec string, key string, value string) bool {
 	ast := Assertion{}
 	ast.Key = key
 	ast.Value = value
