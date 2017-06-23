@@ -20,7 +20,7 @@ import (
 )
 
 func TestPathError(t *testing.T) {
-	_, err := NewEnforcerSafe("", "")
+	_, err := NewEnforcerSafe("hope_this_path_wont_exist", "")
 	if err == nil {
 		t.Errorf("Should be error here.")
 	} else {
