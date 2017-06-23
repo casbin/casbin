@@ -68,6 +68,8 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 		}
 	} else if len(params) - parsedParamLen == 1 {
 		e.InitWithFile(params[0].(string), "")
+	} else if len(params) - parsedParamLen == 0 {
+		e.InitWithFile("", "")
 	} else {
 		panic("Invalid parameters for enforcer.")
 	}
@@ -83,8 +85,10 @@ func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 
 	e.enabled = true
 
-	e.LoadModel()
-	e.LoadPolicy()
+	if e.modelPath != "" {
+		e.LoadModel()
+		e.LoadPolicy()
+	}
 }
 
 // InitWithAdapter initializes an enforcer with a database adapter.
