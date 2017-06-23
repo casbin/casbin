@@ -22,8 +22,8 @@ Casbin is a powerful and efficient open-source access control library for Golang
 4. **[RBAC (Role-Based Access Control)](https://en.wikipedia.org/wiki/Role-based_access_control)**
 5. **RBAC with resource roles**: both users and resources can have roles (or groups) at the same time.
 6. **RBAC with domains/tenants**: users can have different role sets for different domains/tenants.
-7. **[ABAC (Attribute-Based Access Control)](https://en.wikipedia.org/wiki/Attribute-Based_Access_Control)**
-8. **[RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer)**
+7. **[ABAC (Attribute-Based Access Control)](https://en.wikipedia.org/wiki/Attribute-Based_Access_Control)**: syntax sugar like ``resource.Owner`` can be used to get the attribute for a resource.
+8. **[RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer)**: supports paths like ``/res/*``, ``/res/:id`` and HTTP methods like ``GET``, ``POST``, ``PUT``, ``DELETE``.
 9. **Deny-override**: both allow and deny authorizations are supported, deny overrides the allow.
 10. **Priority**: the policy rules can be prioritized like firewall rules.
 
