@@ -15,14 +15,15 @@
 package util
 
 import (
-	"regexp"
 	"sort"
 	"strings"
 )
 
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
 func EscapeAssertion(s string) string {
-	return strings.Replace(s, ".", "_", -1)
+	s = strings.Replace(s, "r.", "r_", -1)
+	s = strings.Replace(s, "p.", "p_", -1)
+	return s
 }
 
 // RemoveComments removes the comments starting with # in the text.
@@ -32,14 +33,6 @@ func RemoveComments(s string) string {
 		return s
 	}
 	return strings.TrimSpace(s[0:pos])
-}
-
-// FixAttribute translates the ABAC attributes into functions.
-func FixAttribute(s string) string {
-	reg := regexp.MustCompile("(r|p)\\.(sub|obj|act)\\.([A-Za-z0-9]*)")
-	res := reg.ReplaceAllString(s, "${2}Attr($1.$2, \"$3\")")
-
-	return res
 }
 
 // ArrayEquals determines whether two string arrays are identical.

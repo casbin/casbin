@@ -45,10 +45,6 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 		return false
 	}
 
-	if sec == "m" {
-		ast.Value = util.FixAttribute(ast.Value)
-	}
-
 	if sec == "r" || sec == "p" {
 		ast.Tokens = strings.Split(ast.Value, ", ")
 		for i := range ast.Tokens {

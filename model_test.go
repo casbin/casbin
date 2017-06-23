@@ -15,13 +15,12 @@
 package casbin
 
 import (
-	"reflect"
 	"testing"
 )
 
-func testEnforce(t *testing.T, e *Enforcer, sub string, obj string, act string, res bool) {
+func testEnforce(t *testing.T, e *Enforcer, sub string, obj interface{}, act string, res bool) {
 	if e.Enforce(sub, obj, act) != res {
-		t.Errorf("%s, %s, %s: %t, supposed to be %t", sub, obj, act, !res, res)
+		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, !res, res)
 	}
 }
 
@@ -212,99 +211,33 @@ func TestRBACModelWithDeny(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
-func getAttr(name string, attr string) string {
-	// This is the same as:
-	//
-	// alice.domain = domain1
-	// bob.domain = domain2
-	// data1.domain = domain1
-	// data2.domain = domain2
-
-	if attr != "domain" {
-		return "unknown"
-	}
-
-	if name == "alice" || name == "data1" {
-		return "domain1"
-	} else if name == "bob" || name == "data2" {
-		return "domain2"
-	} else {
-		return "unknown"
-	}
+type testResource struct {
+	Name   string
+	Owner string
 }
 
-func getAttrFunc(args ...interface{}) (interface{}, error) {
-	name := args[0].(string)
-	attr := args[1].(string)
-
-	return (string)(getAttr(name, attr)), nil
+func newTestResource(name string, owner string) testResource {
+	r := testResource{}
+	r.Name = name
+	r.Owner = owner
+	return r
 }
 
 func TestABACModel(t *testing.T) {
 	e := NewEnforcer("examples/abac_model.conf")
 
-	e.AddSubjectAttributeFunction(getAttrFunc)
-	e.AddObjectAttributeFunction(getAttrFunc)
+	data1 := newTestResource("data1", "alice")
+	data2 := newTestResource("data2", "bob")
 
-	testEnforce(t, e, "alice", "data1", "read", true)
-	testEnforce(t, e, "alice", "data1", "write", true)
-	testEnforce(t, e, "alice", "data2", "read", false)
-	testEnforce(t, e, "alice", "data2", "write", false)
-	testEnforce(t, e, "bob", "data1", "read", false)
-	testEnforce(t, e, "bob", "data1", "write", false)
-	testEnforce(t, e, "bob", "data2", "read", true)
-	testEnforce(t, e, "bob", "data2", "write", true)
+	testEnforce(t, e, "alice", data1, "read", true)
+	testEnforce(t, e, "alice", data1, "write", true)
+	testEnforce(t, e, "alice", data2, "read", false)
+	testEnforce(t, e, "alice", data2, "write", false)
+	testEnforce(t, e, "bob", data1, "read", false)
+	testEnforce(t, e, "bob", data1, "write", false)
+	testEnforce(t, e, "bob", data2, "read", true)
+	testEnforce(t, e, "bob", data2, "write", true)
 }
-
-type testUser struct {
-	name   string
-	domain string
-}
-
-func newTestUser(name string, domain string) *testUser {
-	u := testUser{}
-	u.name = name
-	u.domain = domain
-	return &u
-}
-
-func (u *testUser) getAttribute(attributeName string) string {
-	ru := reflect.ValueOf(u)
-	f := reflect.Indirect(ru).FieldByName(attributeName)
-	return f.String()
-}
-
-type testResource struct {
-	name   string
-	domain string
-}
-
-func newTestResource(name string, domain string) *testResource {
-	r := testResource{}
-	r.name = name
-	r.domain = domain
-	return &r
-}
-
-func (u *testResource) getAttribute(attributeName string) string {
-	ru := reflect.ValueOf(u)
-	f := reflect.Indirect(ru).FieldByName(attributeName)
-	return f.String()
-}
-
-//func TestABACModel2(t *testing.T) {
-//	e := NewEnforcer("examples/abac_model.conf")
-//
-//	alice := newTestUser("alice", "domain1")
-//	bob := newTestUser("bob", "domain2")
-//	data1 := newTestResource("data1", "domain1")
-//	data2 := newTestResource("data2", "domain2")
-//
-//	log.Println(alice.getAttribute("domain"))
-//	log.Println(bob.getAttribute("domain"))
-//	log.Println(data1.getAttribute("domain"))
-//	log.Println(data2.getAttribute("domain"))
-//}
 
 func TestKeyMatchModel(t *testing.T) {
 	e := NewEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv")
