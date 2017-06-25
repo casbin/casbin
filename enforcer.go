@@ -45,10 +45,12 @@ type Enforcer struct {
 	enabled bool
 }
 
-// NewEnforcer gets an enforcer via CONF, file or DB.
-// e := NewEnforcer("path/to/casbin.conf")
-// e := NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.conf")
-// e := NewEnforcer("path/to/rbac_model.conf", "mysql", "root:@tcp(127.0.0.1:3306)/")
+// NewEnforcer gets an enforcer via file or DB.
+// File:
+// e := casbin.NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.conf")
+// MySQL DB:
+// a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
+// e := casbin.NewEnforcer("path/to/basic_model.conf", a)
 func NewEnforcer(params ...interface{}) *Enforcer {
 	e := &Enforcer{}
 
