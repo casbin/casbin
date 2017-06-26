@@ -123,6 +123,7 @@ func TestModifyPolicy(t *testing.T) {
 	e.RemovePolicy("bob", "data2", "write")
 	e.RemovePolicy("alice", "data1", "read")
 	e.AddPolicy("eve", "data3", "read")
+	e.AddPolicy("eve", "data3", "read")
 
 	testGetPolicy(t, e, [][]string{
 		{"data2_admin", "data2", "read"},
