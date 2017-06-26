@@ -40,8 +40,9 @@ func (e *Enforcer) HasRoleForUser(name string, role string) bool {
 }
 
 // AddRoleForUser adds a role for a user.
-func (e *Enforcer) AddRoleForUser(user string, role string) {
-	e.AddGroupingPolicy(user, role)
+// Returns false if the user already has the role.
+func (e *Enforcer) AddRoleForUser(user string, role string) bool {
+	return e.AddGroupingPolicy(user, role)
 }
 
 // DeleteRoleForUser deletes a role for a user.
@@ -71,7 +72,8 @@ func (e *Enforcer) DeletePermission(permission ...string) {
 }
 
 // AddPermissionForUser adds a permission for a user or role.
-func (e *Enforcer) AddPermissionForUser(user string, permission ...string) {
+// Returns false if the user or role already has the permission.
+func (e *Enforcer) AddPermissionForUser(user string, permission ...string) bool {
 	params := make([]interface{}, 0, len(permission) + 1)
 
 	params= append(params, user)
@@ -79,7 +81,7 @@ func (e *Enforcer) AddPermissionForUser(user string, permission ...string) {
 		params = append(params, perm)
 	}
 
-	e.AddPolicy(params...)
+	return e.AddPolicy(params...)
 }
 
 // DeletePermissionForUser deletes a permission for a user or role.
