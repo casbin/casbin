@@ -159,21 +159,6 @@ func (e *Enforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...s
 	e.model.BuildRoleLinks()
 }
 
-// AddSubjectAttributeFunction adds the function that gets attributes for a subject in ABAC.
-func (e *Enforcer) AddSubjectAttributeFunction(function func(args ...interface{}) (interface{}, error)) {
-	e.fm.AddFunction("subAttr", function)
-}
-
-// AddObjectAttributeFunction adds the function that gets attributes for a object in ABAC.
-func (e *Enforcer) AddObjectAttributeFunction(function func(args ...interface{}) (interface{}, error)) {
-	e.fm.AddFunction("objAttr", function)
-}
-
-// AddActionAttributeFunction adds the function that gets attributes for a object in ABAC.
-func (e *Enforcer) AddActionAttributeFunction(function func(args ...interface{}) (interface{}, error)) {
-	e.fm.AddFunction("actAttr", function)
-}
-
 // AddFunction adds a customized function.
 func (e *Enforcer) AddFunction(name string, function func(args ...interface{}) (interface{}, error)) {
 	e.fm.AddFunction(name, function)
