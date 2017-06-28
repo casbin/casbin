@@ -168,18 +168,20 @@ func (e *Enforcer) ClearPolicy() {
 }
 
 // LoadPolicy reloads the policy from file/database.
-func (e *Enforcer) LoadPolicy() {
+func (e *Enforcer) LoadPolicy() error {
 	e.model.ClearPolicy()
-	e.adapter.LoadPolicy(e.model)
+	err := e.adapter.LoadPolicy(e.model)
 
 	e.model.PrintPolicy()
 
 	e.model.BuildRoleLinks()
+
+	return err
 }
 
 // SavePolicy saves the current policy (usually after changed with casbin API) back to file/database.
-func (e *Enforcer) SavePolicy() {
-	e.adapter.SavePolicy(e.model)
+func (e *Enforcer) SavePolicy() error {
+	return e.adapter.SavePolicy(e.model)
 }
 
 // Enable changes the enforcing state of casbin, when casbin is disabled, all access will be allowed by the Enforce() function.
