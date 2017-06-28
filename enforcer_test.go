@@ -32,10 +32,10 @@ func TestCreateModelManually(t *testing.T) {
 	e := NewEnforcer()
 
 	model := make(model.Model)
-	model.AddAssertion("r", "r", "sub, obj, act")
-	model.AddAssertion("p", "p", "sub, obj, act")
-	model.AddAssertion("e", "e", "some(where (p.eft == allow))")
-	model.AddAssertion("m", "m", "r.sub == p.sub && r.obj == p.obj && r.act == p.act")
+	model.AddDef("r", "r", "sub, obj, act")
+	model.AddDef("p", "p", "sub, obj, act")
+	model.AddDef("e", "e", "some(where (p.eft == allow))")
+	model.AddDef("m", "m", "r.sub == p.sub && r.obj == p.obj && r.act == p.act")
 	e.SetModel(model)
 
 	a := persist.NewFileAdapter("examples/basic_policy.csv")
