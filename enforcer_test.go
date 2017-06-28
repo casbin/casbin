@@ -29,18 +29,15 @@ func TestGetAndSetModel(t *testing.T) {
 }
 
 func TestCreateModelManually(t *testing.T) {
-	e := NewEnforcer()
-
-	model := model.NewModel()
-	model.AddDef("r", "r", "sub, obj, act")
-	model.AddDef("p", "p", "sub, obj, act")
-	model.AddDef("e", "e", "some(where (p.eft == allow))")
-	model.AddDef("m", "m", "r.sub == p.sub && r.obj == p.obj && r.act == p.act")
-	e.SetModel(model)
+	m := model.NewModel()
+	m.AddDef("r", "r", "sub, obj, act")
+	m.AddDef("p", "p", "sub, obj, act")
+	m.AddDef("e", "e", "some(where (p.eft == allow))")
+	m.AddDef("m", "m", "r.sub == p.sub && r.obj == p.obj && r.act == p.act")
 
 	a := persist.NewFileAdapter("examples/basic_policy.csv")
-	e.SetAdapter(a)
-	e.LoadPolicy()
+
+	e := NewEnforcer(m, a)
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)

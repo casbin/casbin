@@ -63,10 +63,18 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 	}
 
 	if len(params) - parsedParamLen == 2 {
-		if reflect.TypeOf(params[1]).Kind() == reflect.String {
-			e.InitWithFile(params[0].(string), params[1].(string))
+		if reflect.TypeOf(params[0]).Kind() == reflect.String {
+			if reflect.TypeOf(params[1]).Kind() == reflect.String {
+				e.InitWithFile(params[0].(string), params[1].(string))
+			} else {
+				e.InitWithAdapter(params[0].(string), params[1].(persist.Adapter))
+			}
 		} else {
-			e.InitWithAdapter(params[0].(string), params[1].(persist.Adapter))
+			if reflect.TypeOf(params[1]).Kind() == reflect.String {
+				panic("Invalid parameters for enforcer.")
+			} else {
+				e.InitWithModelAndAdapter(params[0].(model.Model), params[1].(persist.Adapter))
+			}
 		}
 	} else if len(params) - parsedParamLen == 1 {
 		e.InitWithFile(params[0].(string), "")
@@ -105,6 +113,18 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 		e.LoadModel()
 		e.LoadPolicy()
 	}
+}
+
+// InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
+func (e *Enforcer) InitWithModelAndAdapter(model model.Model, adapter persist.Adapter) {
+	e.modelPath = ""
+	e.model = model
+
+	e.adapter = adapter
+
+	e.enabled = true
+
+	e.LoadPolicy()
 }
 
 // LoadModel reloads the model from the model CONF file.
