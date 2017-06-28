@@ -53,6 +53,11 @@ func (e *Enforcer) GetGroupingPolicy() [][]string {
 	return e.model.GetPolicy("g", "g")
 }
 
+// GetFilteredGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
+func (e *Enforcer) GetFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) [][]string {
+	return e.model.GetFilteredPolicy("g", "g", fieldIndex, fieldValues...)
+}
+
 // HasPolicy determines whether an authorization rule exists.
 func (e *Enforcer) HasPolicy(params ...interface{}) bool {
 	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {

@@ -66,6 +66,15 @@ func testGetGroupingPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	}
 }
 
+func testGetFilteredGroupingPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]string, fieldValues ...string) {
+	myRes := e.GetFilteredGroupingPolicy(fieldIndex, fieldValues...)
+	log.Print("Grouping policy for ", util.ParamsToString(fieldValues...), ": ", myRes)
+
+	if !util.Array2DEquals(res, myRes) {
+		t.Error("Grouping policy for ", util.ParamsToString(fieldValues...), ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func testHasPolicy(t *testing.T, e *Enforcer, policy []string, res bool) {
 	myRes := e.HasPolicy(policy)
 	log.Print("Has policy ", util.ArrayToString(policy), ": ", myRes)
@@ -111,6 +120,11 @@ func TestGetPolicy(t *testing.T) {
 
 	testGetGroupingPolicy(t, e, [][]string{
 		{"alice", "data2_admin"}})
+
+	testGetFilteredGroupingPolicy(t, e, 0, [][]string{{"alice", "data2_admin"}}, "alice")
+	testGetFilteredGroupingPolicy(t, e, 0, [][]string{}, "bob")
+	testGetFilteredGroupingPolicy(t, e, 1, [][]string{}, "data1_admin")
+	testGetFilteredGroupingPolicy(t, e, 1, [][]string{{"alice", "data2_admin"}}, "data2_admin")
 
 	testHasGroupingPolicy(t, e, []string{"alice", "data2_admin"}, true)
 	testHasGroupingPolicy(t, e, []string{"bob", "data2_admin"}, false)
