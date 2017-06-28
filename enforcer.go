@@ -101,8 +101,10 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 
 	e.enabled = true
 
-	e.LoadModel()
-	e.LoadPolicy()
+	if e.modelPath != "" {
+		e.LoadModel()
+		e.LoadPolicy()
+	}
 }
 
 // LoadModel reloads the model from the model CONF file.
