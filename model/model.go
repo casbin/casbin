@@ -41,6 +41,12 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 	return model.AddDef(sec, key, value)
 }
 
+// NewModel gets an empty model.
+func NewModel() Model {
+	return make(Model)
+}
+
+// AddDef adds an assertion to the model.
 func (model Model) AddDef(sec string, key string, value string) bool {
 	ast := Assertion{}
 	ast.Key = key

@@ -31,7 +31,7 @@ func TestGetAndSetModel(t *testing.T) {
 func TestCreateModelManually(t *testing.T) {
 	e := NewEnforcer()
 
-	model := make(model.Model)
+	model := model.NewModel()
 	model.AddDef("r", "r", "sub, obj, act")
 	model.AddDef("p", "p", "sub, obj, act")
 	model.AddDef("e", "e", "some(where (p.eft == allow))")
