@@ -45,10 +45,7 @@ func (a *FileAdapter) LoadPolicy(model model.Model) error {
 	}
 
 	err := a.loadPolicyFile(model, loadPolicyLine)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // SavePolicy saves policy to file.
@@ -76,10 +73,7 @@ func (a *FileAdapter) SavePolicy(model model.Model) error {
 	}
 
 	err := a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (a *FileAdapter) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
