@@ -133,6 +133,12 @@ func TestGetPolicy(t *testing.T) {
 func TestModifyPolicy(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"}})
+
 	e.RemovePolicy("alice", "data1", "read")
 	e.RemovePolicy("bob", "data2", "write")
 	e.RemovePolicy("alice", "data1", "read")
@@ -151,6 +157,11 @@ func TestModifyPolicy(t *testing.T) {
 
 func TestModifyGroupingPolicy(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	testGetRoles(t, e, "alice", []string{"data2_admin"})
+	testGetRoles(t, e, "bob", []string{})
+	testGetRoles(t, e, "eve", []string{})
+	testGetRoles(t, e, "non_exist", []string{})
 
 	e.RemoveGroupingPolicy("alice", "data2_admin")
 	e.AddGroupingPolicy("bob", "data1_admin")
