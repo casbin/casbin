@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	"github.com/casbin/casbin/persist"
-	"github.com/casbin/casbin/model"
 )
 
 func TestGetAndSetModel(t *testing.T) {
@@ -29,7 +28,7 @@ func TestGetAndSetModel(t *testing.T) {
 }
 
 func TestCreateModelManually(t *testing.T) {
-	m := model.NewModel()
+	m := NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("e", "e", "some(where (p.eft == allow))")

@@ -45,7 +45,7 @@ type Enforcer struct {
 	enabled bool
 }
 
-// NewEnforcer gets an enforcer via file or DB.
+// NewEnforcer creates an enforcer via file or DB.
 // File:
 // e := casbin.NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.conf")
 // MySQL DB:
@@ -125,6 +125,11 @@ func (e *Enforcer) InitWithModelAndAdapter(model model.Model, adapter persist.Ad
 	e.enabled = true
 
 	e.LoadPolicy()
+}
+
+// NewModel creates an empty model.
+func NewModel() model.Model {
+	return make(model.Model)
 }
 
 // LoadModel reloads the model from the model CONF file.
