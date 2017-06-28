@@ -32,20 +32,33 @@ func TestCreateModelManually(t *testing.T) {
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("e", "e", "some(where (p.eft == allow))")
-	m.AddDef("m", "m", "r.sub == p.sub && r.obj == p.obj && r.act == p.act")
+	m.AddDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)")
 
-	a := persist.NewFileAdapter("examples/basic_policy.csv")
+	a := persist.NewFileAdapter("examples/keymatch_policy.csv")
 
 	e := NewEnforcer(m, a)
 
-	testEnforce(t, e, "alice", "data1", "read", true)
-	testEnforce(t, e, "alice", "data1", "write", false)
-	testEnforce(t, e, "alice", "data2", "read", false)
-	testEnforce(t, e, "alice", "data2", "write", false)
-	testEnforce(t, e, "bob", "data1", "read", false)
-	testEnforce(t, e, "bob", "data1", "write", false)
-	testEnforce(t, e, "bob", "data2", "read", false)
-	testEnforce(t, e, "bob", "data2", "write", true)
+	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
+	testEnforce(t, e, "alice", "/alice_data/resource1", "POST", true)
+	testEnforce(t, e, "alice", "/alice_data/resource2", "GET", true)
+	testEnforce(t, e, "alice", "/alice_data/resource2", "POST", false)
+	testEnforce(t, e, "alice", "/bob_data/resource1", "GET", false)
+	testEnforce(t, e, "alice", "/bob_data/resource1", "POST", false)
+	testEnforce(t, e, "alice", "/bob_data/resource2", "GET", false)
+	testEnforce(t, e, "alice", "/bob_data/resource2", "POST", false)
+
+	testEnforce(t, e, "bob", "/alice_data/resource1", "GET", false)
+	testEnforce(t, e, "bob", "/alice_data/resource1", "POST", false)
+	testEnforce(t, e, "bob", "/alice_data/resource2", "GET", true)
+	testEnforce(t, e, "bob", "/alice_data/resource2", "POST", false)
+	testEnforce(t, e, "bob", "/bob_data/resource1", "GET", false)
+	testEnforce(t, e, "bob", "/bob_data/resource1", "POST", true)
+	testEnforce(t, e, "bob", "/bob_data/resource2", "GET", false)
+	testEnforce(t, e, "bob", "/bob_data/resource2", "POST", true)
+
+	testEnforce(t, e, "cathy", "/cathy_data", "GET", true)
+	testEnforce(t, e, "cathy", "/cathy_data", "POST", true)
+	testEnforce(t, e, "cathy", "/cathy_data", "DELETE", false)
 }
 
 func TestReloadPolicy(t *testing.T) {

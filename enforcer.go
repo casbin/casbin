@@ -116,11 +116,13 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 }
 
 // InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
-func (e *Enforcer) InitWithModelAndAdapter(model model.Model, adapter persist.Adapter) {
+func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) {
 	e.modelPath = ""
-	e.model = model
-
 	e.adapter = adapter
+
+	e.model = m
+	e.model.PrintModel()
+	e.fm = model.LoadFunctionMap()
 
 	e.enabled = true
 
