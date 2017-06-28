@@ -125,6 +125,16 @@ func (e *Enforcer) SetModel(model model.Model) {
 	e.model = model
 }
 
+// GetAdapter gets the current adapter.
+func (e *Enforcer) GetAdapter() persist.Adapter {
+	return e.adapter
+}
+
+// SetAdapter sets the current adapter.
+func (e *Enforcer) SetAdapter(adapter persist.Adapter) {
+	e.adapter = adapter
+}
+
 // ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() {
 	e.model.ClearPolicy()

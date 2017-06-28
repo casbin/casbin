@@ -39,7 +39,8 @@ func TestCreateModelManually(t *testing.T) {
 	e.SetModel(model)
 
 	a := persist.NewFileAdapter("examples/basic_policy.csv")
-	a.LoadPolicy(e.GetModel())
+	e.SetAdapter(a)
+	e.LoadPolicy()
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
