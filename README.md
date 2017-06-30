@@ -129,10 +129,10 @@ In Casbin, the policy storage is implemented as an adapter (aka middleware for C
 
 Adapter | Type | Author | Description
 ----|------|----|----
-[File Adapter (built-in)](#file) | File | Casbin | Persistence for [.CSV (Comma-Separated Values)](https://en.wikipedia.org/wiki/Comma-separated_values) files
+[File Adapter (built-in)](#file-adapter) | File | Casbin | Persistence for [.CSV (Comma-Separated Values)](https://en.wikipedia.org/wiki/Comma-separated_values) files
 [MySQL Adapter](https://github.com/casbin/mysql-adapter) | RDBMS | Casbin | Persistence for [MySQL](https://www.mysql.com)
 [Cassandra Adapter](https://github.com/casbin/cassandra-adapter) | NoSQL | Casbin | Persistence for [Apache Cassandra DB](http://cassandra.apache.org)
-[Consul Adapter](https://github.com/ankitm123/consul-adapter) | KV store | [ankitm123](https://github.com/ankitm123) | Persistence for [HashiCorp Consul](https://www.consul.io/)
+[Consul Adapter](https://github.com/ankitm123/consul-adapter) | KV store | [@ankitm123](https://github.com/ankitm123) | Persistence for [HashiCorp Consul](https://www.consul.io/)
 [Protobuf Adapter](https://github.com/casbin/protobuf-adapter) | Stream | Casbin | Persistence for [Google Protocol Buffers](https://developers.google.com/protocol-buffers/)
 
 All adapters should implement the [Adapter interface](https://github.com/casbin/casbin/blob/master/persist/adapter.go) by providing two methods:``LoadPolicy(model model.Model) error`` and ``SavePolicy(model model.Model) error``. And as a convention, the adapter should be able to automatically create a database named ``casbin``  if it doesn't exist and use it for policy storage.
@@ -203,9 +203,9 @@ RESTful | [keymatch_model.conf](https://github.com/casbin/casbin/blob/master/exa
 Deny-override | [rbac_model_with_deny.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_model_with_deny.conf)  | [rbac_policy_with_deny.csv](https://github.com/casbin/casbin/blob/master/examples/rbac_policy_with_deny.csv)
 Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/examples/priority_model.conf)  | [priority_policy.csv](https://github.com/casbin/casbin/blob/master/examples/priority_policy.csv)
 
-## Our users
+## Our adopters
 
-### Web servers
+### Web frameworks
 
 - [Beego](https://github.com/astaxie/beego): An open-source, high-performance web framework for Go, via built-in plugin: [plugins/authz](https://github.com/astaxie/beego/blob/master/plugins/authz)
 - [Caddy](https://github.com/mholt/caddy): Fast, cross-platform HTTP/2 web server with automatic HTTPS, via plugin: [caddy-authz](https://github.com/casbin/caddy-authz)
