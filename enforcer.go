@@ -171,12 +171,13 @@ func (e *Enforcer) ClearPolicy() {
 func (e *Enforcer) LoadPolicy() error {
 	e.model.ClearPolicy()
 	err := e.adapter.LoadPolicy(e.model)
+	if err != nil {
+		return err
+	}
 
 	e.model.PrintPolicy()
-
 	e.model.BuildRoleLinks()
-
-	return err
+	return nil
 }
 
 // SavePolicy saves the current policy (usually after changed with casbin API) back to file/database.
