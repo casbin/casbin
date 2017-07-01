@@ -77,7 +77,11 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 			}
 		}
 	} else if len(params) - parsedParamLen == 1 {
-		e.InitWithFile(params[0].(string), "")
+		if reflect.TypeOf(params[0]).Kind() == reflect.String {
+			e.InitWithFile(params[0].(string), "")
+		} else {
+			e.InitWithModelAndAdapter(params[0].(model.Model), nil)
+		}
 	} else if len(params) - parsedParamLen == 0 {
 		e.InitWithFile("", "")
 	} else {
@@ -126,7 +130,9 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 
 	e.enabled = true
 
-	e.LoadPolicy()
+	if e.adapter != nil {
+		e.LoadPolicy()
+	}
 }
 
 // NewModel creates an empty model.
