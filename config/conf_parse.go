@@ -22,7 +22,7 @@ type casbinConfig struct {
 	DBDataSource  string
 }
 
-// LoadConfig loads the casbin config file: casbin.conf
+// LoadConfig loads the Casbin config file: casbin.conf
 func LoadConfig(cfgPath string) *casbinConfig {
 	ccfg := casbinConfig{}
 	cfg, err := NewConfig(cfgPath)

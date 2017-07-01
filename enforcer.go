@@ -180,12 +180,12 @@ func (e *Enforcer) LoadPolicy() error {
 	return nil
 }
 
-// SavePolicy saves the current policy (usually after changed with casbin API) back to file/database.
+// SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() error {
 	return e.adapter.SavePolicy(e.model)
 }
 
-// Enable changes the enforcing state of casbin, when casbin is disabled, all access will be allowed by the Enforce() function.
+// Enable changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
 func (e *Enforcer) Enable(enable bool) {
 	e.enabled = enable
 }
