@@ -58,46 +58,6 @@ func (e *Enforcer) LoadModelSafe() (err error) {
 	return
 }
 
-// LoadPolicySafe calls LoadPolicy in a safe way, returns error instead of causing panic.
-func (e *Enforcer) LoadPolicySafe() (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			switch x := r.(type) {
-			case string:
-				err = errors.New(x)
-			case error:
-				err = x
-			default:
-				err = errors.New("Unknown panic")
-			}
-		}
-	}()
-
-	e.LoadPolicy()
-	err = nil
-	return
-}
-
-// SavePolicySafe calls SavePolicy in a safe way, returns error instead of causing panic.
-func (e *Enforcer) SavePolicySafe() (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			switch x := r.(type) {
-			case string:
-				err = errors.New(x)
-			case error:
-				err = x
-			default:
-				err = errors.New("Unknown panic")
-			}
-		}
-	}()
-
-	e.SavePolicy()
-	err = nil
-	return
-}
-
 // EnforceSafe calls Enforce in a safe way, returns error instead of causing panic.
 func (e *Enforcer) EnforceSafe(rvals ...interface{}) (result bool, err error) {
 	defer func() {

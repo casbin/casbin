@@ -71,14 +71,14 @@ func TestNoError(t *testing.T) {
 		fmt.Print(err.Error())
 	}
 
-	err = e.LoadPolicySafe()
+	err = e.LoadPolicy()
 	if err != nil {
 		t.Errorf("Should be no error here.")
 		fmt.Print("Unexpected error: ")
 		fmt.Print(err.Error())
 	}
 
-	err = e.SavePolicySafe()
+	err = e.SavePolicy()
 	if err != nil {
 		t.Errorf("Should be no error here.")
 		fmt.Print("Unexpected error: ")
