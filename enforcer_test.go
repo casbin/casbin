@@ -86,6 +86,32 @@ func TestCreateModelManually(t *testing.T) {
 	testEnforce(t, e, "cathy", "/cathy_data", "DELETE", false)
 }
 
+func TestCreateModelManually2(t *testing.T) {
+	m := NewModel()
+	m.AddDef("r", "r", "sub, obj, act")
+	m.AddDef("p", "p", "sub, obj, act")
+	m.AddDef("g", "g", "_, _")
+	m.AddDef("e", "e", "some(where (p.eft == allow))")
+	m.AddDef("m", "m", "g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act")
+
+	e := NewEnforcer(m)
+
+	e.AddPermissionForUser("alice", "data1", "read")
+	e.AddPermissionForUser("bob", "data2", "write")
+	e.AddPermissionForUser("data2_admin", "data2", "read")
+	e.AddPermissionForUser("data2_admin", "data2", "write")
+	e.AddRoleForUser("alice", "data2_admin")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", true)
+	testEnforce(t, e, "alice", "data2", "write", true)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
 func TestReloadPolicy(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
