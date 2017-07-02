@@ -17,7 +17,6 @@ package casbin
 import (
 	"fmt"
 	"reflect"
-	"strconv"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/model"
@@ -365,7 +364,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 			reqStr += fmt.Sprintf("%v", rval)
 		}
 	}
-	reqStr += " ---> " + strconv.FormatBool(result)
+	reqStr += fmt.Sprintf(" ---> %t", result)
 	util.LogPrint(reqStr)
 
 	return result
