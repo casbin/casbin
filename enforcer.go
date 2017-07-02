@@ -221,6 +221,13 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		for key, ast := range e.model["g"] {
 			rm := ast.RM
 			functions[key] = func(args ...interface{}) (interface{}, error) {
+				if rm == nil {
+					name1 := args[0].(string)
+					name2 := args[1].(string)
+
+					return name1 == name2, nil
+				}
+
 				if len(args) == 2 {
 					name1 := args[0].(string)
 					name2 := args[1].(string)
