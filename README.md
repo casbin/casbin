@@ -190,6 +190,52 @@ e.LoadPolicy()
 e.SavePolicy()
 ```
 
+## What if I don't want to reply on files (.conf, .csv)?
+
+The policy rules can be loaded and saved with various adapters, so it doesn't rely on ``.CSV`` files necessarily. The model can be initialized from code instead of using ``.CONF`` file. Here's an example for the RBAC model:
+
+```go
+// Initialize the model from Go code.
+m := casbin.NewModel()
+m.AddDef("r", "r", "sub, obj, act")
+m.AddDef("p", "p", "sub, obj, act")
+m.AddDef("g", "g", "_, _")
+m.AddDef("e", "e", "some(where (p.eft == allow))")
+m.AddDef("m", "m", "g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act")
+
+// Load the policy rules from the .CSV file adapter.
+// Replace it with your adapter to avoid files.
+a := persist.NewFileAdapter("examples/rbac_policy.csv")
+
+// Create the enforcer.
+e := casbin.NewEnforcer(m, a)
+```
+
+This is equivalent with the common usage:
+
+``examples/rbac_model.conf``
+
+```ini
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+```
+
+```go
+e := casbin.NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+```
+
 ## Error handling
 
 Error or panic may happen when you use Casbin for reasons like:
