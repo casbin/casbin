@@ -130,8 +130,10 @@ e = some(where (p.eft == allow))
 [matchers]
 m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 `
-	m := NewModel()
-	m.LoadModelFromText(text)
+	m := NewModel(text)
+	// The above is the same as:
+	// m := NewModel()
+	// m.LoadModelFromText(text)
 
 	e := NewEnforcer(m)
 

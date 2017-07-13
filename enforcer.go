@@ -134,9 +134,17 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 	}
 }
 
-// NewModel creates an empty model.
-func NewModel() model.Model {
-	return make(model.Model)
+// NewModel creates a model.
+func NewModel(params ...interface{}) model.Model {
+	m := make(model.Model)
+
+	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.String {
+		m.LoadModelFromText(params[0].(string))
+	} else if len(params) != 0 {
+		panic("Invalid parameters for model.")
+	}
+
+	return m
 }
 
 // LoadModel reloads the model from the model CONF file.
