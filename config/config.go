@@ -58,6 +58,15 @@ func NewConfig(confName string) (ConfigInterface, error) {
 	return c, err
 }
 
+// NewConfig create an empty configuration representation.
+func NewConfigFromText(text string) (ConfigInterface, error) {
+	c := &Config{
+		data: make(map[string]map[string]string),
+	}
+	err := c.parseBuffer(bufio.NewReader(strings.NewReader(text)))
+	return c, err
+}
+
 // AddConfig adds a new section->key:value to the configuration.
 func (c *Config) AddConfig(section string, option string, value string) bool {
 	if section == "" {

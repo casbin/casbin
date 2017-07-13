@@ -89,13 +89,11 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 }
 
 // LoadModel loads the model from model CONF file.
-func LoadModel(path string) Model {
+func (model Model) LoadModel(path string) {
 	cfg, err := config.NewConfig(path)
 	if err != nil {
 		panic(err)
 	}
-
-	model := make(Model)
 
 	loadSection(model, cfg, "r")
 	loadSection(model, cfg, "p")
@@ -103,8 +101,21 @@ func LoadModel(path string) Model {
 	loadSection(model, cfg, "m")
 
 	loadSection(model, cfg, "g")
+}
 
-	return model
+// LoadModelFromText loads the model from the text.
+func (model Model) LoadModelFromText(text string) {
+	cfg, err := config.NewConfigFromText(text)
+	if err != nil {
+		panic(err)
+	}
+
+	loadSection(model, cfg, "r")
+	loadSection(model, cfg, "p")
+	loadSection(model, cfg, "e")
+	loadSection(model, cfg, "m")
+
+	loadSection(model, cfg, "g")
 }
 
 // PrintModel prints the model to the log.

@@ -142,7 +142,8 @@ func NewModel() model.Model {
 // LoadModel reloads the model from the model CONF file.
 // Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
 func (e *Enforcer) LoadModel() {
-	e.model = model.LoadModel(e.modelPath)
+	e.model = NewModel()
+	e.model.LoadModel(e.modelPath)
 	e.model.PrintModel()
 	e.fm = model.LoadFunctionMap()
 }

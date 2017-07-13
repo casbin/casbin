@@ -112,6 +112,45 @@ func TestRBACModelInMemory(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestRBACModelInMemory2(t *testing.T) {
+	text :=
+`
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+`
+	m := NewModel()
+	m.LoadModelFromText(text)
+
+	e := NewEnforcer(m)
+
+	e.AddPermissionForUser("alice", "data1", "read")
+	e.AddPermissionForUser("bob", "data2", "write")
+	e.AddPermissionForUser("data2_admin", "data2", "read")
+	e.AddPermissionForUser("data2_admin", "data2", "write")
+	e.AddRoleForUser("alice", "data2_admin")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", true)
+	testEnforce(t, e, "alice", "data2", "write", true)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
 func TestNotUsedRBACModelInMemory(t *testing.T) {
 	m := NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
