@@ -27,7 +27,7 @@ func TestGetAndSetModel(t *testing.T) {
 	e.SetModel(model)
 }
 
-func TestCreateModelManually(t *testing.T) {
+func TestKeyMatchModelInMemory(t *testing.T) {
 	m := NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
@@ -86,7 +86,7 @@ func TestCreateModelManually(t *testing.T) {
 	testEnforce(t, e, "cathy", "/cathy_data", "DELETE", false)
 }
 
-func TestCreateModelManually2(t *testing.T) {
+func TestRBACModelInMemory(t *testing.T) {
 	m := NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
@@ -112,7 +112,7 @@ func TestCreateModelManually2(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
-func TestCreateModelManually3(t *testing.T) {
+func TestNotUsedRBACModelInMemory(t *testing.T) {
 	m := NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
