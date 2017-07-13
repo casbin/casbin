@@ -84,7 +84,10 @@ func (c *Config) parse(fname string) (err error) {
 	defer f.Close()
 
 	buf := bufio.NewReader(f)
+	return c.parseBuffer(buf)
+}
 
+func (c *Config) parseBuffer(buf *bufio.Reader) (err error) {
 	var section string
 	var lineNum int
 
@@ -110,7 +113,7 @@ func (c *Config) parse(fname string) (err error) {
 		default:
 			optionVal := bytes.SplitN(line, []byte{'='}, 2)
 			if len(optionVal) != 2 {
-				return fmt.Errorf("parse %s the content error : line %d , %s = ? ", fname, lineNum, optionVal[0])
+				return fmt.Errorf("parse the content error : line %d , %s = ? ", lineNum, optionVal[0])
 			}
 			option := bytes.TrimSpace(optionVal[0])
 			value := bytes.TrimSpace(optionVal[1])
