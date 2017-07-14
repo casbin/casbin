@@ -212,9 +212,40 @@ a := persist.NewFileAdapter("examples/rbac_policy.csv")
 e := casbin.NewEnforcer(m, a)
 ```
 
-This is equivalent with the common usage:
+Or you can just get the model from one single string:
 
-``examples/rbac_model.conf``
+```go
+// Initialize the model from a string.
+text :=
+`
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+`
+m := NewModel(text)
+
+// Load the policy rules from the .CSV file adapter.
+// Replace it with your adapter to avoid files.
+a := persist.NewFileAdapter("examples/rbac_policy.csv")
+
+// Create the enforcer.
+e := casbin.NewEnforcer(m, a)
+```
+
+These two ways are equivalent with the common usage:
+
+[examples/rbac_model.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_model.conf):
 
 ```ini
 [request_definition]
