@@ -132,14 +132,14 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 
 // GetValuesForFieldInPolicy gets all values for a field for all rules in a policy, duplicated values are removed.
 func (model Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldIndex int) []string {
-	users := []string{}
+	values := []string{}
 
 	for _, rule := range model[sec][ptype].Policy {
-		users = append(users, rule[fieldIndex])
+		values = append(values, rule[fieldIndex])
 	}
 
-	util.ArrayRemoveDuplicates(&users)
-	// sort.Strings(users)
+	util.ArrayRemoveDuplicates(&values)
+	// sort.Strings(values)
 
-	return users
+	return values
 }
