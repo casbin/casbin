@@ -268,6 +268,24 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 e := casbin.NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 ```
 
+## Logging
+
+Casbin uses the built-in ``log`` to print logs to console like:
+
+```log
+2017/07/15 19:43:56 [Request: alice, data1, read ---> true]
+```
+
+The logging is enabled by default. You can toggle it via ``Enforcer.EnableLog()`` or the last parameter of ``NewEnforcer()``. Here's an example:
+
+```go
+// Disable the logging in the new method.
+e := casbin.NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv", false)
+
+// Enable the logging at run-time.
+e.EnableLog(true)
+```
+
 ## Error handling
 
 Error or panic may happen when you use Casbin for reasons like:
