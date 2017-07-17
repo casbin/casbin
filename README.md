@@ -139,57 +139,7 @@ Adapter | Type | Author | Description
 [Protobuf Adapter](https://github.com/casbin/protobuf-adapter) | Stream | Casbin | Persistence for [Google Protocol Buffers](https://developers.google.com/protocol-buffers/)
 [Xorm Adapter](https://github.com/casbin/xorm-adapter) | ORM | Casbin | MySQL, PostgreSQL, TiDB, SQLite, SQL Server, Oracle are supported by [Xorm](https://github.com/go-xorm/xorm/)
 
-All adapters should implement the [Adapter interface](https://github.com/casbin/casbin/blob/master/persist/adapter.go) by providing two methods:``LoadPolicy(model model.Model) error`` and ``SavePolicy(model model.Model) error``. And as a convention, the adapter should be able to automatically create a database named ``casbin``  if it doesn't exist and use it for policy storage.
-
-Note: Unlike the policy, the model can be loaded from a CONF file only. Because we think the model is not a frequently modified part at run-time, so we don't implement an API to save the model into a file or database.
-
-### File adapter
-
-Below shows how to initialize an enforcer from the built-in file adapter:
-
-```go
-e := casbin.NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-```
-
-This is the same with:
-
-```go
-a := persist.NewFileAdapter("examples/basic_policy.csv")
-e := casbin.NewEnforcer("examples/basic_model.conf", a)
-```
-
-### MySQL adapter
-
-Below shows how to initialize an enforcer from MySQL database. it connects to a MySQL DB on 127.0.0.1:3306 with root and blank password.
-
-```go
-a := mysqladapter.NewDBAdapter("mysql", "root:@tcp(127.0.0.1:3306)/")
-e := casbin.NewEnforcer("examples/basic_model.conf", a)
-```
-
-### Use your own storage adapter
-
-You can use your own adapter like below:
-
-```go
-a := yourpackage.YourNewAdapter(your_params)
-e := casbin.NewEnforcer("examples/basic_model.conf", a)
-```
-
-### Load/Save at run-time
-
-You may also want to reload the model, reload the policy or save the policy after initialization:
-
-```go
-// Reload the model from the model CONF file.
-e.LoadModel()
-
-// Reload the policy from file/database.
-e.LoadPolicy()
-
-// Save the current policy (usually after changed with Casbin API) back to file/database.
-e.SavePolicy()
-```
+For details of adapters, please refer to the documentation: https://github.com/casbin/casbin/wiki/Policy-persistence
 
 ## Examples
 
