@@ -23,7 +23,7 @@ Casbin is a powerful and efficient open-source access control library for Golang
 - [Installation](#installation)
 - [Get started](#get-started)
 - [Documentation](#documentation)
-- [Persistence](#persistence)
+- [Policy persistence](#policy-persistence)
 - [Examples](#examples)
 - [Our adopters](#our-adopters)
 
@@ -139,7 +139,7 @@ Note: we provide two sets of APIs to manage permissions:
 
 See: [Our Wiki](https://github.com/casbin/casbin/wiki)
 
-## Persistence
+## Policy persistence
 
 In Casbin, the policy storage is implemented as an adapter (aka middleware for Casbin). To keep light-weight, we don't put adapter code in the main library. A complete list of Casbin adapters is provided as below. Any 3rd-party contribution on a new adapter is welcomed, please inform us and I will put it in this list:)
 
