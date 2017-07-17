@@ -121,9 +121,9 @@ Note: we provide two sets of APIs to manage permissions:
 
 4. Please refer to the ``_test.go`` files for more usage.
 
-## Syntax for models
+## Documentation
 
-See: [Model.md](https://github.com/casbin/casbin/blob/master/Model.md)
+See: [Our Wiki](https://github.com/casbin/casbin/wiki)
 
 ## Persistence
 
