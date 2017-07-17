@@ -29,6 +29,8 @@ Casbin is a powerful and efficient open-source access control library for Golang
 9. **Deny-override**: both allow and deny authorizations are supported, deny overrides the allow.
 10. **Priority**: the policy rules can be prioritized like firewall rules.
 
+## How it works?
+
 In Casbin, an access control model is abstracted into a CONF file based on the **PERM metamodel (Policy, Effect, Request, Matchers)**. So switching or upgrading the authorization mechanism for a project is just as simple as modifying a configuration. You can customize your own access control model by combining the available models. For example, you can get RBAC roles and ABAC attributes together inside one model and share one set of policy rules.
 
 The most basic and simplest model in Casbin is ACL. ACL's model CONF is:
