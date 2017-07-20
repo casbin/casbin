@@ -192,7 +192,7 @@ func TestSavePolicy(t *testing.T) {
 func TestEnable(t *testing.T) {
 	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 
-	e.Enable(false)
+	e.EnableEnforce(false)
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", true)
 	testEnforce(t, e, "alice", "data2", "read", true)
@@ -202,7 +202,7 @@ func TestEnable(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "read", true)
 	testEnforce(t, e, "bob", "data2", "write", true)
 
-	e.Enable(true)
+	e.EnableEnforce(true)
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
 	testEnforce(t, e, "alice", "data2", "read", false)
