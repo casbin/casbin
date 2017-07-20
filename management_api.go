@@ -73,21 +73,22 @@ func (e *Enforcer) HasPolicy(params ...interface{}) bool {
 }
 
 // AddPolicy adds an authorization rule to the current policy.
-// If the rule already exists, the call fails and returns false, otherwise returns true.
+// If the rule already exists, the function returns false and the rule will not be added.
+// Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddPolicy(params ...interface{}) bool {
-	alreadyExisted := false
+	ruleAdded := false
 	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
-		alreadyExisted = e.addPolicy("p", "p", params[0].([]string))
+		ruleAdded = e.addPolicy("p", "p", params[0].([]string))
 	} else {
 		policy := make([]string, 0)
 		for _, param := range params {
 			policy = append(policy, param.(string))
 		}
 
-		alreadyExisted = e.addPolicy("p", "p", policy)
+		ruleAdded = e.addPolicy("p", "p", policy)
 	}
 
-	return alreadyExisted
+	return ruleAdded
 }
 
 // RemovePolicy removes an authorization rule from the current policy.
@@ -128,22 +129,23 @@ func (e *Enforcer) HasGroupingPolicy(params ...interface{}) bool {
 }
 
 // AddGroupingPolicy adds a role inheritance rule to the current policy.
-// If the rule already exists, the call fails and returns false, otherwise returns true.
+// If the rule already exists, the function returns false and the rule will not be added.
+// Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddGroupingPolicy(params ...interface{}) bool {
-	alreadyExisted := false
+	ruleAdded := false
 	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
-		alreadyExisted = e.addPolicy("g", "g", params[0].([]string))
+		ruleAdded = e.addPolicy("g", "g", params[0].([]string))
 	} else {
 		policy := make([]string, 0)
 		for _, param := range params {
 			policy = append(policy, param.(string))
 		}
 
-		alreadyExisted = e.addPolicy("g", "g", policy)
+		ruleAdded = e.addPolicy("g", "g", policy)
 	}
 
 	e.model.BuildRoleLinks()
-	return alreadyExisted
+	return ruleAdded
 }
 
 // RemoveGroupingPolicy removes a role inheritance rule from the current policy.
