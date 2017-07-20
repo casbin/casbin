@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package persist
+package fileadapter
 
 import (
 	"bufio"
@@ -23,33 +23,35 @@ import (
 	"strings"
 
 	"github.com/casbin/casbin/model"
+	"github.com/casbin/casbin/persist"
 	"github.com/casbin/casbin/util"
 )
 
-// FileAdapter represents the file adapter for policy persistence, can load policy from file or save policy to file.
-type FileAdapter struct {
+// Adapter represents the file adapter for policy storage.
+// It can load policy from file or save policy to file.
+type Adapter struct {
 	filePath string
 }
 
-// NewFileAdapter is the constructor for FileAdapter.
-func NewFileAdapter(filePath string) *FileAdapter {
-	a := FileAdapter{}
+// NewAdapter is the constructor for Adapter.
+func NewAdapter(filePath string) *Adapter {
+	a := Adapter{}
 	a.filePath = filePath
 	return &a
 }
 
 // LoadPolicy loads policy from file.
-func (a *FileAdapter) LoadPolicy(model model.Model) error {
+func (a *Adapter) LoadPolicy(model model.Model) error {
 	if a.filePath == "" {
 		return errors.New("Invalid file path, file path cannot be empty")
 	}
 
-	err := a.loadPolicyFile(model, loadPolicyLine)
+	err := a.loadPolicyFile(model, persist.LoadPolicyLine)
 	return err
 }
 
 // SavePolicy saves policy to file.
-func (a *FileAdapter) SavePolicy(model model.Model) error {
+func (a *Adapter) SavePolicy(model model.Model) error {
 	if a.filePath == "" {
 		return errors.New("Invalid file path, file path cannot be empty")
 	}
@@ -76,7 +78,7 @@ func (a *FileAdapter) SavePolicy(model model.Model) error {
 	return err
 }
 
-func (a *FileAdapter) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
+func (a *Adapter) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
@@ -95,7 +97,7 @@ func (a *FileAdapter) loadPolicyFile(model model.Model, handler func(string, mod
 	}
 }
 
-func (a *FileAdapter) savePolicyFile(text string) error {
+func (a *Adapter) savePolicyFile(text string) error {
 	f, err := os.Create(a.filePath)
 	if err != nil {
 		return err
@@ -107,14 +109,14 @@ func (a *FileAdapter) savePolicyFile(text string) error {
 	return nil
 }
 
-func (a *FileAdapter) AddPolicy(sec string, ptype string, policy []string) error {
+func (a *Adapter) AddPolicy(sec string, ptype string, policy []string) error {
 	return errors.New("not implemented")
 }
 
-func (a *FileAdapter) RemovePolicy(sec string, ptype string, policy []string) error {
+func (a *Adapter) RemovePolicy(sec string, ptype string, policy []string) error {
 	return errors.New("not implemented")
 }
 
-func (a *FileAdapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
+func (a *Adapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
 	return errors.New("not implemented")
 }

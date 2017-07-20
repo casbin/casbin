@@ -19,6 +19,7 @@ import (
 	"reflect"
 
 	"github.com/Knetic/govaluate"
+	"github.com/casbin/casbin/fileadapter"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
 	"github.com/casbin/casbin/util"
@@ -95,7 +96,7 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 	e.modelPath = modelPath
 
-	e.adapter = persist.NewFileAdapter(policyPath)
+	e.adapter = fileadapter.NewAdapter(policyPath)
 
 	e.enabled = true
 	e.autoSave = true

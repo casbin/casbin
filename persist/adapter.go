@@ -20,7 +20,7 @@ import (
 	"github.com/casbin/casbin/model"
 )
 
-func loadPolicyLine(line string, model model.Model) {
+func LoadPolicyLine(line string, model model.Model) {
 	if line == "" {
 		return
 	}

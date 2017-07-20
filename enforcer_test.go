@@ -17,7 +17,7 @@ package casbin
 import (
 	"testing"
 
-	"github.com/casbin/casbin/persist"
+	"github.com/casbin/casbin/fileadapter"
 )
 
 func TestGetAndSetModel(t *testing.T) {
@@ -34,7 +34,7 @@ func TestKeyMatchModelInMemory(t *testing.T) {
 	m.AddDef("e", "e", "some(where (p.eft == allow))")
 	m.AddDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)")
 
-	a := persist.NewFileAdapter("examples/keymatch_policy.csv")
+	a := fileadapter.NewAdapter("examples/keymatch_policy.csv")
 
 	e := NewEnforcer(m, a)
 
@@ -240,7 +240,7 @@ func TestEnableLog(t *testing.T) {
 }
 
 func TestInitWithAdapter(t *testing.T) {
-	adapter := persist.NewFileAdapter("examples/basic_policy.csv")
+	adapter := fileadapter.NewAdapter("examples/basic_policy.csv")
 	e := NewEnforcer("examples/basic_model.conf", adapter)
 
 	testEnforce(t, e, "alice", "data1", "read", true)
