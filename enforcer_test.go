@@ -17,7 +17,7 @@ package casbin
 import (
 	"testing"
 
-	"github.com/casbin/casbin/fileadapter"
+	"github.com/casbin/casbin/file-adapter"
 )
 
 func TestGetAndSetModel(t *testing.T) {

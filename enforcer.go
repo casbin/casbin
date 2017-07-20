@@ -19,7 +19,7 @@ import (
 	"reflect"
 
 	"github.com/Knetic/govaluate"
-	"github.com/casbin/casbin/fileadapter"
+	"github.com/casbin/casbin/file-adapter"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
 	"github.com/casbin/casbin/util"
