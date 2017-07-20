@@ -208,8 +208,8 @@ func (e *Enforcer) EnableEnforce(enable bool) {
 	e.enabled = enable
 }
 
-// SetAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
-func (e *Enforcer) SetAutoSave(autoSave bool) {
+// EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
+func (e *Enforcer) EnableAutoSave(autoSave bool) {
 	e.autoSave = autoSave
 }
 
