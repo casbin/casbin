@@ -41,7 +41,8 @@ type Enforcer struct {
 
 	adapter persist.Adapter
 
-	enabled bool
+	enabled  bool
+	autoSave bool
 }
 
 // NewEnforcer creates an enforcer via file or DB.
@@ -97,6 +98,7 @@ func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 	e.adapter = persist.NewFileAdapter(policyPath)
 
 	e.enabled = true
+	e.autoSave = true
 
 	if e.modelPath != "" {
 		e.LoadModel()
@@ -111,6 +113,7 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 	e.adapter = adapter
 
 	e.enabled = true
+	e.autoSave = true
 
 	if e.modelPath != "" {
 		e.LoadModel()
@@ -128,6 +131,7 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 	e.fm = model.LoadFunctionMap()
 
 	e.enabled = true
+	e.autoSave = true
 
 	if e.adapter != nil {
 		e.LoadPolicy()
@@ -202,6 +206,11 @@ func (e *Enforcer) SavePolicy() error {
 // Enable changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
 func (e *Enforcer) Enable(enable bool) {
 	e.enabled = enable
+}
+
+// SetAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
+func (e *Enforcer) SetAutoSave(autoSave bool) {
+	e.autoSave = autoSave
 }
 
 // EnableLog changes whether to print Casbin log to the standard output.
