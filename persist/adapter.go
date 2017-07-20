@@ -41,6 +41,8 @@ func loadPolicyLine(line string, model model.Model) {
 type Adapter interface {
 	LoadPolicy(model model.Model) error
 	SavePolicy(model model.Model) error
+
 	AddPolicy(sec string, ptype string, policy []string) error
 	RemovePolicy(sec string, ptype string, policy []string) error
+	RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error
 }

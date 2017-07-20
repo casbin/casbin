@@ -114,3 +114,7 @@ func (a *FileAdapter) AddPolicy(sec string, ptype string, policy []string) error
 func (a *FileAdapter) RemovePolicy(sec string, ptype string, policy []string) error {
 	return errors.New("not implemented")
 }
+
+func (a *FileAdapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
+	return errors.New("not implemented")
+}
