@@ -16,15 +16,48 @@ package casbin
 
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, policy []string) bool {
-	return e.model.AddPolicy(sec, ptype, policy)
+	ruleAdded := e.model.AddPolicy(sec, ptype, policy)
+
+	if ruleAdded {
+		if e.adapter != nil && e.autoSave {
+			err := e.adapter.AddPolicy(sec, ptype, policy)
+			if err != nil && err.Error() != "not implemented" {
+				panic(err)
+			}
+		}
+	}
+
+	return ruleAdded
 }
 
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, policy []string) bool {
-	return e.model.RemovePolicy(sec, ptype, policy)
+	ruleRemoved := e.model.RemovePolicy(sec, ptype, policy)
+
+	if ruleRemoved {
+		if e.adapter != nil && e.autoSave {
+			err := e.adapter.RemovePolicy(sec, ptype, policy)
+			if err != nil && err.Error() != "not implemented" {
+				panic(err)
+			}
+		}
+	}
+
+	return ruleRemoved
 }
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.
 func(e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) bool {
-	return e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	ruleRemoved := e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+
+	if ruleRemoved {
+		if e.adapter != nil && e.autoSave {
+			err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+			if err != nil && err.Error() != "not implemented" {
+				panic(err)
+			}
+		}
+	}
+
+	return ruleRemoved
 }
