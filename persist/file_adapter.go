@@ -107,10 +107,10 @@ func (a *FileAdapter) savePolicyFile(text string) error {
 	return nil
 }
 
-func (a *FileAdapter) AddPolicy(params ...interface{}) error {
+func (a *FileAdapter) AddPolicy(sec string, ptype string, policy []string) error {
 	return errors.New("not implemented")
 }
 
-func (a *FileAdapter) RemovePolicy(params ...interface{}) error {
+func (a *FileAdapter) RemovePolicy(sec string, ptype string, policy []string) error {
 	return errors.New("not implemented")
 }
