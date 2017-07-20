@@ -145,7 +145,7 @@ In Casbin, the policy storage is implemented as an adapter (aka middleware for C
 
 Adapter | Type | Author | Description
 ----|------|----|----
-[File Adapter (built-in)](#file-adapter) | File | Casbin | Persistence for [.CSV (Comma-Separated Values)](https://en.wikipedia.org/wiki/Comma-separated_values) files
+[File Adapter (built-in)](https://github.com/casbin/casbin/wiki/Policy-persistence#file-adapter) | File | Casbin | Persistence for [.CSV (Comma-Separated Values)](https://en.wikipedia.org/wiki/Comma-separated_values) files
 [MySQL Adapter](https://github.com/casbin/mysql-adapter) | RDBMS | Casbin | Persistence for [MySQL](https://www.mysql.com)
 [Cassandra Adapter](https://github.com/casbin/cassandra-adapter) | NoSQL | Casbin | Persistence for [Apache Cassandra DB](http://cassandra.apache.org)
 [Consul Adapter](https://github.com/ankitm123/consul-adapter) | KV store | [@ankitm123](https://github.com/ankitm123) | Persistence for [HashiCorp Consul](https://www.consul.io/)
