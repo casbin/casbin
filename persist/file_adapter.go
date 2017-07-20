@@ -106,3 +106,11 @@ func (a *FileAdapter) savePolicyFile(text string) error {
 	f.Close()
 	return nil
 }
+
+func (a *FileAdapter) AddPolicy(params ...interface{}) error {
+	return errors.New("not implemented")
+}
+
+func (a *FileAdapter) RemovePolicy(params ...interface{}) error {
+	return errors.New("not implemented")
+}
