@@ -15,12 +15,12 @@
 package casbin
 
 // addPolicy adds a rule to the current policy.
-func (e *Enforcer) addPolicy(sec string, ptype string, policy []string) bool {
-	ruleAdded := e.model.AddPolicy(sec, ptype, policy)
+func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) bool {
+	ruleAdded := e.model.AddPolicy(sec, ptype, rule)
 
 	if ruleAdded {
 		if e.adapter != nil && e.autoSave {
-			err := e.adapter.AddPolicy(sec, ptype, policy)
+			err := e.adapter.AddPolicy(sec, ptype, rule)
 			if err != nil && err.Error() != "not implemented" {
 				panic(err)
 			}
@@ -31,12 +31,12 @@ func (e *Enforcer) addPolicy(sec string, ptype string, policy []string) bool {
 }
 
 // removePolicy removes a rule from the current policy.
-func (e *Enforcer) removePolicy(sec string, ptype string, policy []string) bool {
-	ruleRemoved := e.model.RemovePolicy(sec, ptype, policy)
+func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) bool {
+	ruleRemoved := e.model.RemovePolicy(sec, ptype, rule)
 
 	if ruleRemoved {
 		if e.adapter != nil && e.autoSave {
-			err := e.adapter.RemovePolicy(sec, ptype, policy)
+			err := e.adapter.RemovePolicy(sec, ptype, rule)
 			if err != nil && err.Error() != "not implemented" {
 				panic(err)
 			}

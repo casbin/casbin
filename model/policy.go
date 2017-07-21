@@ -75,9 +75,9 @@ func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, f
 }
 
 // HasPolicy determines whether a model has the specified policy rule.
-func (model Model) HasPolicy(sec string, ptype string, policy []string) bool {
-	for _, rule := range model[sec][ptype].Policy {
-		if util.ArrayEquals(policy, rule) {
+func (model Model) HasPolicy(sec string, ptype string, rule []string) bool {
+	for _, r := range model[sec][ptype].Policy {
+		if util.ArrayEquals(rule, r) {
 			return true
 		}
 	}
@@ -86,18 +86,18 @@ func (model Model) HasPolicy(sec string, ptype string, policy []string) bool {
 }
 
 // AddPolicy adds a policy rule to the model.
-func (model Model) AddPolicy(sec string, ptype string, policy []string) bool {
-	if !model.HasPolicy(sec, ptype, policy) {
-		model[sec][ptype].Policy = append(model[sec][ptype].Policy, policy)
+func (model Model) AddPolicy(sec string, ptype string, rule []string) bool {
+	if !model.HasPolicy(sec, ptype, rule) {
+		model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
 		return true
 	}
 	return false
 }
 
 // RemovePolicy removes a policy rule from the model.
-func (model Model) RemovePolicy(sec string, ptype string, policy []string) bool {
-	for i, rule := range model[sec][ptype].Policy {
-		if util.ArrayEquals(policy, rule) {
+func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
+	for i, r := range model[sec][ptype].Policy {
+		if util.ArrayEquals(rule, r) {
 			model[sec][ptype].Policy = append(model[sec][ptype].Policy[:i], model[sec][ptype].Policy[i+1:]...)
 			return true
 		}

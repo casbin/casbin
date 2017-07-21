@@ -109,11 +109,11 @@ func (a *Adapter) savePolicyFile(text string) error {
 	return nil
 }
 
-func (a *Adapter) AddPolicy(sec string, ptype string, policy []string) error {
+func (a *Adapter) AddPolicy(sec string, ptype string, rule []string) error {
 	return errors.New("not implemented")
 }
 
-func (a *Adapter) RemovePolicy(sec string, ptype string, policy []string) error {
+func (a *Adapter) RemovePolicy(sec string, ptype string, rule []string) error {
 	return errors.New("not implemented")
 }
 
