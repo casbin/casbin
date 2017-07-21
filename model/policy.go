@@ -60,7 +60,7 @@ func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, f
 	for _, rule := range model[sec][ptype].Policy {
 		matched := true
 		for i, fieldValue := range fieldValues {
-			if rule[fieldIndex + i] != fieldValue {
+			if rule[fieldIndex+i] != fieldValue {
 				matched = false
 				break
 			}
@@ -113,7 +113,7 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 	for _, rule := range model[sec][ptype].Policy {
 		matched := true
 		for i, fieldValue := range fieldValues {
-			if rule[fieldIndex + i] != fieldValue {
+			if rule[fieldIndex+i] != fieldValue {
 				matched = false
 				break
 			}

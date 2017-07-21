@@ -114,7 +114,7 @@ func TestRBACModelInMemory(t *testing.T) {
 
 func TestRBACModelInMemory2(t *testing.T) {
 	text :=
-`
+		`
 [request_definition]
 r = sub, obj, act
 

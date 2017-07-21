@@ -47,7 +47,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) bool {
 }
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.
-func(e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) bool {
+func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) bool {
 	ruleRemoved := e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
 
 	if ruleRemoved {

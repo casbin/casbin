@@ -212,7 +212,7 @@ func TestRBACModelWithDeny(t *testing.T) {
 }
 
 type testResource struct {
-	Name   string
+	Name  string
 	Owner string
 }
 

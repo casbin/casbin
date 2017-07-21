@@ -30,7 +30,7 @@ type Effect int
 
 // Values for policy effect.
 const (
-	EffectAllow         Effect = iota
+	EffectAllow Effect = iota
 	EffectIndeterminate
 	EffectDeny
 )
@@ -57,14 +57,14 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 	e := &Enforcer{}
 
 	parsedParamLen := 0
-	if len(params) >= 1 && reflect.TypeOf(params[len(params) - 1]).Kind() == reflect.Bool {
-		enableLog := params[len(params) - 1].(bool)
+	if len(params) >= 1 && reflect.TypeOf(params[len(params)-1]).Kind() == reflect.Bool {
+		enableLog := params[len(params)-1].(bool)
 		e.EnableLog(enableLog)
 
-		parsedParamLen ++
+		parsedParamLen++
 	}
 
-	if len(params) - parsedParamLen == 2 {
+	if len(params)-parsedParamLen == 2 {
 		if reflect.TypeOf(params[0]).Kind() == reflect.String {
 			if reflect.TypeOf(params[1]).Kind() == reflect.String {
 				e.InitWithFile(params[0].(string), params[1].(string))
@@ -78,13 +78,13 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 				e.InitWithModelAndAdapter(params[0].(model.Model), params[1].(persist.Adapter))
 			}
 		}
-	} else if len(params) - parsedParamLen == 1 {
+	} else if len(params)-parsedParamLen == 1 {
 		if reflect.TypeOf(params[0]).Kind() == reflect.String {
 			e.InitWithFile(params[0].(string), "")
 		} else {
 			e.InitWithModelAndAdapter(params[0].(model.Model), nil)
 		}
-	} else if len(params) - parsedParamLen == 0 {
+	} else if len(params)-parsedParamLen == 0 {
 		e.InitWithFile("", "")
 	} else {
 		panic("Invalid parameters for enforcer.")
@@ -378,7 +378,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 
 	reqStr := "Request: "
 	for i, rval := range rvals {
-		if i != len(rvals) - 1 {
+		if i != len(rvals)-1 {
 			reqStr += fmt.Sprintf("%v, ", rval)
 		} else {
 			reqStr += fmt.Sprintf("%v", rval)
