@@ -28,15 +28,15 @@ func (e *Enforcer) GetUsersForRole(name string) []string {
 func (e *Enforcer) HasRoleForUser(name string, role string) bool {
 	roles := e.GetRolesForUser(name)
 
-	has_role := false
+	hasRole := false
 	for _, r := range roles {
 		if r == role {
-			has_role = true
+			hasRole = true
 			break
 		}
 	}
 
-	return has_role
+	return hasRole
 }
 
 // AddRoleForUser adds a role for a user.

@@ -62,14 +62,14 @@ func (e *Enforcer) GetFilteredGroupingPolicy(fieldIndex int, fieldValues ...stri
 func (e *Enforcer) HasPolicy(params ...interface{}) bool {
 	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
 		return e.model.HasPolicy("p", "p", params[0].([]string))
-	} else {
-		policy := make([]string, 0)
-		for _, param := range params {
-			policy = append(policy, param.(string))
-		}
-
-		return e.model.HasPolicy("p", "p", policy)
 	}
+
+	policy := make([]string, 0)
+	for _, param := range params {
+		policy = append(policy, param.(string))
+	}
+
+	return e.model.HasPolicy("p", "p", policy)
 }
 
 // AddPolicy adds an authorization rule to the current policy.
@@ -118,14 +118,14 @@ func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) b
 func (e *Enforcer) HasGroupingPolicy(params ...interface{}) bool {
 	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
 		return e.model.HasPolicy("g", "g", params[0].([]string))
-	} else {
-		policy := make([]string, 0)
-		for _, param := range params {
-			policy = append(policy, param.(string))
-		}
-
-		return e.model.HasPolicy("g", "g", policy)
 	}
+
+	policy := make([]string, 0)
+	for _, param := range params {
+		policy = append(policy, param.(string))
+	}
+
+	return e.model.HasPolicy("g", "g", policy)
 }
 
 // AddGroupingPolicy adds a role inheritance rule to the current policy.

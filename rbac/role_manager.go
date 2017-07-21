@@ -106,7 +106,7 @@ func (rm *RoleManager) GetRoles(name string) []string {
 	return rm.createRole(name).getRoles()
 }
 
-// GetRoles gets the users that inherits a subject.
+// GetUsers gets the users that inherits a subject.
 func (rm *RoleManager) GetUsers(name string) []string {
 	if !rm.hasRole(name) {
 		return nil

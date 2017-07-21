@@ -20,6 +20,7 @@ import (
 	"github.com/casbin/casbin/model"
 )
 
+// LoadPolicyLine loads a text line as a policy rule to model.
 func LoadPolicyLine(line string, model model.Model) {
 	if line == "" {
 		return
@@ -36,8 +37,7 @@ func LoadPolicyLine(line string, model model.Model) {
 	model[sec][key].Policy = append(model[sec][key].Policy, tokens[1:])
 }
 
-// Adapter represents the abstract adapter interface for policy persistence.
-// FileAdapter, DBAdapter inherits this interface.
+// Adapter is the interface for Casbin adapters.
 type Adapter interface {
 	LoadPolicy(model model.Model) error
 	SavePolicy(model model.Model) error

@@ -16,7 +16,8 @@ package util
 
 import "log"
 
-var EnableLog bool = true
+// EnableLog controls whether to print log to console.
+var EnableLog = true
 
 // LogPrint prints the log.
 func LogPrint(v ...interface{}) {

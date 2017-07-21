@@ -27,7 +27,7 @@ import (
 	"github.com/casbin/casbin/util"
 )
 
-// Adapter represents the file adapter for policy storage.
+// Adapter is the file adapter for Casbin.
 // It can load policy from file or save policy to file.
 type Adapter struct {
 	filePath string
@@ -40,7 +40,7 @@ func NewAdapter(filePath string) *Adapter {
 	return &a
 }
 
-// LoadPolicy loads policy from file.
+// LoadPolicy loads all policy rules from the storage.
 func (a *Adapter) LoadPolicy(model model.Model) error {
 	if a.filePath == "" {
 		return errors.New("Invalid file path, file path cannot be empty")
@@ -50,7 +50,7 @@ func (a *Adapter) LoadPolicy(model model.Model) error {
 	return err
 }
 
-// SavePolicy saves policy to file.
+// SavePolicy saves all policy rules to the storage.
 func (a *Adapter) SavePolicy(model model.Model) error {
 	if a.filePath == "" {
 		return errors.New("Invalid file path, file path cannot be empty")
@@ -109,14 +109,17 @@ func (a *Adapter) savePolicyFile(text string) error {
 	return nil
 }
 
+// AddPolicy adds a policy rule to the storage.
 func (a *Adapter) AddPolicy(sec string, ptype string, rule []string) error {
 	return errors.New("not implemented")
 }
 
+// RemovePolicy removes a policy rule from the storage.
 func (a *Adapter) RemovePolicy(sec string, ptype string, rule []string) error {
 	return errors.New("not implemented")
 }
 
+// RemoveFilteredPolicy removes policy rules that match the filter from the storage.
 func (a *Adapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
 	return errors.New("not implemented")
 }
