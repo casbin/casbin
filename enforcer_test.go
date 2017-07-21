@@ -239,6 +239,42 @@ func TestEnableLog(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestEnableAutoSave(t *testing.T) {
+	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+
+	e.EnableAutoSave(false)
+	// Because AutoSave is disabled, the policy removal only affects the policy in Casbin enforcer,
+	// it doesn't affect the policy in the storage.
+	e.RemovePolicy("alice", "data1", "read")
+	// Reload the policy from the storage to see the effect.
+	e.LoadPolicy()
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+
+	// Because AutoSave is enabled, the policy removal not only affects the policy in Casbin enforcer,
+	// but also affects the policy in the storage.
+
+	// However, the file adapter doesn't implement the AutoSave feature, so enabling it has no effect at all here.
+	e.EnableAutoSave(true)
+	// Reload the policy from the storage to see the effect.
+	e.RemovePolicy("alice", "data1", "read")
+	e.LoadPolicy()
+	testEnforce(t, e, "alice", "data1", "read", true) // Will not be false here.
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
 func TestInitWithAdapter(t *testing.T) {
 	adapter := fileadapter.NewAdapter("examples/basic_policy.csv")
 	e := NewEnforcer("examples/basic_model.conf", adapter)
