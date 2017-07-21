@@ -209,14 +209,14 @@ func (e *Enforcer) EnableEnforce(enable bool) {
 	e.enabled = enable
 }
 
-// EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
-func (e *Enforcer) EnableAutoSave(autoSave bool) {
-	e.autoSave = autoSave
-}
-
 // EnableLog changes whether to print Casbin log to the standard output.
 func (e *Enforcer) EnableLog(enable bool) {
 	util.EnableLog = enable
+}
+
+// EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
+func (e *Enforcer) EnableAutoSave(autoSave bool) {
+	e.autoSave = autoSave
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
