@@ -14,7 +14,12 @@
 
 package casbin
 
-// GetRolesForUserUnderDomain gets the roles that a user has.
+// GetRolesForUserUnderDomain gets the roles that a user has under a domain.
 func (e *Enforcer) GetRolesForUserUnderDomain(name string, domain string) []string {
 	return e.model["g"]["g"].RM.GetRoles(name, domain)
+}
+
+// GetPermissionsForUserUnderDomain gets permissions for a user or role under a domain.
+func (e *Enforcer) GetPermissionsForUserUnderDomain(user string, domain string) [][]string {
+	return e.GetFilteredPolicy(0, user, domain)
 }

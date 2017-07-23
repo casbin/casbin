@@ -23,7 +23,7 @@ import (
 
 func testGetRolesUnderDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
 	myRes := e.GetRolesForUserUnderDomain(name, domain)
-	log.Print("Roles for", name, "under", domain, ":", myRes)
+	log.Print("Roles for ", name, " under ", domain, " : ", myRes)
 
 	if !util.SetEquals(res, myRes) {
 		t.Error("Roles for", name, "under", domain, ":", myRes, ", supposed to be ", res)
@@ -42,4 +42,27 @@ func TestRoleAPIWithDomains(t *testing.T) {
 	testGetRolesUnderDomain(t, e, "bob", "domain2", []string{"admin"})
 	testGetRolesUnderDomain(t, e, "admin", "domain2", []string{})
 	testGetRolesUnderDomain(t, e, "non_exist", "domain2", []string{})
+}
+
+func testGetPermissionsUnderDomain(t *testing.T, e *Enforcer, name string, domain string, res [][]string) {
+	myRes := e.GetPermissionsForUserUnderDomain(name, domain)
+	log.Print("Permissions for ", name, " under ", domain, " : ", myRes)
+
+	if !util.Array2DEquals(res, myRes) {
+		t.Error("Permissions for", name, "under", domain, ":", myRes, ", supposed to be ", res)
+	}
+}
+
+func TestPermissionAPIUnderDomain(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model_with_domains.conf", "examples/rbac_policy_with_domains.csv")
+
+	testGetPermissionsUnderDomain(t, e, "alice", "domain1", [][]string{})
+	testGetPermissionsUnderDomain(t, e, "bob", "domain1", [][]string{})
+	testGetPermissionsUnderDomain(t, e, "admin", "domain1", [][]string{{"admin", "domain1", "data1", "read"}, {"admin", "domain1", "data1", "write"}})
+	testGetPermissionsUnderDomain(t, e, "non_exist", "domain1", [][]string{})
+
+	testGetPermissionsUnderDomain(t, e, "alice", "domain2", [][]string{})
+	testGetPermissionsUnderDomain(t, e, "bob", "domain2", [][]string{})
+	testGetPermissionsUnderDomain(t, e, "admin", "domain2", [][]string{{"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}})
+	testGetPermissionsUnderDomain(t, e, "non_exist", "domain2", [][]string{})
 }
