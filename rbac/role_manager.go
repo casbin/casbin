@@ -98,12 +98,23 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) boo
 }
 
 // GetRoles gets the roles that a subject inherits.
-func (rm *RoleManager) GetRoles(name string) []string {
+// domain is a prefix to the roles.
+func (rm *RoleManager) GetRoles(name string, domain ...string) []string {
+	if len(domain) == 1 {
+		name = domain[0] + "::" + name
+	}
+
 	if !rm.hasRole(name) {
 		return nil
 	}
 
-	return rm.createRole(name).getRoles()
+	roles := rm.createRole(name).getRoles()
+	if len(domain) == 1 {
+		for i := range roles {
+			roles[i] = roles[i][len(domain[0]) + 2:]
+		}
+	}
+	return roles
 }
 
 // GetUsers gets the users that inherits a subject.
