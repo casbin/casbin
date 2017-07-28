@@ -67,6 +67,31 @@ func KeyMatch2Func(args ...interface{}) (interface{}, error) {
 	return (bool)(KeyMatch2(name1, name2)), nil
 }
 
+// KeyMatch3 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
+// For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/{resource}"
+func KeyMatch3(key1 string, key2 string) bool {
+	key2 = strings.Replace(key2, "/*", "/.*", -1)
+
+	re := regexp.MustCompile(`(.*)\{[^/]+\}(.*)`)
+	for {
+		if !strings.Contains(key2, "/{") {
+			break
+		}
+
+		key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
+	}
+
+	return RegexMatch(key1, key2)
+}
+
+// KeyMatch3Func is the wrapper for KeyMatch3.
+func KeyMatch3Func(args ...interface{}) (interface{}, error) {
+	name1 := args[0].(string)
+	name2 := args[1].(string)
+
+	return (bool)(KeyMatch3(name1, name2)), nil
+}
+
 // RegexMatch determines whether key1 matches the pattern of key2 in regular expression.
 func RegexMatch(key1 string, key2 string) bool {
 	res, err := regexp.MatchString(key2, key1)

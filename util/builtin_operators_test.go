@@ -73,6 +73,39 @@ func TestKeyMatch2(t *testing.T) {
 	testKeyMatch2(t, "/proxy/", "/proxy/:id/*", false)
 }
 
+func testKeyMatch3(t *testing.T, key1 string, key2 string, res bool) {
+	myRes := KeyMatch3(key1, key2)
+	log.Printf("%s < %s: %t", key1, key2, myRes)
+
+	if myRes != res {
+		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)
+	}
+}
+
+func TestKeyMatch3(t *testing.T) {
+	testKeyMatch3(t, "/foo", "/foo", true)
+	testKeyMatch3(t, "/foo", "/foo*", true)
+	testKeyMatch3(t, "/foo", "/foo/*", false)
+	testKeyMatch3(t, "/foo/bar", "/foo", true) // different with KeyMatch.
+	testKeyMatch3(t, "/foo/bar", "/foo*", true)
+	testKeyMatch3(t, "/foo/bar", "/foo/*", true)
+	testKeyMatch3(t, "/foobar", "/foo", true) // different with KeyMatch.
+	testKeyMatch3(t, "/foobar", "/foo*", true)
+	testKeyMatch3(t, "/foobar", "/foo/*", false)
+
+	testKeyMatch3(t, "/", "/{resource}", false)
+	testKeyMatch3(t, "/resource1", "/{resource}", true)
+	testKeyMatch3(t, "/myid", "/{id}/using/{resId}", false)
+	testKeyMatch3(t, "/myid/using/myresid", "/{id}/using/{resId}", true)
+
+	testKeyMatch3(t, "/proxy/myid", "/proxy/{id}/*", false)
+	testKeyMatch3(t, "/proxy/myid/", "/proxy/{id}/*", true)
+	testKeyMatch3(t, "/proxy/myid/res", "/proxy/{id}/*", true)
+	testKeyMatch3(t, "/proxy/myid/res/res2", "/proxy/{id}/*", true)
+	testKeyMatch3(t, "/proxy/myid/res/res2/res3", "/proxy/{id}/*", true)
+	testKeyMatch3(t, "/proxy/", "/proxy/{id}/*", false)
+}
+
 func testRegexMatch(t *testing.T, key1 string, key2 string, res bool) {
 	myRes := RegexMatch(key1, key2)
 	log.Printf("%s < %s: %t", key1, key2, myRes)
