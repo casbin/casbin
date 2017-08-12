@@ -7,6 +7,7 @@ Casbin
 [![Godoc](https://godoc.org/github.com/casbin/casbin?status.svg)](https://godoc.org/github.com/casbin/casbin)
 [![Release](https://img.shields.io/github/release/casbin/casbin.svg)](https://github.com/casbin/casbin/releases/latest)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
+[![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](http://www.patreon.com/yangluo)
 [![Sourcegraph Badge](https://sourcegraph.com/github.com/casbin/casbin/-/badge.svg)](https://sourcegraph.com/github.com/casbin/casbin?badge)
 
 **Note**: The plugins and middleware based on Casbin can be found at: https://github.com/casbin
@@ -213,4 +214,7 @@ If you have any issues or feature requests, please contact us. PR is welcomed.
 
 ## Donation
 
-<a href="http://www.patreon.com/yangluo"> ![Patreon](http://www.railcraft.info/wp-content/uploads/2014/05/Patreon.png)</a>
+[![Patreon](https://hsluoyz.github.io/donation/patreon.png)](http://www.patreon.com/yangluo)
+
+![Alipay](https://hsluoyz.github.io/donation/donate_alipay.png)
+![Wechat](https://hsluoyz.github.io/donation/donate_weixin.png)
