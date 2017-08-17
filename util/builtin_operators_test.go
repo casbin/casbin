@@ -71,6 +71,11 @@ func TestKeyMatch2(t *testing.T) {
 	testKeyMatch2(t, "/proxy/myid/res/res2", "/proxy/:id/*", true)
 	testKeyMatch2(t, "/proxy/myid/res/res2/res3", "/proxy/:id/*", true)
 	testKeyMatch2(t, "/proxy/", "/proxy/:id/*", false)
+
+	testKeyMatch2(t, "/alice", "/:id", true)
+	testKeyMatch2(t, "/alice/all", "/:id/all", true)
+	testKeyMatch2(t, "/alice", "/:id/all", false)
+	testKeyMatch2(t, "/alice/all", "/:id", false)
 }
 
 func testKeyMatch3(t *testing.T, key1 string, key2 string, res bool) {

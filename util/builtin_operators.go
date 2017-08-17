@@ -53,7 +53,7 @@ func KeyMatch2(key1 string, key2 string) bool {
 			break
 		}
 
-		key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
+		key2 = "^" + re.ReplaceAllString(key2, "$1[^/]+$2") + "$"
 	}
 
 	return RegexMatch(key1, key2)
