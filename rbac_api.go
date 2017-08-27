@@ -40,24 +40,27 @@ func (e *Enforcer) HasRoleForUser(name string, role string) bool {
 }
 
 // AddRoleForUser adds a role for a user.
-// Returns false if the user already has the role.
+// Returns false if the user already has the role (aka not affected).
 func (e *Enforcer) AddRoleForUser(user string, role string) bool {
 	return e.AddGroupingPolicy(user, role)
 }
 
 // DeleteRoleForUser deletes a role for a user.
-func (e *Enforcer) DeleteRoleForUser(user string, role string) {
-	e.RemoveGroupingPolicy(user, role)
+// Returns false if the user does not have the role (aka not affected).
+func (e *Enforcer) DeleteRoleForUser(user string, role string) bool {
+	return e.RemoveGroupingPolicy(user, role)
 }
 
 // DeleteRolesForUser deletes all roles for a user.
-func (e *Enforcer) DeleteRolesForUser(user string) {
-	e.RemoveFilteredGroupingPolicy(0, user)
+// Returns false if the user does not have any roles (aka not affected).
+func (e *Enforcer) DeleteRolesForUser(user string) bool {
+	return e.RemoveFilteredGroupingPolicy(0, user)
 }
 
 // DeleteUser deletes a user.
-func (e *Enforcer) DeleteUser(user string) {
-	e.RemoveFilteredGroupingPolicy(0, user)
+// Returns false if the user does not exist (aka not affected).
+func (e *Enforcer) DeleteUser(user string) bool {
+	return e.RemoveFilteredGroupingPolicy(0, user)
 }
 
 // DeleteRole deletes a role.
@@ -67,12 +70,13 @@ func (e *Enforcer) DeleteRole(role string) {
 }
 
 // DeletePermission deletes a permission.
-func (e *Enforcer) DeletePermission(permission ...string) {
-	e.RemoveFilteredPolicy(1, permission...)
+// Returns false if the permission does not exist (aka not affected).
+func (e *Enforcer) DeletePermission(permission ...string) bool {
+	return e.RemoveFilteredPolicy(1, permission...)
 }
 
 // AddPermissionForUser adds a permission for a user or role.
-// Returns false if the user or role already has the permission.
+// Returns false if the user or role already has the permission (aka not affected).
 func (e *Enforcer) AddPermissionForUser(user string, permission ...string) bool {
 	params := make([]interface{}, 0, len(permission)+1)
 
@@ -85,7 +89,8 @@ func (e *Enforcer) AddPermissionForUser(user string, permission ...string) bool 
 }
 
 // DeletePermissionForUser deletes a permission for a user or role.
-func (e *Enforcer) DeletePermissionForUser(user string, permission ...string) {
+// Returns false if the user or role does not have the permission (aka not affected).
+func (e *Enforcer) DeletePermissionForUser(user string, permission ...string) bool {
 	params := make([]interface{}, 0, len(permission)+1)
 
 	params = append(params, user)
@@ -93,12 +98,13 @@ func (e *Enforcer) DeletePermissionForUser(user string, permission ...string) {
 		params = append(params, perm)
 	}
 
-	e.RemovePolicy(params...)
+	return e.RemovePolicy(params...)
 }
 
 // DeletePermissionsForUser deletes permissions for a user or role.
-func (e *Enforcer) DeletePermissionsForUser(user string) {
-	e.RemoveFilteredPolicy(0, user)
+// Returns false if the user or role does not have any permissions (aka not affected).
+func (e *Enforcer) DeletePermissionsForUser(user string) bool {
+	return e.RemoveFilteredPolicy(0, user)
 }
 
 // GetPermissionsForUser gets permissions for a user or role.
