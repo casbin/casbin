@@ -23,3 +23,15 @@ func (e *Enforcer) GetRolesForUserInDomain(name string, domain string) []string 
 func (e *Enforcer) GetPermissionsForUserInDomain(user string, domain string) [][]string {
 	return e.GetFilteredPolicy(0, user, domain)
 }
+
+// AddRoleForUserInDomain adds a role for a user inside a domain.
+// Returns false if the user already has the role (aka not affected).
+func (e *Enforcer) AddRoleForUserInDomain(user string, role string, domain string) bool {
+	return e.AddGroupingPolicy(user, role, domain)
+}
+
+// DeleteRoleForUserInDomain deletes a role for a user inside a domain.
+// Returns false if the user does not have the role (aka not affected).
+func (e *Enforcer) DeleteRoleForUserInDomain(user string, role string, domain string) bool {
+	return e.RemoveGroupingPolicy(user, role, domain)
+}
