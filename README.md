@@ -175,6 +175,24 @@ RESTful | [keymatch_model.conf](https://github.com/casbin/casbin/blob/master/exa
 Deny-override | [rbac_model_with_deny.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_model_with_deny.conf)  | [rbac_policy_with_deny.csv](https://github.com/casbin/casbin/blob/master/examples/rbac_policy_with_deny.csv)
 Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/examples/priority_model.conf)  | [priority_policy.csv](https://github.com/casbin/casbin/blob/master/examples/priority_policy.csv)
 
+## RoleManager
+
+To use a custom RoleManager implementation.
+
+```go
+
+    type myCustomRoleManager struct {} // assumes the type satisfies the RoleManager interface
+
+    func newRoleManager() rbac.RoleManagerConstructor {
+        return func() rbac.RoleManager {
+            return &myCustomRoleManager{}
+        }
+    }
+
+    e := casbin.NewEnforcer("path/to/model.conf", "path/to/policy.csv")
+    e.SetRoleManager(newRoleManager())
+```
+
 ## How to use Casbin as a service?
 
 - [Go-Simple-API-Gateway](https://github.com/Soontao/go-simple-api-gateway): A simple API gateway written by golang, supports for authentication and authorization

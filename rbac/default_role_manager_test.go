@@ -21,7 +21,7 @@ import (
 	"github.com/casbin/casbin/util"
 )
 
-func testRole(t *testing.T, rm *RoleManager, name1 string, name2 string, res bool) {
+func testRole(t *testing.T, rm RoleManager, name1 string, name2 string, res bool) {
 	myRes := rm.HasLink(name1, name2)
 	log.Printf("%s, %s: %t", name1, name2, myRes)
 
@@ -30,7 +30,7 @@ func testRole(t *testing.T, rm *RoleManager, name1 string, name2 string, res boo
 	}
 }
 
-func testDomainRole(t *testing.T, rm *RoleManager, name1 string, name2 string, domain string, res bool) {
+func testDomainRole(t *testing.T, rm RoleManager, name1 string, name2 string, domain string, res bool) {
 	myRes := rm.HasLink(name1, name2, domain)
 	log.Printf("%s :: %s, %s: %t", domain, name1, name2, myRes)
 
@@ -39,7 +39,7 @@ func testDomainRole(t *testing.T, rm *RoleManager, name1 string, name2 string, d
 	}
 }
 
-func testPrintRoles(t *testing.T, rm *RoleManager, name string, res []string) {
+func testPrintRoles(t *testing.T, rm RoleManager, name string, res []string) {
 	myRes := rm.GetRoles(name)
 	log.Printf("%s: %s", name, myRes)
 
@@ -49,7 +49,7 @@ func testPrintRoles(t *testing.T, rm *RoleManager, name string, res []string) {
 }
 
 func TestRole(t *testing.T) {
-	rm := NewRoleManager(3)
+	rm := NewDefaultRoleManager(3)
 	rm.AddLink("u1", "g1")
 	rm.AddLink("u2", "g1")
 	rm.AddLink("u3", "g2")
@@ -118,7 +118,7 @@ func TestRole(t *testing.T) {
 }
 
 func TestDomainRole(t *testing.T) {
-	rm := NewRoleManager(3)
+	rm := NewDefaultRoleManager(3)
 	rm.AddLink("u1", "g1", "domain1")
 	rm.AddLink("u2", "g1", "domain1")
 	rm.AddLink("u3", "admin", "domain2")

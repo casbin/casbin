@@ -26,11 +26,11 @@ type Assertion struct {
 	Value  string
 	Tokens []string
 	Policy [][]string
-	RM     *rbac.RoleManager
+	RM     rbac.RoleManager
 }
 
-func (ast *Assertion) buildRoleLinks() {
-	ast.RM = rbac.NewRoleManager(10)
+func (ast *Assertion) buildRoleLinks(rmc rbac.RoleManagerConstructor) {
+	ast.RM = rmc()
 	for _, rule := range ast.Policy {
 		if len(rule) == 2 {
 			ast.RM.AddLink(rule[0], rule[1])
