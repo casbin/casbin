@@ -16,6 +16,8 @@ package casbin
 
 import (
 	"testing"
+
+	"github.com/casbin/casbin/rbac"
 )
 
 func testEnforce(t *testing.T, e *Enforcer, sub string, obj interface{}, act string, res bool) {
@@ -205,6 +207,50 @@ func TestRBACModelWithDeny(t *testing.T) {
 	testEnforce(t, e, "alice", "data1", "write", false)
 	testEnforce(t, e, "alice", "data2", "read", true)
 	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
+type testCustomRoleManager struct{}
+
+func (rm *testCustomRoleManager) AddLink(name1 string, name2 string, domain ...string)    {}
+func (rm *testCustomRoleManager) DeleteLink(name1 string, name2 string, domain ...string) {}
+func (rm *testCustomRoleManager) HasLink(name1 string, name2 string, domain ...string) bool {
+	if name1 == "alice" && name2 == "alice" {
+		return true
+	} else if name1 == "alice" && name2 == "data2_admin" {
+		return true
+	} else if name1 == "bob" && name2 == "bob" {
+		return true
+	}
+	return false
+}
+func (rm *testCustomRoleManager) GetRoles(name string, domain ...string) []string {
+	return []string{}
+}
+func (rm *testCustomRoleManager) GetUsers(name string) []string {
+	return []string{}
+}
+func (rm *testCustomRoleManager) PrintRoles() {}
+
+func newTestCustomRoleManager() rbac.RoleManagerConstructor {
+	return func() rbac.RoleManager {
+		return &testCustomRoleManager{}
+	}
+}
+
+func TestRBACModelWithCustomRoleManager(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e.SetRoleManager(newTestCustomRoleManager())
+	e.LoadModel()
+	_ = e.LoadPolicy()
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", true)
+	testEnforce(t, e, "alice", "data2", "write", true)
 	testEnforce(t, e, "bob", "data1", "read", false)
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", false)

@@ -144,7 +144,7 @@ func (e *Enforcer) AddGroupingPolicy(params ...interface{}) bool {
 		ruleAdded = e.addPolicy("g", "g", policy)
 	}
 
-	e.model.BuildRoleLinks()
+	e.model.BuildRoleLinks(e.rmc)
 	return ruleAdded
 }
 
@@ -162,14 +162,14 @@ func (e *Enforcer) RemoveGroupingPolicy(params ...interface{}) bool {
 		ruleRemoved = e.removePolicy("g", "g", policy)
 	}
 
-	e.model.BuildRoleLinks()
+	e.model.BuildRoleLinks(e.rmc)
 	return ruleRemoved
 }
 
 // RemoveFilteredGroupingPolicy removes a role inheritance rule from the current policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) bool {
 	ruleRemoved := e.removeFilteredPolicy("g", "g", fieldIndex, fieldValues...)
-	e.model.BuildRoleLinks()
+	e.model.BuildRoleLinks(e.rmc)
 	return ruleRemoved
 }
 

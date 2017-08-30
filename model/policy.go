@@ -15,13 +15,14 @@
 package model
 
 import (
+	"github.com/casbin/casbin/rbac"
 	"github.com/casbin/casbin/util"
 )
 
 // BuildRoleLinks initializes the roles in RBAC.
-func (model Model) BuildRoleLinks() {
+func (model Model) BuildRoleLinks(rmc rbac.RoleManagerConstructor) {
 	for _, ast := range model["g"] {
-		ast.buildRoleLinks()
+		ast.buildRoleLinks(rmc)
 	}
 }
 

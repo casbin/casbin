@@ -22,6 +22,7 @@ import (
 	"github.com/casbin/casbin/file-adapter"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
+	"github.com/casbin/casbin/rbac"
 	"github.com/casbin/casbin/util"
 )
 
@@ -40,6 +41,7 @@ type Enforcer struct {
 	modelPath string
 	model     model.Model
 	fm        model.FunctionMap
+	rmc       rbac.RoleManagerConstructor
 
 	adapter persist.Adapter
 
@@ -55,6 +57,7 @@ type Enforcer struct {
 // e := casbin.NewEnforcer("path/to/basic_model.conf", a)
 func NewEnforcer(params ...interface{}) *Enforcer {
 	e := &Enforcer{}
+	e.rmc = rbac.DefaultRoleManager()
 
 	parsedParamLen := 0
 	if len(params) >= 1 && reflect.TypeOf(params[len(params)-1]).Kind() == reflect.Bool {
@@ -182,6 +185,11 @@ func (e *Enforcer) SetAdapter(adapter persist.Adapter) {
 	e.adapter = adapter
 }
 
+// SetRoleManager sets the constructor function for creating a RoleManager.
+func (e *Enforcer) SetRoleManager(rmc rbac.RoleManagerConstructor) {
+	e.rmc = rmc
+}
+
 // ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() {
 	e.model.ClearPolicy()
@@ -196,7 +204,7 @@ func (e *Enforcer) LoadPolicy() error {
 	}
 
 	e.model.PrintPolicy()
-	e.model.BuildRoleLinks()
+	e.model.BuildRoleLinks(e.rmc)
 	return nil
 }
 
