@@ -144,12 +144,12 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 }
 
 // NewModel creates a model.
-func NewModel(params ...interface{}) model.Model {
+func NewModel(text ...string) model.Model {
 	m := make(model.Model)
 
-	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.String {
-		m.LoadModelFromText(params[0].(string))
-	} else if len(params) != 0 {
+	if len(text) == 1 {
+		m.LoadModelFromText(text[0])
+	} else if len(text) != 0 {
 		panic("Invalid parameters for model.")
 	}
 
