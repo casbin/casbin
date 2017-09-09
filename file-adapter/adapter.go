@@ -43,7 +43,7 @@ func NewAdapter(filePath string) *Adapter {
 // LoadPolicy loads all policy rules from the storage.
 func (a *Adapter) LoadPolicy(model model.Model) error {
 	if a.filePath == "" {
-		return errors.New("Invalid file path, file path cannot be empty")
+		return errors.New("invalid file path, file path cannot be empty")
 	}
 
 	err := a.loadPolicyFile(model, persist.LoadPolicyLine)
@@ -53,7 +53,7 @@ func (a *Adapter) LoadPolicy(model model.Model) error {
 // SavePolicy saves all policy rules to the storage.
 func (a *Adapter) SavePolicy(model model.Model) error {
 	if a.filePath == "" {
-		return errors.New("Invalid file path, file path cannot be empty")
+		return errors.New("invalid file path, file path cannot be empty")
 	}
 
 	var tmp bytes.Buffer
