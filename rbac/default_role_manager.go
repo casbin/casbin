@@ -32,7 +32,7 @@ func DefaultRoleManager() RoleManagerConstructor {
 }
 
 // NewDefaultRoleManager is the constructor for creating an instance of the
-// default RoleManager implementation..
+// default RoleManager implementation.
 func NewDefaultRoleManager(level int) RoleManager {
 	rm := defaultRoleManager{}
 	rm.allRoles = make(map[string]*Role)

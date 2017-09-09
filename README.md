@@ -10,7 +10,7 @@ Casbin
 [![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](http://www.patreon.com/yangluo)
 [![Sourcegraph Badge](https://sourcegraph.com/github.com/casbin/casbin/-/badge.svg)](https://sourcegraph.com/github.com/casbin/casbin?badge)
 
-**Note**: The plugins and middleware based on Casbin can be found at: https://github.com/casbin
+**News**: Casbin is also started to port to Java, contribution is welcomed. See: https://github.com/casbin/jcasbin
 
 ![casbin Logo](casbin-logo.png)
 
