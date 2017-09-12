@@ -15,6 +15,9 @@
 package model
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/casbin/casbin/rbac"
 	"github.com/casbin/casbin/util"
 )
@@ -31,10 +34,18 @@ type Assertion struct {
 
 func (ast *Assertion) buildRoleLinks(rmc rbac.RoleManagerConstructor) {
 	ast.RM = rmc()
+	count := strings.Count(ast.Value, "_")
 	for _, rule := range ast.Policy {
-		if len(rule) == 2 {
+		if count < 2 || count > 3 {
+			panic(errors.New("the number of \"_\" in role definition should be 2 or 3"))
+		}
+		if len(rule) < count {
+			panic(errors.New("grouping policy elements do not meet role definition"))
+		}
+
+		if count == 2 {
 			ast.RM.AddLink(rule[0], rule[1])
-		} else if len(rule) == 3 {
+		} else if count == 3 {
 			ast.RM.AddLink(rule[0], rule[1], rule[2])
 		}
 	}
