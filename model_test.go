@@ -213,6 +213,38 @@ func TestRBACModelWithDeny(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestRBACModelWithCustomData(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	// You can add custom data to a grouping policy, Casbin will ignore it. It is only meaningful to the caller.
+	// This feature can be used to store information like whether "bob" is an end user (so no subject will inherit "bob")
+	// For Casbin, it is equivalent to: e.AddGroupingPolicy("bob", "data2_admin")
+	e.AddGroupingPolicy("bob", "data2_admin", "custom_data")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", true)
+	testEnforce(t, e, "alice", "data2", "write", true)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", true)
+	testEnforce(t, e, "bob", "data2", "write", true)
+
+	// You should also take the custom data as a parameter when deleting a grouping policy.
+	// e.RemoveGroupingPolicy("bob", "data2_admin") won't work.
+	// Or you can remove it by using RemoveFilteredGroupingPolicy().
+	e.RemoveGroupingPolicy("bob", "data2_admin", "custom_data")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", true)
+	testEnforce(t, e, "alice", "data2", "write", true)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
 type testCustomRoleManager struct{}
 
 func (rm *testCustomRoleManager) AddLink(name1 string, name2 string, domain ...string)    {}
