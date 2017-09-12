@@ -111,6 +111,8 @@ func TestGetPolicy(t *testing.T) {
 	testGetFilteredPolicy(t, e, 2, [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "write"}}, "write")
 
 	testGetFilteredPolicy(t, e, 0, [][]string{{"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}}, "data2_admin", "data2")
+	// Note: "" (empty string) in fieldValues means matching all values.
+	testGetFilteredPolicy(t, e, 0, [][]string{{"data2_admin", "data2", "read"}}, "data2_admin", "", "read")
 	testGetFilteredPolicy(t, e, 1, [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "write"}}, "data2", "write")
 
 	testHasPolicy(t, e, []string{"alice", "data1", "read"}, true)
@@ -125,6 +127,8 @@ func TestGetPolicy(t *testing.T) {
 	testGetFilteredGroupingPolicy(t, e, 0, [][]string{}, "bob")
 	testGetFilteredGroupingPolicy(t, e, 1, [][]string{}, "data1_admin")
 	testGetFilteredGroupingPolicy(t, e, 1, [][]string{{"alice", "data2_admin"}}, "data2_admin")
+	// Note: "" (empty string) in fieldValues means matching all values.
+	testGetFilteredGroupingPolicy(t, e, 0, [][]string{{"alice", "data2_admin"}}, "", "data2_admin")
 
 	testHasGroupingPolicy(t, e, []string{"alice", "data2_admin"}, true)
 	testHasGroupingPolicy(t, e, []string{"bob", "data2_admin"}, false)
