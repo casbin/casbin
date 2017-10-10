@@ -1,0 +1,152 @@
+// Copyright 2017 The casbin Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package casbin
+
+import "sync"
+
+type SyncedEnforcer struct {
+	*Enforcer
+	m sync.RWMutex
+}
+
+// NewEnforcer creates a synchronized enforcer via file or DB.
+func NewSyncedEnforcer(params ...interface{}) *SyncedEnforcer {
+	e := &SyncedEnforcer{}
+	e.Enforcer = NewEnforcer(params...)
+	return e
+}
+
+// Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
+func (e *SyncedEnforcer) Enforce(rvals ...interface{}) bool {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforce(rvals)
+}
+
+// GetAllSubjects gets the list of subjects that show up in the current policy.
+func (e *SyncedEnforcer) GetAllSubjects() []string {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.GetAllSubjects()
+}
+
+// GetAllObjects gets the list of objects that show up in the current policy.
+func (e *SyncedEnforcer) GetAllObjects() []string {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.GetAllObjects()
+}
+
+// GetAllActions gets the list of actions that show up in the current policy.
+func (e *SyncedEnforcer) GetAllActions() []string {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.GetAllActions()
+}
+
+// GetAllRoles gets the list of roles that show up in the current policy.
+func (e *SyncedEnforcer) GetAllRoles() []string {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.GetAllRoles()
+}
+
+// GetPolicy gets all the authorization rules in the policy.
+func (e *SyncedEnforcer) GetPolicy() [][]string {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.GetPolicy()
+}
+
+// GetFilteredPolicy gets all the authorization rules in the policy, field filters can be specified.
+func (e *SyncedEnforcer) GetFilteredPolicy(fieldIndex int, fieldValues ...string) [][]string {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.GetFilteredPolicy(fieldIndex, fieldValues...)
+}
+
+// GetGroupingPolicy gets all the role inheritance rules in the policy.
+func (e *SyncedEnforcer) GetGroupingPolicy() [][]string {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.GetGroupingPolicy()
+}
+
+// GetFilteredGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
+func (e *SyncedEnforcer) GetFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) [][]string {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.GetFilteredGroupingPolicy(fieldIndex, fieldValues...)
+}
+
+// HasPolicy determines whether an authorization rule exists.
+func (e *SyncedEnforcer) HasPolicy(params ...interface{}) bool {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.HasPolicy(params...)
+}
+
+// AddPolicy adds an authorization rule to the current policy.
+// If the rule already exists, the function returns false and the rule will not be added.
+// Otherwise the function returns true by adding the new rule.
+func (e *SyncedEnforcer) AddPolicy(params ...interface{}) bool {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.AddPolicy(params...)
+}
+
+// RemovePolicy removes an authorization rule from the current policy.
+func (e *SyncedEnforcer) RemovePolicy(params ...interface{}) bool {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.RemovePolicy(params...)
+}
+
+// RemoveFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
+func (e *SyncedEnforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) bool {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.RemoveFilteredPolicy(fieldIndex, fieldValues...)
+}
+
+// HasGroupingPolicy determines whether a role inheritance rule exists.
+func (e *SyncedEnforcer) HasGroupingPolicy(params ...interface{}) bool {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.HasGroupingPolicy(params...)
+}
+
+// AddGroupingPolicy adds a role inheritance rule to the current policy.
+// If the rule already exists, the function returns false and the rule will not be added.
+// Otherwise the function returns true by adding the new rule.
+func (e *SyncedEnforcer) AddGroupingPolicy(params ...interface{}) bool {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.AddGroupingPolicy(params...)
+}
+
+// RemoveGroupingPolicy removes a role inheritance rule from the current policy.
+func (e *SyncedEnforcer) RemoveGroupingPolicy(params ...interface{}) bool {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.RemoveGroupingPolicy(params...)
+}
+
+// RemoveFilteredGroupingPolicy removes a role inheritance rule from the current policy, field filters can be specified.
+func (e *SyncedEnforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) bool {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.RemoveFilteredGroupingPolicy(fieldIndex, fieldValues...)
+}
