@@ -14,18 +14,48 @@
 
 package casbin
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
 type SyncedEnforcer struct {
 	*Enforcer
 	m sync.RWMutex
+	autoLoad bool
 }
 
 // NewEnforcer creates a synchronized enforcer via file or DB.
 func NewSyncedEnforcer(params ...interface{}) *SyncedEnforcer {
 	e := &SyncedEnforcer{}
 	e.Enforcer = NewEnforcer(params...)
+	e.autoLoad = false
 	return e
+}
+
+func (e *SyncedEnforcer) PeriodicallyLoadPolicy(d time.Duration) {
+	if e.autoLoad {
+		time.Sleep(30 * time.Millisecond)
+		e.LoadPolicy()
+	}
+}
+
+func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
+	e.autoLoad = true
+	go func() {
+		for {
+			if !e.autoLoad {
+				break
+			}
+
+			e.LoadPolicy()
+			time.Sleep(d)
+		}
+	} ()
+}
+
+func (e *SyncedEnforcer) StopAutoLoadPolicy() {
+	e.autoLoad = false
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
