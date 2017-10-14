@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"log"
 	"sync"
 	"time"
 )
@@ -43,12 +44,20 @@ func (e *SyncedEnforcer) PeriodicallyLoadPolicy(d time.Duration) {
 func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 	e.autoLoad = true
 	go func() {
+		n := 1
+		log.Print("Start automatically load policy")
 		for {
 			if !e.autoLoad {
+				log.Print("Stop automatically load policy")
 				break
 			}
 
+			e.m.Lock()
 			e.LoadPolicy()
+			e.m.Unlock()
+			// Uncomment this line to see when the policy is loaded.
+			// log.Print("Load policy for time: ", n)
+			n ++
 			time.Sleep(d)
 		}
 	} ()
@@ -62,70 +71,70 @@ func (e *SyncedEnforcer) StopAutoLoadPolicy() {
 func (e *SyncedEnforcer) Enforce(rvals ...interface{}) bool {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforce(rvals)
+	return e.Enforcer.Enforce(rvals...)
 }
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *SyncedEnforcer) GetAllSubjects() []string {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.GetAllSubjects()
+	return e.Enforcer.GetAllSubjects()
 }
 
 // GetAllObjects gets the list of objects that show up in the current policy.
 func (e *SyncedEnforcer) GetAllObjects() []string {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.GetAllObjects()
+	return e.Enforcer.GetAllObjects()
 }
 
 // GetAllActions gets the list of actions that show up in the current policy.
 func (e *SyncedEnforcer) GetAllActions() []string {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.GetAllActions()
+	return e.Enforcer.GetAllActions()
 }
 
 // GetAllRoles gets the list of roles that show up in the current policy.
 func (e *SyncedEnforcer) GetAllRoles() []string {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.GetAllRoles()
+	return e.Enforcer.GetAllRoles()
 }
 
 // GetPolicy gets all the authorization rules in the policy.
 func (e *SyncedEnforcer) GetPolicy() [][]string {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.GetPolicy()
+	return e.Enforcer.GetPolicy()
 }
 
 // GetFilteredPolicy gets all the authorization rules in the policy, field filters can be specified.
 func (e *SyncedEnforcer) GetFilteredPolicy(fieldIndex int, fieldValues ...string) [][]string {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.GetFilteredPolicy(fieldIndex, fieldValues...)
+	return e.Enforcer.GetFilteredPolicy(fieldIndex, fieldValues...)
 }
 
 // GetGroupingPolicy gets all the role inheritance rules in the policy.
 func (e *SyncedEnforcer) GetGroupingPolicy() [][]string {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.GetGroupingPolicy()
+	return e.Enforcer.GetGroupingPolicy()
 }
 
 // GetFilteredGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
 func (e *SyncedEnforcer) GetFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) [][]string {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.GetFilteredGroupingPolicy(fieldIndex, fieldValues...)
+	return e.Enforcer.GetFilteredGroupingPolicy(fieldIndex, fieldValues...)
 }
 
 // HasPolicy determines whether an authorization rule exists.
 func (e *SyncedEnforcer) HasPolicy(params ...interface{}) bool {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.HasPolicy(params...)
+	return e.Enforcer.HasPolicy(params...)
 }
 
 // AddPolicy adds an authorization rule to the current policy.
@@ -134,28 +143,28 @@ func (e *SyncedEnforcer) HasPolicy(params ...interface{}) bool {
 func (e *SyncedEnforcer) AddPolicy(params ...interface{}) bool {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.AddPolicy(params...)
+	return e.Enforcer.AddPolicy(params...)
 }
 
 // RemovePolicy removes an authorization rule from the current policy.
 func (e *SyncedEnforcer) RemovePolicy(params ...interface{}) bool {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.RemovePolicy(params...)
+	return e.Enforcer.RemovePolicy(params...)
 }
 
 // RemoveFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
 func (e *SyncedEnforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) bool {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.RemoveFilteredPolicy(fieldIndex, fieldValues...)
+	return e.Enforcer.RemoveFilteredPolicy(fieldIndex, fieldValues...)
 }
 
 // HasGroupingPolicy determines whether a role inheritance rule exists.
 func (e *SyncedEnforcer) HasGroupingPolicy(params ...interface{}) bool {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.HasGroupingPolicy(params...)
+	return e.Enforcer.HasGroupingPolicy(params...)
 }
 
 // AddGroupingPolicy adds a role inheritance rule to the current policy.
@@ -164,19 +173,19 @@ func (e *SyncedEnforcer) HasGroupingPolicy(params ...interface{}) bool {
 func (e *SyncedEnforcer) AddGroupingPolicy(params ...interface{}) bool {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.AddGroupingPolicy(params...)
+	return e.Enforcer.AddGroupingPolicy(params...)
 }
 
 // RemoveGroupingPolicy removes a role inheritance rule from the current policy.
 func (e *SyncedEnforcer) RemoveGroupingPolicy(params ...interface{}) bool {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.RemoveGroupingPolicy(params...)
+	return e.Enforcer.RemoveGroupingPolicy(params...)
 }
 
 // RemoveFilteredGroupingPolicy removes a role inheritance rule from the current policy, field filters can be specified.
 func (e *SyncedEnforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) bool {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.RemoveFilteredGroupingPolicy(fieldIndex, fieldValues...)
+	return e.Enforcer.RemoveFilteredGroupingPolicy(fieldIndex, fieldValues...)
 }

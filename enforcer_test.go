@@ -293,8 +293,8 @@ func TestInitWithAdapter(t *testing.T) {
 
 func TestSync(t *testing.T) {
 	e := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-	// Start reloading the policy every second.
-	e.StartAutoLoadPolicy(time.Second)
+	// Start reloading the policy every 200 ms.
+	e.StartAutoLoadPolicy(time.Millisecond * 200)
 
 	testEnforceSync(t, e, "alice", "data1", "read", true)
 	testEnforceSync(t, e, "alice", "data1", "write", false)
