@@ -19,6 +19,7 @@ import (
 )
 
 func benchmarkEnforce(b *testing.B, e *Enforcer, sub string, obj string, act string, res bool) {
+	b.Helper()
 	if e.Enforce(sub, obj, act) != res {
 		b.Errorf("%s, %s, %s: %t, supposed to be %t", sub, obj, act, !res, res)
 	}
