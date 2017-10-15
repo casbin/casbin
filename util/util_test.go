@@ -20,6 +20,7 @@ import (
 )
 
 func testRemoveComments(t *testing.T, s string, res string) {
+	t.Helper()
 	myRes := RemoveComments(s)
 	log.Printf("%s: %s", s, myRes)
 
@@ -37,6 +38,7 @@ func TestRemoveComments(t *testing.T) {
 }
 
 func testArrayEquals(t *testing.T, a []string, b []string, res bool) {
+	t.Helper()
 	myRes := ArrayEquals(a, b)
 	log.Printf("%s == %s: %t", a, b, myRes)
 
@@ -53,6 +55,7 @@ func TestArrayEquals(t *testing.T) {
 }
 
 func testArray2DEquals(t *testing.T, a [][]string, b [][]string, res bool) {
+	t.Helper()
 	myRes := Array2DEquals(a, b)
 	log.Printf("%s == %s: %t", a, b, myRes)
 
@@ -70,6 +73,7 @@ func TestArray2DEquals(t *testing.T) {
 }
 
 func testSetEquals(t *testing.T, a []string, b []string, res bool) {
+	t.Helper()
 	myRes := SetEquals(a, b)
 	log.Printf("%s == %s: %t", a, b, myRes)
 

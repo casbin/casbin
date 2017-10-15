@@ -22,6 +22,7 @@ import (
 )
 
 func testStringList(t *testing.T, title string, f func() []string, res []string) {
+	t.Helper()
 	myRes := f()
 	log.Print(title+": ", myRes)
 
@@ -40,6 +41,7 @@ func TestGetList(t *testing.T) {
 }
 
 func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
+	t.Helper()
 	myRes := e.GetPolicy()
 	log.Print("Policy: ", myRes)
 
@@ -49,6 +51,7 @@ func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
 }
 
 func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]string, fieldValues ...string) {
+	t.Helper()
 	myRes := e.GetFilteredPolicy(fieldIndex, fieldValues...)
 	log.Print("Policy for ", util.ParamsToString(fieldValues...), ": ", myRes)
 
@@ -58,6 +61,7 @@ func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]st
 }
 
 func testGetGroupingPolicy(t *testing.T, e *Enforcer, res [][]string) {
+	t.Helper()
 	myRes := e.GetGroupingPolicy()
 	log.Print("Grouping policy: ", myRes)
 
@@ -67,6 +71,7 @@ func testGetGroupingPolicy(t *testing.T, e *Enforcer, res [][]string) {
 }
 
 func testGetFilteredGroupingPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]string, fieldValues ...string) {
+	t.Helper()
 	myRes := e.GetFilteredGroupingPolicy(fieldIndex, fieldValues...)
 	log.Print("Grouping policy for ", util.ParamsToString(fieldValues...), ": ", myRes)
 
@@ -76,6 +81,7 @@ func testGetFilteredGroupingPolicy(t *testing.T, e *Enforcer, fieldIndex int, re
 }
 
 func testHasPolicy(t *testing.T, e *Enforcer, policy []string, res bool) {
+	t.Helper()
 	myRes := e.HasPolicy(policy)
 	log.Print("Has policy ", util.ArrayToString(policy), ": ", myRes)
 
@@ -85,6 +91,7 @@ func testHasPolicy(t *testing.T, e *Enforcer, policy []string, res bool) {
 }
 
 func testHasGroupingPolicy(t *testing.T, e *Enforcer, policy []string, res bool) {
+	t.Helper()
 	myRes := e.HasGroupingPolicy(policy)
 	log.Print("Has grouping policy ", util.ArrayToString(policy), ": ", myRes)
 

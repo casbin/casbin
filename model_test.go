@@ -21,24 +21,28 @@ import (
 )
 
 func testEnforce(t *testing.T, e *Enforcer, sub string, obj interface{}, act string, res bool) {
+	t.Helper()
 	if e.Enforce(sub, obj, act) != res {
 		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, !res, res)
 	}
 }
 
 func testEnforceWithoutUsers(t *testing.T, e *Enforcer, obj string, act string, res bool) {
+	t.Helper()
 	if e.Enforce(obj, act) != res {
 		t.Errorf("%s, %s: %t, supposed to be %t", obj, act, !res, res)
 	}
 }
 
 func testDomainEnforce(t *testing.T, e *Enforcer, sub string, dom string, obj string, act string, res bool) {
+	t.Helper()
 	if e.Enforce(sub, dom, obj, act) != res {
 		t.Errorf("%s, %s, %s, %s: %t, supposed to be %t", sub, dom, obj, act, !res, res)
 	}
 }
 
 func testEnforceSync(t *testing.T, e *SyncedEnforcer, sub string, obj interface{}, act string, res bool) {
+	t.Helper()
 	if e.Enforce(sub, obj, act) != res {
 		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, !res, res)
 	}

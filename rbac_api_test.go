@@ -22,6 +22,7 @@ import (
 )
 
 func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
+	t.Helper()
 	myRes := e.GetRolesForUser(name)
 	log.Print("Roles for ", name, ": ", myRes)
 
@@ -31,6 +32,7 @@ func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
 }
 
 func testGetUsers(t *testing.T, e *Enforcer, name string, res []string) {
+	t.Helper()
 	myRes := e.GetUsersForRole(name)
 	log.Print("Users for ", name, ": ", myRes)
 
@@ -40,6 +42,7 @@ func testGetUsers(t *testing.T, e *Enforcer, name string, res []string) {
 }
 
 func testHasRole(t *testing.T, e *Enforcer, name string, role string, res bool) {
+	t.Helper()
 	myRes := e.HasRoleForUser(name, role)
 	log.Print(name, " has role ", role, ": ", myRes)
 
@@ -108,6 +111,7 @@ func TestRoleAPI(t *testing.T) {
 }
 
 func testGetPermissions(t *testing.T, e *Enforcer, name string, res [][]string) {
+	t.Helper()
 	myRes := e.GetPermissionsForUser(name)
 	log.Print("Permissions for ", name, ": ", myRes)
 
@@ -117,6 +121,7 @@ func testGetPermissions(t *testing.T, e *Enforcer, name string, res [][]string) 
 }
 
 func testHasPermission(t *testing.T, e *Enforcer, name string, permission []string, res bool) {
+	t.Helper()
 	myRes := e.HasPermissionForUser(name, permission...)
 	log.Print(name, " has permission ", util.ArrayToString(permission), ": ", myRes)
 

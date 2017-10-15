@@ -22,6 +22,7 @@ import (
 )
 
 func testGetRolesInDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
+	t.Helper()
 	myRes := e.GetRolesForUserInDomain(name, domain)
 	log.Print("Roles for ", name, " under ", domain, " : ", myRes)
 
@@ -58,6 +59,7 @@ func TestRoleAPIWithDomains(t *testing.T) {
 }
 
 func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name string, domain string, res [][]string) {
+	t.Helper()
 	myRes := e.GetPermissionsForUserInDomain(name, domain)
 	log.Print("Permissions for ", name, " under ", domain, " : ", myRes)
 

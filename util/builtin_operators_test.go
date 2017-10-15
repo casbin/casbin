@@ -20,6 +20,7 @@ import (
 )
 
 func testKeyMatch(t *testing.T, key1 string, key2 string, res bool) {
+	t.Helper()
 	myRes := KeyMatch(key1, key2)
 	log.Printf("%s < %s: %t", key1, key2, myRes)
 
@@ -41,6 +42,7 @@ func TestKeyMatch(t *testing.T) {
 }
 
 func testKeyMatch2(t *testing.T, key1 string, key2 string, res bool) {
+	t.Helper()
 	myRes := KeyMatch2(key1, key2)
 	log.Printf("%s < %s: %t", key1, key2, myRes)
 
@@ -79,6 +81,7 @@ func TestKeyMatch2(t *testing.T) {
 }
 
 func testKeyMatch3(t *testing.T, key1 string, key2 string, res bool) {
+	t.Helper()
 	myRes := KeyMatch3(key1, key2)
 	log.Printf("%s < %s: %t", key1, key2, myRes)
 
@@ -112,6 +115,7 @@ func TestKeyMatch3(t *testing.T) {
 }
 
 func testRegexMatch(t *testing.T, key1 string, key2 string, res bool) {
+	t.Helper()
 	myRes := RegexMatch(key1, key2)
 	log.Printf("%s < %s: %t", key1, key2, myRes)
 
@@ -133,6 +137,7 @@ func TestRegexMatch(t *testing.T) {
 }
 
 func testIPMatch(t *testing.T, ip1 string, ip2 string, res bool) {
+	t.Helper()
 	myRes := IPMatch(ip1, ip2)
 	log.Printf("%s < %s: %t", ip1, ip2, myRes)
 
