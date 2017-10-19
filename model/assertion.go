@@ -36,8 +36,8 @@ func (ast *Assertion) buildRoleLinks(rmc rbac.RoleManagerConstructor) {
 	ast.RM = rmc()
 	count := strings.Count(ast.Value, "_")
 	for _, rule := range ast.Policy {
-		if count < 2 || count > 3 {
-			panic(errors.New("the number of \"_\" in role definition should be 2 or 3"))
+		if count < 2 {
+			panic(errors.New("the number of \"_\" in role definition should be at least 2"))
 		}
 		if len(rule) < count {
 			panic(errors.New("grouping policy elements do not meet role definition"))
@@ -47,6 +47,8 @@ func (ast *Assertion) buildRoleLinks(rmc rbac.RoleManagerConstructor) {
 			ast.RM.AddLink(rule[0], rule[1])
 		} else if count == 3 {
 			ast.RM.AddLink(rule[0], rule[1], rule[2])
+		} else if count == 4 {
+			ast.RM.AddLink(rule[0], rule[1], rule[2], rule[3])
 		}
 	}
 
