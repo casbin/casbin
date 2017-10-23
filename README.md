@@ -176,8 +176,8 @@ The benchmarking result is as follows (op = an ``Enforce()`` call, ms = millisec
 
 Test case | Time overhead | Memory overhead
 ----|------|----
-ACL | 0.018579 ms/op | 5.841 KB
-RBAC | 0.025116 ms/op | 7.714 KB
+ACL | 0.016874 ms/op | 5.649 KB
+RBAC | 0.022835 ms/op | 7.522 KB
 
 ## Examples
 

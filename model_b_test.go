@@ -18,19 +18,12 @@ import (
 	"testing"
 )
 
-func benchmarkEnforce(b *testing.B, e *Enforcer, sub string, obj string, act string, res bool) {
-	b.Helper()
-	if e.Enforce(sub, obj, act) != res {
-		b.Errorf("%s, %s, %s: %t, supposed to be %t", sub, obj, act, !res, res)
-	}
-}
-
 func BenchmarkBasicModel(b *testing.B) {
 	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		benchmarkEnforce(b, e, "alice", "data1", "read", true)
+		e.Enforce("alice", "data1", "read")
 	}
 }
 
@@ -39,6 +32,6 @@ func BenchmarkRBACModel(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		benchmarkEnforce(b, e, "alice", "data2", "read", true)
+		e.Enforce("alice", "data2", "read")
 	}
 }
