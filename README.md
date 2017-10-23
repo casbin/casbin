@@ -25,7 +25,10 @@ Casbin is a powerful and efficient open-source access control library for Golang
 - [Get started](#get-started)
 - [Documentation](#documentation)
 - [Policy persistence](#policy-persistence)
+- [Benchmarks](#benchmarks)
 - [Examples](#examples)
+- [RoleManager](#rolemanager)
+- [How to use Casbin as a service?](#how-to-use-casbin-as-a-service)
 - [Our adopters](#our-adopters)
 
 ## Supported models
@@ -160,6 +163,21 @@ Adapter | Type | Author | Description
 [RethinkDB Adapter](https://github.com/adityapandey9/rethinkdb-adapter) | NoSQL | [@adityapandey9](https://github.com/adityapandey9) | Persistence for [RethinkDB](https://rethinkdb.com/)
 
 For details of adapters, please refer to the documentation: https://github.com/casbin/casbin/wiki/Policy-persistence
+
+## Benchmarks
+
+The overhead of policy enforcement is benchmarked in [model_b_test.go](https://github.com/casbin/casbin/blob/master/model_b_test.go). The testbed is:
+
+```
+Intel(R) Core(TM) i7-6700HQ CPU @ 2.60GHz, 2601 Mhz, 4 Core(s), 8 Logical Processor(s)
+```
+
+The result is as follows:
+
+Test case | Overhead per ``Enforce()`` call
+----|----
+ACL | 26111 ns (0.0261 ms)
+RBAC | 34128 ns (0.0341 ms)
 
 ## Examples
 
