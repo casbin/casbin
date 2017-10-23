@@ -29,7 +29,8 @@ type RoleManager interface {
 	// domain is a prefix to the roles.
 	GetRoles(name string, domain ...string) []string
 	// GetUsers gets the users that inherits a role.
-	GetUsers(name string) []string
+	// domain is a prefix to the roles.
+	GetUsers(name string, domain ...string) []string
 	// PrintRoles prints all the roles to log.
 	PrintRoles()
 }

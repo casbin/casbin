@@ -272,7 +272,7 @@ func (rm *testCustomRoleManager) HasLink(name1 string, name2 string, domain ...s
 func (rm *testCustomRoleManager) GetRoles(name string, domain ...string) []string {
 	return []string{}
 }
-func (rm *testCustomRoleManager) GetUsers(name string) []string {
+func (rm *testCustomRoleManager) GetUsers(name string, domain ...string) []string {
 	return []string{}
 }
 func (rm *testCustomRoleManager) PrintRoles() {}
