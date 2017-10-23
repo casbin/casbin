@@ -34,13 +34,6 @@ func NewSyncedEnforcer(params ...interface{}) *SyncedEnforcer {
 	return e
 }
 
-func (e *SyncedEnforcer) PeriodicallyLoadPolicy(d time.Duration) {
-	if e.autoLoad {
-		time.Sleep(30 * time.Millisecond)
-		e.LoadPolicy()
-	}
-}
-
 func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 	e.autoLoad = true
 	go func() {
