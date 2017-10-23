@@ -126,8 +126,7 @@ func (rm *defaultRoleManager) GetRoles(name string, domain ...string) []string {
 }
 
 // GetUsers gets the users that inherits a subject.
-// domain is a prefix to the roles.
-// Actually domain is an unreferenced parameter here, may be used in other implementations.
+// domain is an unreferenced parameter here, may be used in other implementations.
 func (rm *defaultRoleManager) GetUsers(name string, domain ...string) []string {
 	if !rm.hasRole(name) {
 		return nil
