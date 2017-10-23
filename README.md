@@ -172,12 +172,12 @@ The overhead of policy enforcement is benchmarked in [model_b_test.go](https://g
 Intel(R) Core(TM) i7-6700HQ CPU @ 2.60GHz, 2601 Mhz, 4 Core(s), 8 Logical Processor(s)
 ```
 
-The result is as follows:
+The benchmarking result is as follows (op = an ``Enforce()`` call, ms = millisecond, KB = kilo bytes):
 
-Test case | Overhead per ``Enforce()`` call
-----|----
-ACL | 26111 ns (0.0261 ms)
-RBAC | 34128 ns (0.0341 ms)
+Test case | Time overhead | Memory overhead
+----|------|----
+ACL | 0.018579 ms/op | 5.841 KB
+RBAC | 0.025116 ms/op | 7.714 KB
 
 ## Examples
 
