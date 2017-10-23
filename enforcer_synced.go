@@ -52,9 +52,7 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 				break
 			}
 
-			e.m.Lock()
 			e.LoadPolicy()
-			e.m.Unlock()
 			// Uncomment this line to see when the policy is loaded.
 			// log.Print("Load policy for time: ", n)
 			n ++
@@ -65,6 +63,20 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 
 func (e *SyncedEnforcer) StopAutoLoadPolicy() {
 	e.autoLoad = false
+}
+
+// LoadPolicy reloads the policy from file/database.
+func (e *SyncedEnforcer) LoadPolicy() error {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.LoadPolicy()
+}
+
+// SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
+func (e *SyncedEnforcer) SavePolicy() error {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.SavePolicy()
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
