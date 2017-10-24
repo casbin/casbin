@@ -52,6 +52,24 @@ func BenchmarkRBACModel(b *testing.B) {
 	}
 }
 
+func BenchmarkRBACModelWithResourceRoles(b *testing.B) {
+	e := NewEnforcer("examples/rbac_model_with_resource_roles.conf", "examples/rbac_policy_with_resource_roles.csv")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		e.Enforce("alice", "data1", "read")
+	}
+}
+
+func BenchmarkRBACModelWithDomains(b *testing.B) {
+	e := NewEnforcer("examples/rbac_model_with_domains.conf", "examples/rbac_policy_with_domains.csv")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		e.Enforce("alice", "domain1", "data1", "read")
+	}
+}
+
 func BenchmarkABACModel(b *testing.B) {
 	e := NewEnforcer("examples/abac_model.conf")
 	data1 := newTestResource("data1", "alice")
