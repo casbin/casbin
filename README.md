@@ -178,7 +178,9 @@ Test case | Size | Time overhead | Memory overhead
 ----|------|------|----
 ACL | 2 rules (2 users) | 0.015493 ms/op | 5.649 KB
 RBAC | 5 rules (2 users, 1 role) | 0.021738 ms/op | 7.522 KB
-RBAC (large) | 1100 rules (1000 users, 100 role) | 0.164309 ms/op | 80.620 KB
+RBAC (small) | 1100 rules (1000 users, 100 roles) | 0.164309 ms/op | 80.620 KB
+RBAC (medium) | 11000 rules (10000 users, 1000 roles) | 2.258262 ms/op | 765.152 KB
+RBAC (large) | 110000 rules (100000 users, 10000 roles) | 23.916776 ms/op | 7.606 MB
 RBAC with resource roles | 6 rules (2 users, 2 roles) | 0.021146 ms/op | 7.906 KB
 RBAC with domains/tenants | 6 rules (2 users, 1 role, 2 domains) | 0.032696 ms/op | 10.755 KB
 ABAC | 0 rule (0 user) | 0.007510 ms/op | 2.328 KB
