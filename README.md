@@ -172,18 +172,18 @@ The overhead of policy enforcement is benchmarked in [model_b_test.go](https://g
 Intel(R) Core(TM) i7-6700HQ CPU @ 2.60GHz, 2601 Mhz, 4 Core(s), 8 Logical Processor(s)
 ```
 
-The benchmarking result is as follows (op = an ``Enforce()`` call, ms = millisecond, KB = kilo bytes):
+The benchmarking result of ``go test -bench=. -benchmem`` is as follows (op = an ``Enforce()`` call, ms = millisecond, KB = kilo bytes):
 
-Test case | Time overhead | Memory overhead
-----|------|----
-ACL | 0.015493 ms/op | 5.649 KB
-RBAC | 0.021738 ms/op | 7.522 KB
-RBAC with resource roles | 0.021146 ms/op | 7.906 KB
-RBAC with domains/tenants | 0.032696 ms/op | 10.755 KB
-ABAC | 0.007510 ms/op | 2.328 KB
-RESTful | 0.045398 ms/op | 91.774 KB
-Deny-override | 0.023281 ms/op | 8.370 KB
-Priority | 0.016389 ms/op | 5.313 KB
+Test case | Number of rules | Time overhead | Memory overhead
+----|------|------|----
+ACL | 2 | 0.015493 ms/op | 5.649 KB
+RBAC | 5 | 0.021738 ms/op | 7.522 KB
+RBAC with resource roles | 6 | 0.021146 ms/op | 7.906 KB
+RBAC with domains/tenants | 6 | 0.032696 ms/op | 10.755 KB
+ABAC | 0 | 0.007510 ms/op | 2.328 KB
+RESTful | 5 | 0.045398 ms/op | 91.774 KB
+Deny-override | 6 | 0.023281 ms/op | 8.370 KB
+Priority | 9 | 0.016389 ms/op | 5.313 KB
 
 ## Examples
 
