@@ -218,7 +218,9 @@ func (e *Enforcer) AddNamedGroupingPolicy(ptype string, params ...interface{}) b
 		ruleAdded = e.addPolicy("g", ptype, policy)
 	}
 
-	e.model.BuildRoleLinks(e.rmc)
+	if e.autoBuildRoleLinks {
+		e.model.BuildRoleLinks(e.rmc)
+	}
 	return ruleAdded
 }
 
@@ -246,14 +248,18 @@ func (e *Enforcer) RemoveNamedGroupingPolicy(ptype string, params ...interface{}
 		ruleRemoved = e.removePolicy("g", ptype, policy)
 	}
 
-	e.model.BuildRoleLinks(e.rmc)
+	if e.autoBuildRoleLinks {
+		e.model.BuildRoleLinks(e.rmc)
+	}
 	return ruleRemoved
 }
 
 // RemoveFilteredNamedGroupingPolicy removes a role inheritance rule from the current named policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) bool {
 	ruleRemoved := e.removeFilteredPolicy("g", ptype, fieldIndex, fieldValues...)
-	e.model.BuildRoleLinks(e.rmc)
+	if e.autoBuildRoleLinks {
+		e.model.BuildRoleLinks(e.rmc)
+	}
 	return ruleRemoved
 }
 

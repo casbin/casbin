@@ -47,6 +47,7 @@ type Enforcer struct {
 
 	enabled  bool
 	autoSave bool
+	autoBuildRoleLinks bool
 }
 
 // NewEnforcer creates an enforcer via file or DB.
@@ -104,6 +105,7 @@ func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 
 	e.enabled = true
 	e.autoSave = true
+	e.autoBuildRoleLinks = true
 
 	if e.modelPath != "" {
 		e.LoadModel()
@@ -119,6 +121,7 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 
 	e.enabled = true
 	e.autoSave = true
+	e.autoBuildRoleLinks = true
 
 	if e.modelPath != "" {
 		e.LoadModel()
@@ -137,6 +140,7 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 
 	e.enabled = true
 	e.autoSave = true
+	e.autoBuildRoleLinks = true
 
 	if e.adapter != nil {
 		e.LoadPolicy()
@@ -204,7 +208,9 @@ func (e *Enforcer) LoadPolicy() error {
 	}
 
 	e.model.PrintPolicy()
-	e.model.BuildRoleLinks(e.rmc)
+	if e.autoBuildRoleLinks {
+		e.model.BuildRoleLinks(e.rmc)
+	}
 	return nil
 }
 
@@ -226,6 +232,16 @@ func (e *Enforcer) EnableLog(enable bool) {
 // EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
 func (e *Enforcer) EnableAutoSave(autoSave bool) {
 	e.autoSave = autoSave
+}
+
+// EnableAutoBuildRoleLinks controls whether to rebuild the role inheritance relations when a role is added or deleted.
+func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
+	e.autoBuildRoleLinks = autoBuildRoleLinks
+}
+
+// BuildRoleLinks manually rebuild the role inheritance relations.
+func (e *Enforcer) BuildRoleLinks() {
+	e.model.BuildRoleLinks(e.rmc)
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
