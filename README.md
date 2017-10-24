@@ -182,6 +182,7 @@ RBAC with resource roles | 0.021146 ms/op | 7.906 KB
 RBAC with domains/tenants | 0.032696 ms/op | 10.755 KB
 ABAC | 0.007510 ms/op | 2.328 KB
 RESTful | 0.045398 ms/op | 91.774 KB
+Deny-override | 0.023281 ms/op | 8.370 KB
 Priority | 0.016389 ms/op | 5.313 KB
 
 ## Examples

@@ -89,6 +89,15 @@ func BenchmarkKeyMatchModel(b *testing.B) {
 	}
 }
 
+func BenchmarkRBACModelWithDeny(b *testing.B) {
+	e := NewEnforcer("examples/rbac_model_with_deny.conf", "examples/rbac_policy_with_deny.csv")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		e.Enforce("alice", "data1", "read")
+	}
+}
+
 func BenchmarkPriorityModel(b *testing.B) {
 	e := NewEnforcer("examples/priority_model.conf", "examples/priority_policy.csv")
 
