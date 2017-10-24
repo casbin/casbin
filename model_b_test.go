@@ -18,6 +18,22 @@ import (
 	"testing"
 )
 
+func rawEnforce(sub string, obj string, act string) bool {
+	policy := [2][3]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}}
+	for _, rule := range policy {
+		if sub == rule[0] && obj == rule[1] && act == rule[2] {
+			return true
+		}
+	}
+	return false
+}
+
+func BenchmarkRaw(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		rawEnforce("alice", "data1", "read")
+	}
+}
+
 func BenchmarkBasicModel(b *testing.B) {
 	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 
