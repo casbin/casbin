@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -49,6 +50,23 @@ func BenchmarkRBACModel(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		e.Enforce("alice", "data2", "read")
+	}
+}
+
+func BenchmarkRBACModelLarge(b *testing.B) {
+	e := NewEnforcer("examples/rbac_model.conf")
+	// 1000 users, 100 roles, 10 resources.
+	for i := 0; i < 100; i++ {
+		e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i / 10), "read")
+	}
+
+	for i := 0; i < 1000; i++ {
+		e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i / 10))
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		e.Enforce("user501", "data9", "read")
 	}
 }
 
