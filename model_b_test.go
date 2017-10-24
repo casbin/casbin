@@ -51,3 +51,31 @@ func BenchmarkRBACModel(b *testing.B) {
 		e.Enforce("alice", "data2", "read")
 	}
 }
+
+func BenchmarkABACModel(b *testing.B) {
+	e := NewEnforcer("examples/abac_model.conf")
+	data1 := newTestResource("data1", "alice")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		e.Enforce("alice", data1, "read")
+	}
+}
+
+func BenchmarkKeyMatchModel(b *testing.B) {
+	e := NewEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		e.Enforce("alice", "/alice_data/resource1", "GET")
+	}
+}
+
+func BenchmarkPriorityModel(b *testing.B) {
+	e := NewEnforcer("examples/priority_model.conf", "examples/priority_policy.csv")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		e.Enforce("alice", "data1", "read")
+	}
+}
