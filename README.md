@@ -16,6 +16,10 @@ Casbin
 
 Casbin is a powerful and efficient open-source access control library for Golang projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model).
 
+### Supported by Auth0 <span><img src="https://user-images.githubusercontent.com/1801923/31792116-d4fca9ec-b512-11e7-92eb-56e8d3df8e70.png" height="28" align="top"></span>
+
+If you want to easily add authentication and authorization to your Go projects, feel free to check out Auth0's Go SDK and free plan at [auth0.com/overview](https://auth0.com/overview?utm_source=GHsponsor&utm_medium=GHsponsor&utm_campaign=casbin&utm_content=auth)
+
 ## Table of contents
 
 - [Supported models](#supported-models)
