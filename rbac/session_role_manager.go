@@ -16,6 +16,7 @@ package rbac
 
 import (
 	"github.com/casbin/casbin/util"
+	"sort"
 )
 
 type sessionRoleManager struct {
@@ -95,21 +96,32 @@ func (rm *sessionRoleManager) HasLink(name1 string, name2 string, requestTime ..
 }
 
 func (rm *sessionRoleManager) GetRoles(name string, domain ...string) []string {
+	if len(domain) != 1 {
+		return nil
+	}
+	requestTime := domain[0]
+
 	if !rm.hasRole(name) {
 		return nil
 	}
 
-	sessionRoles := rm.createRole(name).getSessionRoles()
+	sessionRoles := rm.createRole(name).getSessionRoles(requestTime)
 	return sessionRoles
 }
 
-func (rm *sessionRoleManager) GetUsers(name string) []string {
+func (rm *sessionRoleManager) GetUsers(name string, domain ...string) []string {
+	if len(domain) != 1 {
+		return nil
+	}
+	requestTime := domain[0]
+
 	users := []string{}
 	for _, role := range rm.allRoles {
-		if role.hasDirectRole(name) {
+		if role.hasDirectRole(name, requestTime) {
 			users = append(users, role.name)
 		}
 	}
+	sort.Strings(users)
 	return users
 }
 
@@ -139,7 +151,7 @@ func (sr *SessionRole) deleteSessions(sessionName string) {
 	// Delete sessions from an array while iterating it
 	index := 0
 	for _, srs := range sr.sessions {
-		if srs.role.name == sessionName {
+		if srs.role.name != sessionName {
 			sr.sessions[index] = srs
 			index++
 		}
@@ -147,21 +159,26 @@ func (sr *SessionRole) deleteSessions(sessionName string) {
 	sr.sessions = sr.sessions[:index]
 }
 
-func (sr *SessionRole) getSessions() []Session {
-	return sr.sessions
-}
+//
+//func (sr *SessionRole) getSessions() []Session {
+//	return sr.sessions
+//}
 
-func (sr *SessionRole) getSessionRoles() []string {
+func (sr *SessionRole) getSessionRoles(requestTime string) []string {
 	names := []string{}
 	for _, session := range sr.sessions {
-		names = append(names, session.role.name)
+		if session.startTime <= requestTime && requestTime <= session.endTime {
+			if !contains(names, session.role.name) {
+				names = append(names, session.role.name)
+			}
+		}
 	}
 	return names
 }
 
 func (sr *SessionRole) hasValidSession(name string, hierarchyLevel int, requestTime string) bool {
-	if hierarchyLevel == 0 {
-		return false
+	if hierarchyLevel == 1 {
+		return sr.name == name
 	}
 
 	for _, s := range sr.sessions {
@@ -177,10 +194,12 @@ func (sr *SessionRole) hasValidSession(name string, hierarchyLevel int, requestT
 	return false
 }
 
-func (sr *SessionRole) hasDirectRole(name string) bool {
+func (sr *SessionRole) hasDirectRole(name string, requestTime string) bool {
 	for _, session := range sr.sessions {
 		if session.role.name == name {
-			return true
+			if session.startTime <= requestTime && requestTime <= session.endTime {
+				return true
+			}
 		}
 	}
 	return false
@@ -207,4 +226,13 @@ type Session struct {
 	role      *SessionRole
 	startTime string
 	endTime   string
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
