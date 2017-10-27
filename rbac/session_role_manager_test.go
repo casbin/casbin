@@ -45,12 +45,12 @@ func TestSessionRole(t *testing.T) {
 	testSessionRole(t, rm, "charlie", "echo", getOneHourAgo(), false)
 	testSessionRole(t, rm, "charlie", "foxtrott", getOneHourAgo(), false)
 
-	testSessionRole(t, rm, "alpha", "bravo", getInOneHour(), false)
-	testSessionRole(t, rm, "alpha", "charlie", getInOneHour(), false)
-	testSessionRole(t, rm, "bravo", "delta", getInOneHour(), false)
-	testSessionRole(t, rm, "bravo", "echo", getInOneHour(), false)
-	testSessionRole(t, rm, "charlie", "echo", getInOneHour(), false)
-	testSessionRole(t, rm, "charlie", "foxtrott", getInOneHour(), false)
+	testSessionRole(t, rm, "alpha", "bravo", getAfterOneHour(), false)
+	testSessionRole(t, rm, "alpha", "charlie", getAfterOneHour(), false)
+	testSessionRole(t, rm, "bravo", "delta", getAfterOneHour(), false)
+	testSessionRole(t, rm, "bravo", "echo", getAfterOneHour(), false)
+	testSessionRole(t, rm, "charlie", "echo", getAfterOneHour(), false)
+	testSessionRole(t, rm, "charlie", "foxtrott", getAfterOneHour(), false)
 }
 
 func TestAddLink(t *testing.T) {
@@ -144,19 +144,19 @@ func TestGetRoles(t *testing.T) {
 
 	testPrintSessionRoles(t, rm, "alpha", getOneHourAgo(), []string{"bravo"})
 	testPrintSessionRoles(t, rm, "alpha", getCurrentTime(), []string{"bravo"})
-	testPrintSessionRoles(t, rm, "alpha", getInOneHour(), []string{})
+	testPrintSessionRoles(t, rm, "alpha", getAfterOneHour(), []string{})
 
 	rm.AddLink("alpha", "charlie", getOneHourAgo(), getCurrentTime())
 
 	testPrintSessionRoles(t, rm, "alpha", getOneHourAgo(), []string{"bravo", "charlie"})
-	testPrintSessionRoles(t, rm, "alpha", getCurrentTime(), []string{"bravo"})
-	testPrintSessionRoles(t, rm, "alpha", getInOneHour(), []string{})
+	testPrintSessionRoles(t, rm, "alpha", getAfterCurrentTime(), []string{"bravo"})
+	testPrintSessionRoles(t, rm, "alpha", getAfterOneHour(), []string{})
 
 	rm.AddLink("alpha", "charlie", getOneHourAgo(), getInOneHour())
 
 	testPrintSessionRoles(t, rm, "alpha", getOneHourAgo(), []string{"bravo", "charlie"})
 	testPrintSessionRoles(t, rm, "alpha", getCurrentTime(), []string{"bravo", "charlie"})
-	testPrintSessionRoles(t, rm, "alpha", getInOneHour(), []string{})
+	testPrintSessionRoles(t, rm, "alpha", getAfterOneHour(), []string{})
 }
 
 func TestGetUsers(t *testing.T) {
@@ -181,7 +181,7 @@ func TestGetUsers(t *testing.T) {
 		t.Errorf("Alpha should have the using roles [bravo charlie delta] but has %s", myRes)
 	}
 
-	myRes = rm.GetUsers("alpha", getInOneHour())
+	myRes = rm.GetUsers("alpha", getAfterOneHour())
 	if !util.ArrayEquals(myRes, []string{}) {
 		t.Errorf("Alpha should not have any using roles but has %s", myRes)
 	}
@@ -214,10 +214,18 @@ func getCurrentTime() string {
 	return strconv.FormatInt(time.Now().UnixNano(), 10)
 }
 
+func getAfterCurrentTime() string {
+	return strconv.FormatInt(time.Now().UnixNano() + 1, 10)
+}
+
 func getOneHourAgo() string {
 	return strconv.FormatInt(time.Now().UnixNano()-60*60*100000000000, 10)
 }
 
 func getInOneHour() string {
 	return strconv.FormatInt(time.Now().Add(time.Hour).UnixNano(), 10)
+}
+
+func getAfterOneHour() string {
+	return strconv.FormatInt(time.Now().Add(time.Hour).UnixNano() + 1, 10)
 }
