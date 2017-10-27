@@ -15,8 +15,9 @@
 package rbac
 
 import (
-	"github.com/casbin/casbin/util"
 	"sort"
+	
+	"github.com/casbin/casbin/util"
 )
 
 type sessionRoleManager struct {
