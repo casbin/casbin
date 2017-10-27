@@ -15,11 +15,11 @@
 package rbac
 
 import (
+	"strconv"
 	"testing"
 	"time"
-	"strconv"
 
-	"github.com/edomosystems/casbin/util"
+	"github.com/casbin/casbin/util"
 )
 
 func TestSessionRole(t *testing.T) {
