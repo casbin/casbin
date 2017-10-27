@@ -168,6 +168,32 @@ Adapter | Type | Author | Description
 
 For details of adapters, please refer to the documentation: https://github.com/casbin/casbin/wiki/Policy-persistence
 
+## Role manager
+
+We support different implementations of a RBAC role manager. The currently supported adapters are:
+
+Role manager | Description
+----|----
+[Default role manager](https://github.com/casbin/casbin/blob/master/rbac/default_role_manager.go) | Supports role hierarchy
+[Session role manager](https://github.com/casbin/casbin/blob/master/rbac/session_role_manager.go) | Supports role hierarchy, time-range-based sessions
+
+For developers: all role managers must implement the [RoleManager](https://github.com/casbin/casbin/blob/master/rbac/role_manager.go) interface.
+
+To use a custom role manager implementation:
+
+```go
+type myCustomRoleManager struct {} // assumes the type satisfies the RoleManager interface
+
+func newRoleManager() rbac.RoleManagerConstructor {
+	return func() rbac.RoleManager {
+		return &myCustomRoleManager{}
+	}
+}
+
+e := casbin.NewEnforcer("path/to/model.conf", "path/to/policy.csv")
+e.SetRoleManager(newRoleManager())
+```
+
 ## Benchmarks
 
 The overhead of policy enforcement is benchmarked in [model_b_test.go](https://github.com/casbin/casbin/blob/master/model_b_test.go). The testbed is:
@@ -207,32 +233,6 @@ ABAC | [abac_model.conf](https://github.com/casbin/casbin/blob/master/examples/a
 RESTful | [keymatch_model.conf](https://github.com/casbin/casbin/blob/master/examples/keymatch_model.conf)  | [keymatch_policy.csv](https://github.com/casbin/casbin/blob/master/examples/keymatch_policy.csv)
 Deny-override | [rbac_model_with_deny.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_model_with_deny.conf)  | [rbac_policy_with_deny.csv](https://github.com/casbin/casbin/blob/master/examples/rbac_policy_with_deny.csv)
 Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/examples/priority_model.conf)  | [priority_policy.csv](https://github.com/casbin/casbin/blob/master/examples/priority_policy.csv)
-
-## Role manager
-
-We support different implementations of a RBAC role manager. The currently supported adapters are:
-
-Role manager | Description
-----|----
-[Default role manager](https://github.com/casbin/casbin/blob/master/rbac/default_role_manager.go) | Supports role hierarchy
-[Session role manager](https://github.com/casbin/casbin/blob/master/rbac/session_role_manager.go) | Supports role hierarchy, time-range-based sessions
-
-For developers: all role managers must implement the [RoleManager](https://github.com/casbin/casbin/blob/master/rbac/role_manager.go) interface.
-
-To use a custom role manager implementation:
-
-```go
-type myCustomRoleManager struct {} // assumes the type satisfies the RoleManager interface
-
-func newRoleManager() rbac.RoleManagerConstructor {
-	return func() rbac.RoleManager {
-		return &myCustomRoleManager{}
-	}
-}
-
-e := casbin.NewEnforcer("path/to/model.conf", "path/to/policy.csv")
-e.SetRoleManager(newRoleManager())
-```
 
 ## How to use Casbin as a service?
 
