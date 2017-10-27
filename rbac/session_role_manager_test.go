@@ -38,12 +38,12 @@ func TestSessionRole(t *testing.T) {
 	testSessionRole(t, rm, "charlie", "echo", getCurrentTime(), true)
 	testSessionRole(t, rm, "charlie", "foxtrott", getCurrentTime(), true)
 
-	testSessionRole(t, rm, "alpha", "bravo", getOneHoureAgo(), false)
-	testSessionRole(t, rm, "alpha", "charlie", getOneHoureAgo(), false)
-	testSessionRole(t, rm, "bravo", "delta", getOneHoureAgo(), false)
-	testSessionRole(t, rm, "bravo", "echo", getOneHoureAgo(), false)
-	testSessionRole(t, rm, "charlie", "echo", getOneHoureAgo(), false)
-	testSessionRole(t, rm, "charlie", "foxtrott", getOneHoureAgo(), false)
+	testSessionRole(t, rm, "alpha", "bravo", getOneHourAgo(), false)
+	testSessionRole(t, rm, "alpha", "charlie", getOneHourAgo(), false)
+	testSessionRole(t, rm, "bravo", "delta", getOneHourAgo(), false)
+	testSessionRole(t, rm, "bravo", "echo", getOneHourAgo(), false)
+	testSessionRole(t, rm, "charlie", "echo", getOneHourAgo(), false)
+	testSessionRole(t, rm, "charlie", "foxtrott", getOneHourAgo(), false)
 
 	testSessionRole(t, rm, "alpha", "bravo", getInOneHour(), false)
 	testSessionRole(t, rm, "alpha", "charlie", getInOneHour(), false)
@@ -89,8 +89,8 @@ func TestDeleteLink(t *testing.T) {
 	alpha := "alpha"
 	bravo := "bravo"
 	charlie := "charlie"
-	rm.AddLink(alpha, bravo, getOneHoureAgo(), getInOneHour())
-	rm.AddLink(alpha, charlie, getOneHoureAgo(), getInOneHour())
+	rm.AddLink(alpha, bravo, getOneHourAgo(), getInOneHour())
+	rm.AddLink(alpha, charlie, getOneHourAgo(), getInOneHour())
 
 	rm.DeleteLink(alpha, bravo)
 	if rm.HasLink(alpha, bravo, getCurrentTime()) {
@@ -108,8 +108,8 @@ func TestDeleteLink(t *testing.T) {
 func TestHierarchieLevel(t *testing.T) {
 	rm := NewSessionRoleManager(2)
 
-	rm.AddLink("alpha", "bravo", getOneHoureAgo(), getInOneHour())
-	rm.AddLink("bravo", "charlie", getOneHoureAgo(), getInOneHour())
+	rm.AddLink("alpha", "bravo", getOneHourAgo(), getInOneHour())
+	rm.AddLink("bravo", "charlie", getOneHourAgo(), getInOneHour())
 	if rm.HasLink("alpha", "charlie", getCurrentTime()) {
 		t.Error("Role manager should not have link alpha < charlie")
 	}
@@ -118,13 +118,13 @@ func TestHierarchieLevel(t *testing.T) {
 func TestOutdatedSessions(t *testing.T) {
 	rm := NewSessionRoleManager(3)
 
-	rm.AddLink("alpha", "bravo", getOneHoureAgo(), getCurrentTime())
-	rm.AddLink("bravo", "charlie", getOneHoureAgo(), getInOneHour())
+	rm.AddLink("alpha", "bravo", getOneHourAgo(), getCurrentTime())
+	rm.AddLink("bravo", "charlie", getOneHourAgo(), getInOneHour())
 
 	if rm.HasLink("alpha", "bravo", getInOneHour()) {
 		t.Error("Role manager should not have link alpha < bravo")
 	}
-	if !rm.HasLink("alpha", "charlie", getOneHoureAgo()) {
+	if !rm.HasLink("alpha", "charlie", getOneHourAgo()) {
 		t.Error("Role manager should have link alpha < charlie")
 	}
 }
@@ -140,21 +140,21 @@ func TestGetRoles(t *testing.T) {
 		t.Error("bravo should not exist")
 	}
 
-	rm.AddLink("alpha", "bravo", getOneHoureAgo(), getInOneHour())
+	rm.AddLink("alpha", "bravo", getOneHourAgo(), getInOneHour())
 
-	testPrintSessionRoles(t, rm, "alpha", getOneHoureAgo(), []string{"bravo"})
+	testPrintSessionRoles(t, rm, "alpha", getOneHourAgo(), []string{"bravo"})
 	testPrintSessionRoles(t, rm, "alpha", getCurrentTime(), []string{"bravo"})
 	testPrintSessionRoles(t, rm, "alpha", getInOneHour(), []string{})
 
-	rm.AddLink("alpha", "charlie", getOneHoureAgo(), getCurrentTime())
+	rm.AddLink("alpha", "charlie", getOneHourAgo(), getCurrentTime())
 
-	testPrintSessionRoles(t, rm, "alpha", getOneHoureAgo(), []string{"bravo", "charlie"})
+	testPrintSessionRoles(t, rm, "alpha", getOneHourAgo(), []string{"bravo", "charlie"})
 	testPrintSessionRoles(t, rm, "alpha", getCurrentTime(), []string{"bravo"})
 	testPrintSessionRoles(t, rm, "alpha", getInOneHour(), []string{})
 
-	rm.AddLink("alpha", "charlie", getOneHoureAgo(), getInOneHour())
+	rm.AddLink("alpha", "charlie", getOneHourAgo(), getInOneHour())
 
-	testPrintSessionRoles(t, rm, "alpha", getOneHoureAgo(), []string{"bravo", "charlie"})
+	testPrintSessionRoles(t, rm, "alpha", getOneHourAgo(), []string{"bravo", "charlie"})
 	testPrintSessionRoles(t, rm, "alpha", getCurrentTime(), []string{"bravo", "charlie"})
 	testPrintSessionRoles(t, rm, "alpha", getInOneHour(), []string{})
 }
@@ -162,9 +162,9 @@ func TestGetRoles(t *testing.T) {
 func TestGetUsers(t *testing.T) {
 	rm := NewSessionRoleManager(3)
 
-	rm.AddLink("bravo", "alpha", getOneHoureAgo(), getInOneHour())
-	rm.AddLink("charlie", "alpha", getOneHoureAgo(), getInOneHour())
-	rm.AddLink("delta", "alpha", getOneHoureAgo(), getInOneHour())
+	rm.AddLink("bravo", "alpha", getOneHourAgo(), getInOneHour())
+	rm.AddLink("charlie", "alpha", getOneHourAgo(), getInOneHour())
+	rm.AddLink("delta", "alpha", getOneHourAgo(), getInOneHour())
 
 	myRes := rm.GetUsers("alpha")
 	if myRes != nil {
@@ -176,7 +176,7 @@ func TestGetUsers(t *testing.T) {
 		t.Errorf("Alpha should have the using roles [bravo charlie delta] but has %s", myRes)
 	}
 
-	myRes = rm.GetUsers("alpha", getOneHoureAgo())
+	myRes = rm.GetUsers("alpha", getOneHourAgo())
 	if !util.ArrayEquals(myRes, []string{"bravo", "charlie", "delta"}) {
 		t.Errorf("Alpha should have the using roles [bravo charlie delta] but has %s", myRes)
 	}
@@ -214,7 +214,7 @@ func getCurrentTime() string {
 	return strconv.FormatInt(time.Now().UnixNano(), 10)
 }
 
-func getOneHoureAgo() string {
+func getOneHourAgo() string {
 	return strconv.FormatInt(time.Now().UnixNano()-60*60*100000000000, 10)
 }
 
