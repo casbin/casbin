@@ -54,12 +54,12 @@ func (rm *sessionRoleManager) createRole(name string) *SessionRole {
 	return rm.allRoles[name]
 }
 
-func (rm *sessionRoleManager) AddLink(name1 string, name2 string, domain ...string) {
-	if len(domain) != 2 {
+func (rm *sessionRoleManager) AddLink(name1 string, name2 string, timeRange ...string) {
+	if len(timeRange) != 2 {
 		return
 	}
-	startTime := domain[0]
-	endTime := domain[1]
+	startTime := timeRange[0]
+	endTime := timeRange[1]
 
 	role1 := rm.createRole(name1)
 	role2 := rm.createRole(name2)
@@ -68,7 +68,7 @@ func (rm *sessionRoleManager) AddLink(name1 string, name2 string, domain ...stri
 	role1.addSession(session)
 }
 
-func (rm *sessionRoleManager) DeleteLink(name1 string, name2 string, domain ...string) {
+func (rm *sessionRoleManager) DeleteLink(name1 string, name2 string, unused ...string) {
 	if !rm.hasRole(name1) || !rm.hasRole(name2) {
 		return
 	}
@@ -96,11 +96,11 @@ func (rm *sessionRoleManager) HasLink(name1 string, name2 string, requestTime ..
 	return role1.hasValidSession(name2, rm.maxHierarchyLevel, requestTime[0])
 }
 
-func (rm *sessionRoleManager) GetRoles(name string, domain ...string) []string {
-	if len(domain) != 1 {
+func (rm *sessionRoleManager) GetRoles(name string, currentTime ...string) []string {
+	if len(currentTime) != 1 {
 		return nil
 	}
-	requestTime := domain[0]
+	requestTime := currentTime[0]
 
 	if !rm.hasRole(name) {
 		return nil
@@ -110,11 +110,11 @@ func (rm *sessionRoleManager) GetRoles(name string, domain ...string) []string {
 	return sessionRoles
 }
 
-func (rm *sessionRoleManager) GetUsers(name string, domain ...string) []string {
-	if len(domain) != 1 {
+func (rm *sessionRoleManager) GetUsers(name string, currentTime ...string) []string {
+	if len(currentTime) != 1 {
 		return nil
 	}
-	requestTime := domain[0]
+	requestTime := currentTime[0]
 
 	users := []string{}
 	for _, role := range rm.allRoles {
