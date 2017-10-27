@@ -208,22 +208,30 @@ RESTful | [keymatch_model.conf](https://github.com/casbin/casbin/blob/master/exa
 Deny-override | [rbac_model_with_deny.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_model_with_deny.conf)  | [rbac_policy_with_deny.csv](https://github.com/casbin/casbin/blob/master/examples/rbac_policy_with_deny.csv)
 Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/examples/priority_model.conf)  | [priority_policy.csv](https://github.com/casbin/casbin/blob/master/examples/priority_policy.csv)
 
-## RoleManager
+## Role manager
 
-To use a custom RoleManager implementation.
+We support different implementations of a RBAC role manager. The currently supported adapters are:
+
+Role manager | Description
+----|----
+[Default role manager](https://github.com/casbin/casbin/blob/master/rbac/default_role_manager.go) | Supports role hierarchy
+[Session role manager](https://github.com/casbin/casbin/blob/master/rbac/session_role_manager.go) | Supports role hierarchy, time-range-based sessions
+
+For developers: all role managers must implement the [RoleManager](https://github.com/casbin/casbin/blob/master/rbac/role_manager.go) interface.
+
+To use a custom role manager implementation:
 
 ```go
+type myCustomRoleManager struct {} // assumes the type satisfies the RoleManager interface
 
-    type myCustomRoleManager struct {} // assumes the type satisfies the RoleManager interface
+func newRoleManager() rbac.RoleManagerConstructor {
+	return func() rbac.RoleManager {
+		return &myCustomRoleManager{}
+	}
+}
 
-    func newRoleManager() rbac.RoleManagerConstructor {
-        return func() rbac.RoleManager {
-            return &myCustomRoleManager{}
-        }
-    }
-
-    e := casbin.NewEnforcer("path/to/model.conf", "path/to/policy.csv")
-    e.SetRoleManager(newRoleManager())
+e := casbin.NewEnforcer("path/to/model.conf", "path/to/policy.csv")
+e.SetRoleManager(newRoleManager())
 ```
 
 ## How to use Casbin as a service?
