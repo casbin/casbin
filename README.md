@@ -26,12 +26,14 @@ If you want to easily add authentication and authorization to your Go projects, 
 - [How it works?](#how-it-works)
 - [Features](#features)
 - [Installation](#installation)
-- [Get started](#get-started)
 - [Documentation](#documentation)
+- [Get started](#get-started)
+- [Policy management](#policy-management)
 - [Policy persistence](#policy-persistence)
+- [Role manager](#role-manager)
+- [Multi-threading](#multi-threading)
 - [Benchmarks](#benchmarks)
 - [Examples](#examples)
-- [RoleManager](#rolemanager)
 - [How to use Casbin as a service?](#how-to-use-casbin-as-a-service)
 - [Our adopters](#our-adopters)
 
@@ -106,6 +108,10 @@ What Casbin does NOT do:
 go get github.com/casbin/casbin
 ```
 
+## Documentation
+
+See: [Our Wiki](https://github.com/casbin/casbin/wiki)
+
 ## Get started
 
 1. New a Casbin enforcer with a model file and a policy file:
@@ -139,10 +145,6 @@ Note: you can also initialize an enforcer with policy in DB instead of file, see
 See [Policy management APIs](#policy-management) for more usage.
 
 4. Please refer to the ``_test.go`` files for more usage.
-
-## Documentation
-
-See: [Our Wiki](https://github.com/casbin/casbin/wiki)
 
 ## Policy management
 
