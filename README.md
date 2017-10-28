@@ -199,6 +199,12 @@ e := casbin.NewEnforcer("path/to/model.conf", "path/to/policy.csv")
 e.SetRoleManager(newRoleManager())
 ```
 
+## Multi-threading
+
+If you use Casbin in a multi-threading manner, you can use the synchronized wrapper of the Casbin enforcer: https://github.com/casbin/casbin/blob/master/enforcer_synced.go.
+
+It also supports the ``AutoLoad`` feature, which means the Casbin enforcer will automatically load the latest policy rules from DB if it has changed. Call ``StartAutoLoadPolicy()`` to start automatically loading policy periodically and call ``StopAutoLoadPolicy()`` to stop it.
+
 ## Benchmarks
 
 The overhead of policy enforcement is benchmarked in [model_b_test.go](https://github.com/casbin/casbin/blob/master/model_b_test.go). The testbed is:
