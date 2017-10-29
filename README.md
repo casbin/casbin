@@ -30,6 +30,7 @@ If you want to easily add authentication and authorization to your Go projects, 
 - [Get started](#get-started)
 - [Policy management](#policy-management)
 - [Policy persistence](#policy-persistence)
+- [Policy consistence between multiple nodes](#policy-consistence-between-multiple-nodes)
 - [Role manager](#role-manager)
 - [Multi-threading](#multi-threading)
 - [Benchmarks](#benchmarks)
@@ -179,6 +180,10 @@ Adapter | Type | Author | Description
 [RethinkDB Adapter](https://github.com/adityapandey9/rethinkdb-adapter) | NoSQL | [@adityapandey9](https://github.com/adityapandey9) | Persistence for [RethinkDB](https://rethinkdb.com/)
 
 For details of adapters, please refer to the documentation: https://github.com/casbin/casbin/wiki/Policy-persistence
+
+## Policy consistence between multiple nodes
+
+We support to use [etcd](https://github.com/coreos/etcd) to keep consistence between multiple Casbin enforcer instances. Please see: https://github.com/casbin/etcd-watcher 
 
 ## Role manager
 
