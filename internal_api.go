@@ -23,6 +23,10 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) bool {
 			err := e.adapter.AddPolicy(sec, ptype, rule)
 			if err != nil && err.Error() != "not implemented" {
 				panic(err)
+			} else if err == nil {
+				if e.watcher != nil {
+					e.watcher.Update()
+				}
 			}
 		}
 	}
@@ -39,6 +43,10 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) bool {
 			err := e.adapter.RemovePolicy(sec, ptype, rule)
 			if err != nil && err.Error() != "not implemented" {
 				panic(err)
+			} else if err == nil {
+				if e.watcher != nil {
+					e.watcher.Update()
+				}
 			}
 		}
 	}
@@ -55,6 +63,10 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 			err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
 			if err != nil && err.Error() != "not implemented" {
 				panic(err)
+			} else if err == nil {
+				if e.watcher != nil {
+					e.watcher.Update()
+				}
 			}
 		}
 	}

@@ -44,6 +44,7 @@ type Enforcer struct {
 	rmc       rbac.RoleManagerConstructor
 
 	adapter persist.Adapter
+	watcher persist.Watcher
 
 	enabled  bool
 	autoSave bool
@@ -102,6 +103,7 @@ func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 	e.modelPath = modelPath
 
 	e.adapter = fileadapter.NewAdapter(policyPath)
+	e.watcher = nil
 
 	e.enabled = true
 	e.autoSave = true
@@ -118,6 +120,7 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 	e.modelPath = modelPath
 
 	e.adapter = adapter
+	e.watcher = nil
 
 	e.enabled = true
 	e.autoSave = true
@@ -133,6 +136,7 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) {
 	e.modelPath = ""
 	e.adapter = adapter
+	e.watcher = nil
 
 	e.model = m
 	e.model.PrintModel()
@@ -189,6 +193,12 @@ func (e *Enforcer) SetAdapter(adapter persist.Adapter) {
 	e.adapter = adapter
 }
 
+// SetWatcher sets the current watcher.
+func (e *Enforcer) SetWatcher(watcher persist.Watcher) {
+	e.watcher = watcher
+	watcher.SetUpdateCallback(func (string) {e.LoadPolicy()})
+}
+
 // SetRoleManager sets the constructor function for creating a RoleManager.
 func (e *Enforcer) SetRoleManager(rmc rbac.RoleManagerConstructor) {
 	e.rmc = rmc
@@ -216,7 +226,13 @@ func (e *Enforcer) LoadPolicy() error {
 
 // SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() error {
-	return e.adapter.SavePolicy(e.model)
+	err := e.adapter.SavePolicy(e.model)
+	if err == nil {
+		if e.watcher != nil {
+			e.watcher.Update()
+		}
+	}
+	return err
 }
 
 // EnableEnforce changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
