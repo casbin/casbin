@@ -261,6 +261,7 @@ Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/ex
 
 - [Go-Simple-API-Gateway](https://github.com/Soontao/go-simple-api-gateway): A simple API gateway written by golang, supports for authentication and authorization
 - [Casbin Server](https://github.com/casbin/casbin-server): Casbin as a Service via RESTful, only exposed permission checking API
+- [middleware-acl](https://github.com/luk4z7/middleware-acl): RESTful access control middleware based on Casbin
 
 ## Our adopters
 
