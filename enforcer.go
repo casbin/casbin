@@ -105,9 +105,7 @@ func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 	e.adapter = fileadapter.NewAdapter(policyPath)
 	e.watcher = nil
 
-	e.enabled = true
-	e.autoSave = true
-	e.autoBuildRoleLinks = true
+	e.initialize()
 
 	if e.modelPath != "" {
 		e.LoadModel()
@@ -122,9 +120,7 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 	e.adapter = adapter
 	e.watcher = nil
 
-	e.enabled = true
-	e.autoSave = true
-	e.autoBuildRoleLinks = true
+	e.initialize()
 
 	if e.modelPath != "" {
 		e.LoadModel()
@@ -142,13 +138,17 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 	e.model.PrintModel()
 	e.fm = model.LoadFunctionMap()
 
-	e.enabled = true
-	e.autoSave = true
-	e.autoBuildRoleLinks = true
+	e.initialize()
 
 	if e.adapter != nil {
 		e.LoadPolicy()
 	}
+}
+
+func (e *Enforcer) initialize() {
+	e.enabled = true
+	e.autoSave = true
+	e.autoBuildRoleLinks = true
 }
 
 // NewModel creates a model.
