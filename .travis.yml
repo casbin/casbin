@@ -3,7 +3,7 @@ language: go
 sudo: false
 
 go:
-  - tip
+  - 1.9
 
 before_install:
   - go get github.com/mattn/goveralls
