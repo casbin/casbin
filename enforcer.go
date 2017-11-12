@@ -15,10 +15,12 @@
 package casbin
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
 	"github.com/Knetic/govaluate"
+	"github.com/casbin/casbin/cache"
 	"github.com/casbin/casbin/file-adapter"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
@@ -42,6 +44,7 @@ type Enforcer struct {
 	model     model.Model
 	fm        model.FunctionMap
 	rmc       rbac.RoleManagerConstructor
+	cache     *cache.LRU
 
 	adapter persist.Adapter
 	watcher persist.Watcher
@@ -149,6 +152,12 @@ func (e *Enforcer) initialize() {
 	e.enabled = true
 	e.autoSave = true
 	e.autoBuildRoleLinks = true
+
+	cache, err := cache.NewLRU(128, nil)
+	if err != nil {
+		panic(err)
+	}
+	e.cache = cache
 }
 
 // NewModel creates a model.
@@ -302,7 +311,17 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 			}
 		}
 	}
-	expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+
+	if e.cache.Contains(expString) {
+		tmp, ok := e.cache.Get(expString)
+		if !ok {
+			panic(errors.New("lru cache error"))
+		}
+		expression = tmp.(*govaluate.EvaluableExpression)
+	} else {
+		expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+		e.cache.Add(expString, expression)
+	}
 
 	var policyResults []Effect
 	if len(e.model["p"]["p"].Policy) != 0 {
