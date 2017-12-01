@@ -28,6 +28,26 @@ func TestGetAndSetModel(t *testing.T) {
 	e.SetModel(model)
 }
 
+func TestGetAndSetAdapter(t *testing.T) {
+	m := NewModel()
+	m.AddDef("r", "r", "sub, obj, act")
+	m.AddDef("p", "p", "sub, obj, act")
+	m.AddDef("e", "e", "some(where (p.eft == allow))")
+	m.AddDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)")
+
+	a := fileadapter.NewAdapter("examples/keymatch_policy.csv")
+
+	e := NewEnforcer(m)
+
+	e.SetAdapter(a)
+	a2 := e.GetAdapter()
+	e.SetAdapter(a2)
+
+	e.LoadPolicy()
+
+	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
+}
+
 func TestKeyMatchModelInMemory(t *testing.T) {
 	m := NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
@@ -85,6 +105,35 @@ func TestKeyMatchModelInMemory(t *testing.T) {
 	testEnforce(t, e, "cathy", "/cathy_data", "GET", true)
 	testEnforce(t, e, "cathy", "/cathy_data", "POST", true)
 	testEnforce(t, e, "cathy", "/cathy_data", "DELETE", false)
+}
+
+func TestKeyMatchModelInMemoryDeny(t *testing.T) {
+	m := NewModel()
+	m.AddDef("r", "r", "sub, obj, act")
+	m.AddDef("p", "p", "sub, obj, act")
+	m.AddDef("e", "e", "!some(where (p.eft == deny))")
+	m.AddDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)")
+
+	a := fileadapter.NewAdapter("examples/keymatch_policy.csv")
+
+	e := NewEnforcer(m, a)
+
+	testEnforce(t, e, "alice", "/alice_data/resource2", "POST", true)
+}
+
+func TestRBACModelInMemoryIndetermine(t *testing.T) {
+	m := NewModel()
+	m.AddDef("r", "r", "sub, obj, act")
+	m.AddDef("p", "p", "sub, obj, act")
+	m.AddDef("g", "g", "_, _")
+	m.AddDef("e", "e", "some(where (p.eft == allow))")
+	m.AddDef("m", "m", "g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act")
+
+	e := NewEnforcer(m)
+
+	e.AddPermissionForUser("alice", "data1", "invalid")
+
+	testEnforce(t, e, "alice", "data1", "read", false)
 }
 
 func TestRBACModelInMemory(t *testing.T) {
@@ -188,6 +237,12 @@ func TestSavePolicy(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	e.SavePolicy()
+}
+
+func TestClearPolicy(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	e.ClearPolicy()
 }
 
 func TestEnableEnforce(t *testing.T) {
@@ -307,4 +362,31 @@ func TestSync(t *testing.T) {
 
 	// Stop the reloading policy periodically.
 	e.StopAutoLoadPolicy()
+}
+
+type SampleWatcher struct {
+}
+
+func (w SampleWatcher) SetUpdateCallback(func(string)) error {
+	return nil
+}
+
+func (w SampleWatcher) Update() error {
+	return nil
+}
+
+func TestSetWatcher(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	sampleWatcher := SampleWatcher{}
+	e.SetWatcher(sampleWatcher)
+
+	e.SavePolicy() //calls watcher.Update()
+}
+
+func TestRoleLinks(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model.conf")
+	e.EnableAutoBuildRoleLinks(false)
+	e.BuildRoleLinks()
+	e.Enforce("user501", "data9", "read")
 }

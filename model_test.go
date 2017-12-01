@@ -17,6 +17,7 @@ package casbin
 import (
 	"testing"
 
+	"github.com/casbin/casbin/file-adapter"
 	"github.com/casbin/casbin/rbac"
 )
 
@@ -210,6 +211,27 @@ func TestRBACModelWithDomainsAtRuntime(t *testing.T) {
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
 }
 
+func TestRBACModelWithDomainsAtRuntimeMockAdapter(t *testing.T) {
+	adapter := fileadapter.NewAdapterMock("examples/rbac_policy_with_domains.csv")
+	e := NewEnforcer("examples/rbac_model_with_domains.conf", adapter)
+
+	sampleWatcher := SampleWatcher{}
+	e.SetWatcher(sampleWatcher)
+
+	e.AddPolicy("admin", "domain3", "data1", "read")
+	e.AddGroupingPolicy("alice", "admin", "domain3")
+
+	testDomainEnforce(t, e, "alice", "domain3", "data1", "read", true)
+
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
+	e.RemoveFilteredPolicy(1, "domain1", "data1")
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", false)
+
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
+	e.RemovePolicy("admin", "domain2", "data2", "read")
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", false)
+}
+
 func TestRBACModelWithDeny(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model_with_deny.conf", "examples/rbac_policy_with_deny.csv")
 
@@ -221,6 +243,12 @@ func TestRBACModelWithDeny(t *testing.T) {
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", false)
 	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
+func TestRBACModelWithNotDeny(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model_with_not_deny.conf", "examples/rbac_policy_with_deny.csv")
+
+	testEnforce(t, e, "alice", "data2", "write", false)
 }
 
 func TestRBACModelWithCustomData(t *testing.T) {
@@ -362,6 +390,26 @@ func TestKeyMatch2Model(t *testing.T) {
 	testEnforce(t, e, "alice", "/alice_data2/myid/using/res_id", "GET", true)
 }
 
+func KeyMatchCustom(args ...interface{}) (interface{}, error) {
+	match := false
+	if args[0].(string) == "/alice_data2/myid/using/res_id" && args[1].(string) == "/alice_data/:resource" {
+		match = true
+	}
+	if args[0].(string) == "/alice_data2/myid/using/res_id" && args[1].(string) == "/alice_data2/:id/using/:resId" {
+		match = true
+	}
+	return match, nil
+}
+
+func TestKeyMatchCustomModel(t *testing.T) {
+	e := NewEnforcer("examples/keymatch_custom_model.conf", "examples/keymatch2_policy.csv")
+
+	e.AddFunction("keyMatchCustom", KeyMatchCustom)
+
+	testEnforce(t, e, "alice", "/alice_data2/myid", "GET", false)
+	testEnforce(t, e, "alice", "/alice_data2/myid/using/res_id", "GET", true)
+}
+
 func TestIPMatchModel(t *testing.T) {
 	e := NewEnforcer("examples/ipmatch_model.conf", "examples/ipmatch_policy.csv")
 
@@ -397,4 +445,10 @@ func TestPriorityModel(t *testing.T) {
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", true)
 	testEnforce(t, e, "bob", "data2", "write", false)
+}
+
+func TestPriorityModelIndeterminate(t *testing.T) {
+	e := NewEnforcer("examples/priority_model.conf", "examples/priority_policy_indetermine.csv")
+
+	testEnforce(t, e, "alice", "data1", "read", false)
 }
