@@ -121,7 +121,7 @@ func TestKeyMatchModelInMemoryDeny(t *testing.T) {
 	testEnforce(t, e, "alice", "/alice_data/resource2", "POST", true)
 }
 
-func TestRBACModelInMemoryIndetermine(t *testing.T) {
+func TestRBACModelInMemoryIndeterminate(t *testing.T) {
 	m := NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")

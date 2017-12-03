@@ -448,7 +448,7 @@ func TestPriorityModel(t *testing.T) {
 }
 
 func TestPriorityModelIndeterminate(t *testing.T) {
-	e := NewEnforcer("examples/priority_model.conf", "examples/priority_policy_indetermine.csv")
+	e := NewEnforcer("examples/priority_model.conf", "examples/priority_policy_indeterminate.csv")
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 }
