@@ -100,6 +100,16 @@ func testHasGroupingPolicy(t *testing.T, e *Enforcer, policy []string, res bool)
 	}
 }
 
+func testHasGroupingPolicyStringInput(t *testing.T, e *Enforcer, policy1 string, policy2 string, res bool) {
+	t.Helper()
+	myRes := e.HasGroupingPolicy(policy1, policy2)
+	log.Print("Has grouping policy ", policy1, policy2, ": ", myRes)
+
+	if res != myRes {
+		t.Error("Has grouping policy ", policy1, policy2, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func TestGetPolicy(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
@@ -139,6 +149,9 @@ func TestGetPolicy(t *testing.T) {
 
 	testHasGroupingPolicy(t, e, []string{"alice", "data2_admin"}, true)
 	testHasGroupingPolicy(t, e, []string{"bob", "data2_admin"}, false)
+
+	testHasGroupingPolicyStringInput(t, e, "alice", "data2_admin", true)
+	testHasGroupingPolicyStringInput(t, e, "bob", "data2_admin", false)
 }
 
 func TestModifyPolicy(t *testing.T) {
@@ -155,6 +168,10 @@ func TestModifyPolicy(t *testing.T) {
 	e.RemovePolicy("alice", "data1", "read")
 	e.AddPolicy("eve", "data3", "read")
 	e.AddPolicy("eve", "data3", "read")
+
+	namedPolicy := []string{"eve", "data3", "read"}
+	e.RemoveNamedPolicy("p", namedPolicy)
+	e.AddNamedPolicy("p", namedPolicy)
 
 	testGetPolicy(t, e, [][]string{
 		{"data2_admin", "data2", "read"},
@@ -177,6 +194,12 @@ func TestModifyGroupingPolicy(t *testing.T) {
 	e.RemoveGroupingPolicy("alice", "data2_admin")
 	e.AddGroupingPolicy("bob", "data1_admin")
 	e.AddGroupingPolicy("eve", "data3_admin")
+
+	namedGroupingPolicy := []string{"alice", "data2_admin"}
+	testGetRoles(t, e, "alice", []string{})
+	e.AddNamedGroupingPolicy("g", namedGroupingPolicy)
+	testGetRoles(t, e, "alice", []string{"data2_admin"})
+	e.RemoveNamedGroupingPolicy("g", namedGroupingPolicy)
 
 	testGetRoles(t, e, "alice", []string{})
 	testGetRoles(t, e, "bob", []string{"data1_admin"})

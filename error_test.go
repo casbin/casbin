@@ -16,6 +16,7 @@ package casbin
 
 import (
 	"fmt"
+	"github.com/casbin/casbin/file-adapter"
 	"testing"
 )
 
@@ -29,10 +30,28 @@ func TestPathError(t *testing.T) {
 	}
 }
 
+func TestEnforcerParamError(t *testing.T) {
+	_, err := NewEnforcerSafe(1, 2, 3)
+	if err == nil {
+		t.Errorf("Should not be error here.")
+	} else {
+		fmt.Print("Test on error: ")
+		fmt.Print(err.Error())
+	}
+
+	_, err2 := NewEnforcerSafe(1, "2")
+	if err2 == nil {
+		t.Errorf("Should not be error here.")
+	} else {
+		fmt.Print("Test on error: ")
+		fmt.Print(err2.Error())
+	}
+}
+
 func TestModelError(t *testing.T) {
 	_, err := NewEnforcerSafe("examples/error/error_model.conf", "examples/error/error_policy.csv")
 	if err == nil {
-		t.Errorf("Should be error here.")
+		t.Errorf("Should not be an error here.")
 	} else {
 		fmt.Print("Test on error: ")
 		fmt.Print(err.Error())
@@ -83,5 +102,53 @@ func TestNoError(t *testing.T) {
 		t.Errorf("Should be no error here.")
 		fmt.Print("Unexpected error: ")
 		fmt.Print(err.Error())
+	}
+}
+
+func TestModelNoError(t *testing.T) {
+	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+
+	e.modelPath = "hope_this_path_wont_exist"
+	err := e.LoadModelSafe()
+
+	if err == nil {
+		t.Errorf("Should not be an error here.")
+	} else {
+		fmt.Print("Test on error: ")
+		fmt.Print(err.Error())
+	}
+}
+
+func TestMockAdapterErrors(t *testing.T) {
+	adapter := fileadapter.NewAdapterMock("examples/rbac_policy_with_domains.csv")
+	adapter.SetMockErr("mock error")
+
+	e, _ := NewEnforcerSafe("examples/rbac_model_with_domains.conf", adapter)
+
+	_, err := e.AddPolicySafe("admin", "domain3", "data1", "read")
+
+	if err == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		fmt.Print("Test on error: ")
+		fmt.Print(err.Error())
+	}
+
+	_, err2 := e.RemoveFilteredPolicySafe(1, "domain1", "data1")
+
+	if err2 == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		fmt.Print("Test on error: ")
+		fmt.Print(err2.Error())
+	}
+
+	_, err3 := e.RemovePolicySafe("admin", "domain2", "data2", "read")
+
+	if err3 == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		fmt.Print("Test on error: ")
+		fmt.Print(err3.Error())
 	}
 }

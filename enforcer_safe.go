@@ -14,21 +14,16 @@
 
 package casbin
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 // NewEnforcerSafe calls NewEnforcer in a safe way, returns error instead of causing panic.
 func NewEnforcerSafe(params ...interface{}) (e *Enforcer, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			switch x := r.(type) {
-			case string:
-				err = errors.New(x)
-			case error:
-				err = x
-			default:
-				err = errors.New("Unknown panic")
-			}
-
+			err = errors.New(fmt.Sprintf("%v",r))
 			e = nil
 		}
 	}()
@@ -42,14 +37,7 @@ func NewEnforcerSafe(params ...interface{}) (e *Enforcer, err error) {
 func (e *Enforcer) LoadModelSafe() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			switch x := r.(type) {
-			case string:
-				err = errors.New(x)
-			case error:
-				err = x
-			default:
-				err = errors.New("Unknown panic")
-			}
+			err = errors.New(fmt.Sprintf("%v",r))
 		}
 	}()
 
@@ -62,20 +50,51 @@ func (e *Enforcer) LoadModelSafe() (err error) {
 func (e *Enforcer) EnforceSafe(rvals ...interface{}) (result bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			switch x := r.(type) {
-			case string:
-				err = errors.New(x)
-			case error:
-				err = x
-			default:
-				err = errors.New("Unknown panic")
-			}
-
+			err = errors.New(fmt.Sprintf("%v",r))
 			result = false
 		}
 	}()
 
 	result = e.Enforce(rvals...)
+	err = nil
+	return
+}
+
+func (e *Enforcer) AddPolicySafe(params ...interface{}) (result bool, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprintf("%v",r))
+			result = false
+		}
+	}()
+
+	result = e.AddNamedPolicy("p", params...)
+	err = nil
+	return
+}
+
+func (e *Enforcer) RemovePolicySafe(params ...interface{}) (result bool, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprintf("%v",r))
+			result = false
+		}
+	}()
+
+	result = e.RemoveNamedPolicy("p", params...)
+	err = nil
+	return
+}
+
+func (e *Enforcer) RemoveFilteredPolicySafe(fieldIndex int, fieldValues ...string) (result bool, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprintf("%v",r))
+			result = false
+		}
+	}()
+
+	result = e.RemoveFilteredNamedPolicy("p", fieldIndex, fieldValues...)
 	err = nil
 	return
 }
