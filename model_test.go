@@ -215,9 +215,6 @@ func TestRBACModelWithDomainsAtRuntimeMockAdapter(t *testing.T) {
 	adapter := fileadapter.NewAdapterMock("examples/rbac_policy_with_domains.csv")
 	e := NewEnforcer("examples/rbac_model_with_domains.conf", adapter)
 
-	sampleWatcher := SampleWatcher{}
-	e.SetWatcher(sampleWatcher)
-
 	e.AddPolicy("admin", "domain3", "data1", "read")
 	e.AddGroupingPolicy("alice", "admin", "domain3")
 

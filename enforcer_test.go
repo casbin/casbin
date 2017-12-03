@@ -364,26 +364,6 @@ func TestSync(t *testing.T) {
 	e.StopAutoLoadPolicy()
 }
 
-type SampleWatcher struct {
-}
-
-func (w SampleWatcher) SetUpdateCallback(func(string)) error {
-	return nil
-}
-
-func (w SampleWatcher) Update() error {
-	return nil
-}
-
-func TestSetWatcher(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
-
-	sampleWatcher := SampleWatcher{}
-	e.SetWatcher(sampleWatcher)
-
-	e.SavePolicy() //calls watcher.Update()
-}
-
 func TestRoleLinks(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf")
 	e.EnableAutoBuildRoleLinks(false)
