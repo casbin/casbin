@@ -245,7 +245,7 @@ func TestRBACModelWithDeny(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
-func TestRBACModelWithNotDeny(t *testing.T) {
+func TestRBACModelWithOnlyDeny(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model_with_not_deny.conf", "examples/rbac_policy_with_deny.csv")
 
 	testEnforce(t, e, "alice", "data2", "write", false)

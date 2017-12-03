@@ -52,7 +52,7 @@ func TestEnforcerParamError(t *testing.T) {
 func TestModelError(t *testing.T) {
 	_, err := NewEnforcerSafe("examples/error/error_model.conf", "examples/error/error_policy.csv")
 	if err == nil {
-		t.Errorf("Should not be an error here.")
+		t.Errorf("Should be error here.")
 	} else {
 		fmt.Print("Test on error: ")
 		fmt.Print(err.Error())
@@ -113,7 +113,7 @@ func TestModelNoError(t *testing.T) {
 	err := e.LoadModelSafe()
 
 	if err == nil {
-		t.Errorf("Should not be an error here.")
+		t.Errorf("Should be error here.")
 	} else {
 		fmt.Print("Test on error: ")
 		fmt.Print(err.Error())
