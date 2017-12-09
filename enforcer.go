@@ -179,8 +179,9 @@ func (e *Enforcer) GetModel() model.Model {
 }
 
 // SetModel sets the current model.
-func (e *Enforcer) SetModel(model model.Model) {
-	e.model = model
+func (e *Enforcer) SetModel(m model.Model) {
+	e.model = m
+	e.fm = model.LoadFunctionMap()
 }
 
 // GetAdapter gets the current adapter.
