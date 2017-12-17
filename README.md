@@ -283,11 +283,11 @@ Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/ex
 
 ### Others
 
-- [Intel RMD](https://github.com/intel/rmd): Intel's resource management daemon, via direct integration
+- [Intel RMD](https://github.com/intel/rmd): Intel's resource management daemon, via direct integration, see: [policy rules](https://github.com/intel/rmd/blob/master/etc/rmd/acl/url/policy.csv)
 - [Docker](https://github.com/docker/docker): The world's leading software container platform, via plugin: [casbin-authz-plugin](https://github.com/casbin/casbin-authz-plugin) ([recommended by Docker](https://docs.docker.com/engine/extend/legacy_plugins/#authorization-plugins))
 - [Gobis](https://github.com/orange-cloudfoundry/gobis): [Orange](https://github.com/orange-cloudfoundry)'s lightweight API Gateway written in go, via plugin: [casbin](https://github.com/orange-cloudfoundry/gobis-middlewares/tree/master/casbin)
 - [Zenpress](https://github.com/insionng/zenpress): A CMS system written in Golang, via direct integration
-- [EngineerCMS](https://github.com/3xxx/EngineerCMS): A CMS to manage knowledge for engineers, via direct integration
+- [EngineerCMS](https://github.com/3xxx/EngineerCMS): A CMS to manage knowledge for engineers, via direct integration, see: [policy rules (in SQLite)](https://github.com/3xxx/EngineerCMS/blob/master/database/engineer.db)
 
 ## License
 
