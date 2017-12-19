@@ -21,33 +21,6 @@ import (
 	"github.com/casbin/casbin/file-adapter"
 )
 
-func TestGetAndSetModel(t *testing.T) {
-	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-
-	model := e.GetModel()
-	e.SetModel(model)
-}
-
-func TestGetAndSetAdapter(t *testing.T) {
-	m := NewModel()
-	m.AddDef("r", "r", "sub, obj, act")
-	m.AddDef("p", "p", "sub, obj, act")
-	m.AddDef("e", "e", "some(where (p.eft == allow))")
-	m.AddDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)")
-
-	a := fileadapter.NewAdapter("examples/keymatch_policy.csv")
-
-	e := NewEnforcer(m)
-
-	e.SetAdapter(a)
-	a2 := e.GetAdapter()
-	e.SetAdapter(a2)
-
-	e.LoadPolicy()
-
-	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
-}
-
 func TestKeyMatchModelInMemory(t *testing.T) {
 	m := NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
@@ -369,4 +342,62 @@ func TestRoleLinks(t *testing.T) {
 	e.EnableAutoBuildRoleLinks(false)
 	e.BuildRoleLinks()
 	e.Enforce("user501", "data9", "read")
+}
+
+func TestGetAndSetModel(t *testing.T) {
+	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	e2 := NewEnforcer("examples/basic_model_with_root.conf", "examples/basic_policy.csv")
+
+	testEnforce(t, e, "root", "data1", "read", false)
+
+	e.SetModel(e2.GetModel())
+
+	testEnforce(t, e, "root", "data1", "read", true)
+}
+
+func TestGetAndSetAdapterInMem(t *testing.T) {
+
+	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	e2 := NewEnforcer("examples/basic_model.conf", "examples/basic_policy_inverse.csv")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+
+	a2 := e2.GetAdapter()
+	e.SetAdapter(a2)
+	e.LoadPolicy()
+
+	testEnforce(t, e, "alice", "data1", "read", false)
+	testEnforce(t, e, "alice", "data1", "write", true)
+}
+
+func TestSetAdapterFromFile(t *testing.T) {
+	e := NewEnforcer("examples/basic_model.conf")
+
+	testEnforce(t, e, "alice", "data1", "read", false)
+
+	a := fileadapter.NewAdapter("examples/basic_policy.csv")
+	e.SetAdapter(a)
+	e.LoadPolicy()
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+}
+
+func TestInitEmpty(t *testing.T) {
+
+	e := NewEnforcer()
+
+	m := NewModel()
+	m.AddDef("r", "r", "sub, obj, act")
+	m.AddDef("p", "p", "sub, obj, act")
+	m.AddDef("e", "e", "some(where (p.eft == allow))")
+	m.AddDef("m", "m", "r.sub == p.sub && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)")
+
+	a := fileadapter.NewAdapter("examples/keymatch_policy.csv")
+
+	e.SetModel(m)
+	e.SetAdapter(a)
+	e.LoadPolicy()
+
+	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
 }
