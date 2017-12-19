@@ -51,7 +51,12 @@ func (a *AdapterMock) SavePolicy(model model.Model) error {
 }
 
 func (a *AdapterMock) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
-	f, _ := os.Open(a.filePath)
+	f, err := os.Open(a.filePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
 	buf := bufio.NewReader(f)
 	for {
 		line, err := buf.ReadString('\n')
