@@ -83,6 +83,8 @@ func (a *Adapter) loadPolicyFile(model model.Model, handler func(string, model.M
 	if err != nil {
 		return err
 	}
+	defer f.Close()
+
 	buf := bufio.NewReader(f)
 	for {
 		line, err := buf.ReadString('\n')
