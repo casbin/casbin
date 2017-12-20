@@ -289,6 +289,7 @@ Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/ex
 - [Gobis](https://github.com/orange-cloudfoundry/gobis): [Orange](https://github.com/orange-cloudfoundry)'s lightweight API Gateway written in go, via plugin: [casbin](https://github.com/orange-cloudfoundry/gobis-middlewares/tree/master/casbin)
 - [Zenpress](https://github.com/insionng/zenpress): A CMS system written in Golang, via direct integration
 - [EngineerCMS](https://github.com/3xxx/EngineerCMS): A CMS to manage knowledge for engineers, via direct integration, see: [policy rules (in SQLite)](https://github.com/3xxx/EngineerCMS/blob/master/database/engineer.db)
+- [Cyber Auth API](https://github.com/CyberlifeCN/cyber-auth-api): A Golang authentication API project, via direct integration, see: [policy rules](https://github.com/CyberlifeCN/cyber-auth-api/blob/master/conf/authz_policy.csv)
 
 ## License
 
