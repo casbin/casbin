@@ -113,6 +113,12 @@ go get github.com/casbin/casbin
 
 See: [Our Wiki](https://github.com/casbin/casbin/wiki)
 
+### 3-rd party tutorials
+
+- [Basic Role-Based HTTP Authorization in Go with Casbin](https://zupzup.org/casbin-http-role-auth)
+- [Using Casbin with Beego: 1. Get started and test (in Chinese)](http://blog.csdn.net/hotqin888/article/details/78460385)
+- [Using Casbin with Beego: 2. Policy storage (in Chinese)](http://blog.csdn.net/hotqin888/article/details/78571240)
+
 ## Get started
 
 1. New a Casbin enforcer with a model file and a policy file:
