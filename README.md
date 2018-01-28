@@ -27,6 +27,7 @@ If you want to easily add authentication and authorization to your Go projects, 
 - [Features](#features)
 - [Installation](#installation)
 - [Documentation](#documentation)
+- [Tutorials](#tutorials)
 - [Get started](#get-started)
 - [Policy management](#policy-management)
 - [Policy persistence](#policy-persistence)
@@ -111,9 +112,9 @@ go get github.com/casbin/casbin
 
 ## Documentation
 
-See: [Our Wiki](https://github.com/casbin/casbin/wiki)
+For documentation, please see: [Our Wiki](https://github.com/casbin/casbin/wiki)
 
-### 3-rd party tutorials
+## Tutorials
 
 - [Basic Role-Based HTTP Authorization in Go with Casbin](https://zupzup.org/casbin-http-role-auth)
 - [Using Casbin with Beego: 1. Get started and test (in Chinese)](http://blog.csdn.net/hotqin888/article/details/78460385)
