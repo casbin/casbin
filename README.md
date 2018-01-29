@@ -292,12 +292,12 @@ Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/ex
 
 ### Others
 
-- [Intel RMD](https://github.com/intel/rmd): Intel's resource management daemon, via direct integration, see: [policy rules](https://github.com/intel/rmd/blob/master/etc/rmd/acl/url/policy.csv)
+- [Intel RMD](https://github.com/intel/rmd): Intel's resource management daemon, via direct integration, see: [model](https://github.com/intel/rmd/blob/master/etc/rmd/acl/url/model.conf), [policy rules](https://github.com/intel/rmd/blob/master/etc/rmd/acl/url/policy.csv)
 - [Docker](https://github.com/docker/docker): The world's leading software container platform, via plugin: [casbin-authz-plugin](https://github.com/casbin/casbin-authz-plugin) ([recommended by Docker](https://docs.docker.com/engine/extend/legacy_plugins/#authorization-plugins))
-- [Gobis](https://github.com/orange-cloudfoundry/gobis): [Orange](https://github.com/orange-cloudfoundry)'s lightweight API Gateway written in go, via plugin: [casbin](https://github.com/orange-cloudfoundry/gobis-middlewares/tree/master/casbin)
-- [Zenpress](https://github.com/insionng/zenpress): A CMS system written in Golang, via direct integration
-- [EngineerCMS](https://github.com/3xxx/EngineerCMS): A CMS to manage knowledge for engineers, via direct integration, see: [policy rules (in SQLite)](https://github.com/3xxx/EngineerCMS/blob/master/database/engineer.db)
-- [Cyber Auth API](https://github.com/CyberlifeCN/cyber-auth-api): A Golang authentication API project, via direct integration, see: [policy rules](https://github.com/CyberlifeCN/cyber-auth-api/blob/master/conf/authz_policy.csv)
+- [Gobis](https://github.com/orange-cloudfoundry/gobis): [Orange](https://github.com/orange-cloudfoundry)'s lightweight API Gateway written in go, via plugin: [casbin](https://github.com/orange-cloudfoundry/gobis-middlewares/tree/master/casbin), see [model (in text)](https://github.com/orange-cloudfoundry/gobis-middlewares/blob/master/casbin/model.go#L52-L65), [policy rules (from request)](https://github.com/orange-cloudfoundry/gobis-middlewares/blob/master/casbin/adapter.go#L46-L64)
+- [Zenpress](https://github.com/insionng/zenpress): A CMS system written in Golang, via direct integration, see: [model](https://github.com/insionng/zenpress/blob/master/content/config/rbac_model.conf), [policy rules (in Gorm)](https://github.com/insionng/zenpress/blob/master/model/user.go#L53-L77)
+- [EngineerCMS](https://github.com/3xxx/EngineerCMS): A CMS to manage knowledge for engineers, via direct integration, see: [model](https://github.com/3xxx/EngineerCMS/blob/master/conf/rbac_model.conf), [policy rules (in SQLite)](https://github.com/3xxx/EngineerCMS/blob/master/database/engineer.db)
+- [Cyber Auth API](https://github.com/CyberlifeCN/cyber-auth-api): A Golang authentication API project, via direct integration, see: [model](https://github.com/CyberlifeCN/cyber-auth-api/blob/master/conf/authz_model.conf), [policy rules](https://github.com/CyberlifeCN/cyber-auth-api/blob/master/conf/authz_policy.csv)
 - [IRIS Community](https://github.com/irisnet/iris-community): Website for IRIS Community Activities, via direct integration, see: [model](https://github.com/irisnet/iris-community/blob/master/authz/authz_model.conf), [policy rules](https://github.com/irisnet/iris-community/blob/master/authz/authz_policy.csv)
 
 ## License
