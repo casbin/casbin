@@ -18,6 +18,8 @@ import (
 	"log"
 	"sync"
 	"time"
+
+	"github.com/casbin/casbin/persist"
 )
 
 type SyncedEnforcer struct {
@@ -58,6 +60,19 @@ func (e *SyncedEnforcer) StopAutoLoadPolicy() {
 	e.autoLoad = false
 }
 
+// SetWatcher sets the current watcher.
+func (e *SyncedEnforcer) SetWatcher(watcher persist.Watcher) {
+	e.watcher = watcher
+	watcher.SetUpdateCallback(func (string) {e.LoadPolicy()})
+}
+
+// ClearPolicy clears all policy.
+func (e *SyncedEnforcer) ClearPolicy() {
+	e.m.Lock()
+	defer e.m.Unlock()
+	e.Enforcer.ClearPolicy()
+}
+
 // LoadPolicy reloads the policy from file/database.
 func (e *SyncedEnforcer) LoadPolicy() error {
 	e.m.Lock()
@@ -70,6 +85,13 @@ func (e *SyncedEnforcer) SavePolicy() error {
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.Enforcer.SavePolicy()
+}
+
+// BuildRoleLinks manually rebuild the role inheritance relations.
+func (e *SyncedEnforcer) BuildRoleLinks() {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	e.Enforcer.BuildRoleLinks()
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
