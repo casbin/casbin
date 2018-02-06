@@ -193,7 +193,14 @@ For details of adapters, please refer to the documentation: https://github.com/c
 
 ## Policy consistence between multiple nodes
 
-We support to use [etcd](https://github.com/coreos/etcd) to keep consistence between multiple Casbin enforcer instances. Please see: https://github.com/casbin/etcd-watcher 
+We support to use distributed messaging systems like [etcd](https://github.com/coreos/etcd) to keep consistence between multiple Casbin enforcer instances. So our users can concurrently use multiple Casbin enforcers to handle large number of permission checking requests.
+
+As with similar policy storage adapters, we don't put watcher code in the main library. Any support for a new messaging system should be implemented as a watcher. A complete list of Casbin watchers is provided as below. Any 3rd-party contribution on a new watcher is welcomed, please inform us and I will put it in this list:)
+
+Watcher | Type | Author | Description
+----|------|----|----
+[Etcd Watcher](https://github.com/casbin/etcd-watcher) | KV store | Casbin | Watcher for [etcd](https://github.com/coreos/etcd)
+[NATS Watcher](https://github.com/Soluto/casbin-nats-watcher) | Messaging system | [Soluto](https://github.com/Soluto) | Watcher for [NATS](https://nats.io/)
 
 ## Role manager
 
