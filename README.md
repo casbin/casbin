@@ -188,6 +188,7 @@ Adapter | Type | Author | Description
 [PostgreSQL Adapter](https://github.com/going/casbin-postgres-adapter) | SQL | [Going](https://github.com/going) | Persistence for [PostgreSQL](https://www.postgresql.org/)
 [RethinkDB Adapter](https://github.com/adityapandey9/rethinkdb-adapter) | NoSQL | [@adityapandey9](https://github.com/adityapandey9) | Persistence for [RethinkDB](https://rethinkdb.com/)
 [DynamoDB Adapter](https://github.com/HOOQTV/dynacasbin) | NoSQL | [HOOQ](https://github.com/HOOQTV) | Persistence for [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
+[Minio/AWS S3 Adapter](https://github.com/Soluto/casbin-minio-adapter) | Object storage | [Soluto](https://github.com/Soluto) | Persistence for [Minio](https://github.com/minio/minio) and [Amazon S3](https://aws.amazon.com/s3/)
 
 For details of adapters, please refer to the documentation: https://github.com/casbin/casbin/wiki/Policy-persistence
 
