@@ -60,6 +60,9 @@ func (rm *RoleManager) Clear() {
 	rm.allRoles = make(map[string]*SessionRole)
 }
 
+// AddLink adds the inheritance link between role: name1 and role: name2.
+// aka role: name1 inherits role: name2.
+// timeRange is the time range when the role inheritance link is active.
 func (rm *RoleManager) AddLink(name1 string, name2 string, timeRange ...string) {
 	if len(timeRange) != 2 {
 		return
@@ -74,6 +77,9 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, timeRange ...string) 
 	role1.addSession(session)
 }
 
+// DeleteLink deletes the inheritance link between role: name1 and role: name2.
+// aka role: name1 does not inherit role: name2 any more.
+// unused is not used.
 func (rm *RoleManager) DeleteLink(name1 string, name2 string, unused ...string) {
 	if !rm.hasRole(name1) || !rm.hasRole(name2) {
 		return
@@ -85,6 +91,8 @@ func (rm *RoleManager) DeleteLink(name1 string, name2 string, unused ...string) 
 	role1.deleteSessions(role2.name)
 }
 
+// HasLink determines whether role: name1 inherits role: name2.
+// requestTime is the querying time for the role inheritance link.
 func (rm *RoleManager) HasLink(name1 string, name2 string, requestTime ...string) bool {
 	if len(requestTime) != 1 {
 		return false
@@ -102,6 +110,8 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, requestTime ...string
 	return role1.hasValidSession(name2, rm.maxHierarchyLevel, requestTime[0])
 }
 
+// GetRoles gets the roles that a subject inherits.
+// currentTime is the querying time for the role inheritance link.
 func (rm *RoleManager) GetRoles(name string, currentTime ...string) []string {
 	if len(currentTime) != 1 {
 		return nil
@@ -116,6 +126,8 @@ func (rm *RoleManager) GetRoles(name string, currentTime ...string) []string {
 	return sessionRoles
 }
 
+// GetUsers gets the users that inherits a subject.
+// currentTime is the querying time for the role inheritance link.
 func (rm *RoleManager) GetUsers(name string, currentTime ...string) []string {
 	if len(currentTime) != 1 {
 		return nil
@@ -132,6 +144,7 @@ func (rm *RoleManager) GetUsers(name string, currentTime ...string) []string {
 	return users
 }
 
+// PrintRoles prints all the roles to log.
 func (rm *RoleManager) PrintRoles() {
 	for _, role := range rm.allRoles {
 		util.LogPrint(role.toString())
