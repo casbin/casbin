@@ -187,3 +187,38 @@ func TestDomainRole(t *testing.T) {
 	testDomainRole(t, rm, "u4", "admin", "domain1", true)
 	testDomainRole(t, rm, "u4", "admin", "domain2", false)
 }
+
+func TestClear(t *testing.T) {
+	rm := NewRoleManager(3)
+	rm.AddLink("u1", "g1")
+	rm.AddLink("u2", "g1")
+	rm.AddLink("u3", "g2")
+	rm.AddLink("u4", "g2")
+	rm.AddLink("u4", "g3")
+	rm.AddLink("g1", "g3")
+
+	// Current role inheritance tree:
+	//             g3    g2
+	//            /  \  /  \
+	//          g1    u4    u3
+	//         /  \
+	//       u1    u2
+
+	rm.Clear()
+
+	// All data is cleared.
+	// No role inheritance now.
+
+	testRole(t, rm, "u1", "g1", false)
+	testRole(t, rm, "u1", "g2", false)
+	testRole(t, rm, "u1", "g3", false)
+	testRole(t, rm, "u2", "g1", false)
+	testRole(t, rm, "u2", "g2", false)
+	testRole(t, rm, "u2", "g3", false)
+	testRole(t, rm, "u3", "g1", false)
+	testRole(t, rm, "u3", "g2", false)
+	testRole(t, rm, "u3", "g3", false)
+	testRole(t, rm, "u4", "g1", false)
+	testRole(t, rm, "u4", "g2", false)
+	testRole(t, rm, "u4", "g3", false)
+}

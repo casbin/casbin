@@ -54,6 +54,28 @@ func TestSessionRole(t *testing.T) {
 	testSessionRole(t, rm, "charlie", "foxtrott", getAfterOneHour(), false)
 }
 
+func TestClear(t *testing.T) {
+	rm := NewRoleManager(3)
+	rm.AddLink("alpha", "bravo", getCurrentTime(), getInOneHour())
+	rm.AddLink("alpha", "charlie", getCurrentTime(), getInOneHour())
+	rm.AddLink("bravo", "delta", getCurrentTime(), getInOneHour())
+	rm.AddLink("bravo", "echo", getCurrentTime(), getInOneHour())
+	rm.AddLink("charlie", "echo", getCurrentTime(), getInOneHour())
+	rm.AddLink("charlie", "foxtrott", getCurrentTime(), getInOneHour())
+
+	rm.Clear()
+
+	// All data is cleared.
+	// No role inheritance now.
+
+	testSessionRole(t, rm, "alpha", "bravo", getCurrentTime(), false)
+	testSessionRole(t, rm, "alpha", "charlie", getCurrentTime(), false)
+	testSessionRole(t, rm, "bravo", "delta", getCurrentTime(), false)
+	testSessionRole(t, rm, "bravo", "echo", getCurrentTime(), false)
+	testSessionRole(t, rm, "charlie", "echo", getCurrentTime(), false)
+	testSessionRole(t, rm, "charlie", "foxtrott", getCurrentTime(), false)
+}
+
 func TestAddLink(t *testing.T) {
 	rm := NewRoleManager(3)
 	rm.AddLink("alpha", "bravo")
