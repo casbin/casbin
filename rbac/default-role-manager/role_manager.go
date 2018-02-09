@@ -20,16 +20,16 @@ import (
 )
 
 type RoleManager struct {
-	allRoles map[string]*Role
-	level    int
+	allRoles             map[string]*Role
+	maxHierarchyLevel    int
 }
 
 // NewRoleManager is the constructor for creating an instance of the
 // default RoleManager implementation.
-func NewRoleManager(level int) rbac.RoleManager {
+func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 	rm := RoleManager{}
 	rm.allRoles = make(map[string]*Role)
-	rm.level = level
+	rm.maxHierarchyLevel = maxHierarchyLevel
 	return &rm
 }
 
@@ -100,7 +100,7 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) boo
 	}
 
 	role1 := rm.createRole(name1)
-	return role1.hasRole(name2, rm.level)
+	return role1.hasRole(name2, rm.maxHierarchyLevel)
 }
 
 // GetRoles gets the roles that a subject inherits.
@@ -177,17 +177,17 @@ func (r *Role) deleteRole(role *Role) {
 	}
 }
 
-func (r *Role) hasRole(name string, level int) bool {
+func (r *Role) hasRole(name string, hierarchyLevel int) bool {
 	if r.name == name {
 		return true
 	}
 
-	if level <= 0 {
+	if hierarchyLevel <= 0 {
 		return false
 	}
 
 	for _, role := range r.roles {
-		if role.hasRole(name, level-1) {
+		if role.hasRole(name, hierarchyLevel-1) {
 			return true
 		}
 	}
