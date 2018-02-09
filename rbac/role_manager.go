@@ -16,6 +16,8 @@ package rbac
 
 // RoleManager provides interface to define the operations for managing roles.
 type RoleManager interface {
+	// Clear clears all stored data and resets the role manager to the initial state.
+	Clear()
 	// AddLink adds the inheritance link between two roles. role: name1 and role: name2.
 	// domain is a prefix to the roles (can be used for other purposes).
 	AddLink(name1 string, name2 string, domain ...string)

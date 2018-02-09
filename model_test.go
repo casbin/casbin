@@ -282,6 +282,7 @@ func TestRBACModelWithCustomData(t *testing.T) {
 
 type testCustomRoleManager struct{}
 
+func (rm *testCustomRoleManager) Clear() {}
 func (rm *testCustomRoleManager) AddLink(name1 string, name2 string, domain ...string)    {}
 func (rm *testCustomRoleManager) DeleteLink(name1 string, name2 string, domain ...string) {}
 func (rm *testCustomRoleManager) HasLink(name1 string, name2 string, domain ...string) bool {

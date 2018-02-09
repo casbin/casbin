@@ -54,6 +54,11 @@ func (rm *defaultRoleManager) createRole(name string) *Role {
 	return rm.allRoles[name]
 }
 
+// Clear clears all stored data and resets the role manager to the initial state.
+func (rm *defaultRoleManager) Clear() {
+	rm.allRoles = make(map[string]*Role)
+}
+
 // AddLink adds the inheritance link between role: name1 and role: name2.
 // aka role: name1 inherits role: name2.
 // domain is a prefix to the roles.

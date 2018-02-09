@@ -55,6 +55,11 @@ func (rm *sessionRoleManager) createRole(name string) *SessionRole {
 	return rm.allRoles[name]
 }
 
+// Clear clears all stored data and resets the role manager to the initial state.
+func (rm *sessionRoleManager) Clear() {
+	rm.allRoles = make(map[string]*SessionRole)
+}
+
 func (rm *sessionRoleManager) AddLink(name1 string, name2 string, timeRange ...string) {
 	if len(timeRange) != 2 {
 		return
