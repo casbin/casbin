@@ -20,9 +20,9 @@ import (
 )
 
 // BuildRoleLinks initializes the roles in RBAC.
-func (model Model) BuildRoleLinks(rmc rbac.RoleManagerConstructor) {
+func (model Model) BuildRoleLinks(rm rbac.RoleManager) {
 	for _, ast := range model["g"] {
-		ast.buildRoleLinks(rmc)
+		ast.buildRoleLinks(rm)
 	}
 }
 

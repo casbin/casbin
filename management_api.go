@@ -219,7 +219,7 @@ func (e *Enforcer) AddNamedGroupingPolicy(ptype string, params ...interface{}) b
 	}
 
 	if e.autoBuildRoleLinks {
-		e.model.BuildRoleLinks(e.rmc)
+		e.BuildRoleLinks()
 	}
 	return ruleAdded
 }
@@ -249,7 +249,7 @@ func (e *Enforcer) RemoveNamedGroupingPolicy(ptype string, params ...interface{}
 	}
 
 	if e.autoBuildRoleLinks {
-		e.model.BuildRoleLinks(e.rmc)
+		e.BuildRoleLinks()
 	}
 	return ruleRemoved
 }
@@ -258,7 +258,7 @@ func (e *Enforcer) RemoveNamedGroupingPolicy(ptype string, params ...interface{}
 func (e *Enforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) bool {
 	ruleRemoved := e.removeFilteredPolicy("g", ptype, fieldIndex, fieldValues...)
 	if e.autoBuildRoleLinks {
-		e.model.BuildRoleLinks(e.rmc)
+		e.BuildRoleLinks()
 	}
 	return ruleRemoved
 }

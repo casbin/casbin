@@ -219,10 +219,8 @@ To use a custom role manager implementation:
 ```go
 type myCustomRoleManager struct {} // assumes the type satisfies the RoleManager interface
 
-func newRoleManager() rbac.RoleManagerConstructor {
-	return func() rbac.RoleManager {
-		return &myCustomRoleManager{}
-	}
+func NewRoleManager() rbac.RoleManager {
+	return &myCustomRoleManager{}
 }
 
 e := casbin.NewEnforcer("path/to/model.conf", "path/to/policy.csv")

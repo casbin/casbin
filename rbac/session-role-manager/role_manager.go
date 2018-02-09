@@ -26,14 +26,6 @@ type RoleManager struct {
 	maxHierarchyLevel int
 }
 
-// SessionRoleManager provides an implementation for the RoleManagerConstructor that
-// supports RBAC sessions with a start time and an end time.
-func SessionRoleManager() rbac.RoleManagerConstructor {
-	return func() rbac.RoleManager {
-		return NewRoleManager(10)
-	}
-}
-
 // NewRoleManager is the constructor for creating an instance of the
 // SessionRoleManager implementation.
 func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {

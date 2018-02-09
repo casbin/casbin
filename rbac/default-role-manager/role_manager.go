@@ -24,14 +24,6 @@ type RoleManager struct {
 	level    int
 }
 
-// DefaultRoleManager provides an implementation for the RoleManagerConstructor
-// that creates the default RoleManager as it was previously created.
-func DefaultRoleManager() rbac.RoleManagerConstructor {
-	return func() rbac.RoleManager {
-		return NewRoleManager(10)
-	}
-}
-
 // NewRoleManager is the constructor for creating an instance of the
 // default RoleManager implementation.
 func NewRoleManager(level int) rbac.RoleManager {

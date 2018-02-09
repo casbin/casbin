@@ -32,8 +32,8 @@ type Assertion struct {
 	RM     rbac.RoleManager
 }
 
-func (ast *Assertion) buildRoleLinks(rmc rbac.RoleManagerConstructor) {
-	ast.RM = rmc()
+func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) {
+	ast.RM = rm
 	count := strings.Count(ast.Value, "_")
 	for _, rule := range ast.Policy {
 		if count < 2 {

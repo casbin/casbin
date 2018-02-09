@@ -36,6 +36,3 @@ type RoleManager interface {
 	// PrintRoles prints all the roles to log.
 	PrintRoles()
 }
-
-// RoleManagerConstructor provides a definition for constructing a RoleManager.
-type RoleManagerConstructor func() RoleManager

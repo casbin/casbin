@@ -282,6 +282,9 @@ func TestRBACModelWithCustomData(t *testing.T) {
 
 type testCustomRoleManager struct{}
 
+func NewRoleManager() rbac.RoleManager {
+	return &testCustomRoleManager{}
+}
 func (rm *testCustomRoleManager) Clear() {}
 func (rm *testCustomRoleManager) AddLink(name1 string, name2 string, domain ...string)    {}
 func (rm *testCustomRoleManager) DeleteLink(name1 string, name2 string, domain ...string) {}
@@ -303,15 +306,9 @@ func (rm *testCustomRoleManager) GetUsers(name string, domain ...string) []strin
 }
 func (rm *testCustomRoleManager) PrintRoles() {}
 
-func newTestCustomRoleManager() rbac.RoleManagerConstructor {
-	return func() rbac.RoleManager {
-		return &testCustomRoleManager{}
-	}
-}
-
 func TestRBACModelWithCustomRoleManager(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
-	e.SetRoleManager(newTestCustomRoleManager())
+	e.SetRoleManager(NewRoleManager())
 	e.LoadModel()
 	_ = e.LoadPolicy()
 

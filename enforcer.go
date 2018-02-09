@@ -42,7 +42,7 @@ type Enforcer struct {
 	modelPath string
 	model     model.Model
 	fm        model.FunctionMap
-	rmc       rbac.RoleManagerConstructor
+	rm        rbac.RoleManager
 
 	adapter persist.Adapter
 	watcher persist.Watcher
@@ -60,7 +60,7 @@ type Enforcer struct {
 // e := casbin.NewEnforcer("path/to/basic_model.conf", a)
 func NewEnforcer(params ...interface{}) *Enforcer {
 	e := &Enforcer{}
-	e.rmc = defaultrolemanager.DefaultRoleManager()
+	e.rm = defaultrolemanager.NewRoleManager(10)
 
 	parsedParamLen := 0
 	if len(params) >= 1 && reflect.TypeOf(params[len(params)-1]).Kind() == reflect.Bool {
@@ -201,9 +201,9 @@ func (e *Enforcer) SetWatcher(watcher persist.Watcher) {
 	watcher.SetUpdateCallback(func (string) {e.LoadPolicy()})
 }
 
-// SetRoleManager sets the constructor function for creating a RoleManager.
-func (e *Enforcer) SetRoleManager(rmc rbac.RoleManagerConstructor) {
-	e.rmc = rmc
+// SetRoleManager sets the current role manager.
+func (e *Enforcer) SetRoleManager(rm rbac.RoleManager) {
+	e.rm = rm
 }
 
 // ClearPolicy clears all policy.
@@ -221,7 +221,7 @@ func (e *Enforcer) LoadPolicy() error {
 
 	e.model.PrintPolicy()
 	if e.autoBuildRoleLinks {
-		e.model.BuildRoleLinks(e.rmc)
+		e.BuildRoleLinks()
 	}
 	return nil
 }
@@ -259,7 +259,8 @@ func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *Enforcer) BuildRoleLinks() {
-	e.model.BuildRoleLinks(e.rmc)
+	e.rm.Clear()
+	e.model.BuildRoleLinks(e.rm)
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
