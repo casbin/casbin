@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rbac
+package sessionrolemanager
 
 import (
 	"strconv"
 	"testing"
 	"time"
 
+	"github.com/casbin/casbin/rbac"
 	"github.com/casbin/casbin/util"
 )
 
@@ -192,7 +193,7 @@ func TestGetUsers(t *testing.T) {
 	}
 }
 
-func testSessionRole(t *testing.T, rm RoleManager, name1 string, name2 string, requestTime string, res bool) {
+func testSessionRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, requestTime string, res bool) {
 	t.Helper()
 	myRes := rm.HasLink(name1, name2, requestTime)
 
@@ -201,7 +202,7 @@ func testSessionRole(t *testing.T, rm RoleManager, name1 string, name2 string, r
 	}
 }
 
-func testPrintSessionRoles(t *testing.T, rm RoleManager, name1 string, requestTime string, res []string) {
+func testPrintSessionRoles(t *testing.T, rm rbac.RoleManager, name1 string, requestTime string, res []string) {
 	t.Helper()
 	myRes := rm.GetRoles(name1, requestTime)
 

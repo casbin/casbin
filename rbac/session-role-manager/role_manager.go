@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rbac
+package sessionrolemanager
 
 import (
 	"sort"
-	
+
+	"github.com/casbin/casbin/rbac"
 	"github.com/casbin/casbin/util"
 )
 
@@ -27,15 +28,15 @@ type sessionRoleManager struct {
 
 // SessionRoleManager provides an implementation for the RoleManagerConstructor that
 // supports RBAC sessions with a start time and an end time.
-func SessionRoleManager() RoleManagerConstructor {
-	return func() RoleManager {
+func SessionRoleManager() rbac.RoleManagerConstructor {
+	return func() rbac.RoleManager {
 		return NewSessionRoleManager(10)
 	}
 }
 
 // NewSessionRoleManager is the constructor for creating an instance of the
 // SessionRoleManager implementation.
-func NewSessionRoleManager(maxHierarchyLevel int) RoleManager {
+func NewSessionRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 	rm := sessionRoleManager{}
 	rm.allRoles = make(map[string]*SessionRole)
 	rm.maxHierarchyLevel = maxHierarchyLevel
