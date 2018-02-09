@@ -19,7 +19,7 @@ import (
 	"github.com/casbin/casbin/util"
 )
 
-type defaultRoleManager struct {
+type RoleManager struct {
 	allRoles map[string]*Role
 	level    int
 }
@@ -28,25 +28,25 @@ type defaultRoleManager struct {
 // that creates the default RoleManager as it was previously created.
 func DefaultRoleManager() rbac.RoleManagerConstructor {
 	return func() rbac.RoleManager {
-		return NewDefaultRoleManager(10)
+		return NewRoleManager(10)
 	}
 }
 
-// NewDefaultRoleManager is the constructor for creating an instance of the
+// NewRoleManager is the constructor for creating an instance of the
 // default RoleManager implementation.
-func NewDefaultRoleManager(level int) rbac.RoleManager {
-	rm := defaultRoleManager{}
+func NewRoleManager(level int) rbac.RoleManager {
+	rm := RoleManager{}
 	rm.allRoles = make(map[string]*Role)
 	rm.level = level
 	return &rm
 }
 
-func (rm *defaultRoleManager) hasRole(name string) bool {
+func (rm *RoleManager) hasRole(name string) bool {
 	_, ok := rm.allRoles[name]
 	return ok
 }
 
-func (rm *defaultRoleManager) createRole(name string) *Role {
+func (rm *RoleManager) createRole(name string) *Role {
 	if !rm.hasRole(name) {
 		rm.allRoles[name] = newRole(name)
 	}
@@ -55,14 +55,14 @@ func (rm *defaultRoleManager) createRole(name string) *Role {
 }
 
 // Clear clears all stored data and resets the role manager to the initial state.
-func (rm *defaultRoleManager) Clear() {
+func (rm *RoleManager) Clear() {
 	rm.allRoles = make(map[string]*Role)
 }
 
 // AddLink adds the inheritance link between role: name1 and role: name2.
 // aka role: name1 inherits role: name2.
 // domain is a prefix to the roles.
-func (rm *defaultRoleManager) AddLink(name1 string, name2 string, domain ...string) {
+func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) {
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
@@ -76,7 +76,7 @@ func (rm *defaultRoleManager) AddLink(name1 string, name2 string, domain ...stri
 // DeleteLink deletes the inheritance link between role: name1 and role: name2.
 // aka role: name1 does not inherit role: name2 any more.
 // domain is a prefix to the roles.
-func (rm *defaultRoleManager) DeleteLink(name1 string, name2 string, domain ...string) {
+func (rm *RoleManager) DeleteLink(name1 string, name2 string, domain ...string) {
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
@@ -93,7 +93,7 @@ func (rm *defaultRoleManager) DeleteLink(name1 string, name2 string, domain ...s
 
 // HasLink determines whether role: name1 inherits role: name2.
 // domain is a prefix to the roles.
-func (rm *defaultRoleManager) HasLink(name1 string, name2 string, domain ...string) bool {
+func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) bool {
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
@@ -113,7 +113,7 @@ func (rm *defaultRoleManager) HasLink(name1 string, name2 string, domain ...stri
 
 // GetRoles gets the roles that a subject inherits.
 // domain is a prefix to the roles.
-func (rm *defaultRoleManager) GetRoles(name string, domain ...string) []string {
+func (rm *RoleManager) GetRoles(name string, domain ...string) []string {
 	if len(domain) == 1 {
 		name = domain[0] + "::" + name
 	}
@@ -133,7 +133,7 @@ func (rm *defaultRoleManager) GetRoles(name string, domain ...string) []string {
 
 // GetUsers gets the users that inherits a subject.
 // domain is an unreferenced parameter here, may be used in other implementations.
-func (rm *defaultRoleManager) GetUsers(name string, domain ...string) []string {
+func (rm *RoleManager) GetUsers(name string, domain ...string) []string {
 	if !rm.hasRole(name) {
 		return nil
 	}
@@ -148,7 +148,7 @@ func (rm *defaultRoleManager) GetUsers(name string, domain ...string) []string {
 }
 
 // PrintRoles prints all the roles to log.
-func (rm *defaultRoleManager) PrintRoles() {
+func (rm *RoleManager) PrintRoles() {
 	for _, role := range rm.allRoles {
 		util.LogPrint(role.toString())
 	}

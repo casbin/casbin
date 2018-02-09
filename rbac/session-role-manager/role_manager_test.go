@@ -24,7 +24,7 @@ import (
 )
 
 func TestSessionRole(t *testing.T) {
-	rm := NewSessionRoleManager(3)
+	rm := NewRoleManager(3)
 	rm.AddLink("alpha", "bravo", getCurrentTime(), getInOneHour())
 	rm.AddLink("alpha", "charlie", getCurrentTime(), getInOneHour())
 	rm.AddLink("bravo", "delta", getCurrentTime(), getInOneHour())
@@ -55,7 +55,7 @@ func TestSessionRole(t *testing.T) {
 }
 
 func TestAddLink(t *testing.T) {
-	rm := NewSessionRoleManager(3)
+	rm := NewRoleManager(3)
 	rm.AddLink("alpha", "bravo")
 	testSessionRole(t, rm, "alpha", "bravo", getCurrentTime(), false)
 
@@ -64,7 +64,7 @@ func TestAddLink(t *testing.T) {
 }
 
 func TestHasLink(t *testing.T) {
-	rm := NewSessionRoleManager(3)
+	rm := NewRoleManager(3)
 
 	alpha := "alpha"
 	bravo := "bravo"
@@ -85,7 +85,7 @@ func TestHasLink(t *testing.T) {
 }
 
 func TestDeleteLink(t *testing.T) {
-	rm := NewSessionRoleManager(3)
+	rm := NewRoleManager(3)
 
 	alpha := "alpha"
 	bravo := "bravo"
@@ -107,7 +107,7 @@ func TestDeleteLink(t *testing.T) {
 }
 
 func TestHierarchieLevel(t *testing.T) {
-	rm := NewSessionRoleManager(2)
+	rm := NewRoleManager(2)
 
 	rm.AddLink("alpha", "bravo", getOneHourAgo(), getInOneHour())
 	rm.AddLink("bravo", "charlie", getOneHourAgo(), getInOneHour())
@@ -117,7 +117,7 @@ func TestHierarchieLevel(t *testing.T) {
 }
 
 func TestOutdatedSessions(t *testing.T) {
-	rm := NewSessionRoleManager(3)
+	rm := NewRoleManager(3)
 
 	rm.AddLink("alpha", "bravo", getOneHourAgo(), getCurrentTime())
 	rm.AddLink("bravo", "charlie", getOneHourAgo(), getInOneHour())
@@ -131,7 +131,7 @@ func TestOutdatedSessions(t *testing.T) {
 }
 
 func TestGetRoles(t *testing.T) {
-	rm := NewSessionRoleManager(3)
+	rm := NewRoleManager(3)
 
 	if rm.GetRoles("alpha") != nil {
 		t.Error("Calling GetRoles without a time should return nil.")
@@ -161,7 +161,7 @@ func TestGetRoles(t *testing.T) {
 }
 
 func TestGetUsers(t *testing.T) {
-	rm := NewSessionRoleManager(3)
+	rm := NewRoleManager(3)
 
 	rm.AddLink("bravo", "alpha", getOneHourAgo(), getInOneHour())
 	rm.AddLink("charlie", "alpha", getOneHourAgo(), getInOneHour())

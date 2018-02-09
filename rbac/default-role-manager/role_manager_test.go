@@ -53,7 +53,7 @@ func testPrintRoles(t *testing.T, rm rbac.RoleManager, name string, res []string
 }
 
 func TestRole(t *testing.T) {
-	rm := NewDefaultRoleManager(3)
+	rm := NewRoleManager(3)
 	rm.AddLink("u1", "g1")
 	rm.AddLink("u2", "g1")
 	rm.AddLink("u3", "g2")
@@ -122,7 +122,7 @@ func TestRole(t *testing.T) {
 }
 
 func TestDomainRole(t *testing.T) {
-	rm := NewDefaultRoleManager(3)
+	rm := NewRoleManager(3)
 	rm.AddLink("u1", "g1", "domain1")
 	rm.AddLink("u2", "g1", "domain1")
 	rm.AddLink("u3", "admin", "domain2")

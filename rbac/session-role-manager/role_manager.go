@@ -21,7 +21,7 @@ import (
 	"github.com/casbin/casbin/util"
 )
 
-type sessionRoleManager struct {
+type RoleManager struct {
 	allRoles          map[string]*SessionRole
 	maxHierarchyLevel int
 }
@@ -30,25 +30,25 @@ type sessionRoleManager struct {
 // supports RBAC sessions with a start time and an end time.
 func SessionRoleManager() rbac.RoleManagerConstructor {
 	return func() rbac.RoleManager {
-		return NewSessionRoleManager(10)
+		return NewRoleManager(10)
 	}
 }
 
-// NewSessionRoleManager is the constructor for creating an instance of the
+// NewRoleManager is the constructor for creating an instance of the
 // SessionRoleManager implementation.
-func NewSessionRoleManager(maxHierarchyLevel int) rbac.RoleManager {
-	rm := sessionRoleManager{}
+func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
+	rm := RoleManager{}
 	rm.allRoles = make(map[string]*SessionRole)
 	rm.maxHierarchyLevel = maxHierarchyLevel
 	return &rm
 }
 
-func (rm *sessionRoleManager) hasRole(name string) bool {
+func (rm *RoleManager) hasRole(name string) bool {
 	_, ok := rm.allRoles[name]
 	return ok
 }
 
-func (rm *sessionRoleManager) createRole(name string) *SessionRole {
+func (rm *RoleManager) createRole(name string) *SessionRole {
 	if !rm.hasRole(name) {
 		rm.allRoles[name] = newSessionRole(name)
 	}
@@ -56,11 +56,11 @@ func (rm *sessionRoleManager) createRole(name string) *SessionRole {
 }
 
 // Clear clears all stored data and resets the role manager to the initial state.
-func (rm *sessionRoleManager) Clear() {
+func (rm *RoleManager) Clear() {
 	rm.allRoles = make(map[string]*SessionRole)
 }
 
-func (rm *sessionRoleManager) AddLink(name1 string, name2 string, timeRange ...string) {
+func (rm *RoleManager) AddLink(name1 string, name2 string, timeRange ...string) {
 	if len(timeRange) != 2 {
 		return
 	}
@@ -74,7 +74,7 @@ func (rm *sessionRoleManager) AddLink(name1 string, name2 string, timeRange ...s
 	role1.addSession(session)
 }
 
-func (rm *sessionRoleManager) DeleteLink(name1 string, name2 string, unused ...string) {
+func (rm *RoleManager) DeleteLink(name1 string, name2 string, unused ...string) {
 	if !rm.hasRole(name1) || !rm.hasRole(name2) {
 		return
 	}
@@ -85,7 +85,7 @@ func (rm *sessionRoleManager) DeleteLink(name1 string, name2 string, unused ...s
 	role1.deleteSessions(role2.name)
 }
 
-func (rm *sessionRoleManager) HasLink(name1 string, name2 string, requestTime ...string) bool {
+func (rm *RoleManager) HasLink(name1 string, name2 string, requestTime ...string) bool {
 	if len(requestTime) != 1 {
 		return false
 	}
@@ -102,7 +102,7 @@ func (rm *sessionRoleManager) HasLink(name1 string, name2 string, requestTime ..
 	return role1.hasValidSession(name2, rm.maxHierarchyLevel, requestTime[0])
 }
 
-func (rm *sessionRoleManager) GetRoles(name string, currentTime ...string) []string {
+func (rm *RoleManager) GetRoles(name string, currentTime ...string) []string {
 	if len(currentTime) != 1 {
 		return nil
 	}
@@ -116,7 +116,7 @@ func (rm *sessionRoleManager) GetRoles(name string, currentTime ...string) []str
 	return sessionRoles
 }
 
-func (rm *sessionRoleManager) GetUsers(name string, currentTime ...string) []string {
+func (rm *RoleManager) GetUsers(name string, currentTime ...string) []string {
 	if len(currentTime) != 1 {
 		return nil
 	}
@@ -132,7 +132,7 @@ func (rm *sessionRoleManager) GetUsers(name string, currentTime ...string) []str
 	return users
 }
 
-func (rm *sessionRoleManager) PrintRoles() {
+func (rm *RoleManager) PrintRoles() {
 	for _, role := range rm.allRoles {
 		util.LogPrint(role.toString())
 	}
