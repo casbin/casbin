@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rbac
+package defaultrolemanager
 
 import (
 	"log"
 	"testing"
 
+	"github.com/casbin/casbin/rbac"
 	"github.com/casbin/casbin/util"
 )
 
-func testRole(t *testing.T, rm RoleManager, name1 string, name2 string, res bool) {
+func testRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, res bool) {
 	t.Helper()
 	myRes := rm.HasLink(name1, name2)
 	log.Printf("%s, %s: %t", name1, name2, myRes)
@@ -31,7 +32,7 @@ func testRole(t *testing.T, rm RoleManager, name1 string, name2 string, res bool
 	}
 }
 
-func testDomainRole(t *testing.T, rm RoleManager, name1 string, name2 string, domain string, res bool) {
+func testDomainRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, domain string, res bool) {
 	t.Helper()
 	myRes := rm.HasLink(name1, name2, domain)
 	log.Printf("%s :: %s, %s: %t", domain, name1, name2, myRes)
@@ -41,7 +42,7 @@ func testDomainRole(t *testing.T, rm RoleManager, name1 string, name2 string, do
 	}
 }
 
-func testPrintRoles(t *testing.T, rm RoleManager, name string, res []string) {
+func testPrintRoles(t *testing.T, rm rbac.RoleManager, name string, res []string) {
 	t.Helper()
 	myRes := rm.GetRoles(name)
 	log.Printf("%s: %s", name, myRes)

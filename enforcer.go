@@ -23,6 +23,7 @@ import (
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
 	"github.com/casbin/casbin/rbac"
+	"github.com/casbin/casbin/rbac/default-role-manager"
 	"github.com/casbin/casbin/util"
 )
 
@@ -59,7 +60,7 @@ type Enforcer struct {
 // e := casbin.NewEnforcer("path/to/basic_model.conf", a)
 func NewEnforcer(params ...interface{}) *Enforcer {
 	e := &Enforcer{}
-	e.rmc = rbac.DefaultRoleManager()
+	e.rmc = defaultrolemanager.DefaultRoleManager()
 
 	parsedParamLen := 0
 	if len(params) >= 1 && reflect.TypeOf(params[len(params)-1]).Kind() == reflect.Bool {

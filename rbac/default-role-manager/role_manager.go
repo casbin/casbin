@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rbac
+package defaultrolemanager
 
 import (
+	"github.com/casbin/casbin/rbac"
 	"github.com/casbin/casbin/util"
 )
 
@@ -25,15 +26,15 @@ type defaultRoleManager struct {
 
 // DefaultRoleManager provides an implementation for the RoleManagerConstructor
 // that creates the default RoleManager as it was previously created.
-func DefaultRoleManager() RoleManagerConstructor {
-	return func() RoleManager {
+func DefaultRoleManager() rbac.RoleManagerConstructor {
+	return func() rbac.RoleManager {
 		return NewDefaultRoleManager(10)
 	}
 }
 
 // NewDefaultRoleManager is the constructor for creating an instance of the
 // default RoleManager implementation.
-func NewDefaultRoleManager(level int) RoleManager {
+func NewDefaultRoleManager(level int) rbac.RoleManager {
 	rm := defaultRoleManager{}
 	rm.allRoles = make(map[string]*Role)
 	rm.level = level
