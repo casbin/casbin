@@ -170,7 +170,7 @@ We also provide a web-based UI for model management and policy management:
 
 ## Policy persistence
 
-In Casbin, the policy storage is implemented as an adapter (aka middleware for Casbin). To keep light-weight, we don't put adapter code in the main library. A complete list of Casbin adapters is provided as below. Any 3rd-party contribution on a new adapter is welcomed, please inform us and I will put it in this list:)
+In Casbin, the policy storage is implemented as an adapter (aka middleware for Casbin). To keep light-weight, we don't put adapter code in the main library (except the default file adapter). A complete list of Casbin adapters is provided as below. Any 3rd-party contribution on a new adapter is welcomed, please inform us and I will put it in this list:)
 
 Adapter | Type | Author | Description
 ----|------|----|----
@@ -196,7 +196,7 @@ For details of adapters, please refer to the documentation: https://github.com/c
 
 We support to use distributed messaging systems like [etcd](https://github.com/coreos/etcd) to keep consistence between multiple Casbin enforcer instances. So our users can concurrently use multiple Casbin enforcers to handle large number of permission checking requests.
 
-As with similar policy storage adapters, we don't put watcher code in the main library. Any support for a new messaging system should be implemented as a watcher. A complete list of Casbin watchers is provided as below. Any 3rd-party contribution on a new watcher is welcomed, please inform us and I will put it in this list:)
+Similar to policy storage adapters, we don't put watcher code in the main library. Any support for a new messaging system should be implemented as a watcher. A complete list of Casbin watchers is provided as below. Any 3rd-party contribution on a new watcher is welcomed, please inform us and I will put it in this list:)
 
 Watcher | Type | Author | Description
 ----|------|----|----
@@ -205,27 +205,14 @@ Watcher | Type | Author | Description
 
 ## Role manager
 
-We support different implementations of a RBAC role manager. The currently supported adapters are:
+The role manager is used to manage the RBAC role hierarchy (user-role mapping) in Casbin. A role manager can retrieve the role data from Casbin policy rules or external sources such as LDAP, Okta, Auth0, Azure AD, etc. We support different implementations of a role manager. To keep light-weight, we don't put role manager code in the main library (except the default role manager). A complete list of Casbin role managers is provided as below. Any 3rd-party contribution on a new role manager is welcomed, please inform us and I will put it in this list:)
 
-Role manager | Description
-----|----
-[Default role manager](https://github.com/casbin/casbin/blob/master/rbac/default_role_manager.go) | Supports role hierarchy
-[Session role manager](https://github.com/casbin/casbin/blob/master/rbac/session_role_manager.go) | Supports role hierarchy, time-range-based sessions
+Role manager | Author | Description
+----|----|----
+[Default Role Manager (built-in)](https://github.com/casbin/casbin/blob/master/rbac/default-role-manager/role_manager.go) | Casbin | Supports role hierarchy
+[Session Role Manager](https://github.com/casbin/session-role-manager) | [EDOMO Systems](https://github.com/edomosystems) | Supports role hierarchy, time-range-based sessions
 
-For developers: all role managers must implement the [RoleManager](https://github.com/casbin/casbin/blob/master/rbac/role_manager.go) interface.
-
-To use a custom role manager implementation:
-
-```go
-type myCustomRoleManager struct {} // assumes the type satisfies the RoleManager interface
-
-func NewRoleManager() rbac.RoleManager {
-	return &myCustomRoleManager{}
-}
-
-e := casbin.NewEnforcer("path/to/model.conf", "path/to/policy.csv")
-e.SetRoleManager(newRoleManager())
-```
+For developers: all role managers must implement the [RoleManager](https://github.com/casbin/casbin/blob/master/rbac/role_manager.go) interface. [Session Role Manager](https://github.com/casbin/session-role-manager) can be used as a reference implementation.
 
 ## Multi-threading
 
