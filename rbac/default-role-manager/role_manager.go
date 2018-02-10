@@ -15,6 +15,8 @@
 package defaultrolemanager
 
 import (
+	"errors"
+
 	"github.com/casbin/casbin/rbac"
 	"github.com/casbin/casbin/util"
 )
@@ -59,6 +61,8 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
+	} else if len(domain) > 1 {
+		return errors.New("error: domain should be 1 parameter")
 	}
 
 	role1 := rm.createRole(name1)
@@ -74,10 +78,12 @@ func (rm *RoleManager) DeleteLink(name1 string, name2 string, domain ...string) 
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
+	} else if len(domain) > 1 {
+		return errors.New("error: domain should be 1 parameter")
 	}
 
 	if !rm.hasRole(name1) || !rm.hasRole(name2) {
-		return nil
+		return errors.New("error: name1 or name2 does not exist")
 	}
 
 	role1 := rm.createRole(name1)
@@ -92,6 +98,8 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
+	} else if len(domain) > 1 {
+		return false, errors.New("error: domain should be 1 parameter")
 	}
 
 	if name1 == name2 {
@@ -111,10 +119,12 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 func (rm *RoleManager) GetRoles(name string, domain ...string) ([]string, error) {
 	if len(domain) == 1 {
 		name = domain[0] + "::" + name
+	} else if len(domain) > 1 {
+		return nil, errors.New("error: domain should be 1 parameter")
 	}
 
 	if !rm.hasRole(name) {
-		return nil, nil
+		return nil, errors.New("error: name does not exist")
 	}
 
 	roles := rm.createRole(name).getRoles()
@@ -130,7 +140,7 @@ func (rm *RoleManager) GetRoles(name string, domain ...string) ([]string, error)
 // domain is an unreferenced parameter here, may be used in other implementations.
 func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error) {
 	if !rm.hasRole(name) {
-		return nil, nil
+		return nil, errors.New("error: name does not exist")
 	}
 
 	names := []string{}
