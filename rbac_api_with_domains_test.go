@@ -32,7 +32,7 @@ func testGetRolesInDomain(t *testing.T, e *Enforcer, name string, domain string,
 }
 
 func TestRoleAPIWithDomains(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model_with_domains.conf", "examples/rbac_policy_with_domains.csv")
+	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	testGetRolesInDomain(t, e, "alice", "domain1", []string{"admin"})
 	testGetRolesInDomain(t, e, "bob", "domain1", []string{})
@@ -69,7 +69,7 @@ func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name string, domain s
 }
 
 func TestPermissionAPIInDomain(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model_with_domains.conf", "examples/rbac_policy_with_domains.csv")
+	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	testGetPermissionsInDomain(t, e, "alice", "domain1", [][]string{})
 	testGetPermissionsInDomain(t, e, "bob", "domain1", [][]string{})

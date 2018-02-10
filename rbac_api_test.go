@@ -131,7 +131,7 @@ func testHasPermission(t *testing.T, e *Enforcer, name string, permission []stri
 }
 
 func TestPermissionAPI(t *testing.T) {
-	e := NewEnforcer("examples/basic_model_without_resources.conf", "examples/basic_policy_without_resources.csv")
+	e := NewEnforcer("examples/basic_without_resources_model.conf", "examples/basic_without_resources_policy.csv")
 
 	testEnforceWithoutUsers(t, e, "alice", "read", true)
 	testEnforceWithoutUsers(t, e, "alice", "write", false)

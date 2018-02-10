@@ -346,7 +346,7 @@ func TestRoleLinks(t *testing.T) {
 
 func TestGetAndSetModel(t *testing.T) {
 	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-	e2 := NewEnforcer("examples/basic_model_with_root.conf", "examples/basic_policy.csv")
+	e2 := NewEnforcer("examples/basic_with_root_model.conf", "examples/basic_policy.csv")
 
 	testEnforce(t, e, "root", "data1", "read", false)
 
@@ -358,7 +358,7 @@ func TestGetAndSetModel(t *testing.T) {
 func TestGetAndSetAdapterInMem(t *testing.T) {
 
 	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-	e2 := NewEnforcer("examples/basic_model.conf", "examples/basic_policy_inverse.csv")
+	e2 := NewEnforcer("examples/basic_model.conf", "examples/basic_inverse_policy.csv")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)

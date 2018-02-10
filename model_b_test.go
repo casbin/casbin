@@ -114,7 +114,7 @@ func BenchmarkRBACModelLarge(b *testing.B) {
 }
 
 func BenchmarkRBACModelWithResourceRoles(b *testing.B) {
-	e := NewEnforcer("examples/rbac_model_with_resource_roles.conf", "examples/rbac_policy_with_resource_roles.csv")
+	e := NewEnforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -123,7 +123,7 @@ func BenchmarkRBACModelWithResourceRoles(b *testing.B) {
 }
 
 func BenchmarkRBACModelWithDomains(b *testing.B) {
-	e := NewEnforcer("examples/rbac_model_with_domains.conf", "examples/rbac_policy_with_domains.csv")
+	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -151,7 +151,7 @@ func BenchmarkKeyMatchModel(b *testing.B) {
 }
 
 func BenchmarkRBACModelWithDeny(b *testing.B) {
-	e := NewEnforcer("examples/rbac_model_with_deny.conf", "examples/rbac_policy_with_deny.csv")
+	e := NewEnforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

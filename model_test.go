@@ -76,7 +76,7 @@ func TestBasicModelNoPolicy(t *testing.T) {
 }
 
 func TestBasicModelWithRoot(t *testing.T) {
-	e := NewEnforcer("examples/basic_model_with_root.conf", "examples/basic_policy.csv")
+	e := NewEnforcer("examples/basic_with_root_model.conf", "examples/basic_policy.csv")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -93,7 +93,7 @@ func TestBasicModelWithRoot(t *testing.T) {
 }
 
 func TestBasicModelWithRootNoPolicy(t *testing.T) {
-	e := NewEnforcer("examples/basic_model_with_root.conf")
+	e := NewEnforcer("examples/basic_with_root_model.conf")
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -110,7 +110,7 @@ func TestBasicModelWithRootNoPolicy(t *testing.T) {
 }
 
 func TestBasicModelWithoutUsers(t *testing.T) {
-	e := NewEnforcer("examples/basic_model_without_users.conf", "examples/basic_policy_without_users.csv")
+	e := NewEnforcer("examples/basic_without_users_model.conf", "examples/basic_without_users_policy.csv")
 
 	testEnforceWithoutUsers(t, e, "data1", "read", true)
 	testEnforceWithoutUsers(t, e, "data1", "write", false)
@@ -119,7 +119,7 @@ func TestBasicModelWithoutUsers(t *testing.T) {
 }
 
 func TestBasicModelWithoutResources(t *testing.T) {
-	e := NewEnforcer("examples/basic_model_without_resources.conf", "examples/basic_policy_without_resources.csv")
+	e := NewEnforcer("examples/basic_without_resources_model.conf", "examples/basic_without_resources_policy.csv")
 
 	testEnforceWithoutUsers(t, e, "alice", "read", true)
 	testEnforceWithoutUsers(t, e, "alice", "write", false)
@@ -141,7 +141,7 @@ func TestRBACModel(t *testing.T) {
 }
 
 func TestRBACModelWithResourceRoles(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model_with_resource_roles.conf", "examples/rbac_policy_with_resource_roles.csv")
+	e := NewEnforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", true)
@@ -154,7 +154,7 @@ func TestRBACModelWithResourceRoles(t *testing.T) {
 }
 
 func TestRBACModelWithDomains(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model_with_domains.conf", "examples/rbac_policy_with_domains.csv")
+	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
@@ -167,7 +167,7 @@ func TestRBACModelWithDomains(t *testing.T) {
 }
 
 func TestRBACModelWithDomainsAtRuntime(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model_with_domains.conf")
+	e := NewEnforcer("examples/rbac_with_domains_model.conf")
 
 	e.AddPolicy("admin", "domain1", "data1", "read")
 	e.AddPolicy("admin", "domain1", "data1", "write")
@@ -212,8 +212,8 @@ func TestRBACModelWithDomainsAtRuntime(t *testing.T) {
 }
 
 func TestRBACModelWithDomainsAtRuntimeMockAdapter(t *testing.T) {
-	adapter := fileadapter.NewAdapterMock("examples/rbac_policy_with_domains.csv")
-	e := NewEnforcer("examples/rbac_model_with_domains.conf", adapter)
+	adapter := fileadapter.NewAdapterMock("examples/rbac_with_domains_policy.csv")
+	e := NewEnforcer("examples/rbac_with_domains_model.conf", adapter)
 
 	e.AddPolicy("admin", "domain3", "data1", "read")
 	e.AddGroupingPolicy("alice", "admin", "domain3")
@@ -230,7 +230,7 @@ func TestRBACModelWithDomainsAtRuntimeMockAdapter(t *testing.T) {
 }
 
 func TestRBACModelWithDeny(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model_with_deny.conf", "examples/rbac_policy_with_deny.csv")
+	e := NewEnforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -243,7 +243,7 @@ func TestRBACModelWithDeny(t *testing.T) {
 }
 
 func TestRBACModelWithOnlyDeny(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model_with_not_deny.conf", "examples/rbac_policy_with_deny.csv")
+	e := NewEnforcer("examples/rbac_with_not_deny_model.conf", "examples/rbac_with_deny_policy.csv")
 
 	testEnforce(t, e, "alice", "data2", "write", false)
 }
@@ -443,7 +443,7 @@ func TestPriorityModel(t *testing.T) {
 }
 
 func TestPriorityModelIndeterminate(t *testing.T) {
-	e := NewEnforcer("examples/priority_model.conf", "examples/priority_policy_indeterminate.csv")
+	e := NewEnforcer("examples/priority_model.conf", "examples/priority_indeterminate_policy.csv")
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 }

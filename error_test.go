@@ -121,10 +121,10 @@ func TestModelNoError(t *testing.T) {
 }
 
 func TestMockAdapterErrors(t *testing.T) {
-	adapter := fileadapter.NewAdapterMock("examples/rbac_policy_with_domains.csv")
+	adapter := fileadapter.NewAdapterMock("examples/rbac_with_domains_policy.csv")
 	adapter.SetMockErr("mock error")
 
-	e, _ := NewEnforcerSafe("examples/rbac_model_with_domains.conf", adapter)
+	e, _ := NewEnforcerSafe("examples/rbac_with_domains_model.conf", adapter)
 
 	_, err := e.AddPolicySafe("admin", "domain3", "data1", "read")
 
