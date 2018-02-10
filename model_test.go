@@ -285,26 +285,26 @@ type testCustomRoleManager struct{}
 func NewRoleManager() rbac.RoleManager {
 	return &testCustomRoleManager{}
 }
-func (rm *testCustomRoleManager) Clear() {}
-func (rm *testCustomRoleManager) AddLink(name1 string, name2 string, domain ...string)    {}
-func (rm *testCustomRoleManager) DeleteLink(name1 string, name2 string, domain ...string) {}
-func (rm *testCustomRoleManager) HasLink(name1 string, name2 string, domain ...string) bool {
+func (rm *testCustomRoleManager) Clear() error { return nil }
+func (rm *testCustomRoleManager) AddLink(name1 string, name2 string, domain ...string) error { return nil }
+func (rm *testCustomRoleManager) DeleteLink(name1 string, name2 string, domain ...string) error { return nil }
+func (rm *testCustomRoleManager) HasLink(name1 string, name2 string, domain ...string) (bool, error) {
 	if name1 == "alice" && name2 == "alice" {
-		return true
+		return true, nil
 	} else if name1 == "alice" && name2 == "data2_admin" {
-		return true
+		return true, nil
 	} else if name1 == "bob" && name2 == "bob" {
-		return true
+		return true, nil
 	}
-	return false
+	return false, nil
 }
-func (rm *testCustomRoleManager) GetRoles(name string, domain ...string) []string {
-	return []string{}
+func (rm *testCustomRoleManager) GetRoles(name string, domain ...string) ([]string, error) {
+	return []string{}, nil
 }
-func (rm *testCustomRoleManager) GetUsers(name string, domain ...string) []string {
-	return []string{}
+func (rm *testCustomRoleManager) GetUsers(name string, domain ...string) ([]string, error) {
+	return []string{}, nil
 }
-func (rm *testCustomRoleManager) PrintRoles() {}
+func (rm *testCustomRoleManager) PrintRoles() error { return nil }
 
 func TestRBACModelWithCustomRoleManager(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")

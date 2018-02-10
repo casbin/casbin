@@ -24,7 +24,7 @@ import (
 
 func testRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, res bool) {
 	t.Helper()
-	myRes := rm.HasLink(name1, name2)
+	myRes, _ := rm.HasLink(name1, name2)
 	log.Printf("%s, %s: %t", name1, name2, myRes)
 
 	if myRes != res {
@@ -34,7 +34,7 @@ func testRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, res
 
 func testDomainRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, domain string, res bool) {
 	t.Helper()
-	myRes := rm.HasLink(name1, name2, domain)
+	myRes, _ := rm.HasLink(name1, name2, domain)
 	log.Printf("%s :: %s, %s: %t", domain, name1, name2, myRes)
 
 	if myRes != res {
@@ -44,7 +44,7 @@ func testDomainRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 strin
 
 func testPrintRoles(t *testing.T, rm rbac.RoleManager, name string, res []string) {
 	t.Helper()
-	myRes := rm.GetRoles(name)
+	myRes, _ := rm.GetRoles(name)
 	log.Printf("%s: %s", name, myRes)
 
 	if !util.ArrayEquals(myRes, res) {

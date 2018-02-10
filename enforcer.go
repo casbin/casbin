@@ -294,14 +294,16 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 					name1 := args[0].(string)
 					name2 := args[1].(string)
 
-					return (bool)(rm.HasLink(name1, name2)), nil
+					res, _ := rm.HasLink(name1, name2)
+					return res, nil
 				}
 
 				name1 := args[0].(string)
 				name2 := args[1].(string)
 				domain := args[2].(string)
 
-				return (bool)(rm.HasLink(name1, name2, domain)), nil
+				res, _ := rm.HasLink(name1, name2, domain)
+				return res, nil
 			}
 		}
 	}

@@ -47,14 +47,15 @@ func (rm *RoleManager) createRole(name string) *Role {
 }
 
 // Clear clears all stored data and resets the role manager to the initial state.
-func (rm *RoleManager) Clear() {
+func (rm *RoleManager) Clear() error {
 	rm.allRoles = make(map[string]*Role)
+	return nil
 }
 
 // AddLink adds the inheritance link between role: name1 and role: name2.
 // aka role: name1 inherits role: name2.
 // domain is a prefix to the roles.
-func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) {
+func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) error {
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
@@ -63,55 +64,57 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) {
 	role1 := rm.createRole(name1)
 	role2 := rm.createRole(name2)
 	role1.addRole(role2)
+	return nil
 }
 
 // DeleteLink deletes the inheritance link between role: name1 and role: name2.
 // aka role: name1 does not inherit role: name2 any more.
 // domain is a prefix to the roles.
-func (rm *RoleManager) DeleteLink(name1 string, name2 string, domain ...string) {
+func (rm *RoleManager) DeleteLink(name1 string, name2 string, domain ...string) error {
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
 	}
 
 	if !rm.hasRole(name1) || !rm.hasRole(name2) {
-		return
+		return nil
 	}
 
 	role1 := rm.createRole(name1)
 	role2 := rm.createRole(name2)
 	role1.deleteRole(role2)
+	return nil
 }
 
 // HasLink determines whether role: name1 inherits role: name2.
 // domain is a prefix to the roles.
-func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) bool {
+func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bool, error) {
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
 	}
 
 	if name1 == name2 {
-		return true
+		return true, nil
 	}
 
 	if !rm.hasRole(name1) || !rm.hasRole(name2) {
-		return false
+		return false, nil
 	}
 
 	role1 := rm.createRole(name1)
-	return role1.hasRole(name2, rm.maxHierarchyLevel)
+	return role1.hasRole(name2, rm.maxHierarchyLevel), nil
 }
 
 // GetRoles gets the roles that a subject inherits.
 // domain is a prefix to the roles.
-func (rm *RoleManager) GetRoles(name string, domain ...string) []string {
+func (rm *RoleManager) GetRoles(name string, domain ...string) ([]string, error) {
 	if len(domain) == 1 {
 		name = domain[0] + "::" + name
 	}
 
 	if !rm.hasRole(name) {
-		return nil
+		return nil, nil
 	}
 
 	roles := rm.createRole(name).getRoles()
@@ -120,14 +123,14 @@ func (rm *RoleManager) GetRoles(name string, domain ...string) []string {
 			roles[i] = roles[i][len(domain[0])+2:]
 		}
 	}
-	return roles
+	return roles, nil
 }
 
 // GetUsers gets the users that inherits a subject.
 // domain is an unreferenced parameter here, may be used in other implementations.
-func (rm *RoleManager) GetUsers(name string, domain ...string) []string {
+func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error) {
 	if !rm.hasRole(name) {
-		return nil
+		return nil, nil
 	}
 
 	names := []string{}
@@ -136,14 +139,15 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) []string {
 			names = append(names, role.name)
 		}
 	}
-	return names
+	return names, nil
 }
 
 // PrintRoles prints all the roles to log.
-func (rm *RoleManager) PrintRoles() {
+func (rm *RoleManager) PrintRoles() error {
 	for _, role := range rm.allRoles {
 		util.LogPrint(role.toString())
 	}
+	return nil
 }
 
 // Role represents the data structure for a role in RBAC.

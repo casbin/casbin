@@ -17,22 +17,22 @@ package rbac
 // RoleManager provides interface to define the operations for managing roles.
 type RoleManager interface {
 	// Clear clears all stored data and resets the role manager to the initial state.
-	Clear()
+	Clear() error
 	// AddLink adds the inheritance link between two roles. role: name1 and role: name2.
 	// domain is a prefix to the roles (can be used for other purposes).
-	AddLink(name1 string, name2 string, domain ...string)
+	AddLink(name1 string, name2 string, domain ...string) error
 	// DeleteLink deletes the inheritance link between two roles. role: name1 and role: name2.
 	// domain is a prefix to the roles (can be used for other purposes).
-	DeleteLink(name1 string, name2 string, domain ...string)
+	DeleteLink(name1 string, name2 string, domain ...string) error
 	// HasLink determines whether a link exists between two roles. role: name1 inherits role: name2.
 	// domain is a prefix to the roles (can be used for other purposes).
-	HasLink(name1 string, name2 string, domain ...string) bool
+	HasLink(name1 string, name2 string, domain ...string) (bool, error)
 	// GetRoles gets the roles that a user inherits.
 	// domain is a prefix to the roles (can be used for other purposes).
-	GetRoles(name string, domain ...string) []string
+	GetRoles(name string, domain ...string) ([]string, error)
 	// GetUsers gets the users that inherits a role.
 	// domain is a prefix to the users (can be used for other purposes).
-	GetUsers(name string, domain ...string) []string
+	GetUsers(name string, domain ...string) ([]string, error)
 	// PrintRoles prints all the roles to log.
-	PrintRoles()
+	PrintRoles() error
 }

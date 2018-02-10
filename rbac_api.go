@@ -16,12 +16,14 @@ package casbin
 
 // GetRolesForUser gets the roles that a user has.
 func (e *Enforcer) GetRolesForUser(name string) []string {
-	return e.model["g"]["g"].RM.GetRoles(name)
+	res, _ := e.model["g"]["g"].RM.GetRoles(name)
+	return res
 }
 
 // GetUsersForRole gets the users that has a role.
 func (e *Enforcer) GetUsersForRole(name string) []string {
-	return e.model["g"]["g"].RM.GetUsers(name)
+	res, _ := e.model["g"]["g"].RM.GetUsers(name)
+	return res
 }
 
 // HasRoleForUser determines whether a user has a role.
