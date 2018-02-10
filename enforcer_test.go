@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/casbin/casbin/file-adapter"
+	"github.com/casbin/casbin/persist/file-adapter"
 )
 
 func TestKeyMatchModelInMemory(t *testing.T) {
