@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -331,8 +332,13 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 				policyResults[i] = EffectIndeterminate
 				panic(err)
 			} else {
-				if !result.(bool) {
+				typ := reflect.TypeOf(result).Kind()
+				if typ == reflect.Bool && !result.(bool) {
 					policyResults[i] = EffectIndeterminate
+				} else if typ == reflect.Float64 && result.(float64) == 0 {
+					policyResults[i] = EffectIndeterminate
+				} else if typ != reflect.Bool && typ != reflect.Float64 {
+					panic(errors.New("matcher result should be bool, int or float"))
 				} else {
 					if effect, ok := parameters["p_eft"]; ok {
 						if effect == "allow" {
