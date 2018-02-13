@@ -310,9 +310,9 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 	}
 	expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 
-	var policyResults []Effect
+	var policyEffects []Effect
 	if len(e.model["p"]["p"].Policy) != 0 {
-		policyResults = make([]Effect, len(e.model["p"]["p"].Policy))
+		policyEffects = make([]Effect, len(e.model["p"]["p"].Policy))
 
 		for i, pvals := range e.model["p"]["p"].Policy {
 			// util.LogPrint("Policy Rule: ", pvals)
@@ -329,27 +329,27 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 			// util.LogPrint("Result: ", result)
 
 			if err != nil {
-				policyResults[i] = EffectIndeterminate
+				policyEffects[i] = EffectIndeterminate
 				panic(err)
 			} else {
 				typ := reflect.TypeOf(result).Kind()
 				if typ == reflect.Bool && !result.(bool) {
-					policyResults[i] = EffectIndeterminate
+					policyEffects[i] = EffectIndeterminate
 				} else if typ == reflect.Float64 && result.(float64) == 0 {
-					policyResults[i] = EffectIndeterminate
+					policyEffects[i] = EffectIndeterminate
 				} else if typ != reflect.Bool && typ != reflect.Float64 {
 					panic(errors.New("matcher result should be bool, int or float"))
 				} else {
 					if effect, ok := parameters["p_eft"]; ok {
 						if effect == "allow" {
-							policyResults[i] = EffectAllow
+							policyEffects[i] = EffectAllow
 						} else if effect == "deny" {
-							policyResults[i] = EffectDeny
+							policyEffects[i] = EffectDeny
 						} else {
-							policyResults[i] = EffectIndeterminate
+							policyEffects[i] = EffectIndeterminate
 						}
 					} else {
-						policyResults[i] = EffectAllow
+						policyEffects[i] = EffectAllow
 					}
 
 					if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
@@ -359,7 +359,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 			}
 		}
 	} else {
-		policyResults = make([]Effect, 1)
+		policyEffects = make([]Effect, 1)
 
 		parameters := make(map[string]interface{}, 8)
 		for j, token := range e.model["r"]["r"].Tokens {
@@ -373,23 +373,23 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		// util.LogPrint("Result: ", result)
 
 		if err != nil {
-			policyResults[0] = EffectIndeterminate
+			policyEffects[0] = EffectIndeterminate
 			panic(err)
 		} else {
 			if result.(bool) {
-				policyResults[0] = EffectAllow
+				policyEffects[0] = EffectAllow
 			} else {
-				policyResults[0] = EffectIndeterminate
+				policyEffects[0] = EffectIndeterminate
 			}
 		}
 	}
 
-	// util.LogPrint("Rule Results: ", policyResults)
+	// util.LogPrint("Rule Results: ", policyEffects)
 
 	result := false
 	if e.model["e"]["e"].Value == "some(where (p_eft == allow))" {
 		result = false
-		for _, eft := range policyResults {
+		for _, eft := range policyEffects {
 			if eft == EffectAllow {
 				result = true
 				break
@@ -397,7 +397,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		}
 	} else if e.model["e"]["e"].Value == "!some(where (p_eft == deny))" {
 		result = true
-		for _, eft := range policyResults {
+		for _, eft := range policyEffects {
 			if eft == EffectDeny {
 				result = false
 				break
@@ -405,7 +405,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		}
 	} else if e.model["e"]["e"].Value == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" {
 		result = false
-		for _, eft := range policyResults {
+		for _, eft := range policyEffects {
 			if eft == EffectAllow {
 				result = true
 			} else if eft == EffectDeny {
@@ -415,7 +415,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		}
 	} else if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
 		result = false
-		for _, eft := range policyResults {
+		for _, eft := range policyEffects {
 			if eft != EffectIndeterminate {
 				if eft == EffectAllow {
 					result = true
