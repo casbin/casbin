@@ -311,8 +311,10 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 	expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 
 	var policyEffects []Effect
+	var matcherResults []float64
 	if len(e.model["p"]["p"].Policy) != 0 {
 		policyEffects = make([]Effect, len(e.model["p"]["p"].Policy))
+		matcherResults = make([]float64, len(e.model["p"]["p"].Policy))
 
 		for i, pvals := range e.model["p"]["p"].Policy {
 			// util.LogPrint("Policy Rule: ", pvals)
@@ -340,6 +342,10 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 				} else if typ != reflect.Bool && typ != reflect.Float64 {
 					panic(errors.New("matcher result should be bool, int or float"))
 				} else {
+					if typ == reflect.Float64 {
+						matcherResults[i] = result.(float64)
+					}
+
 					if effect, ok := parameters["p_eft"]; ok {
 						if effect == "allow" {
 							policyEffects[i] = EffectAllow
@@ -360,6 +366,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		}
 	} else {
 		policyEffects = make([]Effect, 1)
+		matcherResults = make([]float64, 1)
 
 		parameters := make(map[string]interface{}, 8)
 		for j, token := range e.model["r"]["r"].Tokens {
