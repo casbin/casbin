@@ -31,16 +31,17 @@ import (
 
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
-	modelPath string
-	model     model.Model
-	fm        model.FunctionMap
-	rm        rbac.RoleManager
+	modelPath          string
+	model              model.Model
+	fm                 model.FunctionMap
+	eft                effect.Effector
 
-	adapter persist.Adapter
-	watcher persist.Watcher
+	adapter            persist.Adapter
+	watcher            persist.Watcher
+	rm                 rbac.RoleManager
 
-	enabled  bool
-	autoSave bool
+	enabled            bool
+	autoSave           bool
 	autoBuildRoleLinks bool
 }
 
@@ -53,6 +54,7 @@ type Enforcer struct {
 func NewEnforcer(params ...interface{}) *Enforcer {
 	e := &Enforcer{}
 	e.rm = defaultrolemanager.NewRoleManager(10)
+	e.eft = effect.NewDefaultEffector()
 
 	parsedParamLen := 0
 	if len(params) >= 1 && reflect.TypeOf(params[len(params)-1]).Kind() == reflect.Bool {
@@ -384,45 +386,9 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 
 	// util.LogPrint("Rule Results: ", policyEffects)
 
-	result := false
-	if e.model["e"]["e"].Value == "some(where (p_eft == allow))" {
-		result = false
-		for _, eft := range policyEffects {
-			if eft == effect.Allow {
-				result = true
-				break
-			}
-		}
-	} else if e.model["e"]["e"].Value == "!some(where (p_eft == deny))" {
-		result = true
-		for _, eft := range policyEffects {
-			if eft == effect.Deny {
-				result = false
-				break
-			}
-		}
-	} else if e.model["e"]["e"].Value == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" {
-		result = false
-		for _, eft := range policyEffects {
-			if eft == effect.Allow {
-				result = true
-			} else if eft == effect.Deny {
-				result = false
-				break
-			}
-		}
-	} else if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
-		result = false
-		for _, eft := range policyEffects {
-			if eft != effect.Indeterminate {
-				if eft == effect.Allow {
-					result = true
-				} else {
-					result = false
-				}
-				break
-			}
-		}
+	result, err := e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults)
+	if err != nil {
+		panic(err)
 	}
 
 	reqStr := "Request: "
