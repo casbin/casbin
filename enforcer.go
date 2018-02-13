@@ -200,6 +200,11 @@ func (e *Enforcer) SetRoleManager(rm rbac.RoleManager) {
 	e.rm = rm
 }
 
+// SetEffector sets the current effector.
+func (e *Enforcer) SetEffector(eft effect.Effector) {
+	e.eft = eft
+}
+
 // ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() {
 	e.model.ClearPolicy()
