@@ -16,41 +16,39 @@ package defaultrolemanager
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/casbin/casbin/rbac"
 	"github.com/casbin/casbin/util"
 )
 
 type RoleManager struct {
-	allRoles             map[string]*Role
-	maxHierarchyLevel    int
+	allRoles          *sync.Map
+	maxHierarchyLevel int
 }
 
 // NewRoleManager is the constructor for creating an instance of the
 // default RoleManager implementation.
 func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 	rm := RoleManager{}
-	rm.allRoles = make(map[string]*Role)
+	rm.allRoles = &sync.Map{}
 	rm.maxHierarchyLevel = maxHierarchyLevel
 	return &rm
 }
 
 func (rm *RoleManager) hasRole(name string) bool {
-	_, ok := rm.allRoles[name]
+	_, ok := rm.allRoles.Load(name)
 	return ok
 }
 
 func (rm *RoleManager) createRole(name string) *Role {
-	if !rm.hasRole(name) {
-		rm.allRoles[name] = newRole(name)
-	}
-
-	return rm.allRoles[name]
+	role, _ := rm.allRoles.LoadOrStore(name, newRole(name))
+	return role.(*Role)
 }
 
 // Clear clears all stored data and resets the role manager to the initial state.
 func (rm *RoleManager) Clear() error {
-	rm.allRoles = make(map[string]*Role)
+	rm.allRoles = &sync.Map{}
 	return nil
 }
 
@@ -144,19 +142,22 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 	}
 
 	names := []string{}
-	for _, role := range rm.allRoles {
+	rm.allRoles.Range(func(_, value interface{}) bool {
+		role := value.(*Role)
 		if role.hasDirectRole(name) {
 			names = append(names, role.name)
 		}
-	}
+		return true
+	})
 	return names, nil
 }
 
 // PrintRoles prints all the roles to log.
 func (rm *RoleManager) PrintRoles() error {
-	for _, role := range rm.allRoles {
-		util.LogPrint(role.toString())
-	}
+	rm.allRoles.Range(func(_, value interface{}) bool {
+		util.LogPrint(value.(*Role).toString())
+		return true
+	})
 	return nil
 }
 
