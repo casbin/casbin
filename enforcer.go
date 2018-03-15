@@ -225,8 +225,43 @@ func (e *Enforcer) LoadPolicy() error {
 	return nil
 }
 
+// LoadFilteredPolicy reloads a filtered policy from file/database.
+func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
+	e.model.ClearPolicy()
+
+	// Attempt to cast the Adapter as a FilteredAdapter
+	a := reflect.ValueOf(e.adapter)
+	filteredAdapter, ok := a.Interface().(persist.FilteredAdapter)
+	if !ok {
+		return errors.New("filtered policies are not supported by this adapter")
+	}
+	err := filteredAdapter.LoadFilteredPolicy(e.model, filter)
+	if err != nil {
+		return err
+	}
+
+	e.model.PrintPolicy()
+	if e.autoBuildRoleLinks {
+		e.BuildRoleLinks()
+	}
+	return nil
+}
+
+// IsFiltered returns true if the loaded policy has been filtered.
+func (e *Enforcer) IsFiltered() bool {
+	a := reflect.ValueOf(e.adapter)
+	filteredAdapter, ok := a.Interface().(persist.FilteredAdapter)
+	if !ok {
+		return false
+	}
+	return filteredAdapter.IsFiltered()
+}
+
 // SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() error {
+	if e.IsFiltered() {
+		return errors.New("cannot save a filtered policy")
+	}
 	err := e.adapter.SavePolicy(e.model)
 	if err == nil {
 		if e.watcher != nil {
