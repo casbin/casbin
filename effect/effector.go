@@ -19,7 +19,7 @@ type Effect int
 
 // Values for policy effect.
 const (
-	Allow         Effect = iota
+	Allow Effect = iota
 	Indeterminate
 	Deny
 )
