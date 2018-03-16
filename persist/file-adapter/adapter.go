@@ -18,7 +18,6 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"io"
 	"os"
 	"strings"
 
@@ -85,18 +84,12 @@ func (a *Adapter) loadPolicyFile(model model.Model, handler func(string, model.M
 	}
 	defer f.Close()
 
-	buf := bufio.NewReader(f)
-	for {
-		line, err := buf.ReadString('\n')
-		line = strings.TrimSpace(line)
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
 		handler(line, model)
-		if err != nil {
-			if err == io.EOF {
-				return nil
-			}
-			return err
-		}
 	}
+	return scanner.Err()
 }
 
 func (a *Adapter) savePolicyFile(text string) error {

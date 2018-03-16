@@ -1,4 +1,4 @@
-// Copyright 2018 The casbin Authors. All Rights Reserved.
+// Copyright 2017 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package effect
+package persist
 
-// Effect is the result for a policy rule.
-type Effect int
-
-// Values for policy effect.
-const (
-	Allow Effect = iota
-	Indeterminate
-	Deny
+import (
+	"github.com/casbin/casbin/model"
 )
 
-// Effector is the interface for Casbin effectors.
-type Effector interface {
-	// MergeEffects merges all matching results collected by the enforcer into a single decision.
-	MergeEffects(expr string, effects []Effect, results []float64) (bool, error)
+// FilteredAdapter is the interface for Casbin adapters supporting filtered policies.
+type FilteredAdapter interface {
+	Adapter
+
+	// LoadFilteredPolicy loads only policy rules that match the filter.
+	LoadFilteredPolicy(model model.Model, filter interface{}) error
+	// IsFiltered returns true if the loaded policy has been filtered.
+	IsFiltered() bool
 }
