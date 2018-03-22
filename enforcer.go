@@ -17,7 +17,6 @@ package casbin
 import (
 	"errors"
 	"fmt"
-	"reflect"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/effect"
@@ -235,10 +234,13 @@ func (e *Enforcer) LoadPolicy() error {
 func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
 	e.model.ClearPolicy()
 
+	var filteredAdapter persist.FilteredAdapter
+
 	// Attempt to cast the Adapter as a FilteredAdapter
-	a := reflect.ValueOf(e.adapter)
-	filteredAdapter, ok := a.Interface().(persist.FilteredAdapter)
-	if !ok {
+	switch e.adapter.(type) {
+	case persist.FilterAdapter:
+		filteredAdapter = e.adapter.(persist.FilteredAdapter)
+	default:
 		return errors.New("filtered policies are not supported by this adapter")
 	}
 	err := filteredAdapter.LoadFilteredPolicy(e.model, filter)
@@ -255,8 +257,7 @@ func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
 
 // IsFiltered returns true if the loaded policy has been filtered.
 func (e *Enforcer) IsFiltered() bool {
-	a := reflect.ValueOf(e.adapter)
-	filteredAdapter, ok := a.Interface().(persist.FilteredAdapter)
+	filteredAdapter, ok := e.adapter.(persist.FilteredAdapter)
 	if !ok {
 		return false
 	}
