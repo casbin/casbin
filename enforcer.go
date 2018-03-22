@@ -238,7 +238,7 @@ func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
 
 	// Attempt to cast the Adapter as a FilteredAdapter
 	switch e.adapter.(type) {
-	case persist.FilterAdapter:
+	case persist.FilteredAdapter:
 		filteredAdapter = e.adapter.(persist.FilteredAdapter)
 	default:
 		return errors.New("filtered policies are not supported by this adapter")
