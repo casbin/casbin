@@ -14,10 +14,6 @@
 
 package casbin
 
-import (
-	"reflect"
-)
-
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() []string {
 	return e.GetAllNamedSubjects("p")
@@ -105,8 +101,8 @@ func (e *Enforcer) HasPolicy(params ...interface{}) bool {
 
 // HasNamedPolicy determines whether a named authorization rule exists.
 func (e *Enforcer) HasNamedPolicy(ptype string, params ...interface{}) bool {
-	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
-		return e.model.HasPolicy("p", ptype, params[0].([]string))
+	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
+		return e.model.HasPolicy("p", ptype, strSlice)
 	}
 
 	policy := make([]string, 0)
@@ -129,8 +125,8 @@ func (e *Enforcer) AddPolicy(params ...interface{}) bool {
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddNamedPolicy(ptype string, params ...interface{}) bool {
 	ruleAdded := false
-	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
-		ruleAdded = e.addPolicy("p", ptype, params[0].([]string))
+	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
+		ruleAdded = e.addPolicy("p", ptype, strSlice)
 	} else {
 		policy := make([]string, 0)
 		for _, param := range params {
@@ -156,8 +152,8 @@ func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) b
 // RemoveNamedPolicy removes an authorization rule from the current named policy.
 func (e *Enforcer) RemoveNamedPolicy(ptype string, params ...interface{}) bool {
 	ruleRemoved := false
-	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
-		ruleRemoved = e.removePolicy("p", ptype, params[0].([]string))
+	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
+		ruleRemoved = e.removePolicy("p", ptype, strSlice)
 	} else {
 		policy := make([]string, 0)
 		for _, param := range params {
@@ -183,8 +179,8 @@ func (e *Enforcer) HasGroupingPolicy(params ...interface{}) bool {
 
 // HasNamedGroupingPolicy determines whether a named role inheritance rule exists.
 func (e *Enforcer) HasNamedGroupingPolicy(ptype string, params ...interface{}) bool {
-	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
-		return e.model.HasPolicy("g", ptype, params[0].([]string))
+	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
+		return e.model.HasPolicy("g", ptype, strSlice)
 	}
 
 	policy := make([]string, 0)
@@ -207,8 +203,8 @@ func (e *Enforcer) AddGroupingPolicy(params ...interface{}) bool {
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddNamedGroupingPolicy(ptype string, params ...interface{}) bool {
 	ruleAdded := false
-	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
-		ruleAdded = e.addPolicy("g", ptype, params[0].([]string))
+	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
+		ruleAdded = e.addPolicy("g", ptype, strSlice)
 	} else {
 		policy := make([]string, 0)
 		for _, param := range params {
@@ -237,8 +233,8 @@ func (e *Enforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...s
 // RemoveNamedGroupingPolicy removes a role inheritance rule from the current named policy.
 func (e *Enforcer) RemoveNamedGroupingPolicy(ptype string, params ...interface{}) bool {
 	ruleRemoved := false
-	if len(params) == 1 && reflect.TypeOf(params[0]).Kind() == reflect.Slice {
-		ruleRemoved = e.removePolicy("g", ptype, params[0].([]string))
+	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
+		ruleRemoved = e.removePolicy("g", ptype, strSlice)
 	} else {
 		policy := make([]string, 0)
 		for _, param := range params {
