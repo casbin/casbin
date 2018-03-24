@@ -10,7 +10,7 @@ Casbin
 [![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](http://www.patreon.com/yangluo)
 [![Sourcegraph Badge](https://sourcegraph.com/github.com/casbin/casbin/-/badge.svg)](https://sourcegraph.com/github.com/casbin/casbin?badge)
 
-**News**: Casbin is also started to port to Java, contribution is welcomed. See: https://github.com/casbin/jcasbin
+**News**: Casbin is also started to port to Java ([jCasbin](https://github.com/casbin/jcasbin)) and PHP ([PHP-Casbin](https://github.com/sstutz/php-casbin)), contribution is welcomed.
 
 ![casbin Logo](casbin-logo.png)
 
