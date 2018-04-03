@@ -168,8 +168,7 @@ func (e *Enforcer) RemoveNamedPolicy(ptype string, params ...interface{}) bool {
 
 // RemoveFilteredNamedPolicy removes an authorization rule from the current named policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredNamedPolicy(ptype string, fieldIndex int, fieldValues ...string) bool {
-	ruleRemoved := e.removeFilteredPolicy("p", ptype, fieldIndex, fieldValues...)
-	return ruleRemoved
+	return e.removeFilteredPolicy("p", ptype, fieldIndex, fieldValues...)
 }
 
 // HasGroupingPolicy determines whether a role inheritance rule exists.
@@ -253,6 +252,7 @@ func (e *Enforcer) RemoveNamedGroupingPolicy(ptype string, params ...interface{}
 // RemoveFilteredNamedGroupingPolicy removes a role inheritance rule from the current named policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) bool {
 	ruleRemoved := e.removeFilteredPolicy("g", ptype, fieldIndex, fieldValues...)
+
 	if e.autoBuildRoleLinks {
 		e.BuildRoleLinks()
 	}
