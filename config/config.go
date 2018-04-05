@@ -49,7 +49,7 @@ type Config struct {
 	data map[string]map[string]string
 }
 
-// NewConfig create an empty configuration representation.
+// NewConfig create an empty configuration representation from file.
 func NewConfig(confName string) (ConfigInterface, error) {
 	c := &Config{
 		data: make(map[string]map[string]string),
@@ -58,7 +58,7 @@ func NewConfig(confName string) (ConfigInterface, error) {
 	return c, err
 }
 
-// NewConfig create an empty configuration representation.
+// NewConfigFromText create an empty configuration representation from text.
 func NewConfigFromText(text string) (ConfigInterface, error) {
 	c := &Config{
 		data: make(map[string]map[string]string),
@@ -165,7 +165,7 @@ func (c *Config) Set(key string, value string) error {
 	c.Lock()
 	defer c.Unlock()
 	if len(key) == 0 {
-		return errors.New("key is empty.")
+		return errors.New("key is empty")
 	}
 
 	var (
@@ -193,7 +193,6 @@ func (c *Config) get(key string) string {
 	)
 
 	keys := strings.Split(strings.ToLower(key), "::")
-
 	if len(keys) >= 2 {
 		section = keys[0]
 		option = keys[1]

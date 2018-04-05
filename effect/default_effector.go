@@ -20,7 +20,7 @@ import "github.com/pkg/errors"
 type DefaultEffector struct {
 }
 
-// NewAdapter is the constructor for Adapter.
+// NewDefaultEffector is the constructor for DefaultEffector.
 func NewDefaultEffector() *DefaultEffector {
 	e := DefaultEffector{}
 	return &e
