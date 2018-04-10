@@ -356,7 +356,6 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		policyEffects = make([]effect.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
 
-	policyLoop:
 		for i, pvals := range e.model["p"]["p"].Policy {
 			// util.LogPrint("Policy Rule: ", pvals)
 
@@ -379,12 +378,12 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 				case bool:
 					if !result.(bool) {
 						policyEffects[i] = effect.Indeterminate
-						continue policyLoop
+						continue
 					}
 				case float64:
 					if result.(float64) == 0 {
 						policyEffects[i] = effect.Indeterminate
-						continue policyLoop
+						continue
 					} else {
 						matcherResults[i] = result.(float64)
 					}
