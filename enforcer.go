@@ -352,9 +352,9 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 
 	var policyEffects []effect.Effect
 	var matcherResults []float64
-	if len(e.model["p"]["p"].Policy) != 0 {
-		policyEffects = make([]effect.Effect, len(e.model["p"]["p"].Policy))
-		matcherResults = make([]float64, len(e.model["p"]["p"].Policy))
+	if policyLen := len(e.model["p"]["p"].Policy); policyLen != 0 {
+		policyEffects = make([]effect.Effect, policyLen)
+		matcherResults = make([]float64, policyLen)
 
 	policyLoop:
 		for i, pvals := range e.model["p"]["p"].Policy {
