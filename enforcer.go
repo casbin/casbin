@@ -336,9 +336,6 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		return true
 	}
 
-	expString := e.model["m"]["m"].Value
-	var expression *govaluate.EvaluableExpression
-
 	functions := make(map[string]govaluate.ExpressionFunction)
 	for key, function := range e.fm {
 		functions[key] = function
@@ -350,7 +347,8 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		}
 	}
 
-	expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+	expString := e.model["m"]["m"].Value
+	expression, _ := govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 
 	var policyEffects []effect.Effect
 	var matcherResults []float64
