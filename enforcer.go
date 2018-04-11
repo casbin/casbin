@@ -304,6 +304,32 @@ func (e *Enforcer) BuildRoleLinks() {
 	e.model.BuildRoleLinks(e.rm)
 }
 
+func (e *Enforcer) generateGFunction(rm rbac.RoleManager) func(args ...interface{}) (interface{}, error) {
+	return func(args ...interface{}) (interface{}, error) {
+		if rm == nil {
+			name1 := args[0].(string)
+			name2 := args[1].(string)
+
+			return name1 == name2, nil
+		}
+
+		if len(args) == 2 {
+			name1 := args[0].(string)
+			name2 := args[1].(string)
+
+			res, _ := rm.HasLink(name1, name2)
+			return res, nil
+		}
+
+		name1 := args[0].(string)
+		name2 := args[1].(string)
+		domain := args[2].(string)
+
+		res, _ := rm.HasLink(name1, name2, domain)
+		return res, nil
+	}
+}
+
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
 func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 	if !e.enabled {
@@ -314,40 +340,16 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 	var expression *govaluate.EvaluableExpression
 
 	functions := make(map[string]govaluate.ExpressionFunction)
-
 	for key, function := range e.fm {
 		functions[key] = function
 	}
-
-	_, ok := e.model["g"]
-	if ok {
+	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
 			rm := ast.RM
-			functions[key] = func(args ...interface{}) (interface{}, error) {
-				if rm == nil {
-					name1 := args[0].(string)
-					name2 := args[1].(string)
-
-					return name1 == name2, nil
-				}
-
-				if len(args) == 2 {
-					name1 := args[0].(string)
-					name2 := args[1].(string)
-
-					res, _ := rm.HasLink(name1, name2)
-					return res, nil
-				}
-
-				name1 := args[0].(string)
-				name2 := args[1].(string)
-				domain := args[2].(string)
-
-				res, _ := rm.HasLink(name1, name2, domain)
-				return res, nil
-			}
+			functions[key] = e.generateGFunction(rm)
 		}
 	}
+
 	expression, _ = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 
 	var policyEffects []effect.Effect
