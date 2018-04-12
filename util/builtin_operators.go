@@ -18,6 +18,8 @@ import (
 	"net"
 	"regexp"
 	"strings"
+
+	"github.com/casbin/casbin/rbac"
 )
 
 // KeyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
@@ -136,4 +138,31 @@ func IPMatchFunc(args ...interface{}) (interface{}, error) {
 	ip2 := args[1].(string)
 
 	return (bool)(IPMatch(ip1, ip2)), nil
+}
+
+// GenerateGFunction is the factory method of the g(_, _) function.
+func GenerateGFunction(rm rbac.RoleManager) func(args ...interface{}) (interface{}, error) {
+	return func(args ...interface{}) (interface{}, error) {
+		if rm == nil {
+			name1 := args[0].(string)
+			name2 := args[1].(string)
+
+			return name1 == name2, nil
+		}
+
+		if len(args) == 2 {
+			name1 := args[0].(string)
+			name2 := args[1].(string)
+
+			res, _ := rm.HasLink(name1, name2)
+			return res, nil
+		}
+
+		name1 := args[0].(string)
+		name2 := args[1].(string)
+		domain := args[2].(string)
+
+		res, _ := rm.HasLink(name1, name2, domain)
+		return res, nil
+	}
 }
