@@ -106,14 +106,10 @@ func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 
 // InitWithAdapter initializes an enforcer with a database adapter.
 func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
-	if modelPath == "" {
-		return
-	}
-	e.modelPath = modelPath
-
-	m := NewModel()
-	m.LoadModel(modelPath)
+	m := NewModel(modelPath, "")
 	e.InitWithModelAndAdapter(m, adapter)
+
+	e.modelPath = modelPath
 }
 
 // InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
@@ -142,7 +138,11 @@ func (e *Enforcer) initialize() {
 func NewModel(text ...string) model.Model {
 	m := make(model.Model)
 
-	if len(text) == 1 {
+	if len(text) == 2 {
+		if text[0] != "" {
+			m.LoadModel(text[0])
+		}
+	} else if len(text) == 1 {
 		m.LoadModelFromText(text[0])
 	} else if len(text) != 0 {
 		panic("Invalid parameters for model.")
