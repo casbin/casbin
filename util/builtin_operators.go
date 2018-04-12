@@ -143,26 +143,18 @@ func IPMatchFunc(args ...interface{}) (interface{}, error) {
 // GenerateGFunction is the factory method of the g(_, _) function.
 func GenerateGFunction(rm rbac.RoleManager) func(args ...interface{}) (interface{}, error) {
 	return func(args ...interface{}) (interface{}, error) {
-		if rm == nil {
-			name1 := args[0].(string)
-			name2 := args[1].(string)
-
-			return name1 == name2, nil
-		}
-
-		if len(args) == 2 {
-			name1 := args[0].(string)
-			name2 := args[1].(string)
-
-			res, _ := rm.HasLink(name1, name2)
-			return res, nil
-		}
-
 		name1 := args[0].(string)
 		name2 := args[1].(string)
-		domain := args[2].(string)
 
-		res, _ := rm.HasLink(name1, name2, domain)
-		return res, nil
+		if rm == nil {
+			return name1 == name2, nil
+		} else if len(args) == 2 {
+			res, _ := rm.HasLink(name1, name2)
+			return res, nil
+		} else {
+			domain := args[2].(string)
+			res, _ := rm.HasLink(name1, name2, domain)
+			return res, nil
+		}
 	}
 }
