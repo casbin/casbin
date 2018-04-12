@@ -100,37 +100,24 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 
 // InitWithFile initializes an enforcer with a model file and a policy file.
 func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
-	e.modelPath = modelPath
-
-	e.adapter = fileadapter.NewAdapter(policyPath)
-	e.watcher = nil
-
-	e.initialize()
-
-	if e.modelPath != "" {
-		e.LoadModel()
-		e.LoadPolicy()
-	}
+	a := fileadapter.NewAdapter(policyPath)
+	e.InitWithAdapter(modelPath, a)
 }
 
 // InitWithAdapter initializes an enforcer with a database adapter.
 func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
+	if modelPath == "" {
+		return
+	}
 	e.modelPath = modelPath
 
-	e.adapter = adapter
-	e.watcher = nil
-
-	e.initialize()
-
-	if e.modelPath != "" {
-		e.LoadModel()
-		e.LoadPolicy()
-	}
+	m := NewModel()
+	m.LoadModel(modelPath)
+	e.InitWithModelAndAdapter(m, adapter)
 }
 
 // InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
 func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) {
-	e.modelPath = ""
 	e.adapter = adapter
 	e.watcher = nil
 
