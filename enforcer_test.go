@@ -356,7 +356,6 @@ func TestGetAndSetModel(t *testing.T) {
 }
 
 func TestGetAndSetAdapterInMem(t *testing.T) {
-
 	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 	e2 := NewEnforcer("examples/basic_model.conf", "examples/basic_inverse_policy.csv")
 
@@ -384,7 +383,6 @@ func TestSetAdapterFromFile(t *testing.T) {
 }
 
 func TestInitEmpty(t *testing.T) {
-
 	e := NewEnforcer()
 
 	m := NewModel()
