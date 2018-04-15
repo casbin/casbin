@@ -164,9 +164,9 @@ Casbin provides two sets of APIs to manage permissions:
 
 We also provide a web-based UI for model management and policy management:
 
-![model editor](ui_model_editor.png)
+![model editor](https://hsluoyz.github.io/casbin/ui_model_editor.png)
 
-![policy editor](ui_policy_editor.png)
+![policy editor](https://hsluoyz.github.io/casbin/ui_policy_editor.png)
 
 ## Policy persistence
 
@@ -191,7 +191,6 @@ Adapter | Type | Author | Description
 [DynamoDB Adapter](https://github.com/HOOQTV/dynacasbin) | NoSQL | [HOOQ](https://github.com/HOOQTV) | Persistence for [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
 [Minio/AWS S3 Adapter](https://github.com/Soluto/casbin-minio-adapter) | Object storage | [Soluto](https://github.com/Soluto) | Persistence for [Minio](https://github.com/minio/minio) and [Amazon S3](https://aws.amazon.com/s3/)
 [Bolt Adapter](https://github.com/wirepair/bolt-adapter) | KV store | [@wirepair](https://github.com/wirepair) | Persistence for [Bolt](https://github.com/boltdb/bolt)
-
 
 For details of adapters, please refer to the documentation: https://github.com/casbin/casbin/wiki/Policy-persistence
 
