@@ -260,6 +260,6 @@ func (e *Enforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex in
 }
 
 // AddFunction adds a customized function.
-func (e *Enforcer) AddFunction(ptype string, function func(args ...interface{}) (interface{}, error)) {
-	e.fm.AddFunction(ptype, function)
+func (e *Enforcer) AddFunction(name string, function func(args ...interface{}) (interface{}, error)) {
+	e.fm.AddFunction(name, function)
 }
