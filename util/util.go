@@ -84,12 +84,7 @@ func ArrayToString(s []string) string {
 
 // ParamsToString gets a printable string for variable number of parameters.
 func ParamsToString(s ...string) string {
-	tokens := make([]string, 0)
-	for _, token := range s {
-		tokens = append(tokens, token)
-	}
-
-	return strings.Join(tokens, ", ")
+	return strings.Join(s, ", ")
 }
 
 // SetEquals determines whether two string sets are identical.
