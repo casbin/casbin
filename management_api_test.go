@@ -100,16 +100,6 @@ func testHasGroupingPolicy(t *testing.T, e *Enforcer, policy []string, res bool)
 	}
 }
 
-func testHasGroupingPolicyStringInput(t *testing.T, e *Enforcer, policy1 string, policy2 string, res bool) {
-	t.Helper()
-	myRes := e.HasGroupingPolicy(policy1, policy2)
-	log.Print("Has grouping policy ", policy1, policy2, ": ", myRes)
-
-	if res != myRes {
-		t.Error("Has grouping policy ", policy1, policy2, ": ", myRes, ", supposed to be ", res)
-	}
-}
-
 func TestGetPolicyAPI(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
@@ -148,9 +138,6 @@ func TestGetPolicyAPI(t *testing.T) {
 
 	testHasGroupingPolicy(t, e, []string{"alice", "data2_admin"}, true)
 	testHasGroupingPolicy(t, e, []string{"bob", "data2_admin"}, false)
-
-	testHasGroupingPolicyStringInput(t, e, "alice", "data2_admin", true)
-	testHasGroupingPolicyStringInput(t, e, "bob", "data2_admin", false)
 }
 
 func TestModifyPolicyAPI(t *testing.T) {
