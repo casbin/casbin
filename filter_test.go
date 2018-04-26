@@ -52,6 +52,85 @@ func TestLoadFilteredPolicy(t *testing.T) {
 	}
 }
 
+func TestLoadFilteredPolicyWithEmptyModel(t *testing.T) {
+	e := NewEnforcer()
+
+	adapter := fileadapter.NewFilteredAdapter("examples/rbac_with_domains_policy.csv")
+	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
+
+	// validate initial conditions
+	testHasPolicy(t, e, []string{"admin", "domain1", "data1", "read"}, true)
+	testHasPolicy(t, e, []string{"admin", "domain2", "data2", "read"}, true)
+
+	if err := e.LoadFilteredPolicy(&fileadapter.Filter{
+		P: []string{"", "domain1"},
+		G: []string{"", "", "domain1"},
+	}, false); err != nil {
+		t.Errorf("unexpected error in LoadFilteredPolicy: %v", err)
+	}
+	if !e.IsFiltered() {
+		t.Errorf("adapter did not set the filtered flag correctly")
+	}
+
+	// only policies for domain1 should be loaded
+	testHasPolicy(t, e, []string{"admin", "domain1", "data1", "read"}, true)
+	testHasPolicy(t, e, []string{"admin", "domain2", "data2", "read"}, false)
+
+	if err := e.SavePolicy(); err == nil {
+		t.Errorf("enforcer did not prevent saving filtered policy")
+	}
+	if err := e.GetAdapter().SavePolicy(e.GetModel()); err == nil {
+		t.Errorf("adapter did not prevent saving filtered policy")
+	}
+}
+
+func TestLoadFilteredPolicyWithLoadedModel(t *testing.T) {
+	e := NewEnforcer()
+
+	adapter := fileadapter.NewFilteredAdapter("examples/rbac_with_domains_policy.csv")
+	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
+
+	// validate initial conditions
+	testHasPolicy(t, e, []string{"admin", "domain1", "data1", "read"}, true)
+	testHasPolicy(t, e, []string{"admin", "domain2", "data2", "read"}, true)
+
+	// clear model and load domain1
+	if err := e.LoadFilteredPolicy(&fileadapter.Filter{
+		P: []string{"", "domain1"},
+		G: []string{"", "", "domain1"},
+	}, false); err != nil {
+		t.Errorf("unexpected error in LoadFilteredPolicy: %v", err)
+	}
+
+	if !e.IsFiltered() {
+		t.Errorf("adapter did not set the filtered flag correctly")
+	}
+
+	// only policies for domain1 should be loaded
+	testHasPolicy(t, e, []string{"admin", "domain1", "data1", "read"}, true)
+	testHasPolicy(t, e, []string{"admin", "domain2", "data2", "read"}, false)
+
+	// keep model with domain1 loaded and load domain2
+	if err := e.LoadFilteredPolicy(&fileadapter.Filter{
+		P: []string{"", "domain2"},
+		G: []string{"", "", "domain2"},
+	}, true); err != nil {
+		t.Errorf("unexpected error in LoadFilteredPolicy: %v", err)
+	}
+
+	// policies for domain1 and domain2 should be loaded
+	testHasPolicy(t, e, []string{"admin", "domain1", "data1", "read"}, true)
+	testHasPolicy(t, e, []string{"admin", "domain2", "data2", "read"}, true)
+
+
+	if err := e.SavePolicy(); err == nil {
+		t.Errorf("enforcer did not prevent saving filtered policy")
+	}
+	if err := e.GetAdapter().SavePolicy(e.GetModel()); err == nil {
+		t.Errorf("adapter did not prevent saving filtered policy")
+	}
+}
+
 func TestFilteredPolicyInvalidFilter(t *testing.T) {
 	e := NewEnforcer()
 
