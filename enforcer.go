@@ -218,8 +218,10 @@ func (e *Enforcer) LoadPolicy() error {
 }
 
 // LoadFilteredPolicy reloads a filtered policy from file/database.
-func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
-	e.model.ClearPolicy()
+func (e *Enforcer) LoadFilteredPolicy(filter interface{}, keepModel ...bool) error {
+	if len(keepModel) == 0 || (len(keepModel) > 0 && !keepModel[0]) {
+		e.model.ClearPolicy()
+	}
 
 	var filteredAdapter persist.FilteredAdapter
 

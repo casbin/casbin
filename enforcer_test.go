@@ -337,6 +337,25 @@ func TestSync(t *testing.T) {
 	e.StopAutoLoadPolicy()
 }
 
+func TestSync2(t *testing.T) {
+	e := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	// Start reloading the policy every 200 ms.
+	e.StartAutoLoadPolicy(time.Millisecond * 200)
+
+	testEnforceSync(t, e, "alice", "data1", "read", true)
+	testEnforceSync(t, e, "alice", "data1", "write", false)
+	testEnforceSync(t, e, "alice", "data2", "read", false)
+	testEnforceSync(t, e, "alice", "data2", "write", false)
+	testEnforceSync(t, e, "bob", "data1", "read", false)
+	testEnforceSync(t, e, "bob", "data1", "write", false)
+	testEnforceSync(t, e, "bob", "data2", "read", false)
+	testEnforceSync(t, e, "bob", "data2", "write", true)
+
+	// Stop the reloading policy periodically.
+	time.Sleep(time.Millisecond * 200)
+	e.StopAutoLoadPolicy()
+}
+
 func TestRoleLinks(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf")
 	e.EnableAutoBuildRoleLinks(false)
