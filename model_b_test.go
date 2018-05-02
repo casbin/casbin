@@ -59,11 +59,11 @@ func BenchmarkRBACModelSmall(b *testing.B) {
 	e.EnableAutoBuildRoleLinks(false)
 	// 100 roles, 10 resources.
 	for i := 0; i < 100; i++ {
-		e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i / 10), "read")
+		e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read")
 	}
 	// 1000 users.
 	for i := 0; i < 1000; i++ {
-		e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i / 10))
+		e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10))
 	}
 	e.BuildRoleLinks()
 
@@ -79,11 +79,11 @@ func BenchmarkRBACModelMedium(b *testing.B) {
 	e.EnableAutoBuildRoleLinks(false)
 	// 1000 roles, 100 resources.
 	for i := 0; i < 1000; i++ {
-		e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i / 10), "read")
+		e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read")
 	}
 	// 10000 users.
 	for i := 0; i < 10000; i++ {
-		e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i / 10))
+		e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10))
 	}
 	e.BuildRoleLinks()
 
@@ -99,11 +99,11 @@ func BenchmarkRBACModelLarge(b *testing.B) {
 	e.EnableAutoBuildRoleLinks(false)
 	// 10000 roles, 1000 resources.
 	for i := 0; i < 10000; i++ {
-		e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i / 10), "read")
+		e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read")
 	}
 	// 100000 users.
 	for i := 0; i < 100000; i++ {
-		e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i / 10))
+		e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10))
 	}
 	e.BuildRoleLinks()
 

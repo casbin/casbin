@@ -22,6 +22,7 @@ import (
 	"github.com/casbin/casbin/util"
 )
 
+// RoleManager provides a default implementation for the RoleManager interface
 type RoleManager struct {
 	allRoles          *sync.Map
 	maxHierarchyLevel int

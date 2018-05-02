@@ -44,10 +44,13 @@ func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) {
 		}
 
 		if count == 2 {
+			// error intentionally ignored
 			ast.RM.AddLink(rule[0], rule[1])
 		} else if count == 3 {
+			// error intentionally ignored
 			ast.RM.AddLink(rule[0], rule[1], rule[2])
 		} else if count == 4 {
+			// error intentionally ignored
 			ast.RM.AddLink(rule[0], rule[1], rule[2], rule[3])
 		}
 	}

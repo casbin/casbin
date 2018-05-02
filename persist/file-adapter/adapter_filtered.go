@@ -45,12 +45,13 @@ func NewFilteredAdapter(filePath string) *FilteredAdapter {
 	return &a
 }
 
+// LoadPolicy loads all policy rules from the storage.
 func (a *FilteredAdapter) LoadPolicy(model model.Model) error {
 	a.filtered = false
 	return a.Adapter.LoadPolicy(model)
 }
 
-// LoadPolicy loads all policy rules from the storage.
+// LoadFilteredPolicy loads only policy rules that match the filter.
 func (a *FilteredAdapter) LoadFilteredPolicy(model model.Model, filter interface{}) error {
 	if filter == nil {
 		return a.LoadPolicy(model)
@@ -97,7 +98,7 @@ func (a *FilteredAdapter) IsFiltered() bool {
 
 // SavePolicy saves all policy rules to the storage.
 func (a *FilteredAdapter) SavePolicy(model model.Model) error {
-	if a.filtered == true {
+	if a.filtered {
 		return errors.New("cannot save a filtered policy")
 	}
 	return a.Adapter.SavePolicy(model)

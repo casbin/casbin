@@ -15,7 +15,6 @@
 package defaultrolemanager
 
 import (
-	"log"
 	"testing"
 
 	"github.com/casbin/casbin/rbac"
@@ -25,7 +24,7 @@ import (
 func testRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, res bool) {
 	t.Helper()
 	myRes, _ := rm.HasLink(name1, name2)
-	log.Printf("%s, %s: %t", name1, name2, myRes)
+	t.Logf("%s, %s: %t", name1, name2, myRes)
 
 	if myRes != res {
 		t.Errorf("%s < %s: %t, supposed to be %t", name1, name2, !res, res)
@@ -35,7 +34,7 @@ func testRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, res
 func testDomainRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, domain string, res bool) {
 	t.Helper()
 	myRes, _ := rm.HasLink(name1, name2, domain)
-	log.Printf("%s :: %s, %s: %t", domain, name1, name2, myRes)
+	t.Logf("%s :: %s, %s: %t", domain, name1, name2, myRes)
 
 	if myRes != res {
 		t.Errorf("%s :: %s < %s: %t, supposed to be %t", domain, name1, name2, !res, res)
@@ -45,7 +44,7 @@ func testDomainRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 strin
 func testPrintRoles(t *testing.T, rm rbac.RoleManager, name string, res []string) {
 	t.Helper()
 	myRes, _ := rm.GetRoles(name)
-	log.Printf("%s: %s", name, myRes)
+	t.Logf("%s: %s", name, myRes)
 
 	if !util.ArrayEquals(myRes, res) {
 		t.Errorf("%s: %s, supposed to be %s", name, myRes, res)
