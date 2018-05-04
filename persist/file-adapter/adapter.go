@@ -34,9 +34,7 @@ type Adapter struct {
 
 // NewAdapter is the constructor for Adapter.
 func NewAdapter(filePath string) *Adapter {
-	a := Adapter{}
-	a.filePath = filePath
-	return &a
+	return &Adapter{filePath: filePath}
 }
 
 // LoadPolicy loads all policy rules from the storage.
@@ -45,8 +43,7 @@ func (a *Adapter) LoadPolicy(model model.Model) error {
 		return errors.New("invalid file path, file path cannot be empty")
 	}
 
-	err := a.loadPolicyFile(model, persist.LoadPolicyLine)
-	return err
+	return a.loadPolicyFile(model, persist.LoadPolicyLine)
 }
 
 // SavePolicy saves all policy rules to the storage.
@@ -73,8 +70,7 @@ func (a *Adapter) SavePolicy(model model.Model) error {
 		}
 	}
 
-	err := a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
-	return err
+	return a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
 }
 
 func (a *Adapter) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
@@ -98,6 +94,7 @@ func (a *Adapter) savePolicyFile(text string) error {
 		return err
 	}
 	w := bufio.NewWriter(f)
+	// error intentionally ignored
 	w.WriteString(text)
 	w.Flush()
 	f.Close()

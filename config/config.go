@@ -27,11 +27,15 @@ import (
 )
 
 var (
-	DEFAULT_SECTION     = "default"
-	DEFAULT_COMMENT     = []byte{'#'}
+	// DEFAULT_SECTION specifies the name of a section if no name provided
+	DEFAULT_SECTION = "default"
+	// DEFAULT_COMMENT defines what character(s) indicate a comment `#`
+	DEFAULT_COMMENT = []byte{'#'}
+	// DEFAULT_COMMENT_SEM defines what alternate character(s) indicate a comment `;`
 	DEFAULT_COMMENT_SEM = []byte{';'}
 )
 
+// ConfigInterface defines the behavior of a Config implemenation
 type ConfigInterface interface {
 	String(key string) string
 	Strings(key string) []string
@@ -42,6 +46,7 @@ type ConfigInterface interface {
 	Set(key string, value string) error
 }
 
+// Config represents an implementation of the ConfigInterface
 type Config struct {
 	// map is not safe.
 	sync.RWMutex
@@ -133,26 +138,32 @@ func (c *Config) parseBuffer(buf *bufio.Reader) (err error) {
 	return nil
 }
 
+// Bool lookups up the value using the provided key and converts the value to a bool
 func (c *Config) Bool(key string) (bool, error) {
 	return strconv.ParseBool(c.get(key))
 }
 
+// Int lookups up the value using the provided key and converts the value to a int
 func (c *Config) Int(key string) (int, error) {
 	return strconv.Atoi(c.get(key))
 }
 
+// Int64 lookups up the value using the provided key and converts the value to a int64
 func (c *Config) Int64(key string) (int64, error) {
 	return strconv.ParseInt(c.get(key), 10, 64)
 }
 
+// Float64 lookups up the value using the provided key and converts the value to a float64
 func (c *Config) Float64(key string) (float64, error) {
 	return strconv.ParseFloat(c.get(key), 64)
 }
 
+// String lookups up the value using the provided key and converts the value to a string
 func (c *Config) String(key string) string {
 	return c.get(key)
 }
 
+// Strings lookups up the value using the provided key and converts the value to an array of string by splitting the string by comma
 func (c *Config) Strings(key string) []string {
 	v := c.get(key)
 	if v == "" {
@@ -161,6 +172,7 @@ func (c *Config) Strings(key string) []string {
 	return strings.Split(v, ",")
 }
 
+// Set sets the value for the specific key in the Config
 func (c *Config) Set(key string, value string) error {
 	c.Lock()
 	defer c.Unlock()

@@ -15,7 +15,6 @@
 package casbin
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -23,7 +22,7 @@ import (
 func NewEnforcerSafe(params ...interface{}) (e *Enforcer, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("%v", r))
+			err = fmt.Errorf("%v", r)
 			e = nil
 		}
 	}()
@@ -37,7 +36,7 @@ func NewEnforcerSafe(params ...interface{}) (e *Enforcer, err error) {
 func (e *Enforcer) LoadModelSafe() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("%v", r))
+			err = fmt.Errorf("%v", r)
 		}
 	}()
 
@@ -50,7 +49,7 @@ func (e *Enforcer) LoadModelSafe() (err error) {
 func (e *Enforcer) EnforceSafe(rvals ...interface{}) (result bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("%v", r))
+			err = fmt.Errorf("%v", r)
 			result = false
 		}
 	}()
@@ -60,10 +59,11 @@ func (e *Enforcer) EnforceSafe(rvals ...interface{}) (result bool, err error) {
 	return
 }
 
+// AddPolicySafe calls AddPolicy in a safe way, returns error instead of causing panic.
 func (e *Enforcer) AddPolicySafe(params ...interface{}) (result bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("%v", r))
+			err = fmt.Errorf("%v", r)
 			result = false
 		}
 	}()
@@ -73,10 +73,11 @@ func (e *Enforcer) AddPolicySafe(params ...interface{}) (result bool, err error)
 	return
 }
 
+// RemovePolicySafe calls RemovePolicy in a safe way, returns error instead of causing panic.
 func (e *Enforcer) RemovePolicySafe(params ...interface{}) (result bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("%v", r))
+			err = fmt.Errorf("%v", r)
 			result = false
 		}
 	}()
@@ -86,10 +87,11 @@ func (e *Enforcer) RemovePolicySafe(params ...interface{}) (result bool, err err
 	return
 }
 
+// RemoveFilteredPolicySafe calls RemoveFilteredPolicy in a safe way, returns error instead of causing panic.
 func (e *Enforcer) RemoveFilteredPolicySafe(fieldIndex int, fieldValues ...string) (result bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("%v", r))
+			err = fmt.Errorf("%v", r)
 			result = false
 		}
 	}()

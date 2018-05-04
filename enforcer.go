@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/Knetic/govaluate"
+
 	"github.com/casbin/casbin/effect"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
@@ -124,6 +125,7 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 	e.initialize()
 
 	if e.adapter != nil {
+		// error intentionally ignored
 		e.LoadPolicy()
 	}
 }
@@ -184,6 +186,7 @@ func (e *Enforcer) SetAdapter(adapter persist.Adapter) {
 // SetWatcher sets the current watcher.
 func (e *Enforcer) SetWatcher(watcher persist.Watcher) {
 	e.watcher = watcher
+	// error intentionally ignored
 	watcher.SetUpdateCallback(func(string) { e.LoadPolicy() })
 }
 
@@ -205,8 +208,7 @@ func (e *Enforcer) ClearPolicy() {
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
 	e.model.ClearPolicy()
-	err := e.adapter.LoadPolicy(e.model)
-	if err != nil {
+	if err := e.adapter.LoadPolicy(e.model); err != nil {
 		return err
 	}
 
@@ -230,8 +232,7 @@ func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
 	default:
 		return errors.New("filtered policies are not supported by this adapter")
 	}
-	err := filteredAdapter.LoadFilteredPolicy(e.model, filter)
-	if err != nil {
+	if err := filteredAdapter.LoadFilteredPolicy(e.model, filter); err != nil {
 		return err
 	}
 
@@ -256,13 +257,13 @@ func (e *Enforcer) SavePolicy() error {
 	if e.IsFiltered() {
 		return errors.New("cannot save a filtered policy")
 	}
-	err := e.adapter.SavePolicy(e.model)
-	if err == nil {
-		if e.watcher != nil {
-			e.watcher.Update()
-		}
+	if err := e.adapter.SavePolicy(e.model); err != nil {
+		return err
 	}
-	return err
+	if e.watcher != nil {
+		return e.watcher.Update()
+	}
+	return nil
 }
 
 // EnableEnforce changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
@@ -287,6 +288,7 @@ func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *Enforcer) BuildRoleLinks() {
+	// error intentionally ignored
 	e.rm.Clear()
 	e.model.BuildRoleLinks(e.rm)
 }
@@ -334,39 +336,41 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 			if err != nil {
 				policyEffects[i] = effect.Indeterminate
 				panic(err)
-			} else {
-				switch result.(type) {
-				case bool:
-					if !result.(bool) {
-						policyEffects[i] = effect.Indeterminate
-						continue
-					}
-				case float64:
-					if result.(float64) == 0 {
-						policyEffects[i] = effect.Indeterminate
-						continue
-					} else {
-						matcherResults[i] = result.(float64)
-					}
-				default:
-					panic(errors.New("matcher result should be bool, int or float"))
-				}
-				if eft, ok := parameters["p_eft"]; ok {
-					if eft == "allow" {
-						policyEffects[i] = effect.Allow
-					} else if eft == "deny" {
-						policyEffects[i] = effect.Deny
-					} else {
-						policyEffects[i] = effect.Indeterminate
-					}
-				} else {
-					policyEffects[i] = effect.Allow
-				}
-
-				if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
-					break
-				}
 			}
+
+			switch result.(type) {
+			case bool:
+				if !result.(bool) {
+					policyEffects[i] = effect.Indeterminate
+					continue
+				}
+			case float64:
+				if result.(float64) == 0 {
+					policyEffects[i] = effect.Indeterminate
+					continue
+				} else {
+					matcherResults[i] = result.(float64)
+				}
+			default:
+				panic(errors.New("matcher result should be bool, int or float"))
+			}
+
+			if eft, ok := parameters["p_eft"]; ok {
+				if eft == "allow" {
+					policyEffects[i] = effect.Allow
+				} else if eft == "deny" {
+					policyEffects[i] = effect.Deny
+				} else {
+					policyEffects[i] = effect.Indeterminate
+				}
+			} else {
+				policyEffects[i] = effect.Allow
+			}
+
+			if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
+				break
+			}
+
 		}
 	} else {
 		policyEffects = make([]effect.Effect, 1)
@@ -386,12 +390,12 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		if err != nil {
 			policyEffects[0] = effect.Indeterminate
 			panic(err)
+		}
+
+		if result.(bool) {
+			policyEffects[0] = effect.Allow
 		} else {
-			if result.(bool) {
-				policyEffects[0] = effect.Allow
-			} else {
-				policyEffects[0] = effect.Indeterminate
-			}
+			policyEffects[0] = effect.Indeterminate
 		}
 	}
 
@@ -402,16 +406,20 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		panic(err)
 	}
 
-	reqStr := "Request: "
-	for i, rval := range rvals {
-		if i != len(rvals)-1 {
-			reqStr += fmt.Sprintf("%v, ", rval)
-		} else {
-			reqStr += fmt.Sprintf("%v", rval)
+	// only generate the request --> result string if the message
+	// is going to be logged.
+	if util.EnableLog {
+		reqStr := "Request: "
+		for i, rval := range rvals {
+			if i != len(rvals)-1 {
+				reqStr += fmt.Sprintf("%v, ", rval)
+			} else {
+				reqStr += fmt.Sprintf("%v", rval)
+			}
 		}
+		reqStr += fmt.Sprintf(" ---> %t", result)
+		util.LogPrint(reqStr)
 	}
-	reqStr += fmt.Sprintf(" ---> %t", result)
-	util.LogPrint(reqStr)
 
 	return result
 }

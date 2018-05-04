@@ -15,14 +15,13 @@
 package util
 
 import (
-	"log"
 	"testing"
 )
 
 func testRemoveComments(t *testing.T, s string, res string) {
 	t.Helper()
 	myRes := RemoveComments(s)
-	log.Printf("%s: %s", s, myRes)
+	t.Logf("%s: %s", s, myRes)
 
 	if myRes != res {
 		t.Errorf("%s: %s, supposed to be %s", s, myRes, res)
@@ -40,7 +39,7 @@ func TestRemoveComments(t *testing.T) {
 func testArrayEquals(t *testing.T, a []string, b []string, res bool) {
 	t.Helper()
 	myRes := ArrayEquals(a, b)
-	log.Printf("%s == %s: %t", a, b, myRes)
+	t.Logf("%s == %s: %t", a, b, myRes)
 
 	if myRes != res {
 		t.Errorf("%s == %s: %t, supposed to be %t", a, b, myRes, res)
@@ -57,7 +56,7 @@ func TestArrayEquals(t *testing.T) {
 func testArray2DEquals(t *testing.T, a [][]string, b [][]string, res bool) {
 	t.Helper()
 	myRes := Array2DEquals(a, b)
-	log.Printf("%s == %s: %t", a, b, myRes)
+	t.Logf("%s == %s: %t", a, b, myRes)
 
 	if myRes != res {
 		t.Errorf("%s == %s: %t, supposed to be %t", a, b, myRes, res)
@@ -75,7 +74,7 @@ func TestArray2DEquals(t *testing.T) {
 func testSetEquals(t *testing.T, a []string, b []string, res bool) {
 	t.Helper()
 	myRes := SetEquals(a, b)
-	log.Printf("%s == %s: %t", a, b, myRes)
+	t.Logf("%s == %s: %t", a, b, myRes)
 
 	if myRes != res {
 		t.Errorf("%s == %s: %t, supposed to be %t", a, b, myRes, res)

@@ -15,7 +15,6 @@
 package casbin
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/casbin/casbin/persist/file-adapter"
@@ -26,8 +25,8 @@ func TestPathError(t *testing.T) {
 	if err == nil {
 		t.Errorf("Should be error here.")
 	} else {
-		fmt.Print("Test on error: ")
-		fmt.Print(err.Error())
+		t.Log("Test on error: ")
+		t.Log(err.Error())
 	}
 }
 
@@ -36,16 +35,16 @@ func TestEnforcerParamError(t *testing.T) {
 	if err == nil {
 		t.Errorf("Should not be error here.")
 	} else {
-		fmt.Print("Test on error: ")
-		fmt.Print(err.Error())
+		t.Log("Test on error: ")
+		t.Log(err.Error())
 	}
 
 	_, err2 := NewEnforcerSafe(1, "2")
 	if err2 == nil {
 		t.Errorf("Should not be error here.")
 	} else {
-		fmt.Print("Test on error: ")
-		fmt.Print(err2.Error())
+		t.Log("Test on error: ")
+		t.Log(err2.Error())
 	}
 }
 
@@ -54,8 +53,8 @@ func TestModelError(t *testing.T) {
 	if err == nil {
 		t.Errorf("Should be error here.")
 	} else {
-		fmt.Print("Test on error: ")
-		fmt.Print(err.Error())
+		t.Log("Test on error: ")
+		t.Log(err.Error())
 	}
 }
 
@@ -64,8 +63,8 @@ func TestPolicyError(t *testing.T) {
 	if err == nil {
 		t.Errorf("Should be error here.")
 	} else {
-		fmt.Print("Test on error: ")
-		fmt.Print(err.Error())
+		t.Log("Test on error: ")
+		t.Log(err.Error())
 	}
 }
 
@@ -76,8 +75,8 @@ func TestEnforceError(t *testing.T) {
 	if err == nil {
 		t.Errorf("Should be error here.")
 	} else {
-		fmt.Print("Test on error: ")
-		fmt.Print(err.Error())
+		t.Log("Test on error: ")
+		t.Log(err.Error())
 	}
 }
 
@@ -87,22 +86,22 @@ func TestNoError(t *testing.T) {
 	err := e.LoadModelSafe()
 	if err != nil {
 		t.Errorf("Should be no error here.")
-		fmt.Print("Unexpected error: ")
-		fmt.Print(err.Error())
+		t.Log("Unexpected error: ")
+		t.Log(err.Error())
 	}
 
 	err = e.LoadPolicy()
 	if err != nil {
 		t.Errorf("Should be no error here.")
-		fmt.Print("Unexpected error: ")
-		fmt.Print(err.Error())
+		t.Log("Unexpected error: ")
+		t.Log(err.Error())
 	}
 
 	err = e.SavePolicy()
 	if err != nil {
 		t.Errorf("Should be no error here.")
-		fmt.Print("Unexpected error: ")
-		fmt.Print(err.Error())
+		t.Log("Unexpected error: ")
+		t.Log(err.Error())
 	}
 }
 
@@ -115,8 +114,8 @@ func TestModelNoError(t *testing.T) {
 	if err == nil {
 		t.Errorf("Should be error here.")
 	} else {
-		fmt.Print("Test on error: ")
-		fmt.Print(err.Error())
+		t.Log("Test on error: ")
+		t.Log(err.Error())
 	}
 }
 
@@ -131,8 +130,8 @@ func TestMockAdapterErrors(t *testing.T) {
 	if err == nil {
 		t.Errorf("Should be an error here.")
 	} else {
-		fmt.Print("Test on error: ")
-		fmt.Print(err.Error())
+		t.Log("Test on error: ")
+		t.Log(err.Error())
 	}
 
 	_, err2 := e.RemoveFilteredPolicySafe(1, "domain1", "data1")
@@ -140,8 +139,8 @@ func TestMockAdapterErrors(t *testing.T) {
 	if err2 == nil {
 		t.Errorf("Should be an error here.")
 	} else {
-		fmt.Print("Test on error: ")
-		fmt.Print(err2.Error())
+		t.Log("Test on error: ")
+		t.Log(err2.Error())
 	}
 
 	_, err3 := e.RemovePolicySafe("admin", "domain2", "data2", "read")
@@ -149,7 +148,7 @@ func TestMockAdapterErrors(t *testing.T) {
 	if err3 == nil {
 		t.Errorf("Should be an error here.")
 	} else {
-		fmt.Print("Test on error: ")
-		fmt.Print(err3.Error())
+		t.Log("Test on error: ")
+		t.Log(err3.Error())
 	}
 }

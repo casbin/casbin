@@ -286,8 +286,12 @@ func NewRoleManager() rbac.RoleManager {
 	return &testCustomRoleManager{}
 }
 func (rm *testCustomRoleManager) Clear() error { return nil }
-func (rm *testCustomRoleManager) AddLink(name1 string, name2 string, domain ...string) error { return nil }
-func (rm *testCustomRoleManager) DeleteLink(name1 string, name2 string, domain ...string) error { return nil }
+func (rm *testCustomRoleManager) AddLink(name1 string, name2 string, domain ...string) error {
+	return nil
+}
+func (rm *testCustomRoleManager) DeleteLink(name1 string, name2 string, domain ...string) error {
+	return nil
+}
 func (rm *testCustomRoleManager) HasLink(name1 string, name2 string, domain ...string) (bool, error) {
 	if name1 == "alice" && name2 == "alice" {
 		return true, nil

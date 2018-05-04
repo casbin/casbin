@@ -15,14 +15,13 @@
 package util
 
 import (
-	"log"
 	"testing"
 )
 
 func testKeyMatch(t *testing.T, key1 string, key2 string, res bool) {
 	t.Helper()
 	myRes := KeyMatch(key1, key2)
-	log.Printf("%s < %s: %t", key1, key2, myRes)
+	t.Logf("%s < %s: %t", key1, key2, myRes)
 
 	if myRes != res {
 		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)
@@ -44,7 +43,7 @@ func TestKeyMatch(t *testing.T) {
 func testKeyMatch2(t *testing.T, key1 string, key2 string, res bool) {
 	t.Helper()
 	myRes := KeyMatch2(key1, key2)
-	log.Printf("%s < %s: %t", key1, key2, myRes)
+	t.Logf("%s < %s: %t", key1, key2, myRes)
 
 	if myRes != res {
 		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)
@@ -83,7 +82,7 @@ func TestKeyMatch2(t *testing.T) {
 func testKeyMatch3(t *testing.T, key1 string, key2 string, res bool) {
 	t.Helper()
 	myRes := KeyMatch3(key1, key2)
-	log.Printf("%s < %s: %t", key1, key2, myRes)
+	t.Logf("%s < %s: %t", key1, key2, myRes)
 
 	if myRes != res {
 		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)
@@ -117,7 +116,7 @@ func TestKeyMatch3(t *testing.T) {
 func testRegexMatch(t *testing.T, key1 string, key2 string, res bool) {
 	t.Helper()
 	myRes := RegexMatch(key1, key2)
-	log.Printf("%s < %s: %t", key1, key2, myRes)
+	t.Logf("%s < %s: %t", key1, key2, myRes)
 
 	if myRes != res {
 		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)
@@ -139,7 +138,7 @@ func TestRegexMatch(t *testing.T) {
 func testIPMatch(t *testing.T, ip1 string, ip2 string, res bool) {
 	t.Helper()
 	myRes := IPMatch(ip1, ip2)
-	log.Printf("%s < %s: %t", ip1, ip2, myRes)
+	t.Logf("%s < %s: %t", ip1, ip2, myRes)
 
 	if myRes != res {
 		t.Errorf("%s < %s: %t, supposed to be %t", ip1, ip2, !res, res)

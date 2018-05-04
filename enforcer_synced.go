@@ -22,13 +22,14 @@ import (
 	"github.com/casbin/casbin/persist"
 )
 
+// SyncedEnforcer wraps Enforcer and provides synchronized access
 type SyncedEnforcer struct {
 	*Enforcer
-	m sync.RWMutex
+	m        sync.RWMutex
 	autoLoad bool
 }
 
-// NewEnforcer creates a synchronized enforcer via file or DB.
+// NewSyncedEnforcer creates a synchronized enforcer via file or DB.
 func NewSyncedEnforcer(params ...interface{}) *SyncedEnforcer {
 	e := &SyncedEnforcer{}
 	e.Enforcer = NewEnforcer(params...)
@@ -36,6 +37,7 @@ func NewSyncedEnforcer(params ...interface{}) *SyncedEnforcer {
 	return e
 }
 
+// StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy
 func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 	e.autoLoad = true
 	go func() {
@@ -47,15 +49,17 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 				break
 			}
 
+			// error intentionally ignored
 			e.LoadPolicy()
 			// Uncomment this line to see when the policy is loaded.
 			// log.Print("Load policy for time: ", n)
-			n ++
+			n++
 			time.Sleep(d)
 		}
-	} ()
+	}()
 }
 
+// StopAutoLoadPolicy causes the go routine to exit.
 func (e *SyncedEnforcer) StopAutoLoadPolicy() {
 	e.autoLoad = false
 }
@@ -63,7 +67,8 @@ func (e *SyncedEnforcer) StopAutoLoadPolicy() {
 // SetWatcher sets the current watcher.
 func (e *SyncedEnforcer) SetWatcher(watcher persist.Watcher) {
 	e.watcher = watcher
-	watcher.SetUpdateCallback(func (string) {e.LoadPolicy()})
+	// error intentionally ignored
+	watcher.SetUpdateCallback(func(string) { e.LoadPolicy() })
 }
 
 // ClearPolicy clears all policy.

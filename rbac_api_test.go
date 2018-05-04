@@ -15,7 +15,6 @@
 package casbin
 
 import (
-	"log"
 	"testing"
 
 	"github.com/casbin/casbin/util"
@@ -24,7 +23,7 @@ import (
 func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
 	t.Helper()
 	myRes := e.GetRolesForUser(name)
-	log.Print("Roles for ", name, ": ", myRes)
+	t.Log("Roles for ", name, ": ", myRes)
 
 	if !util.SetEquals(res, myRes) {
 		t.Error("Roles for ", name, ": ", myRes, ", supposed to be ", res)
@@ -34,7 +33,7 @@ func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
 func testGetUsers(t *testing.T, e *Enforcer, name string, res []string) {
 	t.Helper()
 	myRes := e.GetUsersForRole(name)
-	log.Print("Users for ", name, ": ", myRes)
+	t.Log("Users for ", name, ": ", myRes)
 
 	if !util.SetEquals(res, myRes) {
 		t.Error("Users for ", name, ": ", myRes, ", supposed to be ", res)
@@ -44,7 +43,7 @@ func testGetUsers(t *testing.T, e *Enforcer, name string, res []string) {
 func testHasRole(t *testing.T, e *Enforcer, name string, role string, res bool) {
 	t.Helper()
 	myRes := e.HasRoleForUser(name, role)
-	log.Print(name, " has role ", role, ": ", myRes)
+	t.Log(name, " has role ", role, ": ", myRes)
 
 	if res != myRes {
 		t.Error(name, " has role ", role, ": ", myRes, ", supposed to be ", res)
@@ -113,7 +112,7 @@ func TestRoleAPI(t *testing.T) {
 func testGetPermissions(t *testing.T, e *Enforcer, name string, res [][]string) {
 	t.Helper()
 	myRes := e.GetPermissionsForUser(name)
-	log.Print("Permissions for ", name, ": ", myRes)
+	t.Log("Permissions for ", name, ": ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
 		t.Error("Permissions for ", name, ": ", myRes, ", supposed to be ", res)
@@ -123,7 +122,7 @@ func testGetPermissions(t *testing.T, e *Enforcer, name string, res [][]string) 
 func testHasPermission(t *testing.T, e *Enforcer, name string, permission []string, res bool) {
 	t.Helper()
 	myRes := e.HasPermissionForUser(name, permission...)
-	log.Print(name, " has permission ", util.ArrayToString(permission), ": ", myRes)
+	t.Log(name, " has permission ", util.ArrayToString(permission), ": ", myRes)
 
 	if res != myRes {
 		t.Error(name, " has permission ", util.ArrayToString(permission), ": ", myRes, ", supposed to be ", res)

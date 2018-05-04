@@ -14,20 +14,26 @@
 
 package casbin
 
+const (
+	notImplemented = "not implemented"
+)
+
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) bool {
 	ruleAdded := e.model.AddPolicy(sec, ptype, rule)
+	if !ruleAdded {
+		return ruleAdded
+	}
 
-	if ruleAdded {
-		if e.adapter != nil && e.autoSave {
-			err := e.adapter.AddPolicy(sec, ptype, rule)
-			if err != nil && err.Error() != "not implemented" {
+	if e.adapter != nil && e.autoSave {
+		if err := e.adapter.AddPolicy(sec, ptype, rule); err != nil {
+			if err.Error() != notImplemented {
 				panic(err)
-			} else if err == nil {
-				if e.watcher != nil {
-					e.watcher.Update()
-				}
 			}
+		}
+		if e.watcher != nil {
+			// error intentionally ignored
+			e.watcher.Update()
 		}
 	}
 
@@ -37,17 +43,19 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) bool {
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) bool {
 	ruleRemoved := e.model.RemovePolicy(sec, ptype, rule)
+	if !ruleRemoved {
+		return ruleRemoved
+	}
 
-	if ruleRemoved {
-		if e.adapter != nil && e.autoSave {
-			err := e.adapter.RemovePolicy(sec, ptype, rule)
-			if err != nil && err.Error() != "not implemented" {
+	if e.adapter != nil && e.autoSave {
+		if err := e.adapter.RemovePolicy(sec, ptype, rule); err != nil {
+			if err.Error() != notImplemented {
 				panic(err)
-			} else if err == nil {
-				if e.watcher != nil {
-					e.watcher.Update()
-				}
 			}
+		}
+		if e.watcher != nil {
+			// error intentionally ignored
+			e.watcher.Update()
 		}
 	}
 
@@ -57,17 +65,19 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) bool {
 // removeFilteredPolicy removes rules based on field filters from the current policy.
 func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) bool {
 	ruleRemoved := e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	if !ruleRemoved {
+		return ruleRemoved
+	}
 
-	if ruleRemoved {
-		if e.adapter != nil && e.autoSave {
-			err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
-			if err != nil && err.Error() != "not implemented" {
+	if e.adapter != nil && e.autoSave {
+		if err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
+			if err.Error() != notImplemented {
 				panic(err)
-			} else if err == nil {
-				if e.watcher != nil {
-					e.watcher.Update()
-				}
 			}
+		}
+		if e.watcher != nil {
+			// error intentionally ignored
+			e.watcher.Update()
 		}
 	}
 
