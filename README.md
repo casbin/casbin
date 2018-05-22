@@ -10,11 +10,11 @@ Casbin
 [![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](http://www.patreon.com/yangluo)
 [![Sourcegraph Badge](https://sourcegraph.com/github.com/casbin/casbin/-/badge.svg)](https://sourcegraph.com/github.com/casbin/casbin?badge)
 
-**News**: Casbin is also started to port to Java ([jCasbin](https://github.com/casbin/jcasbin)) and PHP ([PHP-Casbin](https://github.com/sstutz/php-casbin)), contribution is welcomed.
+**News**: still worry about how to write the correct Casbin policy? ``Casbin online editor`` is coming to help! Try it at: http://casbin.org/editor/
 
 ![casbin Logo](casbin-logo.png)
 
-Casbin is a powerful and efficient open-source access control library for Golang projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model).
+Casbin is a powerful and efficient open-source access control library for Golang projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model). Casbin is also started to port to Java ([jCasbin](https://github.com/casbin/jcasbin)) and PHP ([PHP-Casbin](https://github.com/sstutz/php-casbin)), contribution is welcomed.
 
 ### Supported by Auth0 <span><img src="https://user-images.githubusercontent.com/1801923/31792116-d4fca9ec-b512-11e7-92eb-56e8d3df8e70.png" height="28" align="top"></span>
 
@@ -27,6 +27,7 @@ If you want to easily add authentication and authorization to your Go projects, 
 - [Features](#features)
 - [Installation](#installation)
 - [Documentation](#documentation)
+- [Online editor](#online-editor)
 - [Tutorials](#tutorials)
 - [Get started](#get-started)
 - [Policy management](#policy-management)
@@ -113,6 +114,10 @@ go get github.com/casbin/casbin
 ## Documentation
 
 For documentation, please see: [Our Wiki](https://github.com/casbin/casbin/wiki)
+
+## Online editor
+
+You can also use the online editor (http://casbin.org/editor/) to write your Casbin model and policy in your web browser. It provides functionality such as ``syntax highlighting`` and ``code completion``, just like an IDE for a programming language.
 
 ## Tutorials
 
