@@ -240,6 +240,7 @@ Watcher | Type | Author | Description
 [Etcd Watcher](https://github.com/casbin/etcd-watcher) | KV store | Casbin | Watcher for [etcd](https://github.com/coreos/etcd)
 [NATS Watcher](https://github.com/Soluto/casbin-nats-watcher) | Messaging system | [Soluto](https://github.com/Soluto) | Watcher for [NATS](https://nats.io/)
 [ZooKeeper Watcher](https://github.com/grepsr/casbin-zk-watcher) | KV store  | [Grepsr](https://github.com/grepsr) | Watcher for [Apache ZooKeeper](https://zookeeper.apache.org/)
+[Redis Watcher](https://github.com/billcobbler/casbin-redis-watcher) | KV store  | [@billcobbler](https://github.com/billcobbler) | Watcher for [Redis](http://redis.io/)
 
 ## Role manager
 
