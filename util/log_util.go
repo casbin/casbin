@@ -22,7 +22,7 @@ var EnableLog = true
 // LogPrint prints the log.
 func LogPrint(v ...interface{}) {
 	if EnableLog {
-		log.Print(v)
+		log.Print(v...)
 	}
 }
 
