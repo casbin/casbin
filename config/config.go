@@ -110,14 +110,14 @@ func (c *Config) parseBuffer(buf *bufio.Reader) (err error) {
 		line, _, err := buf.ReadLine()
 		if err == io.EOF {
 			break
-		} else if bytes.Equal(line, []byte{}) {
-			continue
 		} else if err != nil {
 			return err
 		}
 
 		line = bytes.TrimSpace(line)
 		switch {
+		case bytes.Equal(line, []byte{}):
+			continue
 		case bytes.HasPrefix(line, DEFAULT_COMMENT):
 			continue
 		case bytes.HasPrefix(line, DEFAULT_COMMENT_SEM):
