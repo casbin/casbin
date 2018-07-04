@@ -16,6 +16,8 @@ Casbin
 
 Casbin is a powerful and efficient open-source access control library for Golang projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model). Casbin is also started to port to Java ([jCasbin](https://github.com/casbin/jcasbin)) and PHP ([PHP-Casbin](https://github.com/sstutz/php-casbin)), contribution is welcomed.
 
+Casbin originates from the research project from the [Lab for Big Data Technology of Peking University](http://ibd.pku.edu.cn/).
+
 ## Table of contents
 
 - [Supported models](#supported-models)
@@ -343,7 +345,8 @@ This project is licensed under the [Apache 2.0 license](https://github.com/casbi
 
 If you have any issues or feature requests, please contact us. PR is welcomed.
 - https://github.com/casbin/casbin/issues
-- hsluoyz@gmail.com
+- hsluoyz \<at> gmail.com
+- luoyang \<at> pku.edu.cn
 - Tencent QQ group: [546057381](//shang.qq.com/wpa/qunwpa?idkey=8ac8b91fc97ace3d383d0035f7aa06f7d670fd8e8d4837347354a31c18fac885)
 
 ## Donation
