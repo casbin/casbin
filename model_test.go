@@ -389,21 +389,27 @@ func TestKeyMatch2Model(t *testing.T) {
 	testEnforce(t, e, "alice", "/alice_data2/myid/using/res_id", "GET", true)
 }
 
-func KeyMatchCustom(args ...interface{}) (interface{}, error) {
-	match := false
-	if args[0].(string) == "/alice_data2/myid/using/res_id" && args[1].(string) == "/alice_data/:resource" {
-		match = true
+func CustomFunction(key1 string, key2 string) bool {
+	if key1 == "/alice_data2/myid/using/res_id" && key2 == "/alice_data/:resource" {
+		return true
+	} else if key1 == "/alice_data2/myid/using/res_id" && key2 == "/alice_data2/:id/using/:resId" {
+		return true
+	} else {
+		return false
 	}
-	if args[0].(string) == "/alice_data2/myid/using/res_id" && args[1].(string) == "/alice_data2/:id/using/:resId" {
-		match = true
-	}
-	return match, nil
+}
+
+func CustomFunctionWrapper(args ...interface{}) (interface{}, error) {
+	key1 := args[0].(string)
+	key2 := args[1].(string)
+
+	return (bool)(CustomFunction(key1, key2)), nil
 }
 
 func TestKeyMatchCustomModel(t *testing.T) {
 	e := NewEnforcer("examples/keymatch_custom_model.conf", "examples/keymatch2_policy.csv")
 
-	e.AddFunction("keyMatchCustom", KeyMatchCustom)
+	e.AddFunction("keyMatchCustom", CustomFunctionWrapper)
 
 	testEnforce(t, e, "alice", "/alice_data2/myid", "GET", false)
 	testEnforce(t, e, "alice", "/alice_data2/myid/using/res_id", "GET", true)
