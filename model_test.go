@@ -42,13 +42,6 @@ func testDomainEnforce(t *testing.T, e *Enforcer, sub string, dom string, obj st
 	}
 }
 
-func testEnforceSync(t *testing.T, e *SyncedEnforcer, sub string, obj interface{}, act string, res bool) {
-	t.Helper()
-	if e.Enforce(sub, obj, act) != res {
-		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, !res, res)
-	}
-}
-
 func TestBasicModel(t *testing.T) {
 	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 

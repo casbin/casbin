@@ -16,7 +16,6 @@ package casbin
 
 import (
 	"testing"
-	"time"
 
 	"github.com/casbin/casbin/persist/file-adapter"
 )
@@ -317,24 +316,6 @@ func TestInitWithAdapter(t *testing.T) {
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", false)
 	testEnforce(t, e, "bob", "data2", "write", true)
-}
-
-func TestSync(t *testing.T) {
-	e := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-	// Start reloading the policy every 200 ms.
-	e.StartAutoLoadPolicy(time.Millisecond * 200)
-
-	testEnforceSync(t, e, "alice", "data1", "read", true)
-	testEnforceSync(t, e, "alice", "data1", "write", false)
-	testEnforceSync(t, e, "alice", "data2", "read", false)
-	testEnforceSync(t, e, "alice", "data2", "write", false)
-	testEnforceSync(t, e, "bob", "data1", "read", false)
-	testEnforceSync(t, e, "bob", "data1", "write", false)
-	testEnforceSync(t, e, "bob", "data2", "read", false)
-	testEnforceSync(t, e, "bob", "data2", "write", true)
-
-	// Stop the reloading policy periodically.
-	e.StopAutoLoadPolicy()
 }
 
 func TestRoleLinks(t *testing.T) {
