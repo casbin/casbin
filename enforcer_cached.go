@@ -14,11 +14,16 @@
 
 package casbin
 
+import (
+	"sync"
+)
+
 // CachedEnforcer wraps Enforcer and provides decision cache
 type CachedEnforcer struct {
 	*Enforcer
-	m map[string]bool
+	m           map[string]bool
 	enableCache bool
+	locker      *sync.Mutex
 }
 
 // NewCachedEnforcer creates a cached enforcer via file or DB.
@@ -27,6 +32,7 @@ func NewCachedEnforcer(params ...interface{}) *CachedEnforcer {
 	e.Enforcer = NewEnforcer(params...)
 	e.enableCache = true
 	e.m = make(map[string]bool)
+	e.locker = new(sync.Mutex)
 	return e
 }
 
@@ -36,6 +42,7 @@ func (e *CachedEnforcer) EnableCache(enableCache bool) {
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
+// if rvals is not string , ingore the cache
 func (e *CachedEnforcer) Enforce(rvals ...interface{}) bool {
 	if !e.enableCache {
 		return e.Enforcer.Enforce(rvals...)
@@ -43,9 +50,15 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) bool {
 
 	key := ""
 	for _, rval := range rvals {
-		key += rval.(string) + "$$"
+		if val, ok := rval.(string); ok {
+			key += val + "$$"
+		} else {
+			return e.Enforcer.Enforce(rvals...)
+		}
 	}
 
+	e.locker.Lock()
+	defer e.locker.Unlock()
 	if _, ok := e.m[key]; ok {
 		return e.m[key]
 	} else {
