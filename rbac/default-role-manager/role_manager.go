@@ -155,10 +155,18 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 
 // PrintRoles prints all the roles to log.
 func (rm *RoleManager) PrintRoles() error {
+	line := ""
 	rm.allRoles.Range(func(_, value interface{}) bool {
-		util.LogPrint(value.(*Role).toString())
+		if text := value.(*Role).toString(); text != "" {
+			if line == "" {
+				line = text
+			} else {
+				line += ", " + text
+			}
+		}
 		return true
 	})
+	util.LogPrint(line)
 	return nil
 }
 
@@ -222,6 +230,9 @@ func (r *Role) hasDirectRole(name string) bool {
 
 func (r *Role) toString() string {
 	names := ""
+	if len(r.roles) == 0 {
+		return ""
+	}
 	for i, role := range r.roles {
 		if i == 0 {
 			names += role.name
@@ -229,7 +240,12 @@ func (r *Role) toString() string {
 			names += ", " + role.name
 		}
 	}
-	return r.name + " < " + names
+
+	if len(r.roles) == 1 {
+		return r.name + " < " + names
+	} else {
+		return r.name + " < (" + names + ")"
+	}
 }
 
 func (r *Role) getRoles() []string {
