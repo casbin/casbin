@@ -71,4 +71,8 @@ func TestGet(t *testing.T) {
 	}
 
 	config.Set("other::key1", "test key")
+
+	if v := config.String("multi::name"); v != "r.sub==p.sub&&r.obj==p.obj" {
+		t.Errorf("Get failure: expected different value for other::key1 (expected: [%#v] got: [%#v])", "r.sub==p.sub&&r.obj==p.obj", v)
+	}
 }
