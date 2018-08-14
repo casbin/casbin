@@ -107,15 +107,24 @@ func (c *Config) parseBuffer(buf *bufio.Reader) error {
 	var section string
 	var lineNum int
 	var buffer bytes.Buffer
-
+	var canWrite bool
 	for {
+		if canWrite {
+			if err := c.write(section, lineNum, &buffer); err != nil {
+				return err
+			} else {
+				canWrite = false
+			}
+		}
 		lineNum++
 		line, _, err := buf.ReadLine()
 		if err == io.EOF {
-			if err := c.write(section, lineNum, &buffer); err != nil {
-				return err
+			// force write when buffer is not flushed yet
+			if buffer.Len() > 0 {
+				if err := c.write(section, lineNum, &buffer); err != nil {
+					return err
+				}
 			}
-
 			break
 		} else if err != nil {
 			return err
@@ -125,26 +134,28 @@ func (c *Config) parseBuffer(buf *bufio.Reader) error {
 		switch {
 		case bytes.Equal(line, []byte{}), bytes.HasPrefix(line, DEFAULT_COMMENT_SEM),
 			bytes.HasPrefix(line, DEFAULT_COMMENT):
+			canWrite = true
 			continue
 		case bytes.HasPrefix(line, []byte{'['}) && bytes.HasSuffix(line, []byte{']'}):
-			section = string(line[1 : len(line)-1])
-		default:
-			var p []byte
-			isMultiLine := bytes.HasSuffix(line, DEFAULT_MULTI_LINE_SEPARATOR)
-			if isMultiLine {
-				p = bytes.TrimSpace(line[:len(line)-1])
-			} else {
-				p = line
-			}
-			// append to buffer
-			if _, err := buffer.Write(p); err != nil {
-				return err
-			}
-
-			if !isMultiLine {
+			// force write when buffer is not flushed yet
+			if buffer.Len() > 0 {
 				if err := c.write(section, lineNum, &buffer); err != nil {
 					return err
 				}
+				canWrite = false
+			}
+			section = string(line[1 : len(line)-1])
+		default:
+			var p []byte
+			if bytes.HasSuffix(line, DEFAULT_MULTI_LINE_SEPARATOR) {
+				p = bytes.TrimSpace(line[:len(line)-1])
+			} else {
+				p = line
+				canWrite = true
+			}
+
+			if _, err := buffer.Write(p); err != nil {
+				return err
 			}
 		}
 	}
