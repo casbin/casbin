@@ -73,22 +73,22 @@ func TestGet(t *testing.T) {
 	config.Set("other::key1", "test key")
 
 	if v := config.String("multi1::name"); v != "r.sub==p.sub&&r.obj==p.obj" {
-		t.Errorf("Get failure: expected different value for other::key1 (expected: [%#v] got: [%#v])", "r.sub==p.sub&&r.obj==p.obj", v)
+		t.Errorf("Get failure: expected different value for multi1::name (expected: [%#v] got: [%#v])", "r.sub==p.sub&&r.obj==p.obj", v)
 	}
 
 	if v := config.String("multi2::name"); v != "r.sub==p.sub&&r.obj==p.obj" {
-		t.Errorf("Get failure: expected different value for other::key1 (expected: [%#v] got: [%#v])", "r.sub==p.sub&&r.obj==p.obj", v)
+		t.Errorf("Get failure: expected different value for multi2::name (expected: [%#v] got: [%#v])", "r.sub==p.sub&&r.obj==p.obj", v)
 	}
 
 	if v := config.String("multi3::name"); v != "r.sub==p.sub&&r.obj==p.obj" {
-		t.Errorf("Get failure: expected different value for other::key1 (expected: [%#v] got: [%#v])", "r.sub==p.sub&&r.obj==p.obj", v)
+		t.Errorf("Get failure: expected different value for multi3::name (expected: [%#v] got: [%#v])", "r.sub==p.sub&&r.obj==p.obj", v)
 	}
 
 	if v := config.String("multi4::name"); v != "" {
-		t.Errorf("Get failure: expected different value for other::key1 (expected: [%#v] got: [%#v])", "", v)
+		t.Errorf("Get failure: expected different value for multi4::name (expected: [%#v] got: [%#v])", "", v)
 	}
 
 	if v := config.String("multi5::name"); v != "r.sub==p.sub&&r.obj==p.obj" {
-		t.Errorf("Get failure: expected different value for other::key1 (expected: [%#v] got: [%#v])", "r.sub==p.sub&&r.obj==p.obj", v)
+		t.Errorf("Get failure: expected different value for multi5::name (expected: [%#v] got: [%#v])", "r.sub==p.sub&&r.obj==p.obj", v)
 	}
 }
