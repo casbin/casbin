@@ -80,6 +80,10 @@ e = some(where (p.eft == allow))
 # Matchers
 [matchers]
 m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
+
+# We also support multi-line mode by appending '\' in the end:
+# m = r.sub == p.sub && r.obj == p.obj \ 
+#  && r.act == p.act
 ```
 
 An example policy for ACL model is like:
