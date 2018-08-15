@@ -450,3 +450,16 @@ func TestPriorityModelIndeterminate(t *testing.T) {
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 }
+
+func TestRBACModelInMultiLines(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model_in_multi_line.conf", "examples/rbac_policy.csv")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", true)
+	testEnforce(t, e, "alice", "data2", "write", true)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
