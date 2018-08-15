@@ -33,6 +33,8 @@ var (
 	DEFAULT_COMMENT = []byte{'#'}
 	// DEFAULT_COMMENT_SEM defines what alternate character(s) indicate a comment `;`
 	DEFAULT_COMMENT_SEM = []byte{';'}
+	// DEFAULT_MULTI_LINE_SEPARATOR defines what character indicates a multi-line content
+	DEFAULT_MULTI_LINE_SEPARATOR = []byte{'\\'}
 )
 
 // ConfigInterface defines the behavior of a Config implemenation
@@ -101,14 +103,28 @@ func (c *Config) parse(fname string) (err error) {
 	return c.parseBuffer(buf)
 }
 
-func (c *Config) parseBuffer(buf *bufio.Reader) (err error) {
+func (c *Config) parseBuffer(buf *bufio.Reader) error {
 	var section string
 	var lineNum int
-
+	var buffer bytes.Buffer
+	var canWrite bool
 	for {
+		if canWrite {
+			if err := c.write(section, lineNum, &buffer); err != nil {
+				return err
+			} else {
+				canWrite = false
+			}
+		}
 		lineNum++
 		line, _, err := buf.ReadLine()
 		if err == io.EOF {
+			// force write when buffer is not flushed yet
+			if buffer.Len() > 0 {
+				if err := c.write(section, lineNum, &buffer); err != nil {
+					return err
+				}
+			}
 			break
 		} else if err != nil {
 			return err
@@ -116,24 +132,52 @@ func (c *Config) parseBuffer(buf *bufio.Reader) (err error) {
 
 		line = bytes.TrimSpace(line)
 		switch {
-		case bytes.Equal(line, []byte{}):
-			continue
-		case bytes.HasPrefix(line, DEFAULT_COMMENT):
-			continue
-		case bytes.HasPrefix(line, DEFAULT_COMMENT_SEM):
+		case bytes.Equal(line, []byte{}), bytes.HasPrefix(line, DEFAULT_COMMENT_SEM),
+			bytes.HasPrefix(line, DEFAULT_COMMENT):
+			canWrite = true
 			continue
 		case bytes.HasPrefix(line, []byte{'['}) && bytes.HasSuffix(line, []byte{']'}):
+			// force write when buffer is not flushed yet
+			if buffer.Len() > 0 {
+				if err := c.write(section, lineNum, &buffer); err != nil {
+					return err
+				}
+				canWrite = false
+			}
 			section = string(line[1 : len(line)-1])
 		default:
-			optionVal := bytes.SplitN(line, []byte{'='}, 2)
-			if len(optionVal) != 2 {
-				return fmt.Errorf("parse the content error : line %d , %s = ? ", lineNum, optionVal[0])
+			var p []byte
+			if bytes.HasSuffix(line, DEFAULT_MULTI_LINE_SEPARATOR) {
+				p = bytes.TrimSpace(line[:len(line)-1])
+			} else {
+				p = line
+				canWrite = true
 			}
-			option := bytes.TrimSpace(optionVal[0])
-			value := bytes.TrimSpace(optionVal[1])
-			c.AddConfig(section, string(option), string(value))
+
+			if _, err := buffer.Write(p); err != nil {
+				return err
+			}
 		}
 	}
+
+	return nil
+}
+
+func (c *Config) write(section string, lineNum int, b *bytes.Buffer) error {
+	if b.Len() <= 0 {
+		return nil
+	}
+
+	optionVal := bytes.SplitN(b.Bytes(), []byte{'='}, 2)
+	if len(optionVal) != 2 {
+		return fmt.Errorf("parse the content error : line %d , %s = ? ", lineNum, optionVal[0])
+	}
+	option := bytes.TrimSpace(optionVal[0])
+	value := bytes.TrimSpace(optionVal[1])
+	c.AddConfig(section, string(option), string(value))
+
+	// flush buffer after adding
+	b.Reset()
 
 	return nil
 }
@@ -163,7 +207,8 @@ func (c *Config) String(key string) string {
 	return c.get(key)
 }
 
-// Strings lookups up the value using the provided key and converts the value to an array of string by splitting the string by comma
+// Strings lookups up the value using the provided key and converts the value to an array of string
+// by splitting the string by comma
 func (c *Config) Strings(key string) []string {
 	v := c.get(key)
 	if v == "" {
