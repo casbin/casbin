@@ -84,6 +84,12 @@ m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
 # We also support multi-line mode by appending '\' in the end:
 # m = r.sub == p.sub && r.obj == p.obj \ 
 #  && r.act == p.act
+
+# Further more, if you are using ABAC, you may try expression `in` like following:
+# r.obj == p.obj && r.act == p.act || r.obj in ('data2', 'data3')
+# But you SHOULD make sure that the length of the array is MORE than 1, 
+# otherwise there will cause a panic
+
 ```
 
 An example policy for ACL model is like:
