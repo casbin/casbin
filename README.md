@@ -81,15 +81,6 @@ e = some(where (p.eft == allow))
 [matchers]
 m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
 
-# We also support multi-line mode by appending '\' in the end:
-# m = r.sub == p.sub && r.obj == p.obj \ 
-#  && r.act == p.act
-
-# Further more, if you are using ABAC, you may try expression `in` like following:
-# r.obj == p.obj && r.act == p.act || r.obj in ('data2', 'data3')
-# But you SHOULD make sure that the length of the array is MORE than 1, 
-# otherwise there will cause a panic
-
 ```
 
 An example policy for ACL model is like:
@@ -103,6 +94,27 @@ It means:
 
 - alice can read data1
 - bob can write data2
+
+We also support multi-line mode by appending '\\'  in the end:  
+
+```ini
+# Matchers
+[matchers]
+m = r.sub == p.sub && r.obj == p.obj \ 
+  && r.act == p.act
+```
+
+Further more, if you are using ABAC,  you can try operator `in` like following:
+
+```ini
+# Matchers
+[matchers]
+m = r.obj == p.obj && r.act == p.act || r.obj in ('data2', 'data3')
+```
+
+But you **SHOULD ** make sure that the length of the array is **MORE **than **1**,  otherwise there will cause a panic.
+
+For more operators, you may take a look at [govaluate](https://github.com/Knetic/govaluate/blob/master/README.md)
 
 ## Features
 
