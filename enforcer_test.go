@@ -198,6 +198,41 @@ func TestNotUsedRBACModelInMemory(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestMatcherUsingInOperator(t *testing.T) {
+	// In memory
+	text :=
+		`
+		[request_definition]
+		r = sub, obj, act
+
+		[policy_definition]
+		p = sub, obj, act
+
+		[role_definition]
+		g = _, _
+
+		[policy_effect]
+		e = some(where (p.eft == allow))
+
+		# Be careful! The length of array MUST more than 1, otherwise there will cause a panic  
+		[matchers]
+		m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act || r.obj in ('data2', 'data3')
+		`
+	m := NewModel(text)
+	e := NewEnforcer(m)
+	e.AddPermissionForUser("alice", "data1", "read")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "anyone", "data2", "read", true)
+
+	// From file config
+	e = NewEnforcer("examples/rbac_model_matcher_using_in_op.conf")
+	e.AddPermissionForUser("alice", "data1", "read")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "anyone", "data2", "read", true)
+}
+
 func TestReloadPolicy(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
