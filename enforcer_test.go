@@ -208,7 +208,7 @@ func TestMatcherUsingInOperator(t *testing.T) {
 	testEnforce(t, e, "alice", "data3", "read", true)
 	testEnforce(t, e, "anyone", "data1", "read", false)
 	testEnforce(t, e, "anyone", "data2", "read", true)
-	testEnforce(t, e, "anyone", "data2", "read", true)
+	testEnforce(t, e, "anyone", "data3", "read", true)
 }
 
 func TestReloadPolicy(t *testing.T) {
