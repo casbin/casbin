@@ -368,7 +368,7 @@ Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/ex
 
 ## License
 
-This project is licensed under the [Apache 2.0 license](https://github.com/casbin/casbin/blob/master/LICENSE).
+This project is licensed under the [Apache 2.0 license](LICENSE).
 
 ## Contact
 
