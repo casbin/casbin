@@ -53,8 +53,6 @@ type Enforcer struct {
 // e := casbin.NewEnforcer("path/to/basic_model.conf", a)
 func NewEnforcer(params ...interface{}) *Enforcer {
 	e := &Enforcer{}
-	e.rm = defaultrolemanager.NewRoleManager(10)
-	e.eft = effect.NewDefaultEffector()
 
 	parsedParamLen := 0
 	if len(params) >= 1 {
@@ -116,7 +114,6 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 // InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
 func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) {
 	e.adapter = adapter
-	e.watcher = nil
 
 	e.model = m
 	e.model.PrintModel()
@@ -131,6 +128,10 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 }
 
 func (e *Enforcer) initialize() {
+	e.rm = defaultrolemanager.NewRoleManager(10)
+	e.eft = effect.NewDefaultEffector()
+	e.watcher = nil
+
 	e.enabled = true
 	e.autoSave = true
 	e.autoBuildRoleLinks = true
