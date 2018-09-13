@@ -140,7 +140,6 @@ func (model Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldInde
 	}
 
 	util.ArrayRemoveDuplicates(&values)
-	// sort.Strings(values)
 
 	return values
 }
