@@ -65,28 +65,28 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 	}
 
 	if len(params)-parsedParamLen == 2 {
-		switch params[0].(type) {
+		switch p0 := params[0].(type) {
 		case string:
-			switch params[1].(type) {
+			switch p1 := params[1].(type) {
 			case string:
-				e.InitWithFile(params[0].(string), params[1].(string))
+				e.InitWithFile(p0, p1)
 			default:
-				e.InitWithAdapter(params[0].(string), params[1].(persist.Adapter))
+				e.InitWithAdapter(p0, p1.(persist.Adapter))
 			}
 		default:
 			switch params[1].(type) {
 			case string:
 				panic("Invalid parameters for enforcer.")
 			default:
-				e.InitWithModelAndAdapter(params[0].(model.Model), params[1].(persist.Adapter))
+				e.InitWithModelAndAdapter(p0.(model.Model), params[1].(persist.Adapter))
 			}
 		}
 	} else if len(params)-parsedParamLen == 1 {
-		switch params[0].(type) {
+		switch p0 := params[0].(type) {
 		case string:
-			e.InitWithFile(params[0].(string), "")
+			e.InitWithFile(p0, "")
 		default:
-			e.InitWithModelAndAdapter(params[0].(model.Model), nil)
+			e.InitWithModelAndAdapter(p0.(model.Model), nil)
 		}
 	} else if len(params)-parsedParamLen == 0 {
 		e.InitWithFile("", "")
@@ -227,9 +227,9 @@ func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
 	var filteredAdapter persist.FilteredAdapter
 
 	// Attempt to cast the Adapter as a FilteredAdapter
-	switch e.adapter.(type) {
+	switch adapter := e.adapter.(type) {
 	case persist.FilteredAdapter:
-		filteredAdapter = e.adapter.(persist.FilteredAdapter)
+		filteredAdapter = adapter
 	default:
 		return errors.New("filtered policies are not supported by this adapter")
 	}
@@ -339,18 +339,18 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 				panic(err)
 			}
 
-			switch result.(type) {
+			switch result := result.(type) {
 			case bool:
-				if !result.(bool) {
+				if !result {
 					policyEffects[i] = effect.Indeterminate
 					continue
 				}
 			case float64:
-				if result.(float64) == 0 {
+				if result == 0 {
 					policyEffects[i] = effect.Indeterminate
 					continue
 				} else {
-					matcherResults[i] = result.(float64)
+					matcherResults[i] = result
 				}
 			default:
 				panic(errors.New("matcher result should be bool, int or float"))
