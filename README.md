@@ -149,6 +149,7 @@ You can also use the online editor (http://casbin.org/editor/) to write your Cas
 
 - [Basic Role-Based HTTP Authorization in Go with Casbin](https://zupzup.org/casbin-http-role-auth) (or [Chinese translation](https://studygolang.com/articles/12323))
 - [Policy enforcements on Kubernetes with Banzai Cloud's Pipeline and Casbin](https://banzaicloud.com/blog/policy-enforcement-k8s/)
+- [Organizational RBAC in Argo CD with Casbin](https://argoproj.github.io/docs/argo-cd/docs/rbac.html)
 - [Using Casbin with Beego: 1. Get started and test (in Chinese)](https://blog.csdn.net/hotqin888/article/details/78460385)
 - [Using Casbin with Beego: 2. Policy storage (in Chinese)](https://blog.csdn.net/hotqin888/article/details/78571240)
 - [Using Casbin with Beego: 3. Policy query (in Chinese)](https://blog.csdn.net/hotqin888/article/details/78992250)
