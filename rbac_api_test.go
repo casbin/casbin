@@ -173,3 +173,23 @@ func TestPermissionAPI(t *testing.T) {
 	testEnforceWithoutUsers(t, e, "bob", "read", false)
 	testEnforceWithoutUsers(t, e, "bob", "write", false)
 }
+
+func testGetImplicitPermissions(t *testing.T, e *Enforcer, name string, res [][]string) {
+	t.Helper()
+	myRes := e.GetImplicitPermissionsForUser(name)
+	t.Log("Implicit permissions for ", name, ": ", myRes)
+
+	if !util.Array2DEquals(res, myRes) {
+		t.Error("Implicit permissions for ", name, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
+func TestImplicitPermissionAPI(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	testGetPermissions(t, e, "alice", [][]string{{"alice", "data1", "read"}})
+	testGetPermissions(t, e, "bob", [][]string{{"bob", "data2", "write"}})
+
+	testGetImplicitPermissions(t, e, "alice", [][]string{{"alice", "data1", "read"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
+	testGetImplicitPermissions(t, e, "bob", [][]string{{"bob", "data2", "write"}})
+}
