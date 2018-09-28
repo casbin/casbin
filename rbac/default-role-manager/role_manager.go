@@ -123,7 +123,7 @@ func (rm *RoleManager) GetRoles(name string, domain ...string) ([]string, error)
 	}
 
 	if !rm.hasRole(name) {
-		return nil, errors.New("error: name does not exist")
+		return []string{}, nil
 	}
 
 	roles := rm.createRole(name).getRoles()
