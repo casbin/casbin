@@ -126,6 +126,42 @@ func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool 
 	return e.HasPolicy(params...)
 }
 
+// GetImplicitRolesForUser gets implicit roles that a user has.
+// Compared to GetRolesForUser(), this function retrieves indirect roles besides direct roles.
+// For example:
+// g, alice, role:admin
+// g, role:admin, role:user
+//
+// GetRolesForUser("alice") can only get: ["role:admin"].
+// But GetImplicitRolesForUser("alice") will get: ["role:admin", "role:user"].
+func (e *Enforcer) GetImplicitRolesForUser(name string) []string {
+	res := []string{}
+	roleSet := make(map[string]bool)
+	roleSet[name] = true
+
+	q := make([]string, 0)
+	q = append(q, name)
+
+	for len(q) > 0 {
+		name := q[0]
+		q = q[1:]
+
+		roles, err := e.rm.GetRoles(name)
+		if err != nil {
+			panic(err)
+		}
+		for _, r := range roles {
+			if _, ok := roleSet[r]; !ok {
+				res = append(res, r)
+				q = append(q, r)
+				roleSet[r] = true
+			}
+		}
+	}
+
+	return res
+}
+
 // GetImplicitPermissionsForUser gets implicit permissions for a user or role.
 // Compared to GetPermissionsForUser(), this function retrieves permissions for inherited roles.
 // For example:
@@ -136,10 +172,7 @@ func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool 
 // GetPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
 // But GetImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
 func (e *Enforcer) GetImplicitPermissionsForUser(user string) [][]string {
-	roles, err := e.rm.GetRoles(user)
-	if err != nil {
-		panic(err)
-	}
+	roles := e.GetImplicitRolesForUser(user)
 	roles = append([]string{user}, roles...)
 
 	res := [][]string{}
