@@ -139,7 +139,7 @@ go get github.com/casbin/casbin
 
 ## Documentation
 
-For documentation, please see: [Our Wiki](https://github.com/casbin/casbin/wiki)
+https://casbin.org/docs/en/overview
 
 ## Online editor
 
