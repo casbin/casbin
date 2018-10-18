@@ -34,7 +34,7 @@ func TestGetList(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	testStringList(t, "Subjects", e.GetAllSubjects, []string{"alice", "bob", "data2_admin"})
-	testStringList(t, "Objeccts", e.GetAllObjects, []string{"data1", "data2"})
+	testStringList(t, "Objects", e.GetAllObjects, []string{"data1", "data2"})
 	testStringList(t, "Actions", e.GetAllActions, []string{"read", "write"})
 	testStringList(t, "Roles", e.GetAllRoles, []string{"data2_admin"})
 }
