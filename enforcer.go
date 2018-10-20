@@ -312,7 +312,10 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 	}
 
 	expString := e.model["m"]["m"].Value
-	expression, _ := govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+	expression, err := govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+	if err != nil {
+		panic(err)
+	}
 
 	var policyEffects []effect.Effect
 	var matcherResults []float64
