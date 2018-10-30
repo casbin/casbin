@@ -24,6 +24,9 @@ type LoggerTester struct {
 	lastMessage []interface{}
 }
 
+func (t *LoggerTester) EnableLog(bool)  {}
+func (t *LoggerTester) IsEnabled() bool { return true }
+
 func (t *LoggerTester) Print(v ...interface{}) {
 	t.format = ""
 	t.lastMessage = v
@@ -36,8 +39,8 @@ func (t *LoggerTester) Printf(format string, v ...interface{}) {
 
 func TestLog(t *testing.T) {
 	lt := &LoggerTester{}
-	EnableLog = true
 	SetLogger(lt)
+
 	LogPrint(1, "1", true)
 	if lt.format != "" || !reflect.DeepEqual(lt.lastMessage, []interface{}{1, "1", true}) {
 		t.Errorf("incorrect logger message: %+v", lt.lastMessage)

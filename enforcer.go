@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"github.com/Knetic/govaluate"
-
 	"github.com/casbin/casbin/effect"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
@@ -272,9 +271,9 @@ func (e *Enforcer) EnableEnforce(enable bool) {
 	e.enabled = enable
 }
 
-// EnableLog changes whether to print Casbin log to the standard output.
+// EnableLog changes whether Casbin will log messages to the Logger.
 func (e *Enforcer) EnableLog(enable bool) {
-	util.EnableLog = enable
+	util.GetLogger().EnableLog(enable)
 }
 
 // EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
@@ -410,9 +409,8 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		panic(err)
 	}
 
-	// only generate the request --> result string if the message
-	// is going to be logged.
-	if util.EnableLog {
+	// Log request.
+	if util.GetLogger().IsEnabled() {
 		reqStr := "Request: "
 		for i, rval := range rvals {
 			if i != len(rvals)-1 {
