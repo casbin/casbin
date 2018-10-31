@@ -20,6 +20,7 @@ import (
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/effect"
+	"github.com/casbin/casbin/log"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
 	"github.com/casbin/casbin/persist/file-adapter"
@@ -273,7 +274,7 @@ func (e *Enforcer) EnableEnforce(enable bool) {
 
 // EnableLog changes whether Casbin will log messages to the Logger.
 func (e *Enforcer) EnableLog(enable bool) {
-	util.GetLogger().EnableLog(enable)
+	log.GetLogger().EnableLog(enable)
 }
 
 // EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
@@ -323,7 +324,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		matcherResults = make([]float64, policyLen)
 
 		for i, pvals := range e.model["p"]["p"].Policy {
-			// util.LogPrint("Policy Rule: ", pvals)
+			// log.LogPrint("Policy Rule: ", pvals)
 
 			parameters := make(map[string]interface{}, 8)
 			for j, token := range e.model["r"]["r"].Tokens {
@@ -334,7 +335,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 			}
 
 			result, err := expression.Evaluate(parameters)
-			// util.LogPrint("Result: ", result)
+			// log.LogPrint("Result: ", result)
 
 			if err != nil {
 				policyEffects[i] = effect.Indeterminate
@@ -388,7 +389,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		}
 
 		result, err := expression.Evaluate(parameters)
-		// util.LogPrint("Result: ", result)
+		// log.LogPrint("Result: ", result)
 
 		if err != nil {
 			policyEffects[0] = effect.Indeterminate
@@ -402,7 +403,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		}
 	}
 
-	// util.LogPrint("Rule Results: ", policyEffects)
+	// log.LogPrint("Rule Results: ", policyEffects)
 
 	result, err := e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults)
 	if err != nil {
@@ -410,7 +411,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 	}
 
 	// Log request.
-	if util.GetLogger().IsEnabled() {
+	if log.GetLogger().IsEnabled() {
 		reqStr := "Request: "
 		for i, rval := range rvals {
 			if i != len(rvals)-1 {
@@ -420,7 +421,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 			}
 		}
 		reqStr += fmt.Sprintf(" ---> %t", result)
-		util.LogPrint(reqStr)
+		log.LogPrint(reqStr)
 	}
 
 	return result
