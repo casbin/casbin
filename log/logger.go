@@ -1,4 +1,4 @@
-// Copyright 2017 The casbin Authors. All Rights Reserved.
+// Copyright 2018 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,24 +14,17 @@
 
 package log
 
-var logger Logger = &DefaultLogger{}
+// Logger is the logging interface implementation.
+type Logger interface {
+	//EnableLog controls whether print the message.
+	EnableLog(bool)
 
-// SetLogger sets the current logger.
-func SetLogger(l Logger) {
-	logger = l
-}
+	//IsEnabled returns if logger is enabled.
+	IsEnabled() bool
 
-// GetLogger returns the current logger.
-func GetLogger() Logger {
-	return logger
-}
+	//Print formats using the default formats for its operands and logs the message.
+	Print(...interface{})
 
-// LogPrint prints the log.
-func LogPrint(v ...interface{}) {
-	logger.Print(v...)
-}
-
-// LogPrintf prints the log with the format.
-func LogPrintf(format string, v ...interface{}) {
-	logger.Printf(format, v...)
+	//Printf formats according to a format specifier and logs the message.
+	Printf(string, ...interface{})
 }
