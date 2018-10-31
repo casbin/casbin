@@ -1,4 +1,4 @@
-// Copyright 2017 The casbin Authors. All Rights Reserved.
+// Copyright 2018 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,24 +14,29 @@
 
 package log
 
-var logger Logger = &DefaultLogger{}
+import "log"
 
-// SetLogger sets the current logger.
-func SetLogger(l Logger) {
-	logger = l
+// DefaultLogger is the implementation for a Logger using golang log.
+type DefaultLogger struct {
+	enable bool
 }
 
-// GetLogger returns the current logger.
-func GetLogger() Logger {
-	return logger
+func (l *DefaultLogger) EnableLog(enable bool) {
+	l.enable = enable
 }
 
-// LogPrint prints the log.
-func LogPrint(v ...interface{}) {
-	logger.Print(v...)
+func (l *DefaultLogger) IsEnabled() bool {
+	return l.enable
 }
 
-// LogPrintf prints the log with the format.
-func LogPrintf(format string, v ...interface{}) {
-	logger.Printf(format, v...)
+func (l *DefaultLogger) Print(v ...interface{}) {
+	if l.enable {
+		log.Print(v...)
+	}
+}
+
+func (l *DefaultLogger) Printf(format string, v ...interface{}) {
+	if l.enable {
+		log.Printf(format, v...)
+	}
 }
