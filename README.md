@@ -18,10 +18,10 @@ Casbin is a powerful and efficient open-source access control library for Golang
 
 ## All the languages supported by Casbin:
 
-![golang](https://casbin.org/docs/assets/langs/golang.png) | ![java](https://casbin.org/docs/assets/langs/java.png) | ![nodejs](https://casbin.org/docs/assets/langs/nodejs.png) | ![php](https://casbin.org/docs/assets/langs/php.png)
+[![golang](https://casbin.org/docs/assets/langs/golang.png)](https://github.com/casbin/casbin) | [![java](https://casbin.org/docs/assets/langs/java.png)](https://github.com/casbin/jcasbin) | [![nodejs](https://casbin.org/docs/assets/langs/nodejs.png)](https://github.com/casbin/node-casbin) | [![php](https://casbin.org/docs/assets/langs/php.png)](https://github.com/php-casbin/php-casbin)
 ----|----|----|----
-[Casbin](https://github.com/casbin/casbin) | [jCasbin](https://github.com/casbin/jcasbin) | [node-casbin](https://github.com/casbin/node-casbin) | [PHP-Casbin](https://github.com/php-casbin/php-casbin)
-production-ready | production-ready | production-ready | experimental
+[Casbin](https://github.com/casbin/casbin) | [jCasbin](https://github.com/casbin/jcasbin) | [node-Casbin](https://github.com/casbin/node-casbin) | [PHP-Casbin](https://github.com/php-casbin/php-casbin)
+production-ready | production-ready | production-ready | production-ready
 
 ## Table of contents
 
