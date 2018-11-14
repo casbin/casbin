@@ -20,11 +20,24 @@ import (
 	"github.com/casbin/casbin/persist/file-adapter"
 )
 
+func TestInitFilteredAdapter(t *testing.T) {
+	e := NewEnforcer()
+
+	adapter := fileadapter.NewFilteredAdapter("examples/rbac_with_domains_policy.csv")
+	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
+
+	// policy should not be loaded yet
+	testHasPolicy(t, e, []string{"admin", "domain1", "data1", "read"}, false)
+}
+
 func TestLoadFilteredPolicy(t *testing.T) {
 	e := NewEnforcer()
 
 	adapter := fileadapter.NewFilteredAdapter("examples/rbac_with_domains_policy.csv")
 	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
+	if err := e.LoadPolicy(); err != nil {
+		t.Errorf("unexpected error in LoadPolicy: %v", err)
+	}
 
 	// validate initial conditions
 	testHasPolicy(t, e, []string{"admin", "domain1", "data1", "read"}, true)
