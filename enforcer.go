@@ -121,7 +121,9 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 
 	e.initialize()
 
-	if e.adapter != nil {
+	// Do not initialize the full policy when using a filtered adapter
+	_, filtered := e.adapter.(persist.FilteredAdapter)
+	if e.adapter != nil && !filtered {
 		// error intentionally ignored
 		e.LoadPolicy()
 	}
