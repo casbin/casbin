@@ -106,10 +106,10 @@ func TestUnsupportedFilteredPolicy(t *testing.T) {
 }
 
 func TestFilteredAdapterEmptyFilepath(t *testing.T) {
-	e := NewEnforcer()
+	e := NewEnforcer("examples/rbac_with_domains_model.conf")
 
 	adapter := fileadapter.NewFilteredAdapter("")
-	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
+	e.SetAdapter(adapter)
 
 	if err := e.LoadFilteredPolicy(nil); err == nil {
 		t.Errorf("expected error in LoadFilteredPolicy, but got nil")
@@ -117,10 +117,10 @@ func TestFilteredAdapterEmptyFilepath(t *testing.T) {
 }
 
 func TestFilteredAdapterInvalidFilepath(t *testing.T) {
-	e := NewEnforcer()
+	e := NewEnforcer("examples/rbac_with_domains_model.conf")
 
 	adapter := fileadapter.NewFilteredAdapter("examples/does_not_exist_policy.csv")
-	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
+	e.SetAdapter(adapter)
 
 	if err := e.LoadFilteredPolicy(nil); err == nil {
 		t.Errorf("expected error in LoadFilteredPolicy, but got nil")
