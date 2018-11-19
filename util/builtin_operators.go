@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/casbin/casbin/rbac"
+	"github.com/gobwas/glob"
 )
 
 // KeyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
@@ -42,6 +43,21 @@ func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 	name2 := args[1].(string)
 
 	return bool(KeyMatch(name1, name2)), nil
+}
+
+// GlobMatch determines whether key1 matches the pattern of key2 using glob pattern (https://github.com/gobwas/glob)
+func GlobMatch(key1 string, key2 string, sep []rune) bool {
+	g := glob.MustCompile(key2, sep...)
+	return g.Match(key1)
+}
+
+// GlobMatchFunc is the wrapper for GlobMatch.
+func GlobMatchFunc(args ...interface{}) (interface{}, error) {
+	name1 := args[0].(string)
+	name2 := args[1].(string)
+	sep := []rune(args[2].(string))
+
+	return GlobMatch(name1, name2, sep), nil
 }
 
 // KeyMatch2 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.

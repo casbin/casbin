@@ -154,3 +154,57 @@ func TestIPMatch(t *testing.T) {
 	testIPMatch(t, "10.0.0.11", "10.0.0.0/8", true)
 	testIPMatch(t, "11.0.0.123", "10.0.0.0/8", false)
 }
+
+func testGlobMatch(t *testing.T, key1 string, key2 string, separator string, res bool) {
+	t.Helper()
+	myRes := GlobMatch(key1, key2, []rune(separator))
+	t.Logf("%s < %s: %t", key1, key2, myRes)
+
+	if myRes != res {
+		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)
+	}
+}
+func TestGlobMatch(t *testing.T) {
+	testGlobMatch(t, "/foo", "/foo", "/", true)
+	testGlobMatch(t, "/foo", "/foo*", "/", true)
+	testGlobMatch(t, "/foo", "/foo/*", "/", false)
+	testGlobMatch(t, "/foo/bar", "/foo", "/", false)
+	testGlobMatch(t, "/foo/bar", "/foo*", "/", false)
+	testGlobMatch(t, "/foo/bar", "/foo/*", "/", true)
+	testGlobMatch(t, "/foobar", "/foo", "/", false)
+	testGlobMatch(t, "/foobar", "/foo*", "/", true)
+	testGlobMatch(t, "/foobar", "/foo/*", "/", false)
+
+	testGlobMatch(t, "/foo", "*/foo", "/", true)
+	testGlobMatch(t, "/foo", "*/foo*", "/", true)
+	testGlobMatch(t, "/foo", "*/foo/*", "/", false)
+	testGlobMatch(t, "/foo/bar", "*/foo", "/", false)
+	testGlobMatch(t, "/foo/bar", "*/foo*", "/", false)
+	testGlobMatch(t, "/foo/bar", "*/foo/*", "/", true)
+	testGlobMatch(t, "/foobar", "*/foo", "/", false)
+	testGlobMatch(t, "/foobar", "*/foo*", "/", true)
+	testGlobMatch(t, "/foobar", "*/foo/*", "/", false)
+
+	testGlobMatch(t, "/prefix/foo", "*/foo", "/", false)
+	testGlobMatch(t, "/prefix/foo", "*/foo*", "/", false)
+	testGlobMatch(t, "/prefix/foo", "*/foo/*", "/", false)
+	testGlobMatch(t, "/prefix/foo/bar", "*/foo", "/", false)
+	testGlobMatch(t, "/prefix/foo/bar", "*/foo*", "/", false)
+	testGlobMatch(t, "/prefix/foo/bar", "*/foo/*", "/", false)
+	testGlobMatch(t, "/prefix/foobar", "*/foo", "/", false)
+	testGlobMatch(t, "/prefix/foobar", "*/foo*", "/", false)
+	testGlobMatch(t, "/prefix/foobar", "*/foo/*", "/", false)
+
+	testGlobMatch(t, "/prefix/subprefix/foo", "*/foo", "/", false)
+	testGlobMatch(t, "/prefix/subprefix/foo", "*/foo*", "/", false)
+	testGlobMatch(t, "/prefix/subprefix/foo", "*/foo/*", "/", false)
+	testGlobMatch(t, "/prefix/subprefix/foo/bar", "*/foo", "/", false)
+	testGlobMatch(t, "/prefix/subprefix/foo/bar", "*/foo*", "/", false)
+	testGlobMatch(t, "/prefix/subprefix/foo/bar", "*/foo/*", "/", false)
+	testGlobMatch(t, "/prefix/subprefix/foobar", "*/foo", "/", false)
+	testGlobMatch(t, "/prefix/subprefix/foobar", "*/foo*", "/", false)
+	testGlobMatch(t, "/prefix/subprefix/foobar", "*/foo/*", "/", false)
+
+	testGlobMatch(t, "/prefix/subprefix/foobar", "**/foo*", "/", true)
+	testGlobMatch(t, "/prefix/subprefix/foobar", "**/subprefix/**", "/", true)
+}
