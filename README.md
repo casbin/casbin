@@ -208,6 +208,7 @@ Adapter | Type | Author | Description
 [Beego ORM Adapter](https://github.com/casbin/beego-orm-adapter) | ORM | Casbin | MySQL, PostgreSQL, Sqlite3 are supported by [Beego ORM](https://beego.me/docs/mvc/model/overview.md)
 [MongoDB Adapter](https://github.com/casbin/mongodb-adapter) | NoSQL | Casbin | Persistence for [MongoDB](https://www.mongodb.com)
 [Cassandra Adapter](https://github.com/casbin/cassandra-adapter) | NoSQL | Casbin | Persistence for [Apache Cassandra DB](http://cassandra.apache.org)
+[GCP Datastore Adapter](https://github.com/livingpackets/datastore-adapter) | NoSQL | [LivingPackets](https://github.com/livingpackets) | Persistence for [Google Cloud Platform Datastore](https://cloud.google.com/datastore/)
 [Consul Adapter](https://github.com/ankitm123/consul-adapter) | KV store | [@ankitm123](https://github.com/ankitm123) | Persistence for [HashiCorp Consul](https://www.consul.io/)
 [Redis Adapter](https://github.com/casbin/redis-adapter) | KV store | Casbin | Persistence for [Redis](https://redis.io/)
 [Etcd Adapter](https://github.com/sebastianliu/etcd-adapter) | KV store | Casbin | Persistence for [etcd](https://github.com/coreos/etcd)
