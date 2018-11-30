@@ -20,6 +20,17 @@ import (
 	"github.com/casbin/casbin/util"
 )
 
+// testGetUsersInDomain: Add by Gordon
+func testGetUsersInDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
+	t.Helper()
+	myRes := e.GetUsersForRoleInDomain(name, domain)
+	t.Log("Users for ", name, " under ", domain, ": ", myRes)
+
+	if !util.SetEquals(res, myRes) {
+		t.Error("Users for ", name, " under ", domain, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func testGetRolesInDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
 	t.Helper()
 	myRes := e.GetRolesForUserInDomain(name, domain)
@@ -28,6 +39,26 @@ func testGetRolesInDomain(t *testing.T, e *Enforcer, name string, domain string,
 	if !util.SetEquals(res, myRes) {
 		t.Error("Roles for ", name, " under ", domain, ": ", myRes, ", supposed to be ", res)
 	}
+}
+
+// TestUserAPIWithDomains: Add by Gordon
+func TestUserAPIWithDomains(t *testing.T) {
+	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+
+	testGetUsersInDomain(t, e, "admin", "domain1", []string{"alice"})
+	testGetUsersInDomain(t, e, "non_exist", "domain1", []string{})
+
+	testGetUsersInDomain(t, e, "admin", "domain2", []string{"bob"})
+	testGetUsersInDomain(t, e, "non_exist", "domain2", []string{})
+
+	e.DeleteRoleForUserInDomain("alice", "admin", "domain1")
+	e.AddRoleForUserInDomain("bob", "admin", "domain1")
+
+	testGetUsersInDomain(t, e, "admin", "domain1", []string{"alice", "bob"})
+	testGetUsersInDomain(t, e, "non_exist", "domain1", []string{})
+
+	testGetUsersInDomain(t, e, "admin", "domain2", []string{"bob"})
+	testGetUsersInDomain(t, e, "non_exist", "domain2", []string{})
 }
 
 func TestRoleAPIWithDomains(t *testing.T) {
