@@ -54,7 +54,7 @@ func TestUserAPIWithDomains(t *testing.T) {
 	e.DeleteRoleForUserInDomain("alice", "admin", "domain1")
 	e.AddRoleForUserInDomain("bob", "admin", "domain1")
 
-	testGetUsersInDomain(t, e, "admin", "domain1", []string{"alice", "bob"})
+	testGetUsersInDomain(t, e, "admin", "domain1", []string{"bob"})
 	testGetUsersInDomain(t, e, "non_exist", "domain1", []string{})
 
 	testGetUsersInDomain(t, e, "admin", "domain2", []string{"bob"})
