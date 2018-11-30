@@ -138,6 +138,12 @@ func (rm *RoleManager) GetRoles(name string, domain ...string) ([]string, error)
 // GetUsers gets the users that inherits a subject.
 // domain is an unreferenced parameter here, may be used in other implementations.
 func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error) {
+	if len(domain) == 1 {
+		name = domain[0] + "::" + name
+	} else if len(domain) > 1 {
+		return nil, errors.New("error: domain should be 1 parameter")
+	}
+
 	if !rm.hasRole(name) {
 		return nil, errors.New("error: name does not exist")
 	}
@@ -150,6 +156,11 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 		}
 		return true
 	})
+	if len(domain) == 1 {
+		for i := range names {
+			names[i] = names[i][len(domain[0])+2:]
+		}
+	}
 	return names, nil
 }
 
