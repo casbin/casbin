@@ -273,6 +273,17 @@ func TestRBACModelWithCustomData(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestRBACModelWithRESTful(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	e.AddGroupingPolicy("/resource/:id", "data2_admin")
+
+	testEnforce(t, e, "/resource/1", "data2", "read", true)
+	testEnforce(t, e, "/resource/1", "data2", "write", true)
+	testEnforce(t, e, "/resource/1", "data1", "read", false)
+	testEnforce(t, e, "/resource/1", "data1", "write", false)
+}
+
 type testCustomRoleManager struct{}
 
 func NewRoleManager() rbac.RoleManager {
