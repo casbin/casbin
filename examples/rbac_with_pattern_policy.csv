@@ -1,0 +1,8 @@
+p, alice, /pen/1, GET
+p, book_admin, book_group, GET
+p, pen_admin, pen_group, GET
+
+g, alice, book_admin
+g, bob, pen_admin
+g2, /book/:id, book_group
+g2, /pen/:id, pen_group
