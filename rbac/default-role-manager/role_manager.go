@@ -16,16 +16,19 @@ package defaultrolemanager
 
 import (
 	"errors"
+	"strings"
 	"sync"
 
 	"github.com/casbin/casbin/log"
 	"github.com/casbin/casbin/rbac"
+	"github.com/casbin/casbin/util"
 )
 
 // RoleManager provides a default implementation for the RoleManager interface
 type RoleManager struct {
 	allRoles          *sync.Map
 	maxHierarchyLevel int
+	restful           bool
 }
 
 // NewRoleManager is the constructor for creating an instance of the
@@ -38,11 +41,30 @@ func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 }
 
 func (rm *RoleManager) hasRole(name string) bool {
-	_, ok := rm.allRoles.Load(name)
+	var ok bool
+	if rm.restful {
+		rm.allRoles.Range(func(key, value interface{}) bool {
+			if util.KeyMatch2(name, key.(string)) {
+				ok = true
+			}
+			return true
+		})
+	} else {
+		_, ok = rm.allRoles.Load(name)
+	}
+
 	return ok
 }
 
 func (rm *RoleManager) createRole(name string) *Role {
+	if rm.restful {
+		rm.allRoles.Range(func(key, value interface{}) bool {
+			if util.KeyMatch2(name, key.(string)) {
+				name = key.(string)
+			}
+			return true
+		})
+	}
 	role, _ := rm.allRoles.LoadOrStore(name, newRole(name))
 	return role.(*Role)
 }
@@ -62,6 +84,10 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 		name2 = domain[0] + "::" + name2
 	} else if len(domain) > 1 {
 		return errors.New("error: domain should be 1 parameter")
+	}
+
+	if strings.Contains(name1, "/*") || strings.Contains(name1, "/:") {
+		rm.restful = true
 	}
 
 	role1 := rm.createRole(name1)
