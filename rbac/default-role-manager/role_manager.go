@@ -28,7 +28,7 @@ import (
 type RoleManager struct {
 	allRoles          *sync.Map
 	maxHierarchyLevel int
-	restful           bool
+	hasPattern        bool
 }
 
 // NewRoleManager is the constructor for creating an instance of the
@@ -42,7 +42,7 @@ func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 
 func (rm *RoleManager) hasRole(name string) bool {
 	var ok bool
-	if rm.restful {
+	if rm.hasPattern {
 		rm.allRoles.Range(func(key, value interface{}) bool {
 			if util.KeyMatch2(name, key.(string)) {
 				ok = true
@@ -57,7 +57,7 @@ func (rm *RoleManager) hasRole(name string) bool {
 }
 
 func (rm *RoleManager) createRole(name string) *Role {
-	if rm.restful {
+	if rm.hasPattern {
 		rm.allRoles.Range(func(key, value interface{}) bool {
 			if util.KeyMatch2(name, key.(string)) {
 				name = key.(string)
@@ -87,7 +87,7 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 	}
 
 	if strings.Contains(name1, "/*") || strings.Contains(name1, "/:") {
-		rm.restful = true
+		rm.hasPattern = true
 	}
 
 	role1 := rm.createRole(name1)

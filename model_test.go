@@ -273,15 +273,17 @@ func TestRBACModelWithCustomData(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
-func TestRBACModelWithRESTful(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+func TestRBACModelWithPattern(t *testing.T) {
+	e := NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
 
-	e.AddGroupingPolicy("/resource/:id", "data2_admin")
-
-	testEnforce(t, e, "/resource/1", "data2", "read", true)
-	testEnforce(t, e, "/resource/1", "data2", "write", true)
-	testEnforce(t, e, "/resource/1", "data1", "read", false)
-	testEnforce(t, e, "/resource/1", "data1", "write", false)
+	testEnforce(t, e, "alice", "/book/1", "GET", true)
+	testEnforce(t, e, "alice", "/book/2", "GET", true)
+	testEnforce(t, e, "alice", "/pen/1", "GET", true)
+	testEnforce(t, e, "alice", "/pen/2", "GET", false)
+	testEnforce(t, e, "bob", "/book/1", "GET", false)
+	testEnforce(t, e, "bob", "/book/2", "GET", false)
+	testEnforce(t, e, "bob", "/pen/1", "GET", true)
+	testEnforce(t, e, "bob", "/pen/2", "GET", true)
 }
 
 type testCustomRoleManager struct{}
