@@ -1,4 +1,5 @@
 p, alice, /pen/1, GET
+p, alice, /pen2/1, GET
 p, book_admin, book_group, GET
 p, pen_admin, pen_group, GET
 
@@ -6,3 +7,6 @@ g, alice, book_admin
 g, bob, pen_admin
 g2, /book/:id, book_group
 g2, /pen/:id, pen_group
+
+g2, /book2/{id}, book_group
+g2, /pen2/{id}, pen_group

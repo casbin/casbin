@@ -16,12 +16,10 @@ package defaultrolemanager
 
 import (
 	"errors"
-	"strings"
 	"sync"
 
 	"github.com/casbin/casbin/log"
 	"github.com/casbin/casbin/rbac"
-	"github.com/casbin/casbin/util"
 )
 
 // RoleManager provides a default implementation for the RoleManager interface
@@ -29,6 +27,7 @@ type RoleManager struct {
 	allRoles          *sync.Map
 	maxHierarchyLevel int
 	hasPattern        bool
+	matchingFunc      map[string]func(arg1, arg2 string) bool
 }
 
 // NewRoleManager is the constructor for creating an instance of the
@@ -37,15 +36,27 @@ func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 	rm := RoleManager{}
 	rm.allRoles = &sync.Map{}
 	rm.maxHierarchyLevel = maxHierarchyLevel
+	rm.matchingFunc = map[string]func(arg1 string, arg2 string) bool{}
+
 	return &rm
+}
+
+func (rm *RoleManager) AddMatchingFunc(name string, fn func(arg1, arg2 string) bool) {
+	if !rm.hasPattern {
+		rm.hasPattern = true
+	}
+	rm.matchingFunc[name] = fn
 }
 
 func (rm *RoleManager) hasRole(name string) bool {
 	var ok bool
 	if rm.hasPattern {
 		rm.allRoles.Range(func(key, value interface{}) bool {
-			if util.KeyMatch2(name, key.(string)) {
-				ok = true
+			for _, item := range rm.matchingFunc {
+				if item(name, key.(string)) {
+					ok = true
+					break
+				}
 			}
 			return true
 		})
@@ -59,8 +70,11 @@ func (rm *RoleManager) hasRole(name string) bool {
 func (rm *RoleManager) createRole(name string) *Role {
 	if rm.hasPattern {
 		rm.allRoles.Range(func(key, value interface{}) bool {
-			if util.KeyMatch2(name, key.(string)) {
-				name = key.(string)
+			for _, item := range rm.matchingFunc {
+				if item(name, key.(string)) {
+					name = key.(string)
+					break
+				}
 			}
 			return true
 		})
@@ -84,10 +98,6 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 		name2 = domain[0] + "::" + name2
 	} else if len(domain) > 1 {
 		return errors.New("error: domain should be 1 parameter")
-	}
-
-	if strings.Contains(name1, "/*") || strings.Contains(name1, "/:") {
-		rm.hasPattern = true
 	}
 
 	role1 := rm.createRole(name1)
