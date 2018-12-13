@@ -19,6 +19,8 @@ import (
 
 	"github.com/casbin/casbin/persist/file-adapter"
 	"github.com/casbin/casbin/rbac"
+	"github.com/casbin/casbin/rbac/default-role-manager"
+	"github.com/casbin/casbin/util"
 )
 
 func testEnforce(t *testing.T, e *Enforcer, sub string, obj interface{}, act string, res bool) {
@@ -276,6 +278,7 @@ func TestRBACModelWithCustomData(t *testing.T) {
 func TestRBACModelWithPattern(t *testing.T) {
 	e := NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
 
+	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("KeyMatch2", util.KeyMatch2)
 	testEnforce(t, e, "alice", "/book/1", "GET", true)
 	testEnforce(t, e, "alice", "/book/2", "GET", true)
 	testEnforce(t, e, "alice", "/pen/1", "GET", true)
@@ -284,6 +287,16 @@ func TestRBACModelWithPattern(t *testing.T) {
 	testEnforce(t, e, "bob", "/book/2", "GET", false)
 	testEnforce(t, e, "bob", "/pen/1", "GET", true)
 	testEnforce(t, e, "bob", "/pen/2", "GET", true)
+
+	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("KeyMatch3", util.KeyMatch3)
+	testEnforce(t, e, "alice", "/book2/1", "GET", true)
+	testEnforce(t, e, "alice", "/book2/2", "GET", true)
+	testEnforce(t, e, "alice", "/pen2/1", "GET", true)
+	testEnforce(t, e, "alice", "/pen2/2", "GET", false)
+	testEnforce(t, e, "bob", "/book2/1", "GET", false)
+	testEnforce(t, e, "bob", "/book2/2", "GET", false)
+	testEnforce(t, e, "bob", "/pen2/1", "GET", true)
+	testEnforce(t, e, "bob", "/pen2/2", "GET", true)
 }
 
 type testCustomRoleManager struct{}
