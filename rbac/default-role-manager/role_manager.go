@@ -22,12 +22,14 @@ import (
 	"github.com/casbin/casbin/rbac"
 )
 
+type MatchingFunc func(arg1, arg2 string) bool
+
 // RoleManager provides a default implementation for the RoleManager interface
 type RoleManager struct {
 	allRoles          *sync.Map
 	maxHierarchyLevel int
 	hasPattern        bool
-	matchingFunc      map[string]func(arg1, arg2 string) bool
+	matchingFunc      MatchingFunc
 }
 
 // NewRoleManager is the constructor for creating an instance of the
@@ -36,27 +38,22 @@ func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 	rm := RoleManager{}
 	rm.allRoles = &sync.Map{}
 	rm.maxHierarchyLevel = maxHierarchyLevel
-	rm.matchingFunc = map[string]func(arg1 string, arg2 string) bool{}
+	rm.hasPattern = false
 
 	return &rm
 }
 
-func (rm *RoleManager) AddMatchingFunc(name string, fn func(arg1, arg2 string) bool) {
-	if !rm.hasPattern {
-		rm.hasPattern = true
-	}
-	rm.matchingFunc[name] = fn
+func (rm *RoleManager) AddMatchingFunc(name string, fn MatchingFunc) {
+	rm.hasPattern = true
+	rm.matchingFunc = fn
 }
 
 func (rm *RoleManager) hasRole(name string) bool {
 	var ok bool
 	if rm.hasPattern {
 		rm.allRoles.Range(func(key, value interface{}) bool {
-			for _, item := range rm.matchingFunc {
-				if item(name, key.(string)) {
-					ok = true
-					break
-				}
+			if rm.matchingFunc(name, key.(string)) {
+				ok = true
 			}
 			return true
 		})
@@ -70,11 +67,8 @@ func (rm *RoleManager) hasRole(name string) bool {
 func (rm *RoleManager) createRole(name string) *Role {
 	if rm.hasPattern {
 		rm.allRoles.Range(func(key, value interface{}) bool {
-			for _, item := range rm.matchingFunc {
-				if item(name, key.(string)) {
-					name = key.(string)
-					break
-				}
+			if rm.matchingFunc(name, key.(string)) {
+				name = key.(string)
 			}
 			return true
 		})
