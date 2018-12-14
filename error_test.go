@@ -151,4 +151,67 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log("Test on error: ")
 		t.Log(err3.Error())
 	}
+
+	_, err4 := e.AddGroupingPolicySafe("bob", "admin2")
+
+	if err4 == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		t.Log("Test on error: ")
+		t.Log(err4.Error())
+	}
+
+	_, err5 := e.AddNamedGroupingPolicySafe("g", []string{"eve", "admin2", "domain1"})
+
+	if err5 == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		t.Log("Test on error: ")
+		t.Log(err5.Error())
+	}
+
+	_, err6 := e.AddNamedPolicySafe("p", []string{"admin2", "domain2", "data2", "write"})
+
+	if err6 == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		t.Log("Test on error: ")
+		t.Log(err6.Error())
+	}
+
+	_, err7 := e.RemoveGroupingPolicySafe("bob", "admin2")
+
+	if err7 == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		t.Log("Test on error: ")
+		t.Log(err7.Error())
+	}
+
+	_, err8 := e.RemoveFilteredGroupingPolicySafe(0, "bob")
+
+	if err8 == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		t.Log("Test on error: ")
+		t.Log(err8.Error())
+	}
+
+	_, err9 := e.RemoveNamedGroupingPolicySafe("g", []string{"alice", "admin", "domain1"})
+
+	if err9 == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		t.Log("Test on error: ")
+		t.Log(err9.Error())
+	}
+
+	_, err10 := e.RemoveFilteredNamedGroupingPolicySafe("g", 0, "eve")
+
+	if err10 == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		t.Log("Test on error: ")
+		t.Log(err10.Error())
+	}
 }
