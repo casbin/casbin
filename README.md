@@ -262,6 +262,7 @@ Watcher | Type | Author | Description
 [NATS Watcher](https://github.com/Soluto/casbin-nats-watcher) | Messaging system | [Soluto](https://github.com/Soluto) | Watcher for [NATS](https://nats.io/)
 [ZooKeeper Watcher](https://github.com/grepsr/casbin-zk-watcher) | KV store  | [Grepsr](https://github.com/grepsr) | Watcher for [Apache ZooKeeper](https://zookeeper.apache.org/)
 [Redis Watcher](https://github.com/billcobbler/casbin-redis-watcher) | KV store  | [@billcobbler](https://github.com/billcobbler) | Watcher for [Redis](http://redis.io/)
+[GCP Pub/Sub Watcher](https://github.com/livingpackets/cloudpubsub-watcher) | Messaging system  | [LivingPackets](https://github.com/livingpackets) | Watcher for [Google Cloud Platform PUB/SUB](https://cloud.google.com/pubsub/)
 
 ## Role manager
 
