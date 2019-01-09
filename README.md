@@ -350,6 +350,7 @@ Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/ex
 
 ### Others
 
+- [VMware Harbor](https://github.com/goharbor/harbor): VMware's open source trusted cloud native registry project that stores, signs, and scans content, via direct integration, see: [model (in code)](https://github.com/goharbor/harbor/blob/master/src/common/ram/casbin.go#L30-L51), [policy rules (in code)](https://github.com/goharbor/harbor/blob/master/src/common/ram/casbin.go#L53-L132)
 - [Intel RMD](https://github.com/intel/rmd): Intel's resource management daemon, via direct integration, see: [model](https://github.com/intel/rmd/blob/master/etc/rmd/acl/url/model.conf), [policy rules](https://github.com/intel/rmd/blob/master/etc/rmd/acl/url/policy.csv)
 - [VMware Dispatch](https://github.com/vmware/dispatch): A framework for deploying and managing serverless style applications, via direct integration, see: [model (in code)](https://github.com/vmware/dispatch/blob/master/pkg/identity-manager/handlers.go#L46-L55), [policy rules (in code)](https://github.com/vmware/dispatch/blob/master/pkg/identity-manager/handlers_test.go#L35-L45)
 - [Banzai Pipeline](https://github.com/banzaicloud/pipeline): [Banzai Cloud](https://github.com/banzaicloud)'s RESTful API to provision or reuse managed Kubernetes clusters in the cloud, via direct integration, see: [model (in code)](https://github.com/banzaicloud/pipeline/blob/master/auth/authz.go#L15-L30), [policy rules (in code)](https://github.com/banzaicloud/pipeline/blob/master/auth/authz.go#L84-L93)
