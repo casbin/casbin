@@ -15,14 +15,21 @@
 package util
 
 import (
+	"regexp"
 	"sort"
 	"strings"
 )
 
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
 func EscapeAssertion(s string) string {
-	s = strings.Replace(s, "r.", "r_", -1)
-	s = strings.Replace(s, "p.", "p_", -1)
+	//Replace the first dot, because it can't be recognized by the regexp.
+	if (strings.HasPrefix(s, "r") || strings.HasPrefix(s, "p")) {
+		s = strings.Replace(s, ".", "_",1)
+	}
+	var regex = regexp.MustCompile(`(\|| |=|\)|\(|&|<|>|,|\+|-|!|\*|\/)(r|p)\.`)
+	s = regex.ReplaceAllStringFunc(s, func(m string) string {
+		return strings.Replace(m, ".", "_", 1)
+	})
 	return s
 }
 

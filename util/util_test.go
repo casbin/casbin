@@ -18,6 +18,32 @@ import (
 	"testing"
 )
 
+func testEscapeAssertion(t *testing.T, s string, res string) {
+	t.Helper()
+	myRes := EscapeAssertion(s)
+	t.Logf("%s: %s", s, myRes)
+
+	if myRes != res {
+		t.Errorf("%s: %s, supposed to be %s", s, myRes, res)
+	}
+}
+
+func TestEscapeAssertion(t *testing.T) {
+	testEscapeAssertion(t, "r.attr.value == p.attr", "r_attr.value == p_attr")
+	testEscapeAssertion(t, "r.attp.value || p.attr", "r_attp.value || p_attr")
+	testEscapeAssertion(t, "r.attp.value &&p.attr", "r_attp.value &&p_attr")
+	testEscapeAssertion(t, "r.attp.value >p.attr", "r_attp.value >p_attr")
+	testEscapeAssertion(t, "r.attp.value <p.attr", "r_attp.value <p_attr")
+	testEscapeAssertion(t, "r.attp.value +p.attr", "r_attp.value +p_attr")
+	testEscapeAssertion(t, "r.attp.value -p.attr", "r_attp.value -p_attr")
+	testEscapeAssertion(t, "r.attp.value *p.attr", "r_attp.value *p_attr")
+	testEscapeAssertion(t, "r.attp.value /p.attr", "r_attp.value /p_attr")
+	testEscapeAssertion(t, "!r.attp.value /p.attr", "!r_attp.value /p_attr")
+	testEscapeAssertion(t, "g(r.sub, p.sub) == p.attr", "g(r_sub, p_sub) == p_attr")
+	testEscapeAssertion(t, "g(r.sub,p.sub) == p.attr", "g(r_sub,p_sub) == p_attr")
+	testEscapeAssertion(t, "(r.attp.value || p.attr)p.u", "(r_attp.value || p_attr)p_u")
+}
+
 func testRemoveComments(t *testing.T, s string, res string) {
 	t.Helper()
 	myRes := RemoveComments(s)
