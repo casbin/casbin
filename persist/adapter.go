@@ -30,7 +30,10 @@ func LoadPolicyLine(line string, model model.Model) {
 		return
 	}
 
-	tokens := strings.Split(line, ", ")
+	tokens := strings.Split(line, ",")
+	for i := range tokens {
+		tokens[i] = strings.TrimSpace(tokens[i])
+	}
 
 	key := tokens[0]
 	sec := key[:1]
