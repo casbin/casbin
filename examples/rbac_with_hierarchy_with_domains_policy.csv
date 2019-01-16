@@ -1,0 +1,8 @@
+p, role:reader, domain1, data1, read
+p, role:writer, domain1, data1, write
+
+g, role:global_admin, role:reader, domain1
+g, role:global_admin, role:writer, domain1
+
+g, alice, role:global_admin, domain1
+

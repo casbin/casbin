@@ -41,6 +41,16 @@ func testGetRolesInDomain(t *testing.T, e *Enforcer, name string, domain string,
 	}
 }
 
+func TestGetImplicitRolesForDomainUser(t *testing.T) {
+	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_hierarchy_with_domains_policy.csv")
+
+	// This is only able to retrieve the first level of roles.
+	testGetRolesInDomain(t, e, "alice", "domain1", []string{"role:global_admin"})
+
+	// Retrieve all inherit roles. It supports domains as well.
+	testGetImplicitRolesInDomain(t, e, "alice", "domain1", []string{"role:global_admin", "role:reader", "role:writer"})
+}
+
 // TestUserAPIWithDomains: Add by Gordon
 func TestUserAPIWithDomains(t *testing.T) {
 	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
