@@ -184,6 +184,16 @@ func testGetImplicitRoles(t *testing.T, e *Enforcer, name string, res []string) 
 	}
 }
 
+func testGetImplicitRolesInDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
+	t.Helper()
+	myRes := e.GetImplicitRolesForUser(name, domain)
+	t.Log("Implicit roles in domain ", domain, " for ", name, ": ", myRes)
+
+	if !util.ArrayEquals(res, myRes) {
+		t.Error("Implicit roles in domain ", domain, " for ", name, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func TestImplicitRoleAPI(t *testing.T) {
 	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy.csv")
 
