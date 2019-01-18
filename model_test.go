@@ -278,6 +278,11 @@ func TestRBACModelWithCustomData(t *testing.T) {
 func TestRBACModelWithPattern(t *testing.T) {
 	e := NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
 
+	// Here's a little confusing: the matching function here is not the custom function used in matcher.
+	// It is the matching function used by "g" (and "g2", "g3" if any..)
+	// You can see in policy that: "g2, /book/:id, book_group", so in "g2()" function in the matcher, instead
+	// of checking whether "/book/:id" equals the obj: "/book/1", it checks whether the pattern matches.
+	// You can see it as normal RBAC: "/book/:id" == "/book/1" becomes KeyMatch2("/book/:id", "/book/1")
 	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("KeyMatch2", util.KeyMatch2)
 	testEnforce(t, e, "alice", "/book/1", "GET", true)
 	testEnforce(t, e, "alice", "/book/2", "GET", true)
@@ -288,6 +293,8 @@ func TestRBACModelWithPattern(t *testing.T) {
 	testEnforce(t, e, "bob", "/pen/1", "GET", true)
 	testEnforce(t, e, "bob", "/pen/2", "GET", true)
 
+	// AddMatchingFunc() is actually setting a function because only one function is allowed,
+	// so when we set "KeyMatch3", we are actually replacing "KeyMatch2" with "KeyMatch3".
 	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("KeyMatch3", util.KeyMatch3)
 	testEnforce(t, e, "alice", "/book2/1", "GET", true)
 	testEnforce(t, e, "alice", "/book2/2", "GET", true)
