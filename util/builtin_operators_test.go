@@ -54,11 +54,11 @@ func TestKeyMatch2(t *testing.T) {
 	testKeyMatch2(t, "/foo", "/foo", true)
 	testKeyMatch2(t, "/foo", "/foo*", true)
 	testKeyMatch2(t, "/foo", "/foo/*", false)
-	testKeyMatch2(t, "/foo/bar", "/foo", true) // different with KeyMatch.
-	testKeyMatch2(t, "/foo/bar", "/foo*", true)
+	testKeyMatch2(t, "/foo/bar", "/foo", false)
+	testKeyMatch2(t, "/foo/bar", "/foo*", false) // different with KeyMatch.
 	testKeyMatch2(t, "/foo/bar", "/foo/*", true)
-	testKeyMatch2(t, "/foobar", "/foo", true) // different with KeyMatch.
-	testKeyMatch2(t, "/foobar", "/foo*", true)
+	testKeyMatch2(t, "/foobar", "/foo", false)
+	testKeyMatch2(t, "/foobar", "/foo*", false) // different with KeyMatch.
 	testKeyMatch2(t, "/foobar", "/foo/*", false)
 
 	testKeyMatch2(t, "/", "/:resource", false)
