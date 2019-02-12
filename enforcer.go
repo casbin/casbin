@@ -324,10 +324,24 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 	if policyLen := len(e.model["p"]["p"].Policy); policyLen != 0 {
 		policyEffects = make([]effect.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
-
+		if len(e.model["r"]["r"].Tokens) != len(rvals) {
+			panic(
+				fmt.Sprintf(
+					"Invalid Request Definition size: expected %d got %d rvals: %v",
+					len(e.model["r"]["r"].Tokens),
+					len(rvals),
+					rvals))
+		}
 		for i, pvals := range e.model["p"]["p"].Policy {
 			// log.LogPrint("Policy Rule: ", pvals)
-
+			if len(e.model["p"]["p"].Tokens) != len(pvals) {
+				panic(
+					fmt.Sprintf(
+						"Invalid Policy Rule size: expected %d got %d pvals: %v",
+						len(e.model["p"]["p"].Tokens),
+						len(pvals),
+						pvals))
+			}
 			parameters := make(map[string]interface{}, 8)
 			for j, token := range e.model["r"]["r"].Tokens {
 				parameters[token] = rvals[j]
