@@ -19,7 +19,7 @@ const (
 )
 
 // addPolicy adds a rule to the current policy.
-func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) bool {
+func (e *Enforcer) addPolicy(sec, ptype string, rule []string) bool {
 	ruleAdded := e.model.AddPolicy(sec, ptype, rule)
 	if !ruleAdded {
 		return ruleAdded
@@ -41,7 +41,7 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) bool {
 }
 
 // removePolicy removes a rule from the current policy.
-func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) bool {
+func (e *Enforcer) removePolicy(sec, ptype string, rule []string) bool {
 	ruleRemoved := e.model.RemovePolicy(sec, ptype, rule)
 	if !ruleRemoved {
 		return ruleRemoved
@@ -63,7 +63,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) bool {
 }
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.
-func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) bool {
+func (e *Enforcer) removeFilteredPolicy(sec, ptype string, fieldIndex int, fieldValues ...string) bool {
 	ruleRemoved := e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
 	if !ruleRemoved {
 		return ruleRemoved

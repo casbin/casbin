@@ -33,5 +33,5 @@ func TestSetWatcher(t *testing.T) {
 	sampleWatcher := SampleWatcher{}
 	e.SetWatcher(sampleWatcher)
 
-	e.SavePolicy() //calls watcher.Update()
+	e.SavePolicy() // calls watcher.Update()
 }

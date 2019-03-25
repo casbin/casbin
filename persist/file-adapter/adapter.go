@@ -38,23 +38,23 @@ func NewAdapter(filePath string) *Adapter {
 }
 
 // LoadPolicy loads all policy rules from the storage.
-func (a *Adapter) LoadPolicy(model model.Model) error {
+func (a *Adapter) LoadPolicy(m model.Model) error {
 	if a.filePath == "" {
 		return errors.New("invalid file path, file path cannot be empty")
 	}
 
-	return a.loadPolicyFile(model, persist.LoadPolicyLine)
+	return a.loadPolicyFile(m, persist.LoadPolicyLine)
 }
 
 // SavePolicy saves all policy rules to the storage.
-func (a *Adapter) SavePolicy(model model.Model) error {
+func (a *Adapter) SavePolicy(m model.Model) error {
 	if a.filePath == "" {
 		return errors.New("invalid file path, file path cannot be empty")
 	}
 
 	var tmp bytes.Buffer
 
-	for ptype, ast := range model["p"] {
+	for ptype, ast := range m["p"] {
 		for _, rule := range ast.Policy {
 			tmp.WriteString(ptype + ", ")
 			tmp.WriteString(util.ArrayToString(rule))
@@ -62,7 +62,7 @@ func (a *Adapter) SavePolicy(model model.Model) error {
 		}
 	}
 
-	for ptype, ast := range model["g"] {
+	for ptype, ast := range m["g"] {
 		for _, rule := range ast.Policy {
 			tmp.WriteString(ptype + ", ")
 			tmp.WriteString(util.ArrayToString(rule))
@@ -73,7 +73,7 @@ func (a *Adapter) SavePolicy(model model.Model) error {
 	return a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
 }
 
-func (a *Adapter) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
+func (a *Adapter) loadPolicyFile(m model.Model, handler func(string, model.Model)) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
@@ -83,7 +83,7 @@ func (a *Adapter) loadPolicyFile(model model.Model, handler func(string, model.M
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		handler(line, model)
+		handler(line, m)
 	}
 	return scanner.Err()
 }
@@ -102,16 +102,16 @@ func (a *Adapter) savePolicyFile(text string) error {
 }
 
 // AddPolicy adds a policy rule to the storage.
-func (a *Adapter) AddPolicy(sec string, ptype string, rule []string) error {
+func (a *Adapter) AddPolicy(sec, ptype string, rule []string) error {
 	return errors.New("not implemented")
 }
 
 // RemovePolicy removes a policy rule from the storage.
-func (a *Adapter) RemovePolicy(sec string, ptype string, rule []string) error {
+func (a *Adapter) RemovePolicy(sec, ptype string, rule []string) error {
 	return errors.New("not implemented")
 }
 
 // RemoveFilteredPolicy removes policy rules that match the filter from the storage.
-func (a *Adapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
+func (a *Adapter) RemoveFilteredPolicy(sec, ptype string, fieldIndex int, fieldValues ...string) error {
 	return errors.New("not implemented")
 }

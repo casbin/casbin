@@ -22,6 +22,7 @@ import (
 	"github.com/casbin/casbin/rbac"
 )
 
+// MatchingFunc defines a function to perform matching by a RoleManager
 type MatchingFunc func(arg1, arg2 string) bool
 
 // RoleManager provides a default implementation for the RoleManager interface
@@ -43,6 +44,7 @@ func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 	return &rm
 }
 
+// AddMatchingFunc sets the matching function on RoleManager
 func (rm *RoleManager) AddMatchingFunc(name string, fn MatchingFunc) {
 	rm.hasPattern = true
 	rm.matchingFunc = fn
@@ -86,7 +88,7 @@ func (rm *RoleManager) Clear() error {
 // AddLink adds the inheritance link between role: name1 and role: name2.
 // aka role: name1 inherits role: name2.
 // domain is a prefix to the roles.
-func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) error {
+func (rm *RoleManager) AddLink(name1, name2 string, domain ...string) error {
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
@@ -103,7 +105,7 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 // DeleteLink deletes the inheritance link between role: name1 and role: name2.
 // aka role: name1 does not inherit role: name2 any more.
 // domain is a prefix to the roles.
-func (rm *RoleManager) DeleteLink(name1 string, name2 string, domain ...string) error {
+func (rm *RoleManager) DeleteLink(name1, name2 string, domain ...string) error {
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
@@ -123,7 +125,7 @@ func (rm *RoleManager) DeleteLink(name1 string, name2 string, domain ...string) 
 
 // HasLink determines whether role: name1 inherits role: name2.
 // domain is a prefix to the roles.
-func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bool, error) {
+func (rm *RoleManager) HasLink(name1, name2 string, domain ...string) (bool, error) {
 	if len(domain) == 1 {
 		name1 = domain[0] + "::" + name1
 		name2 = domain[0] + "::" + name2
@@ -270,10 +272,12 @@ func (r *Role) hasDirectRole(name string) bool {
 }
 
 func (r *Role) toString() string {
-	names := ""
+	var names string
+
 	if len(r.roles) == 0 {
-		return ""
+		return names
 	}
+
 	for i, role := range r.roles {
 		if i == 0 {
 			names += role.name
@@ -284,9 +288,8 @@ func (r *Role) toString() string {
 
 	if len(r.roles) == 1 {
 		return r.name + " < " + names
-	} else {
-		return r.name + " < (" + names + ")"
 	}
+	return r.name + " < (" + names + ")"
 }
 
 func (r *Role) getRoles() []string {

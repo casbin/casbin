@@ -18,7 +18,7 @@ import (
 	"testing"
 )
 
-func testEscapeAssertion(t *testing.T, s string, res string) {
+func testEscapeAssertion(t *testing.T, s, res string) {
 	t.Helper()
 	myRes := EscapeAssertion(s)
 	t.Logf("%s: %s", s, myRes)
@@ -44,7 +44,7 @@ func TestEscapeAssertion(t *testing.T) {
 	testEscapeAssertion(t, "(r.attp.value || p.attr)p.u", "(r_attp.value || p_attr)p_u")
 }
 
-func testRemoveComments(t *testing.T, s string, res string) {
+func testRemoveComments(t *testing.T, s, res string) {
 	t.Helper()
 	myRes := RemoveComments(s)
 	t.Logf("%s: %s", s, myRes)
@@ -62,7 +62,7 @@ func TestRemoveComments(t *testing.T) {
 	testRemoveComments(t, "r.act == p.act", "r.act == p.act")
 }
 
-func testArrayEquals(t *testing.T, a []string, b []string, res bool) {
+func testArrayEquals(t *testing.T, a, b []string, res bool) {
 	t.Helper()
 	myRes := ArrayEquals(a, b)
 	t.Logf("%s == %s: %t", a, b, myRes)
@@ -79,7 +79,7 @@ func TestArrayEquals(t *testing.T) {
 	testArrayEquals(t, []string{"a", "b", "c"}, []string{}, false)
 }
 
-func testArray2DEquals(t *testing.T, a [][]string, b [][]string, res bool) {
+func testArray2DEquals(t *testing.T, a, b [][]string, res bool) {
 	t.Helper()
 	myRes := Array2DEquals(a, b)
 	t.Logf("%s == %s: %t", a, b, myRes)
@@ -97,7 +97,7 @@ func TestArray2DEquals(t *testing.T) {
 	testArray2DEquals(t, [][]string{{"a", "b", "c"}, {"1", "2", "3"}}, [][]string{}, false)
 }
 
-func testSetEquals(t *testing.T, a []string, b []string, res bool) {
+func testSetEquals(t *testing.T, a, b []string, res bool) {
 	t.Helper()
 	myRes := SetEquals(a, b)
 	t.Logf("%s == %s: %t", a, b, myRes)

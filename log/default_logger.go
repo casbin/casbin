@@ -21,20 +21,24 @@ type DefaultLogger struct {
 	enable bool
 }
 
+// EnableLog controls whether print the message.
 func (l *DefaultLogger) EnableLog(enable bool) {
 	l.enable = enable
 }
 
+// IsEnabled returns if logger is enabled.
 func (l *DefaultLogger) IsEnabled() bool {
 	return l.enable
 }
 
+// Print formats using the default formats for its operands and logs the message.
 func (l *DefaultLogger) Print(v ...interface{}) {
 	if l.enable {
 		log.Print(v...)
 	}
 }
 
+// Printf formats according to a format specifier and logs the message.
 func (l *DefaultLogger) Printf(format string, v ...interface{}) {
 	if l.enable {
 		log.Printf(format, v...)

@@ -40,7 +40,7 @@ func testGetUsers(t *testing.T, e *Enforcer, name string, res []string) {
 	}
 }
 
-func testHasRole(t *testing.T, e *Enforcer, name string, role string, res bool) {
+func testHasRole(t *testing.T, e *Enforcer, name, role string, res bool) {
 	t.Helper()
 	myRes := e.HasRoleForUser(name, role)
 	t.Log(name, " has role ", role, ": ", myRes)
@@ -184,7 +184,7 @@ func testGetImplicitRoles(t *testing.T, e *Enforcer, name string, res []string) 
 	}
 }
 
-func testGetImplicitRolesInDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
+func testGetImplicitRolesInDomain(t *testing.T, e *Enforcer, name, domain string, res []string) {
 	t.Helper()
 	myRes := e.GetImplicitRolesForUser(name, domain)
 	t.Log("Implicit roles in domain ", domain, " for ", name, ": ", myRes)

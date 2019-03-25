@@ -47,15 +47,15 @@ func NewFilteredAdapter(filePath string) *FilteredAdapter {
 }
 
 // LoadPolicy loads all policy rules from the storage.
-func (a *FilteredAdapter) LoadPolicy(model model.Model) error {
+func (a *FilteredAdapter) LoadPolicy(m model.Model) error {
 	a.filtered = false
-	return a.Adapter.LoadPolicy(model)
+	return a.Adapter.LoadPolicy(m)
 }
 
 // LoadFilteredPolicy loads only policy rules that match the filter.
-func (a *FilteredAdapter) LoadFilteredPolicy(model model.Model, filter interface{}) error {
+func (a *FilteredAdapter) LoadFilteredPolicy(m model.Model, filter interface{}) error {
 	if filter == nil {
-		return a.LoadPolicy(model)
+		return a.LoadPolicy(m)
 	}
 	if a.filePath == "" {
 		return errors.New("invalid file path, file path cannot be empty")
@@ -65,14 +65,14 @@ func (a *FilteredAdapter) LoadFilteredPolicy(model model.Model, filter interface
 	if !ok {
 		return errors.New("invalid filter type")
 	}
-	err := a.loadFilteredPolicyFile(model, filterValue, persist.LoadPolicyLine)
+	err := a.loadFilteredPolicyFile(m, filterValue, persist.LoadPolicyLine)
 	if err == nil {
 		a.filtered = true
 	}
 	return err
 }
 
-func (a *FilteredAdapter) loadFilteredPolicyFile(model model.Model, filter *Filter, handler func(string, model.Model)) error {
+func (a *FilteredAdapter) loadFilteredPolicyFile(m model.Model, filter *Filter, handler func(string, model.Model)) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
@@ -87,7 +87,7 @@ func (a *FilteredAdapter) loadFilteredPolicyFile(model model.Model, filter *Filt
 			continue
 		}
 
-		handler(line, model)
+		handler(line, m)
 	}
 	return scanner.Err()
 }
@@ -98,11 +98,11 @@ func (a *FilteredAdapter) IsFiltered() bool {
 }
 
 // SavePolicy saves all policy rules to the storage.
-func (a *FilteredAdapter) SavePolicy(model model.Model) error {
+func (a *FilteredAdapter) SavePolicy(m model.Model) error {
 	if a.filtered {
 		return errors.New("cannot save a filtered policy")
 	}
-	return a.Adapter.SavePolicy(model)
+	return a.Adapter.SavePolicy(m)
 }
 
 func filterLine(line string, filter *Filter) bool {
@@ -123,7 +123,7 @@ func filterLine(line string, filter *Filter) bool {
 	return filterWords(p, filterSlice)
 }
 
-func filterWords(line []string, filter []string) bool {
+func filterWords(line, filter []string) bool {
 	if len(line) < len(filter)+1 {
 		return true
 	}

@@ -75,7 +75,7 @@ func NewConfigFromText(text string) (ConfigInterface, error) {
 }
 
 // AddConfig adds a new section->key:value to the configuration.
-func (c *Config) AddConfig(section string, option string, value string) bool {
+func (c *Config) AddConfig(section, option, value string) bool {
 	if section == "" {
 		section = DEFAULT_SECTION
 	}
@@ -112,17 +112,16 @@ func (c *Config) parseBuffer(buf *bufio.Reader) error {
 		if canWrite {
 			if err := c.write(section, lineNum, &buffer); err != nil {
 				return err
-			} else {
-				canWrite = false
 			}
+			canWrite = false
 		}
 		lineNum++
 		line, _, err := buf.ReadLine()
 		if err == io.EOF {
 			// force write when buffer is not flushed yet
 			if buffer.Len() > 0 {
-				if err := c.write(section, lineNum, &buffer); err != nil {
-					return err
+				if werr := c.write(section, lineNum, &buffer); werr != nil {
+					return werr
 				}
 			}
 			break
@@ -218,10 +217,10 @@ func (c *Config) Strings(key string) []string {
 }
 
 // Set sets the value for the specific key in the Config
-func (c *Config) Set(key string, value string) error {
+func (c *Config) Set(key, value string) error {
 	c.Lock()
 	defer c.Unlock()
-	if len(key) == 0 {
+	if key == "" {
 		return errors.New("key is empty")
 	}
 

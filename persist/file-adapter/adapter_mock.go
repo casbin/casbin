@@ -40,17 +40,16 @@ func NewAdapterMock(filePath string) *AdapterMock {
 }
 
 // LoadPolicy loads all policy rules from the storage.
-func (a *AdapterMock) LoadPolicy(model model.Model) error {
-	err := a.loadPolicyFile(model, persist.LoadPolicyLine)
-	return err
+func (a *AdapterMock) LoadPolicy(m model.Model) error {
+	return a.loadPolicyFile(m, persist.LoadPolicyLine)
 }
 
 // SavePolicy saves all policy rules to the storage.
-func (a *AdapterMock) SavePolicy(model model.Model) error {
+func (a *AdapterMock) SavePolicy(m model.Model) error {
 	return nil
 }
 
-func (a *AdapterMock) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
+func (a *AdapterMock) loadPolicyFile(m model.Model, handler func(string, model.Model)) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
@@ -61,7 +60,7 @@ func (a *AdapterMock) loadPolicyFile(model model.Model, handler func(string, mod
 	for {
 		line, err := buf.ReadString('\n')
 		line = strings.TrimSpace(line)
-		handler(line, model)
+		handler(line, m)
 		if err != nil {
 			if err == io.EOF {
 				return nil
@@ -85,16 +84,16 @@ func (a *AdapterMock) GetMockErr() error {
 }
 
 // AddPolicy adds a policy rule to the storage.
-func (a *AdapterMock) AddPolicy(sec string, ptype string, rule []string) error {
+func (a *AdapterMock) AddPolicy(sec, ptype string, rule []string) error {
 	return a.GetMockErr()
 }
 
 // RemovePolicy removes a policy rule from the storage.
-func (a *AdapterMock) RemovePolicy(sec string, ptype string, rule []string) error {
+func (a *AdapterMock) RemovePolicy(sec, ptype string, rule []string) error {
 	return a.GetMockErr()
 }
 
 // RemoveFilteredPolicy removes policy rules that match the filter from the storage.
-func (a *AdapterMock) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
+func (a *AdapterMock) RemoveFilteredPolicy(sec, ptype string, fieldIndex int, fieldValues ...string) error {
 	return a.GetMockErr()
 }

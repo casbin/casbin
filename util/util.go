@@ -22,9 +22,9 @@ import (
 
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
 func EscapeAssertion(s string) string {
-	//Replace the first dot, because it can't be recognized by the regexp.
-	if (strings.HasPrefix(s, "r") || strings.HasPrefix(s, "p")) {
-		s = strings.Replace(s, ".", "_",1)
+	// Replace the first dot, because it can't be recognized by the regexp.
+	if strings.HasPrefix(s, "r") || strings.HasPrefix(s, "p") {
+		s = strings.Replace(s, ".", "_", 1)
 	}
 	var regex = regexp.MustCompile(`(\|| |=|\)|\(|&|<|>|,|\+|-|!|\*|\/)(r|p)\.`)
 	s = regex.ReplaceAllStringFunc(s, func(m string) string {
@@ -43,7 +43,7 @@ func RemoveComments(s string) string {
 }
 
 // ArrayEquals determines whether two string arrays are identical.
-func ArrayEquals(a []string, b []string) bool {
+func ArrayEquals(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -57,7 +57,7 @@ func ArrayEquals(a []string, b []string) bool {
 }
 
 // Array2DEquals determines whether two 2-dimensional string arrays are identical.
-func Array2DEquals(a [][]string, b [][]string) bool {
+func Array2DEquals(a, b [][]string) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -95,7 +95,7 @@ func ParamsToString(s ...string) string {
 }
 
 // SetEquals determines whether two string sets are identical.
-func SetEquals(a []string, b []string) bool {
+func SetEquals(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
 	}

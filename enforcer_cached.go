@@ -61,11 +61,10 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) bool {
 	defer e.locker.Unlock()
 	if _, ok := e.m[key]; ok {
 		return e.m[key]
-	} else {
-		res := e.Enforcer.Enforce(rvals...)
-		e.m[key] = res
-		return res
 	}
+	res := e.Enforcer.Enforce(rvals...)
+	e.m[key] = res
+	return res
 }
 
 // InvalidateCache deletes all the existing cached decisions.

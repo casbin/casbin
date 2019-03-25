@@ -18,7 +18,7 @@ import (
 	"testing"
 )
 
-func testKeyMatch(t *testing.T, key1 string, key2 string, res bool) {
+func testKeyMatch(t *testing.T, key1, key2 string, res bool) {
 	t.Helper()
 	myRes := KeyMatch(key1, key2)
 	t.Logf("%s < %s: %t", key1, key2, myRes)
@@ -40,7 +40,7 @@ func TestKeyMatch(t *testing.T) {
 	testKeyMatch(t, "/foobar", "/foo/*", false)
 }
 
-func testKeyMatch2(t *testing.T, key1 string, key2 string, res bool) {
+func testKeyMatch2(t *testing.T, key1, key2 string, res bool) {
 	t.Helper()
 	myRes := KeyMatch2(key1, key2)
 	t.Logf("%s < %s: %t", key1, key2, myRes)
@@ -79,7 +79,7 @@ func TestKeyMatch2(t *testing.T) {
 	testKeyMatch2(t, "/alice/all", "/:id", false)
 }
 
-func testKeyMatch3(t *testing.T, key1 string, key2 string, res bool) {
+func testKeyMatch3(t *testing.T, key1, key2 string, res bool) {
 	t.Helper()
 	myRes := KeyMatch3(key1, key2)
 	t.Logf("%s < %s: %t", key1, key2, myRes)
@@ -113,7 +113,7 @@ func TestKeyMatch3(t *testing.T) {
 	testKeyMatch3(t, "/proxy/", "/proxy/{id}/*", false)
 }
 
-func testRegexMatch(t *testing.T, key1 string, key2 string, res bool) {
+func testRegexMatch(t *testing.T, key1, key2 string, res bool) {
 	t.Helper()
 	myRes := RegexMatch(key1, key2)
 	t.Logf("%s < %s: %t", key1, key2, myRes)
@@ -135,7 +135,7 @@ func TestRegexMatch(t *testing.T) {
 	testRegexMatch(t, "/topic/edit/123s", "/topic/delete/[0-9]+", false)
 }
 
-func testIPMatch(t *testing.T, ip1 string, ip2 string, res bool) {
+func testIPMatch(t *testing.T, ip1, ip2 string, res bool) {
 	t.Helper()
 	myRes := IPMatch(ip1, ip2)
 	t.Logf("%s < %s: %t", ip1, ip2, myRes)

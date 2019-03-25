@@ -24,6 +24,24 @@ const (
 	Deny
 )
 
+var (
+	effects = map[string]Effect{
+		"allow": Allow,
+		"deny":  Deny,
+	}
+)
+
+// AsEffect converts the string value of the Effect
+func AsEffect(v interface{}) Effect {
+	vstr, ok := v.(string)
+	if ok {
+		if e, exists := effects[vstr]; exists {
+			return e
+		}
+	}
+	return Indeterminate
+}
+
 // Effector is the interface for Casbin effectors.
 type Effector interface {
 	// MergeEffects merges all matching results collected by the enforcer into a single decision.

@@ -24,7 +24,7 @@ import (
 
 // KeyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*"
-func KeyMatch(key1 string, key2 string) bool {
+func KeyMatch(key1, key2 string) bool {
 	i := strings.Index(key2, "*")
 	if i == -1 {
 		return key1 == key2
@@ -41,12 +41,12 @@ func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return bool(KeyMatch(name1, name2)), nil
+	return KeyMatch(name1, name2), nil
 }
 
 // KeyMatch2 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/:resource"
-func KeyMatch2(key1 string, key2 string) bool {
+func KeyMatch2(key1, key2 string) bool {
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 
 	re := regexp.MustCompile(`(.*):[^/]+(.*)`)
@@ -58,7 +58,7 @@ func KeyMatch2(key1 string, key2 string) bool {
 		key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
 	}
 
-	return RegexMatch(key1, "^" + key2 + "$")
+	return RegexMatch(key1, "^"+key2+"$")
 }
 
 // KeyMatch2Func is the wrapper for KeyMatch2.
@@ -66,12 +66,12 @@ func KeyMatch2Func(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return bool(KeyMatch2(name1, name2)), nil
+	return KeyMatch2(name1, name2), nil
 }
 
 // KeyMatch3 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/{resource}"
-func KeyMatch3(key1 string, key2 string) bool {
+func KeyMatch3(key1, key2 string) bool {
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 
 	re := regexp.MustCompile(`(.*)\{[^/]+\}(.*)`)
@@ -91,11 +91,11 @@ func KeyMatch3Func(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return bool(KeyMatch3(name1, name2)), nil
+	return KeyMatch3(name1, name2), nil
 }
 
 // RegexMatch determines whether key1 matches the pattern of key2 in regular expression.
-func RegexMatch(key1 string, key2 string) bool {
+func RegexMatch(key1, key2 string) bool {
 	res, err := regexp.MatchString(key2, key1)
 	if err != nil {
 		panic(err)
@@ -108,12 +108,12 @@ func RegexMatchFunc(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return bool(RegexMatch(name1, name2)), nil
+	return RegexMatch(name1, name2), nil
 }
 
 // IPMatch determines whether IP address ip1 matches the pattern of IP address ip2, ip2 can be an IP address or a CIDR pattern.
 // For example, "192.168.2.123" matches "192.168.2.0/24"
-func IPMatch(ip1 string, ip2 string) bool {
+func IPMatch(ip1, ip2 string) bool {
 	objIP1 := net.ParseIP(ip1)
 	if objIP1 == nil {
 		panic("invalid argument: ip1 in IPMatch() function is not an IP address.")
@@ -137,7 +137,7 @@ func IPMatchFunc(args ...interface{}) (interface{}, error) {
 	ip1 := args[0].(string)
 	ip2 := args[1].(string)
 
-	return bool(IPMatch(ip1, ip2)), nil
+	return IPMatch(ip1, ip2), nil
 }
 
 // GenerateGFunction is the factory method of the g(_, _) function.
@@ -148,13 +148,13 @@ func GenerateGFunction(rm rbac.RoleManager) func(args ...interface{}) (interface
 
 		if rm == nil {
 			return name1 == name2, nil
-		} else if len(args) == 2 {
+		}
+		if len(args) == 2 {
 			res, _ := rm.HasLink(name1, name2)
 			return res, nil
-		} else {
-			domain := args[2].(string)
-			res, _ := rm.HasLink(name1, name2, domain)
-			return res, nil
 		}
+		domain := args[2].(string)
+		res, _ := rm.HasLink(name1, name2, domain)
+		return res, nil
 	}
 }

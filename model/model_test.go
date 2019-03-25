@@ -5,5 +5,5 @@ import (
 )
 
 func TestModel(t *testing.T) {
-	//No tests yet
+	// No tests yet
 }

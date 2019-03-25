@@ -27,7 +27,7 @@ func (e *Enforcer) GetUsersForRole(name string) []string {
 }
 
 // HasRoleForUser determines whether a user has a role.
-func (e *Enforcer) HasRoleForUser(name string, role string) bool {
+func (e *Enforcer) HasRoleForUser(name, role string) bool {
 	roles := e.GetRolesForUser(name)
 
 	hasRole := false
@@ -43,13 +43,13 @@ func (e *Enforcer) HasRoleForUser(name string, role string) bool {
 
 // AddRoleForUser adds a role for a user.
 // Returns false if the user already has the role (aka not affected).
-func (e *Enforcer) AddRoleForUser(user string, role string) bool {
+func (e *Enforcer) AddRoleForUser(user, role string) bool {
 	return e.AddGroupingPolicy(user, role)
 }
 
 // DeleteRoleForUser deletes a role for a user.
 // Returns false if the user does not have the role (aka not affected).
-func (e *Enforcer) DeleteRoleForUser(user string, role string) bool {
+func (e *Enforcer) DeleteRoleForUser(user, role string) bool {
 	return e.RemoveGroupingPolicy(user, role)
 }
 

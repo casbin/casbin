@@ -29,7 +29,7 @@ func (e *SyncedEnforcer) GetUsersForRole(name string) []string {
 }
 
 // HasRoleForUser determines whether a user has a role.
-func (e *SyncedEnforcer) HasRoleForUser(name string, role string) bool {
+func (e *SyncedEnforcer) HasRoleForUser(name, role string) bool {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.HasRoleForUser(name, role)
@@ -37,7 +37,7 @@ func (e *SyncedEnforcer) HasRoleForUser(name string, role string) bool {
 
 // AddRoleForUser adds a role for a user.
 // Returns false if the user already has the role (aka not affected).
-func (e *SyncedEnforcer) AddRoleForUser(user string, role string) bool {
+func (e *SyncedEnforcer) AddRoleForUser(user, role string) bool {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.AddRoleForUser(user, role)
@@ -45,7 +45,7 @@ func (e *SyncedEnforcer) AddRoleForUser(user string, role string) bool {
 
 // DeleteRoleForUser deletes a role for a user.
 // Returns false if the user does not have the role (aka not affected).
-func (e *SyncedEnforcer) DeleteRoleForUser(user string, role string) bool {
+func (e *SyncedEnforcer) DeleteRoleForUser(user, role string) bool {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.DeleteRoleForUser(user, role)

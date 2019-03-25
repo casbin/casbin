@@ -37,13 +37,13 @@ var sectionNameMap = map[string]string{
 	"m": "matchers",
 }
 
-func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) bool {
+func loadAssertion(model Model, cfg config.ConfigInterface, sec, key string) bool {
 	value := cfg.String(sectionNameMap[sec] + "::" + key)
 	return model.AddDef(sec, key, value)
 }
 
 // AddDef adds an assertion to the model.
-func (model Model) AddDef(sec string, key string, value string) bool {
+func (model Model) AddDef(sec, key, value string) bool {
 	ast := Assertion{}
 	ast.Key = key
 	ast.Value = value

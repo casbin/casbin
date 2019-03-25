@@ -5,5 +5,5 @@ import (
 )
 
 func TestPersist(t *testing.T) {
-	//No tests yet
+	// No tests yet
 }

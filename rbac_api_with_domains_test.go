@@ -21,7 +21,7 @@ import (
 )
 
 // testGetUsersInDomain: Add by Gordon
-func testGetUsersInDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
+func testGetUsersInDomain(t *testing.T, e *Enforcer, name, domain string, res []string) {
 	t.Helper()
 	myRes := e.GetUsersForRoleInDomain(name, domain)
 	t.Log("Users for ", name, " under ", domain, ": ", myRes)
@@ -31,7 +31,7 @@ func testGetUsersInDomain(t *testing.T, e *Enforcer, name string, domain string,
 	}
 }
 
-func testGetRolesInDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
+func testGetRolesInDomain(t *testing.T, e *Enforcer, name, domain string, res []string) {
 	t.Helper()
 	myRes := e.GetRolesForUserInDomain(name, domain)
 	t.Log("Roles for ", name, " under ", domain, ": ", myRes)
@@ -98,7 +98,7 @@ func TestRoleAPIWithDomains(t *testing.T) {
 	testGetRolesInDomain(t, e, "non_exist", "domain2", []string{})
 }
 
-func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name string, domain string, res [][]string) {
+func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name, domain string, res [][]string) {
 	t.Helper()
 	myRes := e.GetPermissionsForUserInDomain(name, domain)
 	t.Log("Permissions for ", name, " under ", domain, ": ", myRes)

@@ -19,7 +19,7 @@ import (
 	"testing"
 )
 
-func rawEnforce(sub string, obj string, act string) bool {
+func rawEnforce(sub, obj, act string) bool {
 	policy := [2][3]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}}
 	for _, rule := range policy {
 		if sub == rule[0] && obj == rule[1] && act == rule[2] {

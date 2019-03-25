@@ -19,13 +19,14 @@ import (
 	"fmt"
 
 	"github.com/Knetic/govaluate"
+
 	"github.com/casbin/casbin/effect"
 	"github.com/casbin/casbin/log"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
-	"github.com/casbin/casbin/persist/file-adapter"
+	fileadapter "github.com/casbin/casbin/persist/file-adapter"
 	"github.com/casbin/casbin/rbac"
-	"github.com/casbin/casbin/rbac/default-role-manager"
+	defaultrolemanager "github.com/casbin/casbin/rbac/default-role-manager"
 	"github.com/casbin/casbin/util"
 )
 
@@ -47,10 +48,10 @@ type Enforcer struct {
 
 // NewEnforcer creates an enforcer via file or DB.
 // File:
-// e := casbin.NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.csv")
+//		e := casbin.NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.csv")
 // MySQL DB:
-// a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
-// e := casbin.NewEnforcer("path/to/basic_model.conf", a)
+//		a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
+//		e := casbin.NewEnforcer("path/to/basic_model.conf", a)
 func NewEnforcer(params ...interface{}) *Enforcer {
 	e := &Enforcer{}
 
@@ -81,16 +82,19 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 				e.InitWithModelAndAdapter(p0.(model.Model), params[1].(persist.Adapter))
 			}
 		}
-	} else if len(params)-parsedParamLen == 1 {
+	}
+	if len(params)-parsedParamLen == 1 {
 		switch p0 := params[0].(type) {
 		case string:
 			e.InitWithFile(p0, "")
 		default:
 			e.InitWithModelAndAdapter(p0.(model.Model), nil)
 		}
-	} else if len(params)-parsedParamLen == 0 {
+	}
+	if len(params)-parsedParamLen == 0 {
 		e.InitWithFile("", "")
-	} else {
+	}
+	if len(params)-parsedParamLen > 2 {
 		panic("Invalid parameters for enforcer.")
 	}
 
@@ -98,7 +102,7 @@ func NewEnforcer(params ...interface{}) *Enforcer {
 }
 
 // InitWithFile initializes an enforcer with a model file and a policy file.
-func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
+func (e *Enforcer) InitWithFile(modelPath, policyPath string) {
 	a := fileadapter.NewAdapter(policyPath)
 	e.InitWithAdapter(modelPath, a)
 }
@@ -143,14 +147,16 @@ func (e *Enforcer) initialize() {
 func NewModel(text ...string) model.Model {
 	m := make(model.Model)
 
+	if len(text) > 2 {
+		panic("Invalid parameters for model.")
+	}
 	if len(text) == 2 {
 		if text[0] != "" {
 			m.LoadModel(text[0])
 		}
-	} else if len(text) == 1 {
+	}
+	if len(text) == 1 {
 		m.LoadModelFromText(text[0])
-	} else if len(text) != 0 {
-		panic("Invalid parameters for model.")
 	}
 
 	return m
@@ -333,7 +339,6 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 					rvals))
 		}
 		for i, pvals := range e.model["p"]["p"].Policy {
-			// log.LogPrint("Policy Rule: ", pvals)
 			if len(e.model["p"]["p"].Tokens) != len(pvals) {
 				panic(
 					fmt.Sprintf(
@@ -350,12 +355,10 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 				parameters[token] = pvals[j]
 			}
 
-			result, err := expression.Evaluate(parameters)
-			// log.LogPrint("Result: ", result)
-
-			if err != nil {
+			result, everr := expression.Evaluate(parameters)
+			if everr != nil {
 				policyEffects[i] = effect.Indeterminate
-				panic(err)
+				panic(everr)
 			}
 
 			switch result := result.(type) {
@@ -372,17 +375,11 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 					matcherResults[i] = result
 				}
 			default:
-				panic(errors.New("matcher result should be bool, int or float"))
+				panic("matcher result should be bool, int or float")
 			}
 
 			if eft, ok := parameters["p_eft"]; ok {
-				if eft == "allow" {
-					policyEffects[i] = effect.Allow
-				} else if eft == "deny" {
-					policyEffects[i] = effect.Deny
-				} else {
-					policyEffects[i] = effect.Indeterminate
-				}
+				policyEffects[i] = effect.AsEffect(eft)
 			} else {
 				policyEffects[i] = effect.Allow
 			}
@@ -404,12 +401,10 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 			parameters[token] = ""
 		}
 
-		result, err := expression.Evaluate(parameters)
-		// log.LogPrint("Result: ", result)
-
-		if err != nil {
+		result, everr := expression.Evaluate(parameters)
+		if everr != nil {
 			policyEffects[0] = effect.Indeterminate
-			panic(err)
+			panic(everr)
 		}
 
 		if result.(bool) {
@@ -418,8 +413,6 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 			policyEffects[0] = effect.Indeterminate
 		}
 	}
-
-	// log.LogPrint("Rule Results: ", policyEffects)
 
 	result, err := e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults)
 	if err != nil {

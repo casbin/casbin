@@ -21,7 +21,7 @@ import (
 	"github.com/casbin/casbin/util"
 )
 
-func testRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, res bool) {
+func testRole(t *testing.T, rm rbac.RoleManager, name1, name2 string, res bool) {
 	t.Helper()
 	myRes, _ := rm.HasLink(name1, name2)
 	t.Logf("%s, %s: %t", name1, name2, myRes)
@@ -31,7 +31,7 @@ func testRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, res
 	}
 }
 
-func testDomainRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, domain string, res bool) {
+func testDomainRole(t *testing.T, rm rbac.RoleManager, name1, name2, domain string, res bool) {
 	t.Helper()
 	myRes, _ := rm.HasLink(name1, name2, domain)
 	t.Logf("%s :: %s, %s: %t", domain, name1, name2, myRes)

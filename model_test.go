@@ -17,9 +17,9 @@ package casbin
 import (
 	"testing"
 
-	"github.com/casbin/casbin/persist/file-adapter"
+	fileadapter "github.com/casbin/casbin/persist/file-adapter"
 	"github.com/casbin/casbin/rbac"
-	"github.com/casbin/casbin/rbac/default-role-manager"
+	defaultrolemanager "github.com/casbin/casbin/rbac/default-role-manager"
 	"github.com/casbin/casbin/util"
 )
 
@@ -30,14 +30,14 @@ func testEnforce(t *testing.T, e *Enforcer, sub string, obj interface{}, act str
 	}
 }
 
-func testEnforceWithoutUsers(t *testing.T, e *Enforcer, obj string, act string, res bool) {
+func testEnforceWithoutUsers(t *testing.T, e *Enforcer, obj, act string, res bool) {
 	t.Helper()
 	if e.Enforce(obj, act) != res {
 		t.Errorf("%s, %s: %t, supposed to be %t", obj, act, !res, res)
 	}
 }
 
-func testDomainEnforce(t *testing.T, e *Enforcer, sub string, dom string, obj string, act string, res bool) {
+func testDomainEnforce(t *testing.T, e *Enforcer, sub, dom, obj, act string, res bool) {
 	t.Helper()
 	if e.Enforce(sub, dom, obj, act) != res {
 		t.Errorf("%s, %s, %s, %s: %t, supposed to be %t", sub, dom, obj, act, !res, res)
@@ -312,18 +312,20 @@ func NewRoleManager() rbac.RoleManager {
 	return &testCustomRoleManager{}
 }
 func (rm *testCustomRoleManager) Clear() error { return nil }
-func (rm *testCustomRoleManager) AddLink(name1 string, name2 string, domain ...string) error {
+func (rm *testCustomRoleManager) AddLink(name1, name2 string, domain ...string) error {
 	return nil
 }
-func (rm *testCustomRoleManager) DeleteLink(name1 string, name2 string, domain ...string) error {
+func (rm *testCustomRoleManager) DeleteLink(name1, name2 string, domain ...string) error {
 	return nil
 }
-func (rm *testCustomRoleManager) HasLink(name1 string, name2 string, domain ...string) (bool, error) {
+func (rm *testCustomRoleManager) HasLink(name1, name2 string, domain ...string) (bool, error) {
 	if name1 == "alice" && name2 == "alice" {
 		return true, nil
-	} else if name1 == "alice" && name2 == "data2_admin" {
+	}
+	if name1 == "alice" && name2 == "data2_admin" {
 		return true, nil
-	} else if name1 == "bob" && name2 == "bob" {
+	}
+	if name1 == "bob" && name2 == "bob" {
 		return true, nil
 	}
 	return false, nil
@@ -357,7 +359,7 @@ type testResource struct {
 	Owner string
 }
 
-func newTestResource(name string, owner string) testResource {
+func newTestResource(name, owner string) testResource {
 	r := testResource{}
 	r.Name = name
 	r.Owner = owner
@@ -415,21 +417,21 @@ func TestKeyMatch2Model(t *testing.T) {
 	testEnforce(t, e, "alice", "/alice_data2/myid/using/res_id", "GET", true)
 }
 
-func CustomFunction(key1 string, key2 string) bool {
+func CustomFunction(key1, key2 string) bool {
 	if key1 == "/alice_data2/myid/using/res_id" && key2 == "/alice_data/:resource" {
 		return true
-	} else if key1 == "/alice_data2/myid/using/res_id" && key2 == "/alice_data2/:id/using/:resId" {
-		return true
-	} else {
-		return false
 	}
+	if key1 == "/alice_data2/myid/using/res_id" && key2 == "/alice_data2/:id/using/:resId" {
+		return true
+	}
+	return false
 }
 
 func CustomFunctionWrapper(args ...interface{}) (interface{}, error) {
 	key1 := args[0].(string)
 	key2 := args[1].(string)
 
-	return bool(CustomFunction(key1, key2)), nil
+	return CustomFunction(key1, key2), nil
 }
 
 func TestKeyMatchCustomModel(t *testing.T) {

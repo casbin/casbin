@@ -16,15 +16,15 @@ package log
 
 // Logger is the logging interface implementation.
 type Logger interface {
-	//EnableLog controls whether print the message.
+	// EnableLog controls whether print the message.
 	EnableLog(bool)
 
-	//IsEnabled returns if logger is enabled.
+	// IsEnabled returns if logger is enabled.
 	IsEnabled() bool
 
-	//Print formats using the default formats for its operands and logs the message.
+	// Print formats using the default formats for its operands and logs the message.
 	Print(...interface{})
 
-	//Printf formats according to a format specifier and logs the message.
+	// Printf formats according to a format specifier and logs the message.
 	Printf(string, ...interface{})
 }
