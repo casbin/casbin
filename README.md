@@ -44,6 +44,7 @@ production-ready | experimental | WIP | WIP
 - [Multi-threading](#multi-threading)
 - [Benchmarks](#benchmarks)
 - [Examples](#examples)
+- [Middlewares](#middlewares)
 - [Our adopters](#our-adopters)
 
 ## Supported models
@@ -282,6 +283,10 @@ ABAC | [abac_model.conf](https://github.com/casbin/casbin/blob/master/examples/a
 RESTful | [keymatch_model.conf](https://github.com/casbin/casbin/blob/master/examples/keymatch_model.conf)  | [keymatch_policy.csv](https://github.com/casbin/casbin/blob/master/examples/keymatch_policy.csv)
 Deny-override | [rbac_model_with_deny.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_with_deny_model.conf)  | [rbac_policy_with_deny.csv](https://github.com/casbin/casbin/blob/master/examples/rbac_with_deny_policy.csv)
 Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/examples/priority_model.conf)  | [priority_policy.csv](https://github.com/casbin/casbin/blob/master/examples/priority_policy.csv)
+
+## Middlewares
+
+Authz middlewares for web frameworks: https://casbin.org/docs/en/middlewares
 
 ## Our adopters
 
