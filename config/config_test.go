@@ -34,7 +34,7 @@ func TestGet(t *testing.T) {
 		t.Errorf("Get failure: expected different value for url (expected: [%#v] got: [%#v])", "act.wiki", v)
 	}
 
-	// reids::key test
+	// redis::key test
 	if v := config.Strings("redis::redis.key"); len(v) != 2 || v[0] != "push1" || v[1] != "push2" {
 		t.Errorf("Get failure: expected different value for redis::redis.key (expected: [%#v] got: [%#v])", "[]string{push1,push2}", v)
 	}
