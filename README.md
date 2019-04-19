@@ -212,27 +212,7 @@ https://casbin.org/docs/en/role-managers
 
 ## Benchmarks
 
-The overhead of policy enforcement is benchmarked in [model_b_test.go](https://github.com/casbin/casbin/blob/master/model_b_test.go). The testbed is:
-
-```
-Intel(R) Core(TM) i7-6700HQ CPU @ 2.60GHz, 2601 Mhz, 4 Core(s), 8 Logical Processor(s)
-```
-
-The benchmarking result of ``go test -bench=. -benchmem`` is as follows (op = an ``Enforce()`` call, ms = millisecond, KB = kilo bytes):
-
-Test case | Size | Time overhead | Memory overhead
-----|------|------|----
-ACL | 2 rules (2 users) | 0.015493 ms/op | 5.649 KB
-RBAC | 5 rules (2 users, 1 role) | 0.021738 ms/op | 7.522 KB
-RBAC (small) | 1100 rules (1000 users, 100 roles) | 0.164309 ms/op | 80.620 KB
-RBAC (medium) | 11000 rules (10000 users, 1000 roles) | 2.258262 ms/op | 765.152 KB
-RBAC (large) | 110000 rules (100000 users, 10000 roles) | 23.916776 ms/op | 7.606 MB
-RBAC with resource roles | 6 rules (2 users, 2 roles) | 0.021146 ms/op | 7.906 KB
-RBAC with domains/tenants | 6 rules (2 users, 1 role, 2 domains) | 0.032696 ms/op | 10.755 KB
-ABAC | 0 rule (0 user) | 0.007510 ms/op | 2.328 KB
-RESTful | 5 rules (3 users) | 0.045398 ms/op | 91.774 KB
-Deny-override | 6 rules (2 users, 1 role) | 0.023281 ms/op | 8.370 KB
-Priority | 9 rules (2 users, 2 roles) | 0.016389 ms/op | 5.313 KB
+https://casbin.org/docs/en/benchmark
 
 ## Examples
 
