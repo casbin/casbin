@@ -173,23 +173,25 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) []stri
 // But GetImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
 func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) [][]string {
 	roles := e.GetImplicitRolesForUser(user, domain...)
-	res := [][]string{}
-	permissions := [][]string{}
+	roles = append([]string{user}, roles...)
 
-	for _, role := range roles {
-		permissions = e.GetPermissionsForUser(role)
-		res = append(res, permissions...)
-	}
-
+	withDomain := false
 	if len(domain) == 1 {
-		permissions = e.GetPermissionsForUserInDomain(user, domain[0])
+		withDomain = true
 	} else if len(domain) > 1 {
 		panic("error: domain should be 1 parameter")
-	} else {
-		permissions = e.GetPermissionsForUser(user)
 	}
 
-	res = append(res, permissions...)
+	res := [][]string{}
+	permissions := [][]string{}
+	for _, role := range roles {
+		if withDomain {
+			permissions = e.GetPermissionsForUserInDomain(role, domain[0])
+		} else {
+			permissions = e.GetPermissionsForUser(role)
+		}
+		res = append(res, permissions...)
+	}
 
 	return res
 }
