@@ -157,3 +157,25 @@ func BenchmarkCachedPriorityModel(b *testing.B) {
 		e.Enforce("alice", "data1", "read")
 	}
 }
+
+func BenchmarkCachedRBACModelMediumParallel(b *testing.B) {
+	e := NewCachedEnforcer("examples/rbac_model.conf")
+	// Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
+	e.EnableAutoBuildRoleLinks(false)
+	// 1000 roles, 100 resources.
+	for i := 0; i < 1000; i++ {
+		e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read")
+	}
+	// 10000 users.
+	for i := 0; i < 10000; i++ {
+		e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10))
+	}
+	e.BuildRoleLinks()
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			e.Enforce("user5001", "data150", "read")
+		}
+	})
+}
