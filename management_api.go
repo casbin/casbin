@@ -44,16 +44,6 @@ func (e *Enforcer) GetAllNamedActions(ptype string) []string {
 	return e.model.GetValuesForFieldInPolicy("p", ptype, 2)
 }
 
-// GetAllRoles gets the list of roles that show up in the current policy.
-func (e *Enforcer) GetAllRoles() []string {
-	return e.GetAllNamedRoles("g")
-}
-
-// GetAllNamedRoles gets the list of roles that show up in the current named policy.
-func (e *Enforcer) GetAllNamedRoles(ptype string) []string {
-	return e.model.GetValuesForFieldInPolicy("g", ptype, 1)
-}
-
 // GetPolicy gets all the authorization rules in the policy.
 func (e *Enforcer) GetPolicy() [][]string {
 	return e.GetNamedPolicy("p")

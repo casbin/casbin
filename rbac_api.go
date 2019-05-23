@@ -14,6 +14,16 @@
 
 package casbin
 
+// GetAllRoles gets the list of roles that show up in the current policy.
+func (e *Enforcer) GetAllRoles() []string {
+	return e.GetAllNamedRoles("g")
+}
+
+// GetAllNamedRoles gets the list of roles that show up in the current named policy.
+func (e *Enforcer) GetAllNamedRoles(ptype string) []string {
+	return e.model.GetValuesForFieldInPolicy("g", ptype, 1)
+}
+
 // GetRolesForUser gets the roles that a user has.
 func (e *Enforcer) GetRolesForUser(name string) []string {
 	res, _ := e.model["g"]["g"].RM.GetRoles(name)
