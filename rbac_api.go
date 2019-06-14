@@ -15,21 +15,23 @@
 package casbin
 
 // GetRolesForUser gets the roles that a user has.
-func (e *Enforcer) GetRolesForUser(name string) []string {
-	res, _ := e.model["g"]["g"].RM.GetRoles(name)
-	return res
+func (e *Enforcer) GetRolesForUser(name string) ([]string, error) {
+	res, err := e.model["g"]["g"].RM.GetRoles(name)
+	return res, err
 }
 
 // GetUsersForRole gets the users that has a role.
-func (e *Enforcer) GetUsersForRole(name string) []string {
-	res, _ := e.model["g"]["g"].RM.GetUsers(name)
-	return res
+func (e *Enforcer) GetUsersForRole(name string) ([]string, error) {
+	res, err := e.model["g"]["g"].RM.GetUsers(name)
+	return res, err
 }
 
 // HasRoleForUser determines whether a user has a role.
-func (e *Enforcer) HasRoleForUser(name string, role string) bool {
-	roles := e.GetRolesForUser(name)
-
+func (e *Enforcer) HasRoleForUser(name string, role string) (bool, error) {
+	roles, err := e.GetRolesForUser(name)
+	if err != nil {
+		return false, err
+	}
 	hasRole := false
 	for _, r := range roles {
 		if r == role {
@@ -38,7 +40,7 @@ func (e *Enforcer) HasRoleForUser(name string, role string) bool {
 		}
 	}
 
-	return hasRole
+	return hasRole, nil
 }
 
 // AddRoleForUser adds a role for a user.
