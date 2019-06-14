@@ -15,21 +15,21 @@
 package casbin
 
 // GetRolesForUser gets the roles that a user has.
-func (e *SyncedEnforcer) GetRolesForUser(name string) []string {
+func (e *SyncedEnforcer) GetRolesForUser(name string) ([]string, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.GetRolesForUser(name)
 }
 
 // GetUsersForRole gets the users that has a role.
-func (e *SyncedEnforcer) GetUsersForRole(name string) []string {
+func (e *SyncedEnforcer) GetUsersForRole(name string) ([]string, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.GetUsersForRole(name)
 }
 
 // HasRoleForUser determines whether a user has a role.
-func (e *SyncedEnforcer) HasRoleForUser(name string, role string) bool {
+func (e *SyncedEnforcer) HasRoleForUser(name string, role string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.HasRoleForUser(name, role)
