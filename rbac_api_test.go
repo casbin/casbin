@@ -17,12 +17,16 @@ package casbin
 import (
 	"testing"
 
+	"github.com/casbin/casbin/errors"
 	"github.com/casbin/casbin/util"
 )
 
 func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
 	t.Helper()
-	myRes := e.GetRolesForUser(name)
+	myRes, err := e.GetRolesForUser(name)
+	if err != nil {
+		t.Error("Roles for ", name, " could not be fetched: ", err.Error())
+	}
 	t.Log("Roles for ", name, ": ", myRes)
 
 	if !util.SetEquals(res, myRes) {
@@ -32,7 +36,15 @@ func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
 
 func testGetUsers(t *testing.T, e *Enforcer, name string, res []string) {
 	t.Helper()
-	myRes := e.GetUsersForRole(name)
+	myRes, err := e.GetUsersForRole(name)
+	switch err {
+	case nil:
+		break
+	case errors.ERR_NAME_NOT_FOUND:
+		t.Log("No name found")
+	default:
+		t.Error("Users for ", name, " could not be fetched: ", err.Error())
+	}
 	t.Log("Users for ", name, ": ", myRes)
 
 	if !util.SetEquals(res, myRes) {
@@ -42,7 +54,10 @@ func testGetUsers(t *testing.T, e *Enforcer, name string, res []string) {
 
 func testHasRole(t *testing.T, e *Enforcer, name string, role string, res bool) {
 	t.Helper()
-	myRes := e.HasRoleForUser(name, role)
+	myRes, err := e.HasRoleForUser(name, role)
+	if err != nil {
+		t.Error("HasRoleForUser returned an error: ", err.Error())
+	}
 	t.Log(name, " has role ", role, ": ", myRes)
 
 	if res != myRes {
