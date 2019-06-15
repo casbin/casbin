@@ -90,14 +90,15 @@ func testKeyMatch3(t *testing.T, key1 string, key2 string, res bool) {
 }
 
 func TestKeyMatch3(t *testing.T) {
+	// keyMatch3() is similar with KeyMatch2(), except using "/proxy/{id}" instead of "/proxy/:id".
 	testKeyMatch3(t, "/foo", "/foo", true)
 	testKeyMatch3(t, "/foo", "/foo*", true)
 	testKeyMatch3(t, "/foo", "/foo/*", false)
-	testKeyMatch3(t, "/foo/bar", "/foo", true) // different with KeyMatch.
-	testKeyMatch3(t, "/foo/bar", "/foo*", true)
+	testKeyMatch3(t, "/foo/bar", "/foo", false)
+	testKeyMatch3(t, "/foo/bar", "/foo*", false)
 	testKeyMatch3(t, "/foo/bar", "/foo/*", true)
-	testKeyMatch3(t, "/foobar", "/foo", true) // different with KeyMatch.
-	testKeyMatch3(t, "/foobar", "/foo*", true)
+	testKeyMatch3(t, "/foobar", "/foo", false)
+	testKeyMatch3(t, "/foobar", "/foo*", false)
 	testKeyMatch3(t, "/foobar", "/foo/*", false)
 
 	testKeyMatch3(t, "/", "/{resource}", false)
