@@ -83,7 +83,7 @@ func KeyMatch3(key1 string, key2 string) bool {
 		key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
 	}
 
-	return RegexMatch(key1, key2)
+	return RegexMatch(key1, "^" + key2 + "$")
 }
 
 // KeyMatch3Func is the wrapper for KeyMatch3.
