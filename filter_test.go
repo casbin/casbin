@@ -111,8 +111,8 @@ func TestFilteredAdapterEmptyFilepath(t *testing.T) {
 	adapter := fileadapter.NewFilteredAdapter("")
 	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
 
-	if err := e.LoadFilteredPolicy(nil); err == nil {
-		t.Errorf("expected error in LoadFilteredPolicy, but got nil")
+	if err := e.LoadFilteredPolicy(nil); err != nil {
+		t.Errorf("unexpected error in LoadFilteredPolicy: %v", err)
 	}
 }
 
