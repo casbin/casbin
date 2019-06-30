@@ -253,3 +253,22 @@ func TestImplicitPermissionAPIWithDomain(t *testing.T) {
 	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_hierarchy_with_domains_policy.csv")
 	testGetImplicitPermissionsWithDomain(t, e, "alice", "domain1", [][]string{{"alice", "domain1", "data2", "read"}, {"role:reader", "domain1", "data1", "read"}, {"role:writer", "domain1", "data1", "write"}})
 }
+
+func testGetImplicitUsers(t *testing.T, e *Enforcer, res []string, permission ...string) {
+	t.Helper()
+	myRes := e.GetImplicitUsersForPermission(permission...)
+	t.Log("Implicit users for permission: ", permission, ": ", myRes)
+
+	if !util.ArrayEquals(res, myRes) {
+		t.Error("Implicit users for permission: ", permission, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
+func TestImplicitUserAPI(t *testing.T) {
+	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy.csv")
+
+	testGetImplicitUsers(t, e, []string{"alice"}, "data1", "read")
+	testGetImplicitUsers(t, e, []string{"alice"}, "data1", "write")
+	testGetImplicitUsers(t, e, []string{"alice"}, "data2", "read")
+	testGetImplicitUsers(t, e, []string{"alice", "bob"}, "data2", "write")
+}
