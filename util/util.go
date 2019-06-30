@@ -122,3 +122,30 @@ func JoinSlice(a string, b ...string) []string {
 
 	return res
 }
+
+// JoinSliceAny joins a string and a slice into a new interface{} slice.
+func JoinSliceAny(a string, b ...string) []interface{} {
+	res := make([]interface{}, 0, len(b)+1)
+
+	res = append(res, a)
+	for _, s := range b {
+		res = append(res, s)
+	}
+
+	return res
+}
+
+// SetSubtract returns the elements in `a` that aren't in `b`.
+func SetSubtract(a []string, b []string) []string {
+	mb := make(map[string]struct{}, len(b))
+	for _, x := range b {
+		mb[x] = struct{}{}
+	}
+	var diff []string
+	for _, x := range a {
+		if _, found := mb[x]; !found {
+			diff = append(diff, x)
+		}
+	}
+	return diff
+}

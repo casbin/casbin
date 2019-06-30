@@ -178,3 +178,28 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 
 	return res
 }
+
+// GetImplicitUsersForPermission gets implicit users for a permission.
+// For example:
+// p, admin, data1, read
+// p, bob, data1, read
+// g, alice, admin
+//
+// GetImplicitUsersForPermission("data1", "read") will get: ["alice", "bob"].
+// Note: only users will be returned, roles (2nd arg in "g") will be excluded.
+func (e *Enforcer) GetImplicitUsersForPermission(permission ...string) []string {
+	subjects := e.GetAllSubjects()
+	roles := e.GetAllRoles()
+
+	users := util.SetSubtract(subjects, roles)
+
+	res := []string{}
+	for _, user := range users {
+		req := util.JoinSliceAny(user, permission...)
+		if e.Enforce(req...) {
+			res = append(res, user)
+		}
+	}
+
+	return res
+}
