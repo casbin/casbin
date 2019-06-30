@@ -14,6 +14,8 @@
 
 package casbin
 
+import "github.com/casbin/casbin/util"
+
 // GetRolesForUser gets the roles that a user has.
 func (e *Enforcer) GetRolesForUser(name string) ([]string, error) {
 	res, err := e.model["g"]["g"].RM.GetRoles(name)
@@ -82,27 +84,13 @@ func (e *Enforcer) DeletePermission(permission ...string) bool {
 // AddPermissionForUser adds a permission for a user or role.
 // Returns false if the user or role already has the permission (aka not affected).
 func (e *Enforcer) AddPermissionForUser(user string, permission ...string) bool {
-	params := make([]interface{}, 0, len(permission)+1)
-
-	params = append(params, user)
-	for _, perm := range permission {
-		params = append(params, perm)
-	}
-
-	return e.AddPolicy(params...)
+	return e.AddPolicy(util.JoinSlice(user, permission...))
 }
 
 // DeletePermissionForUser deletes a permission for a user or role.
 // Returns false if the user or role does not have the permission (aka not affected).
 func (e *Enforcer) DeletePermissionForUser(user string, permission ...string) bool {
-	params := make([]interface{}, 0, len(permission)+1)
-
-	params = append(params, user)
-	for _, perm := range permission {
-		params = append(params, perm)
-	}
-
-	return e.RemovePolicy(params...)
+	return e.RemovePolicy(util.JoinSlice(user, permission...))
 }
 
 // DeletePermissionsForUser deletes permissions for a user or role.
@@ -118,14 +106,7 @@ func (e *Enforcer) GetPermissionsForUser(user string) [][]string {
 
 // HasPermissionForUser determines whether a user has a permission.
 func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool {
-	params := make([]interface{}, 0, len(permission)+1)
-
-	params = append(params, user)
-	for _, perm := range permission {
-		params = append(params, perm)
-	}
-
-	return e.HasPolicy(params...)
+	return e.HasPolicy(util.JoinSlice(user, permission...))
 }
 
 // GetImplicitRolesForUser gets implicit roles that a user has.

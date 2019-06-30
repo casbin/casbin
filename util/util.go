@@ -110,3 +110,15 @@ func SetEquals(a []string, b []string) bool {
 	}
 	return true
 }
+
+// JoinSlice joins a string and a slice into a new slice.
+func JoinSlice(a string, b ...string) []string {
+	res := make([]string, 0, len(b)+1)
+
+	res = append(res, a)
+	for _, s := range b {
+		res = append(res, s)
+	}
+
+	return res
+}
