@@ -25,15 +25,28 @@ func LoadPolicyLine(line string, model model.Model) {
 	if line == "" || strings.HasPrefix(line, "#") {
 		return
 	}
+	sec, ptype, rules := policyLineToSlice(line)
+	model[sec][ptype].Policy = append(model[sec][ptype].Policy, rules[1:])
+}
 
+// LoadPolicyLineUnique loads a text line as a policy rule to a model at most once.
+func LoadPolicyLineUnique(line string, model model.Model) {
+	if line == "" || strings.HasPrefix(line, "#") {
+		return
+	}
+	model.AddPolicy(policyLineToSlice(line))
+}
+
+// policyLineToSlice cleans and slices a policy line string.
+func policyLineToSlice(line string) (sec string, ptype string, rules []string) {
 	tokens := strings.Split(line, ",")
 	for i := 0; i < len(tokens); i++ {
 		tokens[i] = strings.TrimSpace(tokens[i])
 	}
-
-	key := tokens[0]
-	sec := key[:1]
-	model[sec][key].Policy = append(model[sec][key].Policy, tokens[1:])
+	ptype = tokens[0]
+	sec = ptype[:1]
+	tokens = tokens[1:]
+	return
 }
 
 // Adapter is the interface for Casbin adapters.
