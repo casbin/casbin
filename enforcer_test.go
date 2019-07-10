@@ -15,13 +15,14 @@
 package casbin
 
 import (
+	"github.com/casbin/casbin/model"
 	"testing"
 
 	"github.com/casbin/casbin/persist/file-adapter"
 )
 
 func TestKeyMatchModelInMemory(t *testing.T) {
-	m := NewModel()
+	m := make(model.Model)
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("e", "e", "some(where (p.eft == allow))")
@@ -80,7 +81,7 @@ func TestKeyMatchModelInMemory(t *testing.T) {
 }
 
 func TestKeyMatchModelInMemoryDeny(t *testing.T) {
-	m := NewModel()
+	m := make(model.Model)
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("e", "e", "!some(where (p.eft == deny))")
@@ -94,7 +95,7 @@ func TestKeyMatchModelInMemoryDeny(t *testing.T) {
 }
 
 func TestRBACModelInMemoryIndeterminate(t *testing.T) {
-	m := NewModel()
+	m := make(model.Model)
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("g", "g", "_, _")
@@ -109,7 +110,7 @@ func TestRBACModelInMemoryIndeterminate(t *testing.T) {
 }
 
 func TestRBACModelInMemory(t *testing.T) {
-	m := NewModel()
+	m := make(model.Model)
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("g", "g", "_, _")
@@ -152,10 +153,8 @@ e = some(where (p.eft == allow))
 [matchers]
 m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 `
-	m := NewModel(text)
-	// The above is the same as:
-	// m := NewModel()
-	// m.LoadModelFromText(text)
+	m := make(model.Model)
+	m.LoadModelFromText(text)
 
 	e := NewEnforcer(m)
 
@@ -176,7 +175,7 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 }
 
 func TestNotUsedRBACModelInMemory(t *testing.T) {
-	m := NewModel()
+	m := make(model.Model)
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("g", "g", "_, _")
@@ -379,7 +378,7 @@ func TestSetAdapterFromFile(t *testing.T) {
 func TestInitEmpty(t *testing.T) {
 	e := NewEnforcer()
 
-	m := NewModel()
+	m := make(model.Model)
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("e", "e", "some(where (p.eft == allow))")

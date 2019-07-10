@@ -105,9 +105,9 @@ func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 
 // InitWithAdapter initializes an enforcer with a database adapter.
 func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
-	m := NewModel(modelPath, "")
+	m := make(model.Model)
+	m.LoadModel(modelPath)
 	e.InitWithModelAndAdapter(m, adapter)
-
 	e.modelPath = modelPath
 }
 
@@ -140,6 +140,7 @@ func (e *Enforcer) initialize() {
 }
 
 // NewModel creates a model.
+// todo object constructors should live alongside their type declaration and should never panic
 func NewModel(text ...string) model.Model {
 	m := make(model.Model)
 
@@ -159,7 +160,7 @@ func NewModel(text ...string) model.Model {
 // LoadModel reloads the model from the model CONF file.
 // Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
 func (e *Enforcer) LoadModel() {
-	e.model = NewModel()
+	e.model = make(model.Model)
 	e.model.LoadModel(e.modelPath)
 	e.model.PrintModel()
 	e.fm = model.LoadFunctionMap()
