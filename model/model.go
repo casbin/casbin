@@ -114,7 +114,7 @@ func (model Model) Load(pathOrText string) {
 
 // LoadWithConfig will attempt to load all sections using the current model and cfg useful if you want to handle cfg
 // loading errors instead of panicking
-func (model Model) LoadWithConfig(cfg config.ConfigInterface ){
+func (model Model) LoadWithConfig(cfg config.ConfigInterface) {
 	loadAllSections(model, cfg)
 }
 
