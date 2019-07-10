@@ -96,11 +96,17 @@ func (e *Enforcer) GetFilteredNamedGroupingPolicy(ptype string, fieldIndex int, 
 
 // HasPolicy determines whether an authorization rule exists.
 func (e *Enforcer) HasPolicy(params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	return e.HasNamedPolicy("p", params...)
 }
 
 // HasNamedPolicy determines whether a named authorization rule exists.
 func (e *Enforcer) HasNamedPolicy(ptype string, params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
 		return e.model.HasPolicy("p", ptype, strSlice)
 	}
@@ -117,6 +123,9 @@ func (e *Enforcer) HasNamedPolicy(ptype string, params ...interface{}) bool {
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddPolicy(params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	return e.AddNamedPolicy("p", params...)
 }
 
@@ -124,6 +133,9 @@ func (e *Enforcer) AddPolicy(params ...interface{}) bool {
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddNamedPolicy(ptype string, params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	var ruleAdded bool
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
 		ruleAdded = e.addPolicy("p", ptype, strSlice)
@@ -141,6 +153,9 @@ func (e *Enforcer) AddNamedPolicy(ptype string, params ...interface{}) bool {
 
 // RemovePolicy removes an authorization rule from the current policy.
 func (e *Enforcer) RemovePolicy(params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	return e.RemoveNamedPolicy("p", params...)
 }
 
@@ -151,6 +166,9 @@ func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) b
 
 // RemoveNamedPolicy removes an authorization rule from the current named policy.
 func (e *Enforcer) RemoveNamedPolicy(ptype string, params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	var ruleRemoved bool
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
 		ruleRemoved = e.removePolicy("p", ptype, strSlice)
@@ -173,11 +191,17 @@ func (e *Enforcer) RemoveFilteredNamedPolicy(ptype string, fieldIndex int, field
 
 // HasGroupingPolicy determines whether a role inheritance rule exists.
 func (e *Enforcer) HasGroupingPolicy(params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	return e.HasNamedGroupingPolicy("g", params...)
 }
 
 // HasNamedGroupingPolicy determines whether a named role inheritance rule exists.
 func (e *Enforcer) HasNamedGroupingPolicy(ptype string, params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
 		return e.model.HasPolicy("g", ptype, strSlice)
 	}
@@ -194,6 +218,9 @@ func (e *Enforcer) HasNamedGroupingPolicy(ptype string, params ...interface{}) b
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddGroupingPolicy(params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	return e.AddNamedGroupingPolicy("g", params...)
 }
 
@@ -201,6 +228,9 @@ func (e *Enforcer) AddGroupingPolicy(params ...interface{}) bool {
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddNamedGroupingPolicy(ptype string, params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	var ruleAdded bool
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
 		ruleAdded = e.addPolicy("g", ptype, strSlice)
@@ -221,6 +251,9 @@ func (e *Enforcer) AddNamedGroupingPolicy(ptype string, params ...interface{}) b
 
 // RemoveGroupingPolicy removes a role inheritance rule from the current policy.
 func (e *Enforcer) RemoveGroupingPolicy(params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	return e.RemoveNamedGroupingPolicy("g", params...)
 }
 
@@ -231,6 +264,9 @@ func (e *Enforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...s
 
 // RemoveNamedGroupingPolicy removes a role inheritance rule from the current named policy.
 func (e *Enforcer) RemoveNamedGroupingPolicy(ptype string, params ...interface{}) bool {
+	if len(params) == 0 {
+		return false
+	}
 	var ruleRemoved bool
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
 		ruleRemoved = e.removePolicy("g", ptype, strSlice)

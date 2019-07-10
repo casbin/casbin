@@ -23,9 +23,9 @@ import (
 	"github.com/casbin/casbin/log"
 	"github.com/casbin/casbin/model"
 	"github.com/casbin/casbin/persist"
-	"github.com/casbin/casbin/persist/file-adapter"
+	fileadapter "github.com/casbin/casbin/persist/file-adapter"
 	"github.com/casbin/casbin/rbac"
-	"github.com/casbin/casbin/rbac/default-role-manager"
+	defaultrolemanager "github.com/casbin/casbin/rbac/default-role-manager"
 	"github.com/casbin/casbin/util"
 )
 
@@ -211,7 +211,7 @@ func (e *Enforcer) ClearPolicy() {
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
 	e.model.ClearPolicy()
-	if err := e.adapter.LoadPolicy(e.model); err != nil {
+	if err := e.adapter.LoadPolicy(e.model); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
 		return err
 	}
 
@@ -235,7 +235,7 @@ func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
 	default:
 		return errors.New("filtered policies are not supported by this adapter")
 	}
-	if err := filteredAdapter.LoadFilteredPolicy(e.model, filter); err != nil {
+	if err := filteredAdapter.LoadFilteredPolicy(e.model, filter); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
 		return err
 	}
 
@@ -319,6 +319,22 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		panic(err)
 	}
 
+	rTokens := make(map[string]int, len(e.model["r"]["r"].Tokens))
+	for i, token := range e.model["r"]["r"].Tokens {
+		rTokens[token] = i
+	}
+	pTokens := make(map[string]int, len(e.model["p"]["p"].Tokens))
+	for i, token := range e.model["p"]["p"].Tokens {
+		pTokens[token] = i
+	}
+
+	parameters := enforceParameters{
+		rTokens: rTokens,
+		rVals:   rvals,
+
+		pTokens: pTokens,
+	}
+
 	var policyEffects []effect.Effect
 	var matcherResults []float64
 	if policyLen := len(e.model["p"]["p"].Policy); policyLen != 0 {
@@ -342,15 +358,10 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 						len(pvals),
 						pvals))
 			}
-			parameters := make(map[string]interface{}, 8)
-			for j, token := range e.model["r"]["r"].Tokens {
-				parameters[token] = rvals[j]
-			}
-			for j, token := range e.model["p"]["p"].Tokens {
-				parameters[token] = pvals[j]
-			}
 
-			result, err := expression.Evaluate(parameters)
+			parameters.pVals = pvals
+
+			result, err := expression.Eval(parameters)
 			// log.LogPrint("Result: ", result)
 
 			if err != nil {
@@ -375,7 +386,8 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 				panic(errors.New("matcher result should be bool, int or float"))
 			}
 
-			if eft, ok := parameters["p_eft"]; ok {
+			if j, ok := parameters.pTokens["p_eft"]; ok {
+				eft := parameters.pVals[j]
 				if eft == "allow" {
 					policyEffects[i] = effect.Allow
 				} else if eft == "deny" {
@@ -396,15 +408,9 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 		policyEffects = make([]effect.Effect, 1)
 		matcherResults = make([]float64, 1)
 
-		parameters := make(map[string]interface{}, 8)
-		for j, token := range e.model["r"]["r"].Tokens {
-			parameters[token] = rvals[j]
-		}
-		for _, token := range e.model["p"]["p"].Tokens {
-			parameters[token] = ""
-		}
+		parameters.pVals = make([]string, len(parameters.pTokens))
 
-		result, err := expression.Evaluate(parameters)
+		result, err := expression.Eval(parameters)
 		// log.LogPrint("Result: ", result)
 
 		if err != nil {
@@ -441,4 +447,37 @@ func (e *Enforcer) Enforce(rvals ...interface{}) bool {
 	}
 
 	return result
+}
+
+// assumes bounds have already been checked
+type enforceParameters struct {
+	rTokens map[string]int
+	rVals   []interface{}
+
+	pTokens map[string]int
+	pVals   []string
+}
+
+// implements govaluate.Parameters
+func (p enforceParameters) Get(name string) (interface{}, error) {
+	if name == "" {
+		return nil, nil
+	}
+
+	switch name[0] {
+	case 'p':
+		i, ok := p.pTokens[name]
+		if !ok {
+			return nil, errors.New("No parameter '" + name + "' found.")
+		}
+		return p.pVals[i], nil
+	case 'r':
+		i, ok := p.rTokens[name]
+		if !ok {
+			return nil, errors.New("No parameter '" + name + "' found.")
+		}
+		return p.rVals[i], nil
+	default:
+		return nil, errors.New("No parameter '" + name + "' found.")
+	}
 }

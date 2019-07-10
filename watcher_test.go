@@ -19,6 +19,10 @@ import "testing"
 type SampleWatcher struct {
 }
 
+func (w SampleWatcher) Close() {
+	return
+}
+
 func (w SampleWatcher) SetUpdateCallback(func(string)) error {
 	return nil
 }
