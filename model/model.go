@@ -15,6 +15,7 @@
 package model
 
 import (
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -35,6 +36,13 @@ var sectionNameMap = map[string]string{
 	"g": "role_definition",
 	"e": "policy_effect",
 	"m": "matchers",
+}
+
+var sectionIdentifiers = func() (identifiers []string) {
+	for k := range sectionNameMap {
+		identifiers = append(identifiers, k)
+	}
+	return
 }
 
 func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) bool {
@@ -78,6 +86,12 @@ func getKeySuffix(i int) string {
 	return strconv.Itoa(i)
 }
 
+func loadAllSections(model Model, cfg config.ConfigInterface) {
+	for _, sec := range sectionIdentifiers() {
+		loadSection(model, cfg, sec)
+	}
+}
+
 func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 	i := 1
 	for {
@@ -89,19 +103,28 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 	}
 }
 
+// Load will attempt to load a model from either a file or text
+func (model Model) Load(pathOrText string) (err error) {
+	var cfg config.ConfigInterface
+	if strings.ToLower(filepath.Ext(pathOrText)) == ".conf" {
+		cfg, err = config.NewConfig(pathOrText)
+	} else {
+		cfg, err = config.NewConfigFromText(pathOrText)
+	}
+	if err != nil {
+		return
+	}
+	loadAllSections(model, cfg)
+	return
+}
+
 // LoadModel loads the model from model CONF file.
 func (model Model) LoadModel(path string) {
 	cfg, err := config.NewConfig(path)
 	if err != nil {
 		panic(err)
 	}
-
-	loadSection(model, cfg, "r")
-	loadSection(model, cfg, "p")
-	loadSection(model, cfg, "e")
-	loadSection(model, cfg, "m")
-
-	loadSection(model, cfg, "g")
+	loadAllSections(model, cfg)
 }
 
 // LoadModelFromText loads the model from the text.
@@ -110,13 +133,7 @@ func (model Model) LoadModelFromText(text string) {
 	if err != nil {
 		panic(err)
 	}
-
-	loadSection(model, cfg, "r")
-	loadSection(model, cfg, "p")
-	loadSection(model, cfg, "e")
-	loadSection(model, cfg, "m")
-
-	loadSection(model, cfg, "g")
+	loadAllSections(model, cfg)
 }
 
 // PrintModel prints the model to the log.
