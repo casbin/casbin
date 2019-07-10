@@ -103,19 +103,19 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 	}
 }
 
-// Load will attempt to load a model from either a file or text
-func (model Model) Load(pathOrText string) (err error) {
-	var cfg config.ConfigInterface
+// Load will attempt to load a model from either a file or text using basic string logic
+func (model Model) Load(pathOrText string) {
 	if strings.ToLower(filepath.Ext(pathOrText)) == ".conf" {
-		cfg, err = config.NewConfig(pathOrText)
+		model.LoadModel(pathOrText)
 	} else {
-		cfg, err = config.NewConfigFromText(pathOrText)
+		model.LoadModelFromText(pathOrText)
 	}
-	if err != nil {
-		return
-	}
+}
+
+// LoadWithConfig will attempt to load all sections using the current model and cfg useful if you want to handle cfg
+// loading errors instead of panicking
+func (model Model) LoadWithConfig(cfg config.ConfigInterface ){
 	loadAllSections(model, cfg)
-	return
 }
 
 // LoadModel loads the model from model CONF file.
