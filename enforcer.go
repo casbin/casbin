@@ -106,7 +106,11 @@ func (e *Enforcer) InitWithFile(modelPath string, policyPath string) {
 // InitWithAdapter initializes an enforcer with a database adapter.
 func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) {
 	m := make(model.Model)
-	m.LoadModel(modelPath)
+	if modelPath == ""{
+		m.LoadModelFromText(modelPath)
+	}else{
+		m.LoadModel(modelPath)
+	}
 	e.InitWithModelAndAdapter(m, adapter)
 	e.modelPath = modelPath
 }
