@@ -23,8 +23,8 @@ import (
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
 func EscapeAssertion(s string) string {
 	//Replace the first dot, because it can't be recognized by the regexp.
-	if (strings.HasPrefix(s, "r") || strings.HasPrefix(s, "p")) {
-		s = strings.Replace(s, ".", "_",1)
+	if strings.HasPrefix(s, "r") || strings.HasPrefix(s, "p") {
+		s = strings.Replace(s, ".", "_", 1)
 	}
 	var regex = regexp.MustCompile(`(\|| |=|\)|\(|&|<|>|,|\+|-|!|\*|\/)(r|p)\.`)
 	s = regex.ReplaceAllStringFunc(s, func(m string) string {
