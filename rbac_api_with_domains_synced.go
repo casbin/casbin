@@ -37,7 +37,7 @@ func (e *SyncedEnforcer) GetPermissionsForUserInDomain(user string, domain strin
 
 // AddRoleForUserInDomain adds a role for a user inside a domain.
 // Returns false if the user already has the role (aka not affected).
-func (e *SyncedEnforcer) AddRoleForUserInDomain(user string, role string, domain string) bool {
+func (e *SyncedEnforcer) AddRoleForUserInDomain(user string, role string, domain string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.AddRoleForUserInDomain(user, role, domain)
@@ -45,7 +45,7 @@ func (e *SyncedEnforcer) AddRoleForUserInDomain(user string, role string, domain
 
 // DeleteRoleForUserInDomain deletes a role for a user inside a domain.
 // Returns false if the user does not have the role (aka not affected).
-func (e *SyncedEnforcer) DeleteRoleForUserInDomain(user string, role string, domain string) bool {
+func (e *SyncedEnforcer) DeleteRoleForUserInDomain(user string, role string, domain string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.DeleteRoleForUserInDomain(user, role, domain)

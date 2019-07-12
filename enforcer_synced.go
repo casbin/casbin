@@ -177,21 +177,21 @@ func (e *SyncedEnforcer) HasPolicy(params ...interface{}) bool {
 // AddPolicy adds an authorization rule to the current policy.
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
-func (e *SyncedEnforcer) AddPolicy(params ...interface{}) bool {
+func (e *SyncedEnforcer) AddPolicy(params ...interface{}) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.AddPolicy(params...)
 }
 
 // RemovePolicy removes an authorization rule from the current policy.
-func (e *SyncedEnforcer) RemovePolicy(params ...interface{}) bool {
+func (e *SyncedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.RemovePolicy(params...)
 }
 
 // RemoveFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
-func (e *SyncedEnforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) bool {
+func (e *SyncedEnforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.RemoveFilteredPolicy(fieldIndex, fieldValues...)
@@ -207,21 +207,21 @@ func (e *SyncedEnforcer) HasGroupingPolicy(params ...interface{}) bool {
 // AddGroupingPolicy adds a role inheritance rule to the current policy.
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
-func (e *SyncedEnforcer) AddGroupingPolicy(params ...interface{}) bool {
+func (e *SyncedEnforcer) AddGroupingPolicy(params ...interface{}) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.AddGroupingPolicy(params...)
 }
 
 // RemoveGroupingPolicy removes a role inheritance rule from the current policy.
-func (e *SyncedEnforcer) RemoveGroupingPolicy(params ...interface{}) bool {
+func (e *SyncedEnforcer) RemoveGroupingPolicy(params ...interface{}) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.RemoveGroupingPolicy(params...)
 }
 
 // RemoveFilteredGroupingPolicy removes a role inheritance rule from the current policy, field filters can be specified.
-func (e *SyncedEnforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) bool {
+func (e *SyncedEnforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.RemoveFilteredGroupingPolicy(fieldIndex, fieldValues...)
