@@ -14,50 +14,7 @@
 
 package casbin
 
-import (
-	"fmt"
-)
-
-// NewEnforcerSafe calls NewEnforcer in a safe way, returns error instead of causing panic.
-func NewEnforcerSafe(params ...interface{}) (e *Enforcer, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("%v", r)
-			e = nil
-		}
-	}()
-
-	e = NewEnforcer(params...)
-	err = nil
-	return
-}
-
-// LoadModelSafe calls LoadModel in a safe way, returns error instead of causing panic.
-func (e *Enforcer) LoadModelSafe() (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("%v", r)
-		}
-	}()
-
-	e.LoadModel()
-	err = nil
-	return
-}
-
-// EnforceSafe calls Enforce in a safe way, returns error instead of causing panic.
-func (e *Enforcer) EnforceSafe(rvals ...interface{}) (result bool, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("%v", r)
-			result = false
-		}
-	}()
-
-	result = e.Enforce(rvals...)
-	err = nil
-	return
-}
+import "fmt"
 
 // AddPolicySafe calls AddPolicy in a safe way, returns error instead of causing panic.
 func (e *Enforcer) AddPolicySafe(params ...interface{}) (result bool, err error) {

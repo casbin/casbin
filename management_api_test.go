@@ -31,7 +31,7 @@ func testStringList(t *testing.T, title string, f func() []string, res []string)
 }
 
 func TestGetList(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	testStringList(t, "Subjects", e.GetAllSubjects, []string{"alice", "bob", "data2_admin"})
 	testStringList(t, "Objects", e.GetAllObjects, []string{"data1", "data2"})
@@ -100,7 +100,7 @@ func testHasGroupingPolicy(t *testing.T, e *Enforcer, policy []string, res bool)
 }
 
 func TestGetPolicyAPI(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	testGetPolicy(t, e, [][]string{
 		{"alice", "data1", "read"},
@@ -140,7 +140,7 @@ func TestGetPolicyAPI(t *testing.T) {
 }
 
 func TestModifyPolicyAPI(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	testGetPolicy(t, e, [][]string{
 		{"alice", "data1", "read"},
@@ -169,7 +169,7 @@ func TestModifyPolicyAPI(t *testing.T) {
 }
 
 func TestModifyGroupingPolicyAPI(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	testGetRoles(t, e, "alice", []string{"data2_admin"})
 	testGetRoles(t, e, "bob", []string{})

@@ -14,33 +14,6 @@
 
 package casbin
 
-// NewSyncedEnforcerSafe creates a synchronized enforcer via file or DB.
-func NewSyncedEnforcerSafe(params ...interface{}) (enforcer *SyncedEnforcer, err error) {
-	e := &SyncedEnforcer{}
-	e.Enforcer, err = NewEnforcerSafe(params...)
-
-	if err != nil {
-		return nil, err
-	}
-
-	e.autoLoad = false
-	return e, nil
-}
-
-// LoadModelSafe calls LoadModel in a safe way, returns error instead of causing panic.
-func (e *SyncedEnforcer) LoadModelSafe() (err error) {
-	e.m.RLock()
-	defer e.m.RUnlock()
-	return e.Enforcer.LoadModelSafe()
-}
-
-// EnforceSafe calls Enforce in a safe way, returns error instead of causing panic.
-func (e *SyncedEnforcer) EnforceSafe(rvals ...interface{}) (result bool, err error) {
-	e.m.RLock()
-	defer e.m.RUnlock()
-	return e.Enforcer.EnforceSafe(rvals...)
-}
-
 // AddPolicySafe calls AddPolicy in a safe way, returns error instead of causing panic.
 func (e *SyncedEnforcer) AddPolicySafe(params ...interface{}) (result bool, err error) {
 	e.m.Lock()

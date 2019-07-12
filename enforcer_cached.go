@@ -27,13 +27,18 @@ type CachedEnforcer struct {
 }
 
 // NewCachedEnforcer creates a cached enforcer via file or DB.
-func NewCachedEnforcer(params ...interface{}) *CachedEnforcer {
+func NewCachedEnforcer(params ...interface{}) (*CachedEnforcer, error) {
 	e := &CachedEnforcer{}
-	e.Enforcer = NewEnforcer(params...)
+	var err error
+	e.Enforcer, err = NewEnforcer(params...)
+	if err != nil {
+		return nil, err
+	}
+
 	e.enableCache = true
 	e.m = make(map[string]bool)
 	e.locker = new(sync.RWMutex)
-	return e
+	return e, nil
 }
 
 // EnableCache determines whether to enable cache on Enforce(). When enableCache is enabled, cached result (true | false) will be returned for previous decisions.
@@ -43,7 +48,7 @@ func (e *CachedEnforcer) EnableCache(enableCache bool) {
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
 // if rvals is not string , ingore the cache
-func (e *CachedEnforcer) Enforce(rvals ...interface{}) bool {
+func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 	if !e.enableCache {
 		return e.Enforcer.Enforce(rvals...)
 	}
@@ -58,11 +63,15 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) bool {
 	}
 
 	if res, ok := e.getCachedResult(key); ok {
-		return res
+		return res, nil
 	} else {
-		res := e.Enforcer.Enforce(rvals...)
+		res, err := e.Enforcer.Enforce(rvals...)
+		if err != nil {
+			return false, err
+		}
+
 		e.setCachedResult(key, res)
-		return res
+		return res, nil
 	}
 }
 

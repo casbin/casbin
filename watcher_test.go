@@ -32,7 +32,7 @@ func (w SampleWatcher) Update() error {
 }
 
 func TestSetWatcher(t *testing.T) {
-	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	sampleWatcher := SampleWatcher{}
 	e.SetWatcher(sampleWatcher)

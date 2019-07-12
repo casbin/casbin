@@ -42,7 +42,7 @@ func testGetRolesInDomain(t *testing.T, e *Enforcer, name string, domain string,
 }
 
 func TestGetImplicitRolesForDomainUser(t *testing.T) {
-	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_hierarchy_with_domains_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_hierarchy_with_domains_policy.csv")
 
 	// This is only able to retrieve the first level of roles.
 	testGetRolesInDomain(t, e, "alice", "domain1", []string{"role:global_admin"})
@@ -53,7 +53,7 @@ func TestGetImplicitRolesForDomainUser(t *testing.T) {
 
 // TestUserAPIWithDomains: Add by Gordon
 func TestUserAPIWithDomains(t *testing.T) {
-	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	testGetUsersInDomain(t, e, "admin", "domain1", []string{"alice"})
 	testGetUsersInDomain(t, e, "non_exist", "domain1", []string{})
@@ -72,7 +72,7 @@ func TestUserAPIWithDomains(t *testing.T) {
 }
 
 func TestRoleAPIWithDomains(t *testing.T) {
-	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	testGetRolesInDomain(t, e, "alice", "domain1", []string{"admin"})
 	testGetRolesInDomain(t, e, "bob", "domain1", []string{})
@@ -109,7 +109,7 @@ func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name string, domain s
 }
 
 func TestPermissionAPIInDomain(t *testing.T) {
-	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	testGetPermissionsInDomain(t, e, "alice", "domain1", [][]string{})
 	testGetPermissionsInDomain(t, e, "bob", "domain1", [][]string{})

@@ -18,13 +18,13 @@ import "testing"
 
 func testEnforceCache(t *testing.T, e *CachedEnforcer, sub string, obj interface{}, act string, res bool) {
 	t.Helper()
-	if e.Enforce(sub, obj, act) != res {
-		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, !res, res)
+	if myRes, _ := e.Enforce(sub, obj, act); myRes != res {
+		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, myRes, res)
 	}
 }
 
 func TestCache(t *testing.T) {
-	e := NewCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	e, _ := NewCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 	// The cache is enabled by default for NewCachedEnforcer.
 
 	testEnforceCache(t, e, "alice", "data1", "read", true)
