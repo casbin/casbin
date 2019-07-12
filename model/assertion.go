@@ -32,29 +32,35 @@ type Assertion struct {
 	RM     rbac.RoleManager
 }
 
-func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) {
+func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
 	ast.RM = rm
 	count := strings.Count(ast.Value, "_")
 	for _, rule := range ast.Policy {
 		if count < 2 {
-			panic(errors.New("the number of \"_\" in role definition should be at least 2"))
+			return errors.New("the number of \"_\" in role definition should be at least 2")
 		}
 		if len(rule) < count {
-			panic(errors.New("grouping policy elements do not meet role definition"))
+			return errors.New("grouping policy elements do not meet role definition")
 		}
 
 		if count == 2 {
-			// error intentionally ignored
-			ast.RM.AddLink(rule[0], rule[1])
+			err := ast.RM.AddLink(rule[0], rule[1])
+			if err != nil {
+				return err
+			}
 		} else if count == 3 {
-			// error intentionally ignored
-			ast.RM.AddLink(rule[0], rule[1], rule[2])
+			err := ast.RM.AddLink(rule[0], rule[1], rule[2])
+			if err != nil {
+				return err
+			}
 		} else if count == 4 {
-			// error intentionally ignored
-			ast.RM.AddLink(rule[0], rule[1], rule[2], rule[3])
+			err := ast.RM.AddLink(rule[0], rule[1], rule[2], rule[3])
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	log.LogPrint("Role links for: " + ast.Key)
-	ast.RM.PrintRoles()
+	return ast.RM.PrintRoles()
 }

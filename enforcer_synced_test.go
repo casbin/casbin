@@ -21,13 +21,13 @@ import (
 
 func testEnforceSync(t *testing.T, e *SyncedEnforcer, sub string, obj interface{}, act string, res bool) {
 	t.Helper()
-	if e.Enforce(sub, obj, act) != res {
-		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, !res, res)
+	if myRes, _ := e.Enforce(sub, obj, act); myRes != res {
+		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, myRes, res)
 	}
 }
 
 func TestSync(t *testing.T) {
-	e := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 	// Start reloading the policy every 200 ms.
 	e.StartAutoLoadPolicy(time.Millisecond * 200)
 
@@ -39,41 +39,6 @@ func TestSync(t *testing.T) {
 	testEnforceSync(t, e, "bob", "data1", "write", false)
 	testEnforceSync(t, e, "bob", "data2", "read", false)
 	testEnforceSync(t, e, "bob", "data2", "write", true)
-
-	// Stop the reloading policy periodically.
-	e.StopAutoLoadPolicy()
-}
-
-func testEnforceSyncSafe(t *testing.T, e *SyncedEnforcer, sub string, obj interface{}, act string, expectedRes bool) {
-	t.Helper()
-	var res bool
-	var err error
-
-	if res, err = e.EnforceSafe(sub, obj, act); err != nil {
-		t.Errorf("%s, %v, %s: got error %+v", sub, obj, act, err)
-	}
-
-	if res != expectedRes {
-		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, !expectedRes, expectedRes)
-	}
-}
-
-func TestSyncSafe(t *testing.T) {
-	e, err := NewSyncedEnforcerSafe("examples/basic_model.conf", "examples/basic_policy.csv")
-	if err != nil {
-		t.Errorf("got error while initializing enforcer %+v", err)
-	}
-	// Start reloading the policy every 200 ms.
-	e.StartAutoLoadPolicy(time.Millisecond * 200)
-
-	testEnforceSyncSafe(t, e, "alice", "data1", "read", true)
-	testEnforceSyncSafe(t, e, "alice", "data1", "write", false)
-	testEnforceSyncSafe(t, e, "alice", "data2", "read", false)
-	testEnforceSyncSafe(t, e, "alice", "data2", "write", false)
-	testEnforceSyncSafe(t, e, "bob", "data1", "read", false)
-	testEnforceSyncSafe(t, e, "bob", "data1", "write", false)
-	testEnforceSyncSafe(t, e, "bob", "data2", "read", false)
-	testEnforceSyncSafe(t, e, "bob", "data2", "write", true)
 
 	// Stop the reloading policy periodically.
 	e.StopAutoLoadPolicy()

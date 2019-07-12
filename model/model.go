@@ -90,10 +90,10 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 }
 
 // LoadModel loads the model from model CONF file.
-func (model Model) LoadModel(path string) {
+func (model Model) LoadModel(path string) error {
 	cfg, err := config.NewConfig(path)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	loadSection(model, cfg, "r")
@@ -102,6 +102,8 @@ func (model Model) LoadModel(path string) {
 	loadSection(model, cfg, "m")
 
 	loadSection(model, cfg, "g")
+
+	return nil
 }
 
 // LoadModelFromText loads the model from the text.

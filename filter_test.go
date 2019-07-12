@@ -21,7 +21,7 @@ import (
 )
 
 func TestInitFilteredAdapter(t *testing.T) {
-	e := NewEnforcer()
+	e, _ := NewEnforcer()
 
 	adapter := fileadapter.NewFilteredAdapter("examples/rbac_with_domains_policy.csv")
 	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
@@ -31,7 +31,7 @@ func TestInitFilteredAdapter(t *testing.T) {
 }
 
 func TestLoadFilteredPolicy(t *testing.T) {
-	e := NewEnforcer()
+	e, _ := NewEnforcer()
 
 	adapter := fileadapter.NewFilteredAdapter("examples/rbac_with_domains_policy.csv")
 	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
@@ -66,7 +66,7 @@ func TestLoadFilteredPolicy(t *testing.T) {
 }
 
 func TestFilteredPolicyInvalidFilter(t *testing.T) {
-	e := NewEnforcer()
+	e, _ := NewEnforcer()
 
 	adapter := fileadapter.NewFilteredAdapter("examples/rbac_with_domains_policy.csv")
 	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
@@ -77,7 +77,7 @@ func TestFilteredPolicyInvalidFilter(t *testing.T) {
 }
 
 func TestFilteredPolicyEmptyFilter(t *testing.T) {
-	e := NewEnforcer()
+	e, _ := NewEnforcer()
 
 	adapter := fileadapter.NewFilteredAdapter("examples/rbac_with_domains_policy.csv")
 	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
@@ -94,7 +94,7 @@ func TestFilteredPolicyEmptyFilter(t *testing.T) {
 }
 
 func TestUnsupportedFilteredPolicy(t *testing.T) {
-	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	err := e.LoadFilteredPolicy(&fileadapter.Filter{
 		P: []string{"", "domain1"},
@@ -106,7 +106,7 @@ func TestUnsupportedFilteredPolicy(t *testing.T) {
 }
 
 func TestFilteredAdapterEmptyFilepath(t *testing.T) {
-	e := NewEnforcer()
+	e, _ := NewEnforcer()
 
 	adapter := fileadapter.NewFilteredAdapter("")
 	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)
@@ -117,7 +117,7 @@ func TestFilteredAdapterEmptyFilepath(t *testing.T) {
 }
 
 func TestFilteredAdapterInvalidFilepath(t *testing.T) {
-	e := NewEnforcer()
+	e, _ := NewEnforcer()
 
 	adapter := fileadapter.NewFilteredAdapter("examples/does_not_exist_policy.csv")
 	e.InitWithAdapter("examples/rbac_with_domains_model.conf", adapter)

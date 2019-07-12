@@ -30,11 +30,16 @@ type SyncedEnforcer struct {
 }
 
 // NewSyncedEnforcer creates a synchronized enforcer via file or DB.
-func NewSyncedEnforcer(params ...interface{}) *SyncedEnforcer {
+func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 	e := &SyncedEnforcer{}
-	e.Enforcer = NewEnforcer(params...)
+	var err error
+	e.Enforcer, err = NewEnforcer(params...)
+	if err != nil {
+		return nil, err
+	}
+
 	e.autoLoad = false
-	return e
+	return e, nil
 }
 
 // StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy
@@ -93,14 +98,14 @@ func (e *SyncedEnforcer) SavePolicy() error {
 }
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
-func (e *SyncedEnforcer) BuildRoleLinks() {
+func (e *SyncedEnforcer) BuildRoleLinks() error {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	e.Enforcer.BuildRoleLinks()
+	return e.Enforcer.BuildRoleLinks()
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
-func (e *SyncedEnforcer) Enforce(rvals ...interface{}) bool {
+func (e *SyncedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.Enforcer.Enforce(rvals...)

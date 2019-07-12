@@ -21,10 +21,15 @@ import (
 )
 
 // BuildRoleLinks initializes the roles in RBAC.
-func (model Model) BuildRoleLinks(rm rbac.RoleManager) {
+func (model Model) BuildRoleLinks(rm rbac.RoleManager) error {
 	for _, ast := range model["g"] {
-		ast.buildRoleLinks(rm)
+		err := ast.buildRoleLinks(rm)
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 // PrintPolicy prints the policy to log.

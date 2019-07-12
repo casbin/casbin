@@ -36,7 +36,7 @@ func BenchmarkRaw(b *testing.B) {
 }
 
 func BenchmarkBasicModel(b *testing.B) {
-	e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -45,7 +45,7 @@ func BenchmarkBasicModel(b *testing.B) {
 }
 
 func BenchmarkRBACModel(b *testing.B) {
-	e := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -54,7 +54,7 @@ func BenchmarkRBACModel(b *testing.B) {
 }
 
 func BenchmarkRBACModelSmall(b *testing.B) {
-	e := NewEnforcer("examples/rbac_model.conf")
+	e, _ := NewEnforcer("examples/rbac_model.conf")
 	// Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
 	e.EnableAutoBuildRoleLinks(false)
 	// 100 roles, 10 resources.
@@ -74,7 +74,7 @@ func BenchmarkRBACModelSmall(b *testing.B) {
 }
 
 func BenchmarkRBACModelMedium(b *testing.B) {
-	e := NewEnforcer("examples/rbac_model.conf")
+	e, _ := NewEnforcer("examples/rbac_model.conf")
 	// Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
 	e.EnableAutoBuildRoleLinks(false)
 	// 1000 roles, 100 resources.
@@ -94,7 +94,7 @@ func BenchmarkRBACModelMedium(b *testing.B) {
 }
 
 func BenchmarkRBACModelLarge(b *testing.B) {
-	e := NewEnforcer("examples/rbac_model.conf")
+	e, _ := NewEnforcer("examples/rbac_model.conf")
 	// Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
 	e.EnableAutoBuildRoleLinks(false)
 	// 10000 roles, 1000 resources.
@@ -114,7 +114,7 @@ func BenchmarkRBACModelLarge(b *testing.B) {
 }
 
 func BenchmarkRBACModelWithResourceRoles(b *testing.B) {
-	e := NewEnforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -123,7 +123,7 @@ func BenchmarkRBACModelWithResourceRoles(b *testing.B) {
 }
 
 func BenchmarkRBACModelWithDomains(b *testing.B) {
-	e := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -132,7 +132,7 @@ func BenchmarkRBACModelWithDomains(b *testing.B) {
 }
 
 func BenchmarkABACModel(b *testing.B) {
-	e := NewEnforcer("examples/abac_model.conf")
+	e, _ := NewEnforcer("examples/abac_model.conf")
 	data1 := newTestResource("data1", "alice")
 
 	b.ResetTimer()
@@ -142,7 +142,7 @@ func BenchmarkABACModel(b *testing.B) {
 }
 
 func BenchmarkKeyMatchModel(b *testing.B) {
-	e := NewEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv")
+	e, _ := NewEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -151,7 +151,7 @@ func BenchmarkKeyMatchModel(b *testing.B) {
 }
 
 func BenchmarkRBACModelWithDeny(b *testing.B) {
-	e := NewEnforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -160,7 +160,7 @@ func BenchmarkRBACModelWithDeny(b *testing.B) {
 }
 
 func BenchmarkPriorityModel(b *testing.B) {
-	e := NewEnforcer("examples/priority_model.conf", "examples/priority_policy.csv")
+	e, _ := NewEnforcer("examples/priority_model.conf", "examples/priority_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
