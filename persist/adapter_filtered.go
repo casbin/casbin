@@ -15,7 +15,7 @@
 package persist
 
 import (
-	"github.com/casbin/casbin/model"
+	"github.com/casbin/casbin/v2/model"
 )
 
 // FilteredAdapter is the interface for Casbin adapters supporting filtered policies.

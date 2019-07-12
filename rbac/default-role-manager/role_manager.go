@@ -17,9 +17,9 @@ package defaultrolemanager
 import (
 	"sync"
 
-	"github.com/casbin/casbin/errors"
-	"github.com/casbin/casbin/log"
-	"github.com/casbin/casbin/rbac"
+	"github.com/casbin/casbin/v2/errors"
+	"github.com/casbin/casbin/v2/log"
+	"github.com/casbin/casbin/v2/rbac"
 )
 
 type MatchingFunc func(arg1, arg2 string) bool

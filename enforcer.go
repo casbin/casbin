@@ -19,14 +19,14 @@ import (
 	"fmt"
 
 	"github.com/Knetic/govaluate"
-	"github.com/casbin/casbin/effect"
-	"github.com/casbin/casbin/log"
-	"github.com/casbin/casbin/model"
-	"github.com/casbin/casbin/persist"
-	fileadapter "github.com/casbin/casbin/persist/file-adapter"
-	"github.com/casbin/casbin/rbac"
-	defaultrolemanager "github.com/casbin/casbin/rbac/default-role-manager"
-	"github.com/casbin/casbin/util"
+	"github.com/casbin/casbin/v2/effect"
+	"github.com/casbin/casbin/v2/log"
+	"github.com/casbin/casbin/v2/model"
+	"github.com/casbin/casbin/v2/persist"
+	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
+	"github.com/casbin/casbin/v2/rbac"
+	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
+	"github.com/casbin/casbin/v2/util"
 )
 
 // Enforcer is the main interface for authorization enforcement and policy management.
