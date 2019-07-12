@@ -14,7 +14,7 @@
 
 package model
 
-import "github.com/casbin/casbin/util"
+import "github.com/casbin/casbin/v2/util"
 
 // FunctionMap represents the collection of Function.
 type FunctionMap map[string]func(args ...interface{}) (interface{}, error)

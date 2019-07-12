@@ -19,7 +19,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/casbin/casbin/rbac"
+	"github.com/casbin/casbin/v2/rbac"
 )
 
 // KeyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
@@ -58,7 +58,7 @@ func KeyMatch2(key1 string, key2 string) bool {
 		key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
 	}
 
-	return RegexMatch(key1, "^" + key2 + "$")
+	return RegexMatch(key1, "^"+key2+"$")
 }
 
 // KeyMatch2Func is the wrapper for KeyMatch2.
@@ -83,7 +83,7 @@ func KeyMatch3(key1 string, key2 string) bool {
 		key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
 	}
 
-	return RegexMatch(key1, "^" + key2 + "$")
+	return RegexMatch(key1, "^"+key2+"$")
 }
 
 // KeyMatch3Func is the wrapper for KeyMatch3.
