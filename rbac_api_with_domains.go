@@ -33,12 +33,12 @@ func (e *Enforcer) GetPermissionsForUserInDomain(user string, domain string) [][
 
 // AddRoleForUserInDomain adds a role for a user inside a domain.
 // Returns false if the user already has the role (aka not affected).
-func (e *Enforcer) AddRoleForUserInDomain(user string, role string, domain string) bool {
+func (e *Enforcer) AddRoleForUserInDomain(user string, role string, domain string) (bool, error) {
 	return e.AddGroupingPolicy(user, role, domain)
 }
 
 // DeleteRoleForUserInDomain deletes a role for a user inside a domain.
 // Returns false if the user does not have the role (aka not affected).
-func (e *Enforcer) DeleteRoleForUserInDomain(user string, role string, domain string) bool {
+func (e *Enforcer) DeleteRoleForUserInDomain(user string, role string, domain string) (bool, error) {
 	return e.RemoveGroupingPolicy(user, role, domain)
 }

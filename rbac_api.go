@@ -14,7 +14,11 @@
 
 package casbin
 
-import "github.com/casbin/casbin/util"
+import (
+	"errors"
+
+	"github.com/casbin/casbin/util"
+)
 
 // GetRolesForUser gets the roles that a user has.
 func (e *Enforcer) GetRolesForUser(name string) ([]string, error) {
@@ -47,55 +51,61 @@ func (e *Enforcer) HasRoleForUser(name string, role string) (bool, error) {
 
 // AddRoleForUser adds a role for a user.
 // Returns false if the user already has the role (aka not affected).
-func (e *Enforcer) AddRoleForUser(user string, role string) bool {
+func (e *Enforcer) AddRoleForUser(user string, role string) (bool, error) {
 	return e.AddGroupingPolicy(user, role)
 }
 
 // DeleteRoleForUser deletes a role for a user.
 // Returns false if the user does not have the role (aka not affected).
-func (e *Enforcer) DeleteRoleForUser(user string, role string) bool {
+func (e *Enforcer) DeleteRoleForUser(user string, role string) (bool, error) {
 	return e.RemoveGroupingPolicy(user, role)
 }
 
 // DeleteRolesForUser deletes all roles for a user.
 // Returns false if the user does not have any roles (aka not affected).
-func (e *Enforcer) DeleteRolesForUser(user string) bool {
+func (e *Enforcer) DeleteRolesForUser(user string) (bool, error) {
 	return e.RemoveFilteredGroupingPolicy(0, user)
 }
 
 // DeleteUser deletes a user.
 // Returns false if the user does not exist (aka not affected).
-func (e *Enforcer) DeleteUser(user string) bool {
+func (e *Enforcer) DeleteUser(user string) (bool, error) {
 	return e.RemoveFilteredGroupingPolicy(0, user)
 }
 
 // DeleteRole deletes a role.
-func (e *Enforcer) DeleteRole(role string) {
-	e.RemoveFilteredGroupingPolicy(1, role)
-	e.RemoveFilteredPolicy(0, role)
+func (e *Enforcer) DeleteRole(role string) (bool, error) {
+	var err error
+	res1, err := e.RemoveFilteredGroupingPolicy(1, role)
+	if err != nil {
+		return res1, err
+	}
+
+	res2, err := e.RemoveFilteredPolicy(0, role)
+	return res1 || res2, err
 }
 
 // DeletePermission deletes a permission.
 // Returns false if the permission does not exist (aka not affected).
-func (e *Enforcer) DeletePermission(permission ...string) bool {
+func (e *Enforcer) DeletePermission(permission ...string) (bool, error) {
 	return e.RemoveFilteredPolicy(1, permission...)
 }
 
 // AddPermissionForUser adds a permission for a user or role.
 // Returns false if the user or role already has the permission (aka not affected).
-func (e *Enforcer) AddPermissionForUser(user string, permission ...string) bool {
+func (e *Enforcer) AddPermissionForUser(user string, permission ...string) (bool, error) {
 	return e.AddPolicy(util.JoinSlice(user, permission...))
 }
 
 // DeletePermissionForUser deletes a permission for a user or role.
 // Returns false if the user or role does not have the permission (aka not affected).
-func (e *Enforcer) DeletePermissionForUser(user string, permission ...string) bool {
+func (e *Enforcer) DeletePermissionForUser(user string, permission ...string) (bool, error) {
 	return e.RemovePolicy(util.JoinSlice(user, permission...))
 }
 
 // DeletePermissionsForUser deletes permissions for a user or role.
 // Returns false if the user or role does not have any permissions (aka not affected).
-func (e *Enforcer) DeletePermissionsForUser(user string) bool {
+func (e *Enforcer) DeletePermissionsForUser(user string) (bool, error) {
 	return e.RemoveFilteredPolicy(0, user)
 }
 
@@ -117,7 +127,7 @@ func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool 
 //
 // GetRolesForUser("alice") can only get: ["role:admin"].
 // But GetImplicitRolesForUser("alice") will get: ["role:admin", "role:user"].
-func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) []string {
+func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]string, error) {
 	res := []string{}
 	roleSet := make(map[string]bool)
 	roleSet[name] = true
@@ -131,7 +141,7 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) []stri
 
 		roles, err := e.rm.GetRoles(name, domain...)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		for _, r := range roles {
 			if _, ok := roleSet[r]; !ok {
@@ -142,7 +152,7 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) []stri
 		}
 	}
 
-	return res
+	return res, nil
 }
 
 // GetImplicitPermissionsForUser gets implicit permissions for a user or role.
@@ -154,15 +164,19 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) []stri
 //
 // GetPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
 // But GetImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
-func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) [][]string {
-	roles := e.GetImplicitRolesForUser(user, domain...)
+func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) ([][]string, error) {
+	roles, err := e.GetImplicitRolesForUser(user, domain...)
+	if err != nil {
+		return nil, err
+	}
+
 	roles = append([]string{user}, roles...)
 
 	withDomain := false
 	if len(domain) == 1 {
 		withDomain = true
 	} else if len(domain) > 1 {
-		panic("error: domain should be 1 parameter")
+		return nil, errors.New("domain should be 1 parameter")
 	}
 
 	res := [][]string{}
@@ -176,7 +190,7 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 		res = append(res, permissions...)
 	}
 
-	return res
+	return res, nil
 }
 
 // GetImplicitUsersForPermission gets implicit users for a permission.

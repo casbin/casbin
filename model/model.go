@@ -107,10 +107,10 @@ func (model Model) LoadModel(path string) error {
 }
 
 // LoadModelFromText loads the model from the text.
-func (model Model) LoadModelFromText(text string) {
+func (model Model) LoadModelFromText(text string) error {
 	cfg, err := config.NewConfigFromText(text)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	loadSection(model, cfg, "r")
@@ -119,6 +119,8 @@ func (model Model) LoadModelFromText(text string) {
 	loadSection(model, cfg, "m")
 
 	loadSection(model, cfg, "g")
+
+	return nil
 }
 
 // PrintModel prints the model to the log.
