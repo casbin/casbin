@@ -94,11 +94,18 @@ func (a *Adapter) savePolicyFile(text string) error {
 		return err
 	}
 	w := bufio.NewWriter(f)
-	// error intentionally ignored
-	w.WriteString(text)
-	w.Flush()
-	f.Close()
-	return nil
+
+	_, err = w.WriteString(text)
+	if err != nil {
+		return err
+	}
+
+	err = w.Flush()
+	if err != nil {
+		return err
+	}
+
+	return f.Close()
 }
 
 // AddPolicy adds a policy rule to the storage.
