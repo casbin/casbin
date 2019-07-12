@@ -351,6 +351,7 @@ func (e *Enforcer) BuildRoleLinks() error {
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
 func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
+	var policyLog string
 	if !e.enabled {
 		return true, nil
 	}
@@ -402,6 +403,7 @@ func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
 					rvals))
 		}
 		for i, pvals := range e.model["p"]["p"].Policy {
+			policyLog = policyLog + " Policy Rule: " + pvals
 			// log.LogPrint("Policy Rule: ", pvals)
 			if len(e.model["p"]["p"].Tokens) != len(pvals) {
 				return false, errors.New(
@@ -451,6 +453,8 @@ func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
 				policyEffects[i] = effect.Allow
 			}
 
+			policyLog = policyLog + " Policy Result: " + policyEffects[i]
+
 			if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
 				break
 			}
@@ -494,7 +498,8 @@ func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
 			}
 		}
 		reqStr += fmt.Sprintf(" ---> %t", result)
-		log.LogPrint(reqStr)
+		// log.LogPrint(reqStr)
+		log.LogPrint(policyLog)
 	}
 
 	return result, nil
