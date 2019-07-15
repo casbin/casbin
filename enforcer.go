@@ -123,7 +123,7 @@ func (e *Enforcer) InitWithFile(modelPath string, policyPath string) error {
 
 // InitWithAdapter initializes an enforcer with a database adapter.
 func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) error {
-	m, err := NewModel(modelPath, "")
+	m, err := model.NewModelFromFile(modelPath)
 	if err != nil {
 		return err
 	}
@@ -169,35 +169,12 @@ func (e *Enforcer) initialize() {
 	e.autoBuildRoleLinks = true
 }
 
-// NewModel creates a model.
-func NewModel(text ...string) (model.Model, error) {
-	m := make(model.Model)
-
-	if len(text) == 2 {
-		if text[0] != "" {
-			err := m.LoadModel(text[0])
-			if err != nil {
-				return nil, err
-			}
-		}
-	} else if len(text) == 1 {
-		m.LoadModelFromText(text[0])
-	} else if len(text) != 0 {
-		return nil, errors.New("invalid parameters for model")
-	}
-
-	return m, nil
-}
-
 // LoadModel reloads the model from the model CONF file.
 // Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
 func (e *Enforcer) LoadModel() error {
 	var err error
 
-	e.model, err = NewModel()
-	if err != nil {
-		return err
-	}
+	e.model = model.NewModel()
 
 	err = e.model.LoadModel(e.modelPath)
 	if err != nil {

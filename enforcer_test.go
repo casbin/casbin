@@ -17,11 +17,12 @@ package casbin
 import (
 	"testing"
 
+	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist/file-adapter"
 )
 
 func TestKeyMatchModelInMemory(t *testing.T) {
-	m, _ := NewModel()
+	m := model.NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("e", "e", "some(where (p.eft == allow))")
@@ -80,7 +81,7 @@ func TestKeyMatchModelInMemory(t *testing.T) {
 }
 
 func TestKeyMatchModelInMemoryDeny(t *testing.T) {
-	m, _ := NewModel()
+	m := model.NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("e", "e", "!some(where (p.eft == deny))")
@@ -94,7 +95,7 @@ func TestKeyMatchModelInMemoryDeny(t *testing.T) {
 }
 
 func TestRBACModelInMemoryIndeterminate(t *testing.T) {
-	m, _ := NewModel()
+	m := model.NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("g", "g", "_, _")
@@ -109,7 +110,7 @@ func TestRBACModelInMemoryIndeterminate(t *testing.T) {
 }
 
 func TestRBACModelInMemory(t *testing.T) {
-	m, _ := NewModel()
+	m := model.NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("g", "g", "_, _")
@@ -152,7 +153,7 @@ e = some(where (p.eft == allow))
 [matchers]
 m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 `
-	m, _ := NewModel(text)
+	m, _ := model.NewModelFromString(text)
 	// The above is the same as:
 	// m := NewModel()
 	// m.LoadModelFromText(text)
@@ -176,7 +177,7 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 }
 
 func TestNotUsedRBACModelInMemory(t *testing.T) {
-	m, _ := NewModel()
+	m := model.NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("g", "g", "_, _")
@@ -379,7 +380,7 @@ func TestSetAdapterFromFile(t *testing.T) {
 func TestInitEmpty(t *testing.T) {
 	e, _ := NewEnforcer()
 
-	m, _ := NewModel()
+	m := model.NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("e", "e", "some(where (p.eft == allow))")
