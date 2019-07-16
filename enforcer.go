@@ -104,10 +104,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 			}
 		}
 	} else if len(params)-parsedParamLen == 0 {
-		err := e.InitWithFile("", "")
-		if err != nil {
-			return nil, err
-		}
+		return e, nil
 	} else {
 		return nil, errors.New("invalid parameters for enforcer")
 	}
@@ -173,10 +170,7 @@ func (e *Enforcer) initialize() {
 // Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
 func (e *Enforcer) LoadModel() error {
 	var err error
-
-	e.model = model.NewModel()
-
-	err = e.model.LoadModel(e.modelPath)
+	e.model, err = model.NewModelFromFile(e.modelPath)
 	if err != nil {
 		return err
 	}

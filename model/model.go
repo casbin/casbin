@@ -99,10 +99,6 @@ func NewModel() Model {
 func NewModelFromFile(path string) (Model, error) {
 	m := NewModel()
 
-	if path == "" {
-		return m, nil
-	}
-
 	err := m.LoadModel(path)
 	if err != nil {
 		return nil, err
