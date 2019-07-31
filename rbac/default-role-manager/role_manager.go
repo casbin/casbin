@@ -15,6 +15,7 @@
 package defaultrolemanager
 
 import (
+	"strings"
 	"sync"
 
 	"github.com/casbin/casbin/v2/errors"
@@ -196,18 +197,21 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 
 // PrintRoles prints all the roles to log.
 func (rm *RoleManager) PrintRoles() error {
-	line := ""
-	rm.allRoles.Range(func(_, value interface{}) bool {
-		if text := value.(*Role).toString(); text != "" {
-			if line == "" {
-				line = text
-			} else {
-				line += ", " + text
+	if log.GetLogger().IsEnabled() {
+		var sb strings.Builder
+		rm.allRoles.Range(func(_, value interface{}) bool {
+			if text := value.(*Role).toString(); text != "" {
+				if sb.Len() == 0 {
+					sb.WriteString(text)
+				} else {
+					sb.WriteString(", ")
+					sb.WriteString(text)
+				}
 			}
-		}
-		return true
-	})
-	log.LogPrint(line)
+			return true
+		})
+		log.LogPrint(sb.String())
+	}
 	return nil
 }
 
@@ -270,23 +274,31 @@ func (r *Role) hasDirectRole(name string) bool {
 }
 
 func (r *Role) toString() string {
-	names := ""
 	if len(r.roles) == 0 {
 		return ""
 	}
+
+	var sb strings.Builder
+	sb.WriteString(r.name)
+	sb.WriteString(" < ")
+	if len(r.roles) != 1 {
+		sb.WriteString("(")
+	}
+
 	for i, role := range r.roles {
 		if i == 0 {
-			names += role.name
+			sb.WriteString(role.name)
 		} else {
-			names += ", " + role.name
+			sb.WriteString(", ")
+			sb.WriteString(role.name)
 		}
 	}
 
-	if len(r.roles) == 1 {
-		return r.name + " < " + names
-	} else {
-		return r.name + " < (" + names + ")"
+	if len(r.roles) != 1 {
+		sb.WriteString(")")
 	}
+
+	return sb.String()
 }
 
 func (r *Role) getRoles() []string {
