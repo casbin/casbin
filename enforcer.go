@@ -17,6 +17,7 @@ package casbin
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effect"
@@ -456,16 +457,17 @@ func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
 
 	// Log request.
 	if log.GetLogger().IsEnabled() {
-		reqStr := "Request: "
+		var reqStr strings.Builder
+		reqStr.WriteString("Request: ")
 		for i, rval := range rvals {
 			if i != len(rvals)-1 {
-				reqStr += fmt.Sprintf("%v, ", rval)
+				reqStr.WriteString(fmt.Sprintf("%v, ", rval))
 			} else {
-				reqStr += fmt.Sprintf("%v", rval)
+				reqStr.WriteString(fmt.Sprintf("%v", rval))
 			}
 		}
-		reqStr += fmt.Sprintf(" ---> %t", result)
-		log.LogPrint(reqStr)
+		reqStr.WriteString(fmt.Sprintf(" ---> %t", result))
+		log.LogPrint(reqStr.String())
 	}
 
 	return result, nil
