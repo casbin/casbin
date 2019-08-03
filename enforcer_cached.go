@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"strings"
 	"sync"
 )
 
@@ -53,16 +54,17 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 		return e.Enforcer.Enforce(rvals...)
 	}
 
-	key := ""
+	var key strings.Builder
 	for _, rval := range rvals {
 		if val, ok := rval.(string); ok {
-			key += val + "$$"
+			key.WriteString(val)
+			key.WriteString("$$")
 		} else {
 			return e.Enforcer.Enforce(rvals...)
 		}
 	}
 
-	if res, ok := e.getCachedResult(key); ok {
+	if res, ok := e.getCachedResult(key.String()); ok {
 		return res, nil
 	} else {
 		res, err := e.Enforcer.Enforce(rvals...)
@@ -70,7 +72,7 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 			return false, err
 		}
 
-		e.setCachedResult(key, res)
+		e.setCachedResult(key.String(), res)
 		return res, nil
 	}
 }
