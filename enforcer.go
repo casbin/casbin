@@ -105,6 +105,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 			}
 		}
 	} else if len(params)-parsedParamLen == 0 {
+		e.initialize()
 		return e, nil
 	} else {
 		return nil, errors.New("invalid parameters for enforcer")
