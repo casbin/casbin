@@ -179,6 +179,8 @@ func (e *Enforcer) LoadModel() error {
 	e.model.PrintModel()
 	e.fm = model.LoadFunctionMap()
 
+	e.initialize()
+
 	return nil
 }
 
@@ -191,6 +193,8 @@ func (e *Enforcer) GetModel() model.Model {
 func (e *Enforcer) SetModel(m model.Model) {
 	e.model = m
 	e.fm = model.LoadFunctionMap()
+
+	e.initialize()
 }
 
 // GetAdapter gets the current adapter.
