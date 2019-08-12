@@ -168,7 +168,7 @@ Note: you can also initialize an enforcer with policy in DB instead of file, see
     obj := "data1" // the resource that is going to be accessed.
     act := "read" // the operation that the user performs on the resource.
 
-    if res := e.Enforce(sub, obj, act); res {
+    if res, _ := e.Enforce(sub, obj, act); res {
         // permit alice to read data1
     } else {
         // deny the request, show an error
