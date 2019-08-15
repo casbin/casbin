@@ -126,14 +126,13 @@ func (e *Enforcer) AddPolicy(params ...interface{}) (bool, error) {
 func (e *Enforcer) AddNamedPolicy(ptype string, params ...interface{}) (bool, error) {
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
 		return e.addPolicy("p", ptype, strSlice)
-	} else {
-		policy := make([]string, 0)
-		for _, param := range params {
-			policy = append(policy, param.(string))
-		}
-
-		return e.addPolicy("p", ptype, policy)
 	}
+	policy := make([]string, 0)
+	for _, param := range params {
+		policy = append(policy, param.(string))
+	}
+
+	return e.addPolicy("p", ptype, policy)
 }
 
 // RemovePolicy removes an authorization rule from the current policy.
@@ -150,14 +149,13 @@ func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) (
 func (e *Enforcer) RemoveNamedPolicy(ptype string, params ...interface{}) (bool, error) {
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
 		return e.removePolicy("p", ptype, strSlice)
-	} else {
-		policy := make([]string, 0)
-		for _, param := range params {
-			policy = append(policy, param.(string))
-		}
-
-		return e.removePolicy("p", ptype, policy)
 	}
+	policy := make([]string, 0)
+	for _, param := range params {
+		policy = append(policy, param.(string))
+	}
+
+	return e.removePolicy("p", ptype, policy)
 }
 
 // RemoveFilteredNamedPolicy removes an authorization rule from the current named policy, field filters can be specified.

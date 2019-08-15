@@ -370,22 +370,20 @@ func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
 		policyEffects = make([]effect.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
 		if len(e.model["r"]["r"].Tokens) != len(rvals) {
-			return false, errors.New(
-				fmt.Sprintf(
-					"invalid request size: expected %d, got %d, rvals: %v",
-					len(e.model["r"]["r"].Tokens),
-					len(rvals),
-					rvals))
+			return false, fmt.Errorf(
+				"invalid request size: expected %d, got %d, rvals: %v",
+				len(e.model["r"]["r"].Tokens),
+				len(rvals),
+				rvals)
 		}
 		for i, pvals := range e.model["p"]["p"].Policy {
 			// log.LogPrint("Policy Rule: ", pvals)
 			if len(e.model["p"]["p"].Tokens) != len(pvals) {
-				return false, errors.New(
-					fmt.Sprintf(
-						"invalid policy size: expected %d, got %d, pvals: %v",
-						len(e.model["p"]["p"].Tokens),
-						len(pvals),
-						pvals))
+				return false, fmt.Errorf(
+					"invalid policy size: expected %d, got %d, pvals: %v",
+					len(e.model["p"]["p"].Tokens),
+					len(pvals),
+					pvals)
 			}
 
 			parameters.pVals = pvals
