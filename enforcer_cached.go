@@ -66,15 +66,14 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 
 	if res, ok := e.getCachedResult(key.String()); ok {
 		return res, nil
-	} else {
-		res, err := e.Enforcer.Enforce(rvals...)
-		if err != nil {
-			return false, err
-		}
-
-		e.setCachedResult(key.String(), res)
-		return res, nil
 	}
+	res, err := e.Enforcer.Enforce(rvals...)
+	if err != nil {
+		return false, err
+	}
+
+	e.setCachedResult(key.String(), res)
+	return res, nil
 }
 
 func (e *CachedEnforcer) getCachedResult(key string) (res bool, ok bool) {
