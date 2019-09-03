@@ -325,8 +325,8 @@ func (e *Enforcer) BuildRoleLinks() error {
 	return e.model.BuildRoleLinks(e.rm)
 }
 
-// Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
-func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
+// enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
+func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (bool, error) {
 	if !e.enabled {
 		return true, nil
 	}
@@ -341,8 +341,12 @@ func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
 			functions[key] = util.GenerateGFunction(rm)
 		}
 	}
-
-	expString := e.model["m"]["m"].Value
+	var expString string
+	if matcher == "" {
+		expString = e.model["m"]["m"].Value
+	} else {
+		expString = matcher
+	}
 	expression, err := govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 	if err != nil {
 		return false, err
@@ -473,6 +477,16 @@ func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
 	}
 
 	return result, nil
+}
+
+// Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
+func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
+	return e.enforce("", rvals...)
+}
+
+// EnforceWithMatcher use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
+func (e *Enforcer) EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error) {
+	return e.enforce(matcher, rvals...)
 }
 
 // assumes bounds have already been checked
