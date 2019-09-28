@@ -15,6 +15,7 @@
 package util
 
 import (
+	"errors"
 	"net"
 	"regexp"
 	"strings"
@@ -92,6 +93,74 @@ func KeyMatch3Func(args ...interface{}) (interface{}, error) {
 	name2 := args[1].(string)
 
 	return bool(KeyMatch3(name1, name2)), nil
+}
+
+// KeyMatch4 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
+// Besides what KeyMatch3 does, KeyMatch4 can also match repeated patterns:
+// "/parent/123/child/123" matches "/parent/{id}/child/{id}"
+// "/parent/123/child/456" does not match "/parent/{id}/child/{id}"
+// But KeyMatch3 will match both.
+func KeyMatch4(key1 string, key2 string) bool {
+	key2 = strings.Replace(key2, "/*", "/.*", -1)
+
+	tokens := []string{}
+	j := -1
+	for i, c := range key2 {
+		if c == '{' {
+			j = i
+		} else if c == '}' {
+			tokens = append(tokens, key2[j:i+1])
+		}
+	}
+
+	re := regexp.MustCompile(`(.*)\{[^/]+\}(.*)`)
+	for {
+		if !strings.Contains(key2, "/{") {
+			break
+		}
+
+		key2 = re.ReplaceAllString(key2, "$1([^/]+)$2")
+	}
+
+	re = regexp.MustCompile("^"+key2+"$")
+	values := re.FindStringSubmatch(key1)
+	if values == nil {
+		return false
+	}
+	values = values[1:]
+
+	if len(tokens) != len(values) {
+		panic(errors.New("KeyMatch4: number of tokens is not equal to number of values"))
+	}
+
+	m := map[string][]string{}
+	for i := 0; i < len(tokens); i ++ {
+		if _, ok := m[tokens[i]]; !ok {
+			m[tokens[i]] = []string{}
+		}
+
+		m[tokens[i]] = append(m[tokens[i]], values[i])
+	}
+
+	for _, values := range m {
+		if len(values) > 1 {
+			for i := 1; i < len(values); i ++ {
+				if values[i] != values[0] {
+					return false
+				}
+			}
+		}
+	}
+
+	return true
+}
+
+// KeyMatch4Func is the wrapper for KeyMatch4.
+func KeyMatch4Func(args ...interface{}) (interface{}, error) {
+	name1 := args[0].(string)
+	name2 := args[1].(string)
+
+	return bool(KeyMatch4(name1, name2)), nil
 }
 
 // RegexMatch determines whether key1 matches the pattern of key2 in regular expression.
