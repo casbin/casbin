@@ -114,6 +114,30 @@ func TestKeyMatch3(t *testing.T) {
 	testKeyMatch3(t, "/proxy/", "/proxy/{id}/*", false)
 }
 
+func testKeyMatch4(t *testing.T, key1 string, key2 string, res bool) {
+	t.Helper()
+	myRes := KeyMatch4(key1, key2)
+	t.Logf("%s < %s: %t", key1, key2, myRes)
+
+	if myRes != res {
+		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)
+	}
+}
+
+func TestKeyMatch4(t *testing.T) {
+	testKeyMatch4(t, "/parent/123/child/123", "/parent/{id}/child/{id}", true)
+	testKeyMatch4(t, "/parent/123/child/456", "/parent/{id}/child/{id}", false)
+
+	testKeyMatch4(t, "/parent/123/child/123", "/parent/{id}/child/{another_id}", true)
+	testKeyMatch4(t, "/parent/123/child/456", "/parent/{id}/child/{another_id}", true)
+
+	testKeyMatch4(t, "/parent/123/child/123/book/123", "/parent/{id}/child/{id}/book/{id}", true)
+	testKeyMatch4(t, "/parent/123/child/123/book/456", "/parent/{id}/child/{id}/book/{id}", false)
+	testKeyMatch4(t, "/parent/123/child/456/book/123", "/parent/{id}/child/{id}/book/{id}", false)
+	testKeyMatch4(t, "/parent/123/child/456/book/", "/parent/{id}/child/{id}/book/{id}", false)
+	testKeyMatch4(t, "/parent/123/child/456", "/parent/{id}/child/{id}/book/{id}", false)
+}
+
 func testRegexMatch(t *testing.T, key1 string, key2 string, res bool) {
 	t.Helper()
 	myRes := RegexMatch(key1, key2)
