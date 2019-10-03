@@ -16,11 +16,11 @@ package model
 
 import "github.com/casbin/casbin/v2/util"
 
-// FunctionMap represents the collection of Function.
-type FunctionMap map[string]func(args ...interface{}) (interface{}, error)
-
 // Function represents a function that is used in the matchers, used to get attributes in ABAC.
 type Function func(args ...interface{}) (interface{}, error)
+
+// FunctionMap represents the collection of Function.
+type FunctionMap map[string]Function
 
 // AddFunction adds an expression function.
 func (fm FunctionMap) AddFunction(name string, function Function) {

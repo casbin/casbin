@@ -14,6 +14,8 @@
 
 package casbin
 
+import "github.com/casbin/casbin/v2/model"
+
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() []string {
 	return e.GetAllNamedSubjects("p")
@@ -254,6 +256,6 @@ func (e *Enforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex in
 }
 
 // AddFunction adds a customized function.
-func (e *Enforcer) AddFunction(name string, function func(args ...interface{}) (interface{}, error)) {
+func (e *Enforcer) AddFunction(name string, function model.Function) {
 	e.fm.AddFunction(name, function)
 }

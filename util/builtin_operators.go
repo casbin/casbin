@@ -20,6 +20,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/rbac"
 )
 
@@ -122,7 +123,7 @@ func KeyMatch4(key1 string, key2 string) bool {
 		key2 = re.ReplaceAllString(key2, "$1([^/]+)$2")
 	}
 
-	re = regexp.MustCompile("^"+key2+"$")
+	re = regexp.MustCompile("^" + key2 + "$")
 	values := re.FindStringSubmatch(key1)
 	if values == nil {
 		return false
@@ -134,7 +135,7 @@ func KeyMatch4(key1 string, key2 string) bool {
 	}
 
 	m := map[string][]string{}
-	for i := 0; i < len(tokens); i ++ {
+	for i := 0; i < len(tokens); i++ {
 		if _, ok := m[tokens[i]]; !ok {
 			m[tokens[i]] = []string{}
 		}
@@ -144,7 +145,7 @@ func KeyMatch4(key1 string, key2 string) bool {
 
 	for _, values := range m {
 		if len(values) > 1 {
-			for i := 1; i < len(values); i ++ {
+			for i := 1; i < len(values); i++ {
 				if values[i] != values[0] {
 					return false
 				}
@@ -210,8 +211,8 @@ func IPMatchFunc(args ...interface{}) (interface{}, error) {
 }
 
 // GenerateGFunction is the factory method of the g(_, _) function.
-func GenerateGFunction(rm rbac.RoleManager) func(args ...interface{}) (interface{}, error) {
-	return func(args ...interface{}) (interface{}, error) {
+func GenerateGFunction(rm rbac.RoleManager) model.Function {
+	return model.Function {
 		name1 := args[0].(string)
 		name2 := args[1].(string)
 
