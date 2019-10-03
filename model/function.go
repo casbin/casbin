@@ -14,16 +14,16 @@
 
 package model
 
-import "github.com/casbin/casbin/v2/util"
-
-// Function represents a function that is used in the matchers, used to get attributes in ABAC.
-type Function func(args ...interface{}) (interface{}, error)
+import (
+	"github.com/Knetic/govaluate"
+	"github.com/casbin/casbin/v2/util"
+)
 
 // FunctionMap represents the collection of Function.
-type FunctionMap map[string]Function
+type FunctionMap map[string]govaluate.ExpressionFunction
 
 // AddFunction adds an expression function.
-func (fm FunctionMap) AddFunction(name string, function Function) {
+func (fm FunctionMap) AddFunction(name string, function govaluate.ExpressionFunction) {
 	fm[name] = function
 }
 

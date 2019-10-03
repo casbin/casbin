@@ -20,7 +20,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/casbin/casbin/v2/model"
+	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/rbac"
 )
 
@@ -211,8 +211,8 @@ func IPMatchFunc(args ...interface{}) (interface{}, error) {
 }
 
 // GenerateGFunction is the factory method of the g(_, _) function.
-func GenerateGFunction(rm rbac.RoleManager) model.Function {
-	return model.Function {
+func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
+	return func(args ...interface{}) (interface{}, error) {
 		name1 := args[0].(string)
 		name2 := args[1].(string)
 
