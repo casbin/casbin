@@ -19,6 +19,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/persist"
 )
 
@@ -343,7 +344,7 @@ func (e *SyncedEnforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIn
 }
 
 // AddFunction adds a customized function.
-func (e *SyncedEnforcer) AddFunction(name string, function func(args ...interface{}) (interface{}, error)) {
+func (e *SyncedEnforcer) AddFunction(name string, function govaluate.ExpressionFunction) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	e.Enforcer.AddFunction(name, function)
