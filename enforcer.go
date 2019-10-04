@@ -331,10 +331,7 @@ func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (bool, error) {
 		return true, nil
 	}
 
-	functions := make(map[string]govaluate.ExpressionFunction)
-	for key, function := range e.fm {
-		functions[key] = function
-	}
+	functions := e.fm
 	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
 			rm := ast.RM
