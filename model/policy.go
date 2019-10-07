@@ -149,3 +149,16 @@ func (model Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldInde
 
 	return values
 }
+
+// GetValuesForFieldInPolicyAllTypes gets all values for a field for all rules in a policy of all ptypes, duplicated values are removed.
+func (model Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int) []string {
+	values := []string{}
+
+	for ptype := range model[sec] {
+		values = append(values, model.GetValuesForFieldInPolicy(sec, ptype, fieldIndex)...)
+	}
+
+	util.ArrayRemoveDuplicates(&values)
+
+	return values
+}

@@ -18,7 +18,7 @@ import "github.com/Knetic/govaluate"
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() []string {
-	return e.GetAllNamedSubjects("p")
+	return e.model.GetValuesForFieldInPolicyAllTypes("p", 0)
 }
 
 // GetAllNamedSubjects gets the list of subjects that show up in the current named policy.
@@ -28,7 +28,7 @@ func (e *Enforcer) GetAllNamedSubjects(ptype string) []string {
 
 // GetAllObjects gets the list of objects that show up in the current policy.
 func (e *Enforcer) GetAllObjects() []string {
-	return e.GetAllNamedObjects("p")
+	return e.model.GetValuesForFieldInPolicyAllTypes("p", 1)
 }
 
 // GetAllNamedObjects gets the list of objects that show up in the current named policy.
@@ -38,7 +38,7 @@ func (e *Enforcer) GetAllNamedObjects(ptype string) []string {
 
 // GetAllActions gets the list of actions that show up in the current policy.
 func (e *Enforcer) GetAllActions() []string {
-	return e.GetAllNamedActions("p")
+	return e.model.GetValuesForFieldInPolicyAllTypes("p", 2)
 }
 
 // GetAllNamedActions gets the list of actions that show up in the current named policy.
@@ -48,7 +48,7 @@ func (e *Enforcer) GetAllNamedActions(ptype string) []string {
 
 // GetAllRoles gets the list of roles that show up in the current policy.
 func (e *Enforcer) GetAllRoles() []string {
-	return e.GetAllNamedRoles("g")
+	return e.model.GetValuesForFieldInPolicyAllTypes("g", 1)
 }
 
 // GetAllNamedRoles gets the list of roles that show up in the current named policy.
