@@ -68,10 +68,11 @@ func (e *SyncedEnforcer) DeleteUser(user string) (bool, error) {
 }
 
 // DeleteRole deletes a role.
-func (e *SyncedEnforcer) DeleteRole(role string) {
+// Returns false if the role does not exist (aka not affected).
+func (e *SyncedEnforcer) DeleteRole(role string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	e.Enforcer.DeleteRole(role)
+	return e.Enforcer.DeleteRole(role)
 }
 
 // DeletePermission deletes a permission.
