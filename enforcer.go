@@ -47,11 +47,16 @@ type Enforcer struct {
 }
 
 // NewEnforcer creates an enforcer via file or DB.
+//
 // File:
-// e := casbin.NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.csv")
+//
+// 	e := casbin.NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.csv")
+//
 // MySQL DB:
-// a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
-// e := casbin.NewEnforcer("path/to/basic_model.conf", a)
+//
+// 	a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
+// 	e := casbin.NewEnforcer("path/to/basic_model.conf", a)
+//
 func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 	e := &Enforcer{}
 
