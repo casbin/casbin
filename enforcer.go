@@ -61,8 +61,9 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 	e := &Enforcer{}
 
 	parsedParamLen := 0
-	if len(params) >= 1 {
-		enableLog, ok := params[len(params)-1].(bool)
+	paramLen := len(params)
+	if paramLen >= 1 {
+		enableLog, ok := params[paramLen-1].(bool)
 		if ok {
 			e.EnableLog(enableLog)
 
@@ -70,7 +71,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 		}
 	}
 
-	if len(params)-parsedParamLen == 2 {
+	if paramLen-parsedParamLen == 2 {
 		switch p0 := params[0].(type) {
 		case string:
 			switch p1 := params[1].(type) {
@@ -96,7 +97,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 				}
 			}
 		}
-	} else if len(params)-parsedParamLen == 1 {
+	} else if paramLen-parsedParamLen == 1 {
 		switch p0 := params[0].(type) {
 		case string:
 			err := e.InitWithFile(p0, "")
@@ -109,7 +110,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 				return nil, err
 			}
 		}
-	} else if len(params)-parsedParamLen == 0 {
+	} else if paramLen-parsedParamLen == 0 {
 		return e, nil
 	} else {
 		return nil, errors.New("invalid parameters for enforcer")
