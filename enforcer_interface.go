@@ -1,15 +1,28 @@
+// Copyright 2019 The casbin Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package casbin
 
 import (
-	"github.com/casbin/casbin/effect"
-	"github.com/casbin/casbin/model"
-	"github.com/casbin/casbin/persist"
-	"github.com/casbin/casbin/rbac"
+	"github.com/casbin/casbin/v2/effect"
+	"github.com/casbin/casbin/v2/model"
+	"github.com/casbin/casbin/v2/persist"
+	"github.com/casbin/casbin/v2/rbac"
 )
 
 type IEnforcer interface {
-
-	/* Enforcer API`s */
+	/* Enforcer API */
 	InitWithFile(modelPath string, policyPath string)
 	InitWithAdapter(modelPath string, adapter persist.Adapter)
 	InitWithModelAndAdapter(m model.Model, adapter persist.Adapter)
@@ -33,7 +46,7 @@ type IEnforcer interface {
 	BuildRoleLinks()
 	Enforce(rvals ...interface{}) bool
 
-	/* RBAC API`s */
+	/* RBAC API */
 	GetRolesForUser(name string) ([]string, error)
 	GetUsersForRole(name string) ([]string, error)
 	HasRoleForUser(name string, role string) (bool, error)
@@ -52,7 +65,7 @@ type IEnforcer interface {
 	DeleteRole(role string)
 	DeletePermission(permission ...string) bool
 
-	/* management API`s */
+	/* Management API */
 	GetAllSubjects() []string
 	GetAllNamedSubjects(ptype string) []string
 	GetAllObjects() []string
