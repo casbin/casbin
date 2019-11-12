@@ -15,10 +15,11 @@
 package casbin
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/casbin/casbin/v2/model"
-	"github.com/casbin/casbin/v2/persist/file-adapter"
+	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
 )
 
 func TestKeyMatchModelInMemory(t *testing.T) {
@@ -337,6 +338,30 @@ func TestRoleLinks(t *testing.T) {
 	e.EnableAutoBuildRoleLinks(false)
 	e.BuildRoleLinks()
 	e.Enforce("user501", "data9", "read")
+}
+
+func TestEnforceConcurrency(t *testing.T) {
+	defer func() {
+		if r := recover(); r != nil {
+			t.Errorf("Enforce is not concurrent")
+		}
+	}()
+
+	e, _ := NewEnforcer("examples/rbac_model.conf")
+	e.LoadModel()
+
+	var wg sync.WaitGroup
+
+	// Simulate concurrency (maybe use a timer?)
+	for i := 1; i <= 10000; i++ {
+		wg.Add(1)
+		go func() {
+			e.Enforce("user501", "data9", "read")
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
 }
 
 func TestGetAndSetModel(t *testing.T) {
