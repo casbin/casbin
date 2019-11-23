@@ -44,6 +44,9 @@ func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 	return &rm
 }
 
+// e.BuildRoleLinks must be called after AddMatchingFunc().
+//
+// example: e.GetRoleManager().(*defaultrolemanager.RoleManager).AddMatchingFunc('matcher', util.KeyMatch)
 func (rm *RoleManager) AddMatchingFunc(name string, fn MatchingFunc) {
 	rm.hasPattern = true
 	rm.matchingFunc = fn
@@ -66,15 +69,19 @@ func (rm *RoleManager) hasRole(name string) bool {
 }
 
 func (rm *RoleManager) createRole(name string) *Role {
+	role, _ := rm.allRoles.LoadOrStore(name, newRole(name))
+
 	if rm.hasPattern {
 		rm.allRoles.Range(func(key, value interface{}) bool {
-			if rm.matchingFunc(name, key.(string)) {
-				name = key.(string)
+			if rm.matchingFunc(name, key.(string)) && name!=key.(string) {
+				// Add new role to matching role
+				role1, _ := rm.allRoles.LoadOrStore(key.(string), newRole(key.(string)))
+				role.(*Role).addRole(role1.(*Role))
 			}
 			return true
 		})
 	}
-	role, _ := rm.allRoles.LoadOrStore(name, newRole(name))
+
 	return role.(*Role)
 }
 
