@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"testing"
 
 	"github.com/casbin/casbin/v2/errors"
@@ -217,6 +218,17 @@ func TestImplicitRoleAPI(t *testing.T) {
 
 	testGetImplicitRoles(t, e, "alice", []string{"admin", "data1_admin", "data2_admin"})
 	testGetImplicitRoles(t, e, "bob", []string{})
+
+	e, _ = NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
+
+	e.GetRoleManager().(*defaultrolemanager.RoleManager).AddMatchingFunc("matcher", util.KeyMatch)
+	err := e.BuildRoleLinks()
+	if err != nil {
+		t.Error(err)
+	}
+
+	testGetImplicitRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin", "/book/*", "book_group"})
+	testGetRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin"})
 }
 
 func testGetImplicitPermissions(t *testing.T, e *Enforcer, name string, res [][]string) {
