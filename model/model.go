@@ -126,14 +126,7 @@ func (model Model) LoadModel(path string) error {
 		return err
 	}
 
-	loadSection(model, cfg, "r")
-	loadSection(model, cfg, "p")
-	loadSection(model, cfg, "e")
-	loadSection(model, cfg, "m")
-
-	loadSection(model, cfg, "g")
-
-	return nil
+	return model.loadModelFromConfig(cfg)
 }
 
 // LoadModelFromText loads the model from the text.
@@ -143,6 +136,10 @@ func (model Model) LoadModelFromText(text string) error {
 		return err
 	}
 
+	return model.loadModelFromConfig(cfg)
+}
+
+func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	loadSection(model, cfg, "r")
 	loadSection(model, cfg, "p")
 	loadSection(model, cfg, "e")
