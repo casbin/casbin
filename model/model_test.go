@@ -100,3 +100,17 @@ func TestHasSection(t *testing.T) {
 		}
 	}
 }
+
+func TestModel_AddDef(t *testing.T) {
+	m := NewModel()
+	s := "r"
+	v := "sub, obj, act"
+	ok := m.AddDef(s, s, v)
+	if !ok {
+		t.Errorf("non empty assertion should be added")
+	}
+	ok = m.AddDef(s, s, "")
+	if ok {
+		t.Errorf("empty assertion value should not be added")
+	}
+}
