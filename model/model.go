@@ -15,7 +15,7 @@
 package model
 
 import (
-	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -147,10 +147,14 @@ func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	for s := range sectionNameMap {
 		loadSection(model, cfg, s)
 	}
+	ms := make([]string, 0)
 	for _, rs := range requiredSections {
 		if !model.hasSection(rs) {
-			return errors.New("model does not contain all required sections ")
+			ms = append(ms, sectionNameMap[rs])
 		}
+	}
+	if len(ms) > 0 {
+		return fmt.Errorf("missing required sections: %s", strings.Join(ms, ","))
 	}
 	return nil
 }

@@ -18,6 +18,7 @@ import (
 	"github.com/casbin/casbin/v2/config"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -81,6 +82,13 @@ func TestLoadModelFromConfig(t *testing.T) {
 	err = m.loadModelFromConfig(&MockConfig{})
 	if err == nil {
 		t.Error("empty config should return error")
+	} else {
+		// check for missing sections in message
+		for _, rs := range requiredSections {
+			if !strings.Contains(err.Error(), sectionNameMap[rs]) {
+				t.Errorf("section name: %s should be in message", sectionNameMap[rs])
+			}
+		}
 	}
 }
 
