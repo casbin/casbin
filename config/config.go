@@ -37,7 +37,7 @@ var (
 	DEFAULT_MULTI_LINE_SEPARATOR = []byte{'\\'}
 )
 
-// ConfigInterface defines the behavior of a Config implemenation
+// ConfigInterface defines the behavior of a Config implementation
 type ConfigInterface interface {
 	String(key string) string
 	Strings(key string) []string
