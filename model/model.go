@@ -15,6 +15,7 @@
 package model
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -37,6 +38,9 @@ var sectionNameMap = map[string]string{
 	"m": "matchers",
 }
 
+// Minimal required sections for a model to be valid
+var requiredSections = []string{"r", "p", "e", "m"}
+
 func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) bool {
 	value := cfg.String(sectionNameMap[sec] + "::" + key)
 	return model.AddDef(sec, key, value)
@@ -44,13 +48,13 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 
 // AddDef adds an assertion to the model.
 func (model Model) AddDef(sec string, key string, value string) bool {
+	if value == "" {
+		return false
+	}
+
 	ast := Assertion{}
 	ast.Key = key
 	ast.Value = value
-
-	if ast.Value == "" {
-		return false
-	}
 
 	if sec == "r" || sec == "p" {
 		ast.Tokens = strings.Split(ast.Value, ", ")
@@ -140,14 +144,24 @@ func (model Model) LoadModelFromText(text string) error {
 }
 
 func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
-	loadSection(model, cfg, "r")
-	loadSection(model, cfg, "p")
-	loadSection(model, cfg, "e")
-	loadSection(model, cfg, "m")
-
-	loadSection(model, cfg, "g")
-
+	for s := range sectionNameMap {
+		loadSection(model, cfg, s)
+	}
+	ms := make([]string, 0)
+	for _, rs := range requiredSections {
+		if !model.hasSection(rs) {
+			ms = append(ms, sectionNameMap[rs])
+		}
+	}
+	if len(ms) > 0 {
+		return fmt.Errorf("missing required sections: %s", strings.Join(ms, ","))
+	}
 	return nil
+}
+
+func (model Model) hasSection(sec string) bool {
+	section := model[sec]
+	return section != nil
 }
 
 // PrintModel prints the model to the log.
