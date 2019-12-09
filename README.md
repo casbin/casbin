@@ -97,12 +97,12 @@ It means:
 - alice can read data1
 - bob can write data2
 
-We also support multi-line mode by appending '\\'  in the end:  
+We also support multi-line mode by appending '\\'  in the end:
 
 ```ini
 # Matchers
 [matchers]
-m = r.sub == p.sub && r.obj == p.obj \ 
+m = r.sub == p.sub && r.obj == p.obj \
   && r.act == p.act
 ```
 
@@ -131,7 +131,7 @@ What Casbin does:
 What Casbin does NOT do:
 
 1. authentication (aka verify ``username`` and ``password`` when a user logs in)
-2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and Casbin is not designed as a password container. However, Casbin stores the user-role mapping for the RBAC scenario. 
+2. manage the list of users or roles. I believe it's more convenient for the project itself to manage these entities. Users usually have their passwords, and Casbin is not designed as a password container. However, Casbin stores the user-role mapping for the RBAC scenario.
 
 ## Installation
 
@@ -236,9 +236,13 @@ Authz middlewares for web frameworks: https://casbin.org/docs/en/middlewares
 
 https://casbin.org/docs/en/adopters
 
+## How to Contribute
+
+Please read the [contributing guide](contributing.md).
+
 ## Contributors
 
-This project exists thanks to all the people who contribute. 
+This project exists thanks to all the people who contribute.
 <a href="https://github.com/casbin/casbin/graphs/contributors"><img src="https://opencollective.com/casbin/contributors.svg?width=890&button=false" /></a>
 
 ## Backers
