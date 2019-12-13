@@ -238,7 +238,7 @@ https://casbin.org/docs/en/adopters
 
 ## How to Contribute
 
-Please read the [contributing guide](contributing.md).
+Please read the [contributing guide](CONTRIBUTING.md).
 
 ## Contributors
 
