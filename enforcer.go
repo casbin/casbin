@@ -338,6 +338,12 @@ func (e *Enforcer) BuildRoleLinks() error {
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (bool, error) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Errorf("panic: %v", err)
+		}
+	}()
+
 	if !e.enabled {
 		return true, nil
 	}
