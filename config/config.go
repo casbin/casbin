@@ -149,6 +149,7 @@ func (c *Config) parseBuffer(buf *bufio.Reader) error {
 			var p []byte
 			if bytes.HasSuffix(line, DEFAULT_MULTI_LINE_SEPARATOR) {
 				p = bytes.TrimSpace(line[:len(line)-1])
+				p = append(p, " "...)
 			} else {
 				p = line
 				canWrite = true
