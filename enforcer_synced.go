@@ -26,8 +26,8 @@ import (
 // SyncedEnforcer wraps Enforcer and provides synchronized access
 type SyncedEnforcer struct {
 	*Enforcer
-	m        sync.RWMutex
-	autoLoad bool
+	m            sync.RWMutex
+	stopAutoLoad chan struct{}
 }
 
 // NewSyncedEnforcer creates a synchronized enforcer via file or DB.
@@ -39,35 +39,36 @@ func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 		return nil, err
 	}
 
-	e.autoLoad = false
+	e.stopAutoLoad = make(chan struct{}, 1)
 	return e, nil
 }
 
 // StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy
 func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
-	e.autoLoad = true
+	ticker := time.NewTicker(d)
 	go func() {
+		defer ticker.Stop()
 		n := 1
 		log.Print("Start automatically load policy")
 		for {
-			if !e.autoLoad {
+			select {
+			case <-ticker.C:
+				// error intentionally ignored
+				_ = e.LoadPolicy()
+				// Uncomment this line to see when the policy is loaded.
+				// log.Print("Load policy for time: ", n)
+				n++
+			case <-e.stopAutoLoad:
 				log.Print("Stop automatically load policy")
-				break
+				return
 			}
-
-			// error intentionally ignored
-			e.LoadPolicy()
-			// Uncomment this line to see when the policy is loaded.
-			// log.Print("Load policy for time: ", n)
-			n++
-			time.Sleep(d)
 		}
 	}()
 }
 
 // StopAutoLoadPolicy causes the go routine to exit.
 func (e *SyncedEnforcer) StopAutoLoadPolicy() {
-	e.autoLoad = false
+	e.stopAutoLoad <- struct{}{}
 }
 
 // SetWatcher sets the current watcher.
