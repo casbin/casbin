@@ -62,48 +62,58 @@ func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 	return e, nil
 }
 
+// GetParentEnforcer returns the parent enforcer wrapped by this instance.
 func (e *SyncedEnforcer) GetParentEnforcer() BasicEnforcer {
 	return e.base
 }
 
+// InitWithFile initializes an enforcer with a model file and a policy file.
 func (e *SyncedEnforcer) InitWithFile(modelPath string, policyPath string) error {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.base.InitWithFile(modelPath, policyPath)
 }
 
+// InitWithAdapter initializes an enforcer with a database adapter.
 func (e *SyncedEnforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) error {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.base.InitWithAdapter(modelPath, adapter)
 }
 
+// InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
 func (e *SyncedEnforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.base.InitWithModelAndAdapter(m, adapter)
 }
 
+// LoadModel reloads the model from the model CONF file.
+// Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
 func (e *SyncedEnforcer) LoadModel() error {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.base.LoadModel()
 }
 
+// GetModel gets the current model.
 func (e *SyncedEnforcer) GetModel() model.Model {
 	return e.base.GetModel()
 }
 
+// SetModel sets the current model.
 func (e *SyncedEnforcer) SetModel(m model.Model) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	e.base.SetModel(m)
 }
 
+// GetAdapter gets the current adapter.
 func (e *SyncedEnforcer) GetAdapter() persist.Adapter {
 	return e.base.GetAdapter()
 }
 
+// SetAdapter sets the current adapter.
 func (e *SyncedEnforcer) SetAdapter(adapter persist.Adapter) {
 	e.m.Lock()
 	defer e.m.Unlock()
@@ -116,16 +126,19 @@ func (e *SyncedEnforcer) SetWatcher(watcher persist.Watcher) error {
 	return watcher.SetUpdateCallback(func(string) { e.LoadPolicy() })
 }
 
+// GetRoleManager gets the current role manager.
 func (e *SyncedEnforcer) GetRoleManager() rbac.RoleManager {
 	return e.base.GetRoleManager()
 }
 
+// SetRoleManager sets the current role manager.
 func (e *SyncedEnforcer) SetRoleManager(rm rbac.RoleManager) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	e.base.SetRoleManager(rm)
 }
 
+// SetEffector sets the current effector.
 func (e *SyncedEnforcer) SetEffector(eft effect.Effector) {
 	e.m.Lock()
 	defer e.m.Unlock()
@@ -146,12 +159,14 @@ func (e *SyncedEnforcer) LoadPolicy() error {
 	return e.base.LoadPolicy()
 }
 
+// LoadFilteredPolicy reloads a filtered policy from file/database.
 func (e *SyncedEnforcer) LoadFilteredPolicy(filter interface{}) error {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.base.LoadFilteredPolicy(filter)
 }
 
+// IsFiltered returns true if the loaded policy has been filtered.
 func (e *SyncedEnforcer) IsFiltered() bool {
 	return e.base.IsFiltered()
 }
@@ -169,18 +184,22 @@ func (e *SyncedEnforcer) SavePolicy() error {
 	return nil
 }
 
+// EnableEnforce changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
 func (e *SyncedEnforcer) EnableEnforce(enable bool) {
 	e.base.EnableEnforce(enable)
 }
 
+// EnableLog changes whether Casbin will log messages to the Logger.
 func (e *SyncedEnforcer) EnableLog(enable bool) {
 	e.base.EnableLog(enable)
 }
 
+// EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
 func (e *SyncedEnforcer) EnableAutoSave(autoSave bool) {
 	e.base.EnableAutoSave(autoSave)
 }
 
+// EnableAutoBuildRoleLinks controls whether to rebuild the role inheritance relations when a role is added or deleted.
 func (e *SyncedEnforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 	e.base.EnableAutoBuildRoleLinks(autoBuildRoleLinks)
 }
@@ -199,6 +218,7 @@ func (e *SyncedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 	return e.base.Enforce(rvals...)
 }
 
+// EnforceWithMatcher use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *SyncedEnforcer) EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
@@ -471,18 +491,43 @@ func (e *SyncedEnforcer) AddFunction(name string, function govaluate.ExpressionF
 	e.api.AddFunction(name, function)
 }
 
+// GetImplicitPermissionsForUser gets implicit permissions for a user or role.
+// Compared to GetPermissionsForUser(), this function retrieves permissions for inherited roles.
+// For example:
+// p, admin, data1, read
+// p, alice, data2, read
+// g, alice, admin
+//
+// GetPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
+// But GetImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
 func (e *SyncedEnforcer) GetImplicitPermissionsForUser(user string, domain ...string) ([][]string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.api.GetImplicitPermissionsForUser(user, domain...)
 }
 
+// GetImplicitRolesForUser gets implicit roles that a user has.
+// Compared to GetRolesForUser(), this function retrieves indirect roles besides direct roles.
+// For example:
+// g, alice, role:admin
+// g, role:admin, role:user
+//
+// GetRolesForUser("alice") can only get: ["role:admin"].
+// But GetImplicitRolesForUser("alice") will get: ["role:admin", "role:user"].
 func (e *SyncedEnforcer) GetImplicitRolesForUser(user string, domain ...string) ([]string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.api.GetImplicitRolesForUser(user, domain...)
 }
 
+// GetImplicitUsersForPermission gets implicit users for a permission.
+// For example:
+// p, admin, data1, read
+// p, bob, data1, read
+// g, alice, admin
+//
+// GetImplicitUsersForPermission("data1", "read") will get: ["alice", "bob"].
+// Note: only users will be returned, roles (2nd arg in "g") will be excluded.
 func (e *SyncedEnforcer) GetImplicitUsersForPermission(permission ...string) ([]string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()

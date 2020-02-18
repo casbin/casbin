@@ -36,7 +36,7 @@ type CachedEnforcer struct {
 	locker      *sync.RWMutex
 }
 
-// NewCachedEnforcer creates a cached enforcer via file or DB.
+// NewCachedEnforcer creates a cached enforcer from an existing enforcer or via file or DB.
 func NewCachedEnforcer(params ...interface{}) (*CachedEnforcer, error) {
 	e := &CachedEnforcer{}
 	if len(params) == 1 {
@@ -68,12 +68,13 @@ func (e *CachedEnforcer) EnableCache(enableCache bool) {
 	e.enableCache = enableCache
 }
 
+// EnableAutoCLear determines whether to automatically invalidate the cache when the policy is changed.
 func (e *CachedEnforcer) EnableAutoClear(enableAuto bool) {
 	e.autoClear = enableAuto
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
-// if rvals is not string , ingore the cache
+// if rvals is not string , ignore the cache
 func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 	if !e.enableCache {
 		return e.base.Enforce(rvals...)
@@ -123,10 +124,12 @@ func (e *CachedEnforcer) InvalidateCache() {
 	}
 }
 
+// GetParentEnforcer returns the parent enforcer wrapped by this instance.
 func (e *CachedEnforcer) GetParentEnforcer() BasicEnforcer {
 	return e.base
 }
 
+// InitWithFile initializes an enforcer with a model file and a policy file.
 func (e *CachedEnforcer) InitWithFile(modelPath string, policyPath string) error {
 	if e.autoClear {
 		defer e.InvalidateCache()
@@ -134,6 +137,7 @@ func (e *CachedEnforcer) InitWithFile(modelPath string, policyPath string) error
 	return e.base.InitWithFile(modelPath, policyPath)
 }
 
+// InitWithAdapter initializes an enforcer with a database adapter.
 func (e *CachedEnforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) error {
 	if e.autoClear {
 		defer e.InvalidateCache()
@@ -141,6 +145,7 @@ func (e *CachedEnforcer) InitWithAdapter(modelPath string, adapter persist.Adapt
 	return e.base.InitWithAdapter(modelPath, adapter)
 }
 
+// InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
 func (e *CachedEnforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error {
 	if e.autoClear {
 		defer e.InvalidateCache()
@@ -148,6 +153,8 @@ func (e *CachedEnforcer) InitWithModelAndAdapter(m model.Model, adapter persist.
 	return e.base.InitWithModelAndAdapter(m, adapter)
 }
 
+// LoadModel reloads the model from the model CONF file.
+// Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
 func (e *CachedEnforcer) LoadModel() error {
 	if e.autoClear {
 		defer e.InvalidateCache()
@@ -155,11 +162,13 @@ func (e *CachedEnforcer) LoadModel() error {
 	return e.base.LoadModel()
 }
 
+// GetModel gets the current model.
 func (e *CachedEnforcer) GetModel() model.Model {
 
 	return e.base.GetModel()
 }
 
+// SetModel sets the current model.
 func (e *CachedEnforcer) SetModel(m model.Model) {
 	if e.autoClear {
 		defer e.InvalidateCache()
@@ -167,10 +176,12 @@ func (e *CachedEnforcer) SetModel(m model.Model) {
 	e.base.SetModel(m)
 }
 
+// GetAdapter gets the current adapter.
 func (e *CachedEnforcer) GetAdapter() persist.Adapter {
 	return e.base.GetAdapter()
 }
 
+// SetAdapter sets the current adapter.
 func (e *CachedEnforcer) SetAdapter(adapter persist.Adapter) {
 	e.base.SetAdapter(adapter)
 }
@@ -180,10 +191,12 @@ func (e *CachedEnforcer) SetWatcher(watcher persist.Watcher) error {
 	return e.base.SetWatcher(watcher)
 }
 
+// GetRoleManager gets the current role manager.
 func (e *CachedEnforcer) GetRoleManager() rbac.RoleManager {
 	return e.base.GetRoleManager()
 }
 
+// SetRoleManager sets the current role manager.
 func (e *CachedEnforcer) SetRoleManager(rm rbac.RoleManager) {
 	e.base.SetRoleManager(rm)
 	if e.autoClear {
@@ -191,6 +204,7 @@ func (e *CachedEnforcer) SetRoleManager(rm rbac.RoleManager) {
 	}
 }
 
+// SetEffector sets the current effector.
 func (e *CachedEnforcer) SetEffector(eft effect.Effector) {
 	e.base.SetEffector(eft)
 	if e.autoClear {
@@ -214,6 +228,7 @@ func (e *CachedEnforcer) LoadPolicy() error {
 	return e.base.LoadPolicy()
 }
 
+// LoadFilteredPolicy reloads a filtered policy from file/database.
 func (e *CachedEnforcer) LoadFilteredPolicy(filter interface{}) error {
 	if e.autoClear {
 		defer e.InvalidateCache()
@@ -221,6 +236,7 @@ func (e *CachedEnforcer) LoadFilteredPolicy(filter interface{}) error {
 	return e.base.LoadFilteredPolicy(filter)
 }
 
+// IsFiltered returns true if the loaded policy has been filtered.
 func (e *CachedEnforcer) IsFiltered() bool {
 	return e.base.IsFiltered()
 }
@@ -230,18 +246,22 @@ func (e *CachedEnforcer) SavePolicy() error {
 	return e.base.SavePolicy()
 }
 
+// EnableEnforce changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
 func (e *CachedEnforcer) EnableEnforce(enable bool) {
 	e.base.EnableEnforce(enable)
 }
 
+// EnableLog changes whether Casbin will log messages to the Logger.
 func (e *CachedEnforcer) EnableLog(enable bool) {
 	e.base.EnableLog(enable)
 }
 
+// EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
 func (e *CachedEnforcer) EnableAutoSave(autoSave bool) {
 	e.base.EnableAutoSave(autoSave)
 }
 
+// EnableAutoBuildRoleLinks controls whether to rebuild the role inheritance relations when a role is added or deleted.
 func (e *CachedEnforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 	e.base.EnableAutoBuildRoleLinks(autoBuildRoleLinks)
 }
@@ -251,6 +271,7 @@ func (e *CachedEnforcer) BuildRoleLinks() error {
 	return e.base.BuildRoleLinks()
 }
 
+// EnforceWithMatcher use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *CachedEnforcer) EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error) {
 	return e.base.EnforceWithMatcher(matcher, rvals)
 }
@@ -464,14 +485,39 @@ func (e *CachedEnforcer) AddFunction(name string, function govaluate.ExpressionF
 	e.api.AddFunction(name, function)
 }
 
+// GetImplicitPermissionsForUser gets implicit permissions for a user or role.
+// Compared to GetPermissionsForUser(), this function retrieves permissions for inherited roles.
+// For example:
+// p, admin, data1, read
+// p, alice, data2, read
+// g, alice, admin
+//
+// GetPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
+// But GetImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
 func (e *CachedEnforcer) GetImplicitPermissionsForUser(user string, domain ...string) ([][]string, error) {
 	return e.api.GetImplicitPermissionsForUser(user, domain...)
 }
 
+// GetImplicitRolesForUser gets implicit roles that a user has.
+// Compared to GetRolesForUser(), this function retrieves indirect roles besides direct roles.
+// For example:
+// g, alice, role:admin
+// g, role:admin, role:user
+//
+// GetRolesForUser("alice") can only get: ["role:admin"].
+// But GetImplicitRolesForUser("alice") will get: ["role:admin", "role:user"].
 func (e *CachedEnforcer) GetImplicitRolesForUser(user string, domain ...string) ([]string, error) {
 	return e.api.GetImplicitRolesForUser(user, domain...)
 }
 
+// GetImplicitUsersForPermission gets implicit users for a permission.
+// For example:
+// p, admin, data1, read
+// p, bob, data1, read
+// g, alice, admin
+//
+// GetImplicitUsersForPermission("data1", "read") will get: ["alice", "bob"].
+// Note: only users will be returned, roles (2nd arg in "g") will be excluded.
 func (e *CachedEnforcer) GetImplicitUsersForPermission(permission ...string) ([]string, error) {
 	return e.api.GetImplicitUsersForPermission(permission...)
 }

@@ -119,6 +119,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 	return e, nil
 }
 
+// GetParentEnforcer always returns nil to support the BasicEnforcer interface.
 func (e *Enforcer) GetParentEnforcer() BasicEnforcer {
 	return nil
 }

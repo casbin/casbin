@@ -104,6 +104,9 @@ type (
 		AddFunction(name string, function func(args ...interface{}) (interface{}, error))
 	}
 
+	// BasicEnforcer is the interface that describes the minimal set of functions required for an enforcer
+	//
+	// An object implements BasicEnforcer to enable it to be used as a wrapper around Enforcer.
 	BasicEnforcer interface {
 		InitWithFile(modelPath string, policyPath string) error
 		InitWithAdapter(modelPath string, adapter persist.Adapter) error
@@ -132,6 +135,10 @@ type (
 		GetParentEnforcer() BasicEnforcer
 	}
 
+	// APIEnforcer is the interface which provides the management and RBAC API functions
+	//
+	// Enforcer wrappers must implement this interface in order to expose the RBAC and
+	// management APIs from lower level wrappers or the root Enforcer.
 	APIEnforcer interface {
 		GetRolesForUser(name string) ([]string, error)
 		GetUsersForRole(name string) ([]string, error)
@@ -190,12 +197,14 @@ type (
 		AddFunction(name string, function govaluate.ExpressionFunction)
 	}
 
+	// FullEnforcer is the interface which describes the full featured Enforcer interface
 	FullEnforcer interface {
 		BasicEnforcer
 		APIEnforcer
 	}
 )
 
+// GetRootEnforcer locates and returns the root instance of Enforcer from a arbitrarily wrapped instance
 func GetRootEnforcer(e BasicEnforcer) *Enforcer {
 	for {
 		if ne := e.GetParentEnforcer(); ne != nil {
