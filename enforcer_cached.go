@@ -28,6 +28,7 @@ import (
 
 // CachedEnforcer wraps Enforcer and provides decision cache
 type CachedEnforcer struct {
+	Enforcer    *Enforcer
 	base        BasicEnforcer
 	api         APIEnforcer
 	m           map[string]bool
@@ -57,6 +58,7 @@ func NewCachedEnforcer(params ...interface{}) (*CachedEnforcer, error) {
 		e.api = ef
 	}
 
+	e.Enforcer = GetRootEnforcer(e.base)
 	e.enableCache = true
 	e.m = make(map[string]bool)
 	e.locker = new(sync.RWMutex)

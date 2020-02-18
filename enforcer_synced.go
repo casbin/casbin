@@ -29,6 +29,7 @@ import (
 
 // SyncedEnforcer wraps Enforcer and provides synchronized access
 type SyncedEnforcer struct {
+	Enforcer *Enforcer
 	base     BasicEnforcer
 	api      APIEnforcer
 	m        sync.RWMutex
@@ -58,6 +59,7 @@ func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 		e.api = ef
 	}
 
+	e.Enforcer = GetRootEnforcer(e.base)
 	e.autoLoad = false
 	return e, nil
 }
