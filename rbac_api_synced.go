@@ -18,21 +18,21 @@ package casbin
 func (e *SyncedEnforcer) GetRolesForUser(name string) ([]string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.GetRolesForUser(name)
+	return e.api.GetRolesForUser(name)
 }
 
 // GetUsersForRole gets the users that has a role.
 func (e *SyncedEnforcer) GetUsersForRole(name string) ([]string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.GetUsersForRole(name)
+	return e.api.GetUsersForRole(name)
 }
 
 // HasRoleForUser determines whether a user has a role.
 func (e *SyncedEnforcer) HasRoleForUser(name string, role string) (bool, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.HasRoleForUser(name, role)
+	return e.api.HasRoleForUser(name, role)
 }
 
 // AddRoleForUser adds a role for a user.
@@ -40,7 +40,7 @@ func (e *SyncedEnforcer) HasRoleForUser(name string, role string) (bool, error) 
 func (e *SyncedEnforcer) AddRoleForUser(user string, role string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.AddRoleForUser(user, role)
+	return e.api.AddRoleForUser(user, role)
 }
 
 // DeleteRoleForUser deletes a role for a user.
@@ -48,7 +48,7 @@ func (e *SyncedEnforcer) AddRoleForUser(user string, role string) (bool, error) 
 func (e *SyncedEnforcer) DeleteRoleForUser(user string, role string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.DeleteRoleForUser(user, role)
+	return e.api.DeleteRoleForUser(user, role)
 }
 
 // DeleteRolesForUser deletes all roles for a user.
@@ -56,7 +56,7 @@ func (e *SyncedEnforcer) DeleteRoleForUser(user string, role string) (bool, erro
 func (e *SyncedEnforcer) DeleteRolesForUser(user string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.DeleteRolesForUser(user)
+	return e.api.DeleteRolesForUser(user)
 }
 
 // DeleteUser deletes a user.
@@ -64,7 +64,7 @@ func (e *SyncedEnforcer) DeleteRolesForUser(user string) (bool, error) {
 func (e *SyncedEnforcer) DeleteUser(user string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.DeleteUser(user)
+	return e.api.DeleteUser(user)
 }
 
 // DeleteRole deletes a role.
@@ -72,7 +72,7 @@ func (e *SyncedEnforcer) DeleteUser(user string) (bool, error) {
 func (e *SyncedEnforcer) DeleteRole(role string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.DeleteRole(role)
+	return e.api.DeleteRole(role)
 }
 
 // DeletePermission deletes a permission.
@@ -80,7 +80,7 @@ func (e *SyncedEnforcer) DeleteRole(role string) (bool, error) {
 func (e *SyncedEnforcer) DeletePermission(permission ...string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.DeletePermission(permission...)
+	return e.api.DeletePermission(permission...)
 }
 
 // AddPermissionForUser adds a permission for a user or role.
@@ -88,7 +88,7 @@ func (e *SyncedEnforcer) DeletePermission(permission ...string) (bool, error) {
 func (e *SyncedEnforcer) AddPermissionForUser(user string, permission ...string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.AddPermissionForUser(user, permission...)
+	return e.api.AddPermissionForUser(user, permission...)
 }
 
 // DeletePermissionForUser deletes a permission for a user or role.
@@ -96,7 +96,7 @@ func (e *SyncedEnforcer) AddPermissionForUser(user string, permission ...string)
 func (e *SyncedEnforcer) DeletePermissionForUser(user string, permission ...string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.DeletePermissionForUser(user, permission...)
+	return e.api.DeletePermissionForUser(user, permission...)
 }
 
 // DeletePermissionsForUser deletes permissions for a user or role.
@@ -104,19 +104,19 @@ func (e *SyncedEnforcer) DeletePermissionForUser(user string, permission ...stri
 func (e *SyncedEnforcer) DeletePermissionsForUser(user string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.DeletePermissionsForUser(user)
+	return e.api.DeletePermissionsForUser(user)
 }
 
 // GetPermissionsForUser gets permissions for a user or role.
 func (e *SyncedEnforcer) GetPermissionsForUser(user string) [][]string {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.GetPermissionsForUser(user)
+	return e.api.GetPermissionsForUser(user)
 }
 
 // HasPermissionForUser determines whether a user has a permission.
 func (e *SyncedEnforcer) HasPermissionForUser(user string, permission ...string) bool {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.HasPermissionForUser(user, permission...)
+	return e.api.HasPermissionForUser(user, permission...)
 }

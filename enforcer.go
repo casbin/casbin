@@ -119,6 +119,10 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 	return e, nil
 }
 
+func (e *Enforcer) GetParentEnforcer() BasicEnforcer {
+	return nil
+}
+
 // InitWithFile initializes an enforcer with a model file and a policy file.
 func (e *Enforcer) InitWithFile(modelPath string, policyPath string) error {
 	a := fileadapter.NewAdapter(policyPath)
