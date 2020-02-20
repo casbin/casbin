@@ -70,10 +70,18 @@ func (e *Enforcer) DeleteRolesForUser(user string) (bool, error) {
 // DeleteUser deletes a user.
 // Returns false if the user does not exist (aka not affected).
 func (e *Enforcer) DeleteUser(user string) (bool, error) {
-	return e.RemoveFilteredGroupingPolicy(0, user)
+	var err error
+	res1, err := e.RemoveFilteredGroupingPolicy(0, user)
+	if err != nil {
+		return res1, err
+	}
+
+	res2, err := e.RemoveFilteredPolicy(0, user)
+	return res1 || res2, err
 }
 
 // DeleteRole deletes a role.
+// Returns false if the role does not exist (aka not affected).
 func (e *Enforcer) DeleteRole(role string) (bool, error) {
 	var err error
 	res1, err := e.RemoveFilteredGroupingPolicy(1, role)
