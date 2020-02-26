@@ -43,3 +43,17 @@ func TestSync(t *testing.T) {
 	// Stop the reloading policy periodically.
 	e.StopAutoLoadPolicy()
 }
+
+func TestStopAutoLoadPolicy(t *testing.T) {
+	e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	e.StartAutoLoadPolicy(5 * time.Millisecond)
+	if !e.autoLoadRunning {
+		t.Error("auto load is not running")
+	}
+	e.StopAutoLoadPolicy()
+	// Need a moment, to exit goroutine
+	time.Sleep(10 * time.Millisecond)
+	if e.autoLoadRunning {
+		t.Error("auto load is still running")
+	}
+}

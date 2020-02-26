@@ -33,7 +33,8 @@ type SyncedEnforcer struct {
 	base     BasicEnforcer
 	api      APIEnforcer
 	m        sync.RWMutex
-	autoLoad bool
+	stopAutoLoad    chan struct{}
+	autoLoadRunning bool
 	watcher  persist.Watcher
 }
 
@@ -60,7 +61,7 @@ func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 	}
 
 	e.Enforcer = GetRootEnforcer(e.base)
-	e.autoLoad = false
+	e.stopAutoLoad = make(chan struct{}, 1)
 	return e, nil
 }
 
@@ -229,29 +230,40 @@ func (e *SyncedEnforcer) EnforceWithMatcher(matcher string, rvals ...interface{}
 
 // StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy
 func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
-	e.autoLoad = true
+	// Don't start another goroutine if there is already one running
+	if e.autoLoadRunning {
+		return
+	}
+	e.autoLoadRunning = true
+	ticker := time.NewTicker(d)
 	go func() {
+		defer func() {
+			ticker.Stop()
+			e.autoLoadRunning = false
+		}()
 		n := 1
 		log.Print("Start automatically load policy")
 		for {
-			if !e.autoLoad {
+			select {
+			case <-ticker.C:
+				// error intentionally ignored
+				_ = e.LoadPolicy()
+				// Uncomment this line to see when the policy is loaded.
+				// log.Print("Load policy for time: ", n)
+				n++
+			case <-e.stopAutoLoad:
 				log.Print("Stop automatically load policy")
-				break
+				return
 			}
-
-			// error intentionally ignored
-			e.LoadPolicy()
-			// Uncomment this line to see when the policy is loaded.
-			// log.Print("Load policy for time: ", n)
-			n++
-			time.Sleep(d)
 		}
 	}()
 }
 
 // StopAutoLoadPolicy causes the go routine to exit.
 func (e *SyncedEnforcer) StopAutoLoadPolicy() {
-	e.autoLoad = false
+	if e.autoLoadRunning {
+		e.stopAutoLoad <- struct{}{}
+	}
 }
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.

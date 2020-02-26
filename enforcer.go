@@ -44,6 +44,7 @@ type Enforcer struct {
 	enabled            bool
 	autoSave           bool
 	autoBuildRoleLinks bool
+	autoNotifyWatcher  bool
 }
 
 // NewEnforcer creates an enforcer via file or DB.
@@ -176,6 +177,7 @@ func (e *Enforcer) initialize() {
 	e.enabled = true
 	e.autoSave = true
 	e.autoBuildRoleLinks = true
+	e.autoNotifyWatcher = true
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -319,6 +321,11 @@ func (e *Enforcer) EnableEnforce(enable bool) {
 // EnableLog changes whether Casbin will log messages to the Logger.
 func (e *Enforcer) EnableLog(enable bool) {
 	log.GetLogger().EnableLog(enable)
+}
+
+// EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
+func (e *Enforcer) EnableAutoNotifyWatcher(enable bool)  {
+	e.autoNotifyWatcher = enable
 }
 
 // EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.

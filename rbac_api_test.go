@@ -104,7 +104,7 @@ func TestRoleAPI(t *testing.T) {
 
 	e.AddRoleForUser("alice", "data2_admin")
 
-	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "read", false)
 	testEnforce(t, e, "alice", "data1", "write", false)
 	testEnforce(t, e, "alice", "data2", "read", true)
 	testEnforce(t, e, "alice", "data2", "write", true)
@@ -115,7 +115,7 @@ func TestRoleAPI(t *testing.T) {
 
 	e.DeleteRole("data2_admin")
 
-	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "read", false)
 	testEnforce(t, e, "alice", "data1", "write", false)
 	testEnforce(t, e, "alice", "data2", "read", false)
 	testEnforce(t, e, "alice", "data2", "write", false)
