@@ -15,12 +15,19 @@
 package casbin
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 
 	"github.com/casbin/casbin/v2/model"
 	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
 )
+
+func testEnforceExample(e FullEnforcer, sub string, obj interface{}, act string, res bool) {
+	if myRes, _ := e.Enforce(sub, obj, act); myRes != res {
+		panic(fmt.Sprintf("%s, %v, %s: %t, supposed to be %t\n", sub, obj, act, myRes, res))
+	}
+}
 
 func TestKeyMatchModelInMemory(t *testing.T) {
 	m := model.NewModel()
@@ -418,4 +425,37 @@ func TestInitEmpty(t *testing.T) {
 	e.LoadPolicy()
 
 	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
+}
+
+func ExampleWrappedEnforcer() {
+	modelPath := "examples/basic_model.conf"
+	adapter := fileadapter.NewAdapter("examples/basic_policy.csv")
+
+	se, err := NewSyncedEnforcer(modelPath, adapter, false)
+	if err != nil {
+		panic(err)
+	}
+	e, err := NewCachedEnforcer(se)
+	if err != nil {
+		panic(err)
+	}
+
+	seRoot := GetRootEnforcer(se)
+	ceRoot := GetRootEnforcer(e)
+	if seRoot != ceRoot {
+		panic("root enforcers are divergent!")
+	}
+
+	testEnforceExample(e, "alice", "data1", "read", true)
+	testEnforceExample(e, "alice", "data1", "write", false)
+	testEnforceExample(e, "alice", "data2", "read", false)
+	testEnforceExample(e, "alice", "data2", "write", false)
+	testEnforceExample(e, "bob", "data1", "read", false)
+	testEnforceExample(e, "bob", "data1", "write", false)
+	testEnforceExample(e, "bob", "data2", "read", false)
+	testEnforceExample(e, "bob", "data2", "write", true)
+
+	fmt.Println("Success!")
+	// Output:
+	// Success!
 }
