@@ -510,4 +510,5 @@ func TestDomainMatchModel(t *testing.T) {
 	testDomainEnforce(t, e, "bob", "domain2", "data1", "write", false)
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
+
 }
