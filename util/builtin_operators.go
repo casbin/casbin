@@ -16,6 +16,7 @@ package util
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"regexp"
 	"strings"
@@ -210,6 +211,29 @@ func IPMatchFunc(args ...interface{}) (interface{}, error) {
 	return bool(IPMatch(ip1, ip2)), nil
 }
 
+// DomainMatch determines whether key1 matches the pattern of key2 , key2 can contain a *.
+// For example, "*::name" matches "domain::name"
+func DomainMatch(key1 string, key2 string) bool {
+	k1 := strings.Split(key1, "::")
+	k2 := strings.Split(key2, "::")
+	if k1[1] != k2[1] {
+		return false
+	}
+
+	if k1[0] == "*" || k2[0] == "*" {
+		return true
+	}
+
+	return k1[0] == k2[0]
+}
+
+// DomainMatchFunc is the wrapper for DomainMatch.
+func DomainMatchFunc(args ...interface{}) (interface{}, error) {
+	domain1 := args[0].(string)
+	domain2 := args[1].(string)
+	return bool(DomainMatch(domain1, domain2)), nil
+}
+
 // GenerateGFunction is the factory method of the g(_, _) function.
 func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 	return func(args ...interface{}) (interface{}, error) {
@@ -224,6 +248,7 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 		} else {
 			domain := args[2].(string)
 			res, _ := rm.HasLink(name1, name2, domain)
+			fmt.Print(res)
 			return res, nil
 		}
 	}

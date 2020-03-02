@@ -17,9 +17,9 @@ package casbin
 import (
 	"testing"
 
-	"github.com/casbin/casbin/v2/persist/file-adapter"
+	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
 	"github.com/casbin/casbin/v2/rbac"
-	"github.com/casbin/casbin/v2/rbac/default-role-manager"
+	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -495,4 +495,21 @@ func TestRBACModelInMultiLines(t *testing.T) {
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", false)
 	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
+func TestDomainMatchModel(t *testing.T) {
+	e, _ := NewEnforcer("examples/domainmatch_model.conf", "examples/domainmatch_policy.csv")
+	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("DomainMatch", util.DomainMatch)
+	// testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
+	// testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
+	// testDomainEnforce(t, e, "alice", "domain1", "data2", "read", false)
+	// testDomainEnforce(t, e, "alice", "domain1", "data2", "write", false)
+	// testDomainEnforce(t, e, "alice", "domain2", "data2", "read", true)
+	// testDomainEnforce(t, e, "alice", "domain2", "data2", "write", true)
+	// testDomainEnforce(t, e, "bob", "domain2", "data1", "read", false)
+	// testDomainEnforce(t, e, "bob", "domain2", "data1", "write", false)
+	// testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
+	// testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
+
+	testDomainEnforce(t, e, "bob", "domain3", "data3", "read", true)
 }

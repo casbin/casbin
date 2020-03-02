@@ -319,7 +319,7 @@ func (e *Enforcer) EnableLog(enable bool) {
 }
 
 // EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
-func (e *Enforcer) EnableAutoNotifyWatcher(enable bool)  {
+func (e *Enforcer) EnableAutoNotifyWatcher(enable bool) {
 	e.autoNotifyWatcher = enable
 }
 

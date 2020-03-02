@@ -21,6 +21,7 @@ import (
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
+	"github.com/casbin/casbin/v2/util"
 )
 
 type MatchingFunc func(arg1, arg2 string) bool
@@ -73,7 +74,7 @@ func (rm *RoleManager) createRole(name string) *Role {
 
 	if rm.hasPattern {
 		rm.allRoles.Range(func(key, value interface{}) bool {
-			if rm.matchingFunc(name, key.(string)) && name!=key.(string) {
+			if rm.matchingFunc(name, key.(string)) && name != key.(string) {
 				// Add new role to matching role
 				role1, _ := rm.allRoles.LoadOrStore(key.(string), newRole(key.(string)))
 				role.(*Role).addRole(role1.(*Role))
@@ -254,7 +255,7 @@ func (r *Role) deleteRole(role *Role) {
 }
 
 func (r *Role) hasRole(name string, hierarchyLevel int) bool {
-	if r.name == name {
+	if util.DomainMatch(r.name, name) {
 		return true
 	}
 
