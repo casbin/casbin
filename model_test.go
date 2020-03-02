@@ -475,7 +475,7 @@ func TestPriorityModel(t *testing.T) {
 	testEnforce(t, e, "bob", "data1", "read", false)
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", true)
-	testEnforce(t, e, "bob", "data2", "write", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
 func TestPriorityModelIndeterminate(t *testing.T) {
@@ -500,15 +500,28 @@ func TestRBACModelInMultiLines(t *testing.T) {
 func TestDomainMatchModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/domainmatch_model.conf", "examples/domainmatch_policy.csv")
 	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("DomainMatch", util.DomainMatch)
+
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
-	testDomainEnforce(t, e, "alice", "domain1", "data2", "read", false)
-	testDomainEnforce(t, e, "alice", "domain1", "data2", "write", false)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "read", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "write", true)
 	testDomainEnforce(t, e, "alice", "domain2", "data2", "read", true)
 	testDomainEnforce(t, e, "alice", "domain2", "data2", "write", true)
 	testDomainEnforce(t, e, "bob", "domain2", "data1", "read", false)
 	testDomainEnforce(t, e, "bob", "domain2", "data1", "write", false)
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
+}
+
+func TestAllMatch(t *testing.T) {
+	e, _ := NewEnforcer("examples/allmatch_model.conf", "examples/allmatch_policy.csv")
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", true)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
 
 }

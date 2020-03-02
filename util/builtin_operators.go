@@ -217,7 +217,7 @@ func AllMatch(key1 string, key2 string) bool {
 		return true
 	}
 
-	return false
+	return key1 == key2
 }
 
 // AllMatchFunc is the wrapper for AllMatch.
