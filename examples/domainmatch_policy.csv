@@ -5,3 +5,8 @@ p, admin, domain2, data2, write
 
 g, alice, admin, *
 g, bob, admin, domain2
+
+p, data3_admin, *, data3, read
+p, data3_admin, *, data3, write
+
+g, bob, data3_admin, domain3

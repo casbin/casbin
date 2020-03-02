@@ -16,7 +16,6 @@ package util
 
 import (
 	"errors"
-	"fmt"
 	"net"
 	"regexp"
 	"strings"
@@ -211,6 +210,24 @@ func IPMatchFunc(args ...interface{}) (interface{}, error) {
 	return bool(IPMatch(ip1, ip2)), nil
 }
 
+// AllMatch determines whether key1 matches the pattern of key2 , key2 can contain a *.
+// For example, "*" matches everything
+func AllMatch(key1 string, key2 string) bool {
+	if key1 == "*" || key2 == "*" {
+		return true
+	}
+
+	return false
+}
+
+// AllMatchFunc is the wrapper for AllMatch.
+func AllMatchFunc(args ...interface{}) (interface{}, error) {
+	name1 := args[0].(string)
+	name2 := args[1].(string)
+
+	return bool(AllMatch(name1, name2)), nil
+}
+
 // DomainMatch determines whether key1 matches the pattern of key2 , key2 can contain a *.
 // For example, "*::name" matches "domain::name"
 func DomainMatch(key1 string, key2 string) bool {
@@ -248,7 +265,6 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 		} else {
 			domain := args[2].(string)
 			res, _ := rm.HasLink(name1, name2, domain)
-			fmt.Print(res)
 			return res, nil
 		}
 	}
