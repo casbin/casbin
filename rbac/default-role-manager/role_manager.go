@@ -255,7 +255,7 @@ func (r *Role) deleteRole(role *Role) {
 }
 
 func (r *Role) hasRole(name string, hierarchyLevel int) bool {
-	if util.DomainMatch(r.name, name) {
+	if r.name == name {
 		return true
 	}
 
@@ -268,6 +268,10 @@ func (r *Role) hasRole(name string, hierarchyLevel int) bool {
 			return true
 		}
 	}
+	if strings.Index(name, "::") != -1 {
+		return util.DomainMatch(r.name, name)
+	}
+
 	return false
 }
 
