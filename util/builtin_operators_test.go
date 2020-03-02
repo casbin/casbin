@@ -180,7 +180,7 @@ func TestIPMatch(t *testing.T) {
 	testIPMatch(t, "11.0.0.123", "10.0.0.0/8", false)
 }
 
-func testDoaminMatch(t *testing.T, domain1 string, domian2 string, res bool) {
+func testDomainMatch(t *testing.T, domain1 string, domian2 string, res bool) {
 	t.Helper()
 	myRes := DomainMatch(domain1, domian2)
 	t.Logf("%s < %s: %t", domain1, domian2, myRes)
@@ -190,5 +190,8 @@ func testDoaminMatch(t *testing.T, domain1 string, domian2 string, res bool) {
 	}
 }
 func TestDoaminMatch(t *testing.T) {
-	testDoaminMatch(t, "*::name", "domain::name", true)
+	testDomainMatch(t, "*::name", "domain::name", true)
+	testDomainMatch(t, "domain::name", "domain::name", true)
+	testDomainMatch(t, "::name", "domain::name", false)
+	testDomainMatch(t, "domain1::name", "domain2::name", false)
 }
