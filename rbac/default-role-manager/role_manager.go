@@ -268,6 +268,11 @@ func (r *Role) hasRole(name string, hierarchyLevel int) bool {
 			return true
 		}
 	}
+
+	return r.hasDomainRole(name)
+}
+
+func (r *Role) hasDomainRole(name string) bool {
 	if strings.Index(name, "::") != -1 {
 		return util.DomainMatch(r.name, name)
 	}
