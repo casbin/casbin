@@ -58,6 +58,16 @@ func testPrintRoles(t *testing.T, rm rbac.RoleManager, name string, res []string
 	}
 }
 
+func testCheckLoop(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, res bool) {
+	role1, _ := rm.(*RoleManager).allRoles.LoadOrStore(name1, newRole(name1))
+	role2, _ := rm.(*RoleManager).allRoles.LoadOrStore(name2, newRole(name2))
+
+	myRes := rm.(*RoleManager).CheckLoop(role1.(*Role), role2.(*Role))
+
+	if myRes != res {
+		t.Errorf("%s < %s: %t, supposed to be %t", name1, name2, !res, res)
+	}
+}
 func TestRole(t *testing.T) {
 	rm := NewRoleManager(3)
 	rm.AddLink("u1", "g1")
@@ -233,6 +243,7 @@ func TestLoopRole(t *testing.T) {
 	rm := NewRoleManager(3)
 	testConflictRole(t, rm, "g1", "g2", true)
 	testConflictRole(t, rm, "u2", "g1", true)
+	testCheckLoop(t, rm, "u2", "g2", true)
 	testConflictRole(t, rm, "u2", "g2", false)
 	// Current role inheritance tree:
 	//  		     g2
@@ -245,6 +256,7 @@ func TestLoopRole(t *testing.T) {
 	testConflictRole(t, rm, "g2", "g1", true)
 	testConflictRole(t, rm, "g3", "g1", true)
 	testConflictRole(t, rm, "u1", "g1", true)
+	testCheckLoop(t, rm, "u1", "g3", true)
 	testConflictRole(t, rm, "u1", "g3", false)
 	// Current role inheritance tree:
 	//				 g1
@@ -252,4 +264,13 @@ func TestLoopRole(t *testing.T) {
 	//             g2  g3
 	//				\  /
 	//               u1
+
+	rm.Clear()
+	testConflictRole(t, rm, "u2", "g1", true)
+	testConflictRole(t, rm, "u2", "g2", true)
+	testConflictRole(t, rm, "g1", "g2", true)
+	// Current role inheritance tree:
+	//       g1   g2                  g1 - g2
+	//         \  /          ->       \    /
+	//          u1                      u1
 }
