@@ -241,7 +241,9 @@ func TestClear(t *testing.T) {
 
 func TestLoopRole(t *testing.T) {
 	rm := NewRoleManager(3)
+	testCheckLoop(t, rm, "g1", "g2", false)
 	testConflictRole(t, rm, "g1", "g2", true)
+	testCheckLoop(t, rm, "u2", "g1", false)
 	testConflictRole(t, rm, "u2", "g1", true)
 	testCheckLoop(t, rm, "u2", "g2", true)
 	testConflictRole(t, rm, "u2", "g2", false)
@@ -253,8 +255,11 @@ func TestLoopRole(t *testing.T) {
 	//               u2
 
 	rm.Clear()
+	testCheckLoop(t, rm, "g2", "g1", false)
 	testConflictRole(t, rm, "g2", "g1", true)
+	testCheckLoop(t, rm, "g3", "g1", false)
 	testConflictRole(t, rm, "g3", "g1", true)
+	testCheckLoop(t, rm, "u1", "g1", false)
 	testConflictRole(t, rm, "u1", "g1", true)
 	testCheckLoop(t, rm, "u1", "g3", true)
 	testConflictRole(t, rm, "u1", "g3", false)
@@ -266,8 +271,11 @@ func TestLoopRole(t *testing.T) {
 	//               u1
 
 	rm.Clear()
+	testCheckLoop(t, rm, "u2", "g1", false)
 	testConflictRole(t, rm, "u2", "g1", true)
+	testCheckLoop(t, rm, "u2", "g2", false)
 	testConflictRole(t, rm, "u2", "g2", true)
+	testCheckLoop(t, rm, "g1", "g2", false)
 	testConflictRole(t, rm, "g1", "g2", true)
 	// Current role inheritance tree:
 	//       g1   g2                  g1 - g2
