@@ -68,6 +68,14 @@ func testCheckLoop(t *testing.T, rm rbac.RoleManager, name1 string, name2 string
 		t.Errorf("%s < %s: %t, supposed to be %t", name1, name2, !res, res)
 	}
 }
+
+func testDeleteRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string) {
+	err := rm.DeleteLink(name1, name2)
+	if err != nil {
+		t.Errorf("%s < %s : %s, delete link wrong", name1, name2, err.Error())
+	}
+}
+
 func TestRole(t *testing.T) {
 	rm := NewRoleManager(3)
 	rm.AddLink("u1", "g1")
@@ -239,6 +247,40 @@ func TestClear(t *testing.T) {
 	testRole(t, rm, "u4", "g3", false)
 }
 
+func TestDeleteRole(t *testing.T) {
+	rm := NewRoleManager(3)
+	rm.AddLink("u1", "g1")
+	rm.AddLink("u2", "g1")
+	rm.AddLink("u3", "g2")
+	rm.AddLink("u4", "g2")
+	rm.AddLink("u4", "g3")
+	rm.AddLink("g1", "g3")
+
+	// Current role inheritance tree:
+	//             g3    g2
+	//            /  \  /  \
+	//          g1    u4    u3
+	//         /  \
+	//       u1    u2
+
+	testDeleteRole(t, rm, "g1", "g3")
+
+	// Current role inheritance tree:
+	//             g3    g2
+	//               \  /  \
+	//          g1    u4    u3
+	//         /  \
+	//       u1    u2
+
+	testDeleteRole(t, rm, "u4", "g3")
+
+	// Current role inheritance tree:
+	//             g3    g2
+	//                  /  \
+	//          g1    u4    u3
+	//         /  \
+	//       u1    u2
+}
 func TestLoopRole(t *testing.T) {
 	rm := NewRoleManager(3)
 	testCheckLoop(t, rm, "g1", "g2", false)
