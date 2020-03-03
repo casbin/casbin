@@ -229,12 +229,12 @@ func (rm *RoleManager) PrintRoles() error {
 
 // CheckLoop check if there are policy conflicts
 func (rm *RoleManager) CheckLoop(role1 *Role, role2 *Role) bool {
-	if ok, _ := rm.HasLink(role1.name, role2.name); ok {
+	if ok, _ := rm.HasLink(role2.name, role1.name); ok {
 		return true
 	}
 
 	for _, role := range role1.roles {
-		if rm.CheckLoop(role2, role) {
+		if rm.CheckLoop(role, role2) {
 			return true
 		}
 	}
