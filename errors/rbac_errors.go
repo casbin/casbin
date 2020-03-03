@@ -21,4 +21,5 @@ var (
 	ERR_NAME_NOT_FOUND    = errors.New("error: name does not exist")
 	ERR_DOMAIN_PARAMETER  = errors.New("error: domain should be 1 parameter")
 	ERR_NAMES12_NOT_FOUND = errors.New("error: name1 or name2 does not exist")
+	ERR_POLICY_CONFLICTS  = errors.New("error: policy has exists")
 )

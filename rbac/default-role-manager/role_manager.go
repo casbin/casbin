@@ -73,7 +73,7 @@ func (rm *RoleManager) createRole(name string) *Role {
 
 	if rm.hasPattern {
 		rm.allRoles.Range(func(key, value interface{}) bool {
-			if rm.matchingFunc(name, key.(string)) && name!=key.(string) {
+			if rm.matchingFunc(name, key.(string)) && name != key.(string) {
 				// Add new role to matching role
 				role1, _ := rm.allRoles.LoadOrStore(key.(string), newRole(key.(string)))
 				role.(*Role).addRole(role1.(*Role))
@@ -104,6 +104,11 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 
 	role1 := rm.createRole(name1)
 	role2 := rm.createRole(name2)
+
+	if rm.CheckLoop(role1, role2) {
+		return errors.ERR_POLICY_CONFLICTS
+	}
+
 	role1.addRole(role2)
 	return nil
 }
@@ -220,6 +225,21 @@ func (rm *RoleManager) PrintRoles() error {
 		log.LogPrint(sb.String())
 	}
 	return nil
+}
+
+// CheckLoop check if there are policy conflicts
+func (rm *RoleManager) CheckLoop(role1 *Role, role2 *Role) bool {
+	if ok, _ := rm.HasLink(role1.name, role2.name); ok {
+		return true
+	}
+
+	for _, role := range role1.roles {
+		if rm.CheckLoop(role2, role) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Role represents the data structure for a role in RBAC.

@@ -31,6 +31,13 @@ func testRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, res
 	}
 }
 
+func testConflictRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, ok bool) {
+	err := rm.AddLink(name1, name2)
+	if (ok && err != nil) || (!ok && err == nil) {
+		t.Errorf("%s, %s :Invalid conflict detection ", name1, name2)
+	}
+}
+
 func testDomainRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, domain string, res bool) {
 	t.Helper()
 	myRes, _ := rm.HasLink(name1, name2, domain)
@@ -220,4 +227,29 @@ func TestClear(t *testing.T) {
 	testRole(t, rm, "u4", "g1", false)
 	testRole(t, rm, "u4", "g2", false)
 	testRole(t, rm, "u4", "g3", false)
+}
+
+func TestLoopRole(t *testing.T) {
+	rm := NewRoleManager(3)
+	testConflictRole(t, rm, "g1", "g2", true)
+	testConflictRole(t, rm, "u2", "g1", true)
+	testConflictRole(t, rm, "u2", "g2", false)
+	// Current role inheritance tree:
+	//  		     g2
+	// 				/  \
+	//             g1   |
+	//				\  /
+	//               u2
+
+	rm.Clear()
+	testConflictRole(t, rm, "g2", "g1", true)
+	testConflictRole(t, rm, "g3", "g1", true)
+	testConflictRole(t, rm, "u1", "g1", true)
+	testConflictRole(t, rm, "u1", "g3", false)
+	// Current role inheritance tree:
+	//				 g1
+	//				/  \
+	//             g2  g3
+	//				\  /
+	//               u1
 }
