@@ -221,3 +221,31 @@ func TestClear(t *testing.T) {
 	testRole(t, rm, "u4", "g2", false)
 	testRole(t, rm, "u4", "g3", false)
 }
+
+func TestDomainPartternRole(t *testing.T) {
+	rm := NewRoleManager(10)
+	rm.Clear()
+	rm.(*RoleManager).AddMatchingFunc("DomainMatch", util.DomainMatch)
+	rm.AddLink("u1", "g1", "domain1")
+	rm.AddLink("u2", "g1", "domain2")
+	rm.AddLink("u3", "g1", "*")
+	rm.AddLink("u4", "g2", "domain3")
+	// Current role inheritance tree after deleting the links:
+	//       domain1:g1    domain2:g1			domain3:g2
+	//		   /      \    /      \					|
+	//	 domain1:u1    *:g1     domain2:u2		domain3:u4
+	// 					|
+	// 				   *:u3
+	testDomainRole(t, rm, "u1", "g1", "domain1", true)
+	testDomainRole(t, rm, "u2", "g1", "domain1", false)
+	testDomainRole(t, rm, "u2", "g1", "domain2", true)
+	testDomainRole(t, rm, "u3", "g1", "domain1", true)
+	testDomainRole(t, rm, "u1", "g2", "domain1", false)
+	testDomainRole(t, rm, "u4", "g2", "domain3", true)
+	testDomainRole(t, rm, "u3", "g2", "domain3", false)
+	// use * when querying permissions，it will return true always, so I forbid to use * for query in domain
+	testDomainRole(t, rm, "u3", "g2", "*", false)
+	testDomainRole(t, rm, "u3", "g1", "*", false)
+	testDomainRole(t, rm, "u2", "g1", "*", false)
+	testDomainRole(t, rm, "u3", "g1", "*", false)
+}

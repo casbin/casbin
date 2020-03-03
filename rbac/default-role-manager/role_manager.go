@@ -133,11 +133,8 @@ func (rm *RoleManager) DeleteLink(name1 string, name2 string, domain ...string) 
 // HasLink determines whether role: name1 inherits role: name2.
 // domain is a prefix to the roles.
 func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bool, error) {
-	if len(domain) == 1 {
-		name1 = domain[0] + "::" + name1
-		name2 = domain[0] + "::" + name2
-	} else if len(domain) > 1 {
-		return false, errors.ERR_DOMAIN_PARAMETER
+	if len(domain) >= 1 {
+		return rm.hasDomainLink(name1, name2, domain...)
 	}
 
 	if name1 == name2 {
@@ -223,6 +220,26 @@ func (rm *RoleManager) PrintRoles() error {
 	return nil
 }
 
+func (rm *RoleManager) hasDomainLink(name1 string, name2 string, domain ...string) (bool, error) {
+	if len(domain) > 1 {
+		return false, errors.ERR_DOMAIN_PARAMETER
+	}
+
+	if domain[0] == "*" {
+		return false, errors.ERR_DOMAIN_PARAMETER
+	}
+
+	name1 = domain[0] + "::" + name1
+	name2 = domain[0] + "::" + name2
+
+	if !rm.hasRole(name1) || !rm.hasRole(name2) {
+		return false, nil
+	}
+
+	role1 := rm.createRole(name1)
+	return role1.hasDomainRole(name2, rm.maxHierarchyLevel), nil
+}
+
 // Role represents the data structure for a role in RBAC.
 type Role struct {
 	name  string
@@ -269,15 +286,25 @@ func (r *Role) hasRole(name string, hierarchyLevel int) bool {
 		}
 	}
 
-	return r.hasDomainRole(name)
+	return false
 }
 
-func (r *Role) hasDomainRole(name string) bool {
-	if strings.Index(name, "::") != -1 {
-		return util.DomainMatch(r.name, name)
+func (r *Role) hasDomainRole(name string, hierarchyLevel int) bool {
+	if r.name == name {
+		return true
 	}
 
-	return false
+	if hierarchyLevel <= 0 {
+		return false
+	}
+
+	for _, role := range r.roles {
+		if role.hasDomainRole(name, hierarchyLevel-1) {
+			return true
+		}
+	}
+
+	return util.DomainMatch(r.name, name)
 }
 
 func (r *Role) hasDirectRole(name string) bool {
