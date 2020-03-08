@@ -73,7 +73,7 @@ func (rm *RoleManager) createRole(name string) *Role {
 
 	if rm.hasPattern {
 		rm.allRoles.Range(func(key, value interface{}) bool {
-			if rm.matchingFunc(name, key.(string)) && name!=key.(string) {
+			if rm.matchingFunc(name, key.(string)) && name != key.(string) {
 				// Add new role to matching role
 				role1, _ := rm.allRoles.LoadOrStore(key.(string), newRole(key.(string)))
 				role.(*Role).addRole(role1.(*Role))
@@ -145,6 +145,10 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 
 	if !rm.hasRole(name1) || !rm.hasRole(name2) {
 		return false, nil
+	}
+
+	if _, ok := rm.allRoles.Load(name1); !ok {
+		defer rm.allRoles.Delete(name1)
 	}
 
 	role1 := rm.createRole(name1)
