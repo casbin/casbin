@@ -102,6 +102,13 @@ func (e *SyncedEnforcer) LoadPolicy() error {
 	return e.Enforcer.LoadPolicy()
 }
 
+// LoadFilteredPolicy reloads a filtered policy from file/database.
+func (e *SyncedEnforcer) LoadFilteredPolicy(filter interface{}) error {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.LoadFilteredPolicy(filter)
+}
+
 // SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
 func (e *SyncedEnforcer) SavePolicy() error {
 	e.m.RLock()
