@@ -145,6 +145,16 @@ func testHasPermission(t *testing.T, e *Enforcer, name string, permission []stri
 	}
 }
 
+func testHasPermissionAmongUsers(t *testing.T, e*Enforcer, names []string, permission []string, res bool) {
+  t.Helper()
+  myRes := e.HasPermissionAmongUsers(names, permission...)
+  t.Log("One of ", util.ArrayToString(names), " has permission ", util.ArrayToString(permission), ": ", myRes)
+
+  if res != myRes {
+    t.Error("One of ", util.ArrayToString(names), " has permission ", util.ArrayToString(permission), ": ", myRes, ", supposed to be ", res)
+  }
+}
+
 func TestPermissionAPI(t *testing.T) {
 	e, _ := NewEnforcer("examples/basic_without_resources_model.conf", "examples/basic_without_resources_policy.csv")
 
@@ -160,6 +170,12 @@ func TestPermissionAPI(t *testing.T) {
 	testHasPermission(t, e, "alice", []string{"write"}, false)
 	testHasPermission(t, e, "bob", []string{"read"}, false)
 	testHasPermission(t, e, "bob", []string{"write"}, true)
+
+  testHasPermissionAmongUsers(t, e, []string{"alice"}, []string{"write"}, false)
+	testHasPermissionAmongUsers(t, e, []string{"alice", "carol"}, []string{"write"}, false)
+	testHasPermissionAmongUsers(t, e, []string{"alice", "bob"}, []string{"write"}, true)
+	testHasPermissionAmongUsers(t, e, []string{"alice", "bob"}, []string{"read"}, true)
+
 
 	e.DeletePermission("read")
 
@@ -188,6 +204,16 @@ func TestPermissionAPI(t *testing.T) {
 	testEnforceWithoutUsers(t, e, "alice", "write", false)
 	testEnforceWithoutUsers(t, e, "bob", "read", false)
 	testEnforceWithoutUsers(t, e, "bob", "write", false)
+}
+
+func testHasImplicitPermissionForUser(t *testing.T, e *Enforcer, name string, permission []string, res bool) {
+  t.Helper()
+  myRes, _ := e.HasImplicitPermissionForUser(name, permission...)
+  t.Log(name, " has permission ", util.ArrayToString(permission), ": ", myRes)
+
+  if res != myRes {
+    t.Error(name, " has permission ", util.ArrayToString(permission), ": ", myRes, ", supposed to be ", res)
+  }
 }
 
 func testGetImplicitRoles(t *testing.T, e *Enforcer, name string, res []string) {
@@ -219,6 +245,9 @@ func TestImplicitRoleAPI(t *testing.T) {
 	testGetImplicitRoles(t, e, "alice", []string{"admin", "data1_admin", "data2_admin"})
 	testGetImplicitRoles(t, e, "bob", []string{})
 
+  testHasImplicitPermissionForUser(t, e, "alice", []string{"data2", "read"}, true)
+  testHasImplicitPermissionForUser(t, e, "bob", []string{"data2", "read"}, false)
+
 	e, _ = NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
 
 	e.GetRoleManager().(*defaultrolemanager.RoleManager).AddMatchingFunc("matcher", util.KeyMatch)
@@ -229,6 +258,9 @@ func TestImplicitRoleAPI(t *testing.T) {
 
 	testGetImplicitRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin", "/book/*", "book_group"})
 	testGetRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin"})
+
+  testHasImplicitPermissionForUser(t, e, "cathy", []string{"pen_group", "GET"}, true)
+  testHasImplicitPermissionForUser(t, e, "cathy", []string{"book_group", "GET"}, false)
 }
 
 func testGetImplicitPermissions(t *testing.T, e *Enforcer, name string, res [][]string) {

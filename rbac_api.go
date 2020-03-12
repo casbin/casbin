@@ -127,6 +127,26 @@ func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool 
 	return e.HasPolicy(util.JoinSlice(user, permission...))
 }
 
+// HasImplicitPermissionForUser determines whtether a user has a permission implicitly
+// If use model with domain, please call HasImplicitPermissionForUserInDomain
+func (e *Enforcer) HasImplicitPermissionForUser(user string, permission ...string) (bool, error) {
+  if users, err := e.GetImplicitRolesForUser(user); err != nil {
+    return false, err
+  } else {
+    return e.HasPermissionAmongUsers(users, permission...), nil
+  }
+}
+
+// HasPermissionInUsers will determines if one of the users has a permission
+func (e *Enforcer) HasPermissionAmongUsers(users []string, permission ...string) bool {
+  for _, user := range users {
+    if e.HasPermissionForUser(user, permission...) {
+      return true
+    }
+  }
+  return false
+}
+
 // GetImplicitRolesForUser gets implicit roles that a user has.
 // Compared to GetRolesForUser(), this function retrieves indirect roles besides direct roles.
 // For example:

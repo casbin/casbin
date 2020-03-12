@@ -42,3 +42,24 @@ func (e *Enforcer) AddRoleForUserInDomain(user string, role string, domain strin
 func (e *Enforcer) DeleteRoleForUserInDomain(user string, role string, domain string) (bool, error) {
 	return e.RemoveGroupingPolicy(user, role, domain)
 }
+
+// HasImplicitPermissionForUserInDomain determines whether a user has a permission implicitly
+// Because we have no idea which param in permission is domain, user has to provide it manually
+func (e *Enforcer) HasImplicitPermissionForUserInDomain(user string, domain string, permission ...string) (bool, error) {
+  sameDomain := false
+  for _, param := range permission {
+    if domain == param {
+      sameDomain = true
+      break
+    }
+  }
+  if !sameDomain {
+    return false, nil
+  }
+  if users, err := e.GetImplicitRolesForUser(user, domain); err != nil {
+    return false, err
+  } else {
+    users = append(users, user)
+    return e.HasPermissionAmongUsers(users, permission...), nil
+  }
+}

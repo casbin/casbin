@@ -41,6 +41,16 @@ func testGetRolesInDomain(t *testing.T, e *Enforcer, name string, domain string,
 	}
 }
 
+func testHasImplicitPermissionForUserInDomain(t *testing.T, e *Enforcer, name string, domain string, permission []string, res bool) {
+	t.Helper()
+	myRes, _ := e.HasImplicitPermissionForUserInDomain(name, domain, permission...)
+	t.Log("Implicit Permission ", util.ArrayToString(permission), " for ", name, " under ", domain, ": ", myRes)
+
+	if res != myRes {
+	  t.Error("Implicit Permission ", util.ArrayToString(permission) , name, " under ", domain, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func TestGetImplicitRolesForDomainUser(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_hierarchy_with_domains_policy.csv")
 
@@ -83,6 +93,10 @@ func TestRoleAPIWithDomains(t *testing.T) {
 	testGetRolesInDomain(t, e, "bob", "domain2", []string{"admin"})
 	testGetRolesInDomain(t, e, "admin", "domain2", []string{})
 	testGetRolesInDomain(t, e, "non_exist", "domain2", []string{})
+
+  testHasImplicitPermissionForUserInDomain(t, e, "alice", "domain1", []string{"domain1", "data1", "read"}, true)
+  testHasImplicitPermissionForUserInDomain(t, e, "alice", "domain1", []string{"domain2", "data2", "read"}, false)
+  testHasImplicitPermissionForUserInDomain(t, e, "alice", "domain2", []string{"domain2", "data2", "read"}, false)
 
 	e.DeleteRoleForUserInDomain("alice", "admin", "domain1")
 	e.AddRoleForUserInDomain("bob", "admin", "domain1")
