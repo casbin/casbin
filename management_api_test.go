@@ -154,6 +154,24 @@ func TestModifyPolicyAPI(t *testing.T) {
 	e.AddPolicy("eve", "data3", "read")
 	e.AddPolicy("eve", "data3", "read")
 
+	rule1 := []interface{} {"jack", "data4", "read"}
+	rule2 := []interface{} {"katy", "data4", "write"}
+	rule3 := []interface{} {"leyo", "data4", "read"}
+	rule4 := []interface{} {"ham", "data4", "write"}
+
+	e.AddPolicies(rule1, rule2, rule3, rule4)
+
+	testGetPolicy(t, e, [][]string{
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+		{"eve", "data3", "read"},
+		{"jack", "data4", "read"},
+		{"katy", "data4", "write"},
+		{"leyo", "data4", "read"},
+		{"ham", "data4", "write"}})
+
+	e.RemovePolicies(rule1, rule2, rule3, rule4)
+
 	namedPolicy := []string{"eve", "data3", "read"}
 	e.RemoveNamedPolicy("p", namedPolicy)
 	e.AddNamedPolicy("p", namedPolicy)
