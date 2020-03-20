@@ -46,9 +46,15 @@ type Adapter interface {
 	// AddPolicy adds a policy rule to the storage.
 	// This is part of the Auto-Save feature.
 	AddPolicy(sec string, ptype string, rule []string) error
+	// AddPolicies adds policy rules to the storage.
+	// This is part of the Auto-Save feature.
+	AddPolicies(secs []string, ptypes []string, rules [][]string) []error
 	// RemovePolicy removes a policy rule from the storage.
 	// This is part of the Auto-Save feature.
 	RemovePolicy(sec string, ptype string, rule []string) error
+	// RemovePolicies removes policy rules from the storage.
+	// This is part of the Auto-Save feature.
+	RemovePolicies(secs []string, ptypes []string, rules [][]string) []error
 	// RemoveFilteredPolicy removes policy rules that match the filter from the storage.
 	// This is part of the Auto-Save feature.
 	RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error

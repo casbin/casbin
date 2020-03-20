@@ -43,6 +43,41 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 	return ruleAdded, nil
 }
 
+// addPolicies adds rules to the current policy.
+// removePolicies removes rules from the current policy.
+func (e *Enforcer) addPolicies(secs []string, ptypes []string, rules [][]string) ([]bool, []error) {
+	rulesAdded := e.model.AddPolicies(secs, ptypes, rules)
+	errs := make([]error, len(rulesAdded))
+	for i, isRuleAdded := range rulesAdded {
+		if !isRuleAdded {
+			errs[i] = nil
+		}
+	}
+
+	if e.adapter != nil && e.autoSave {
+		newErrs := e.adapter.AddPolicies(secs, ptypes, rules)
+		for i, err := range newErrs {
+			if err != nil {
+				if err.Error() != notImplemented {
+					errs[i] = err
+				}
+			}
+		}
+		return rulesAdded, errs
+	}
+
+	if e.watcher !=nil && e.autoNotifyWatcher {
+		err := e.watcher.Update()
+		if err != nil {
+			for i := range rulesAdded {
+				errs[i] = err
+			}
+		}
+	}
+
+	return rulesAdded, errs
+}
+
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
 	ruleRemoved := e.model.RemovePolicy(sec, ptype, rule)
@@ -66,6 +101,40 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 	}
 
 	return ruleRemoved, nil
+}
+
+// removePolicies removes rules from the current policy.
+func (e *Enforcer) removePolicies(secs []string, ptypes []string, rules [][]string) ([]bool, []error) {
+	rulesRemoved := e.model.RemovePolicies(secs, ptypes, rules)
+	errs := make([]error, len(rulesRemoved))
+	for i, isRuleRemoved := range rulesRemoved {
+		if !isRuleRemoved {
+			errs[i] = nil
+		}
+	}
+
+	if e.adapter != nil && e.autoSave {
+		newErrs := e.adapter.RemovePolicies(secs, ptypes, rules)
+		for i, err := range newErrs {
+			if err != nil {
+				if err.Error() != notImplemented {
+					errs[i] = err
+				}
+			}
+		}
+		return rulesRemoved, errs
+	}
+
+	if e.watcher !=nil && e.autoNotifyWatcher {
+		err := e.watcher.Update()
+		if err != nil {
+			for i := range rulesRemoved {
+				errs[i] = err
+			}
+		}
+	}
+
+	return rulesRemoved, errs
 }
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.

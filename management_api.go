@@ -125,17 +125,12 @@ func (e *Enforcer) AddPolicy(params ...interface{}) (bool, error) {
 // AddPolicies adds authorization rules to the current policy.
 // If the rule already exists, the function returns false for the corresponding rule and the rule will not be added.
 // Otherwise the function returns true for the corresponding rule by adding the new rule.
-func (e *Enforcer) AddPolicies(rules ...interface{}) [][] interface{} {
-	results := make([][] interface{}, 0)
-	for _, ruleParams := range rules {
-		status, err := e.AddNamedPolicy("p", ruleParams.([] interface{})...)
-		
-		result := make([]interface{}, 0)
-		result = append(result, status, err)
-
-		results = append(results, result)
+func (e *Enforcer) AddPolicies(rules [][]string) ([]bool, []error) {
+	ptypes := make([]string, 0)
+	for range rules {
+		ptypes = append(ptypes, "p")
 	}
-	return results
+	return e.AddNamedPolicies(ptypes, rules)
 }
 
 // AddNamedPolicy adds an authorization rule to the current named policy.
@@ -153,23 +148,29 @@ func (e *Enforcer) AddNamedPolicy(ptype string, params ...interface{}) (bool, er
 	return e.addPolicy("p", ptype, policy)
 }
 
+// AddNamedPolicies adds authorization rules to the current named policy.
+// If the rule already exists, the function returns false for the corresponding rule and the rule will not be added.
+// Otherwise the function returns true for the corresponding by adding the new rule.
+func (e *Enforcer) AddNamedPolicies(ptypes []string, rules [][] string) ([]bool, []error) {
+	secs := make([]string, 0)
+	for range ptypes {
+		secs = append(secs, "p")
+	}
+	return e.addPolicies(secs, ptypes, rules)
+}
+
 // RemovePolicy removes an authorization rule from the current policy.
 func (e *Enforcer) RemovePolicy(params ...interface{}) (bool, error) {
 	return e.RemoveNamedPolicy("p", params...)
 }
 
 // RemovePolicies removes authorization rules from the current policy.
-func (e *Enforcer) RemovePolicies(rules ...interface{}) [][] interface{} {
-	results := make([][] interface{}, 0)
-	for _, ruleParams := range rules {
-		status, err := e.RemoveNamedPolicy("p", ruleParams.([] interface{})...)
-		
-		result := make([]interface{}, 0)
-		result = append(result, status, err)
-
-		results = append(results, result)
+func (e *Enforcer) RemovePolicies(rules [][]string) ([]bool, []error) {
+	ptypes := make([]string, 0)
+	for range rules {
+		ptypes = append(ptypes, "p")
 	}
-	return results
+	return e.RemoveNamedPolicies(ptypes, rules)
 }
 
 // RemoveFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
@@ -188,6 +189,15 @@ func (e *Enforcer) RemoveNamedPolicy(ptype string, params ...interface{}) (bool,
 	}
 
 	return e.removePolicy("p", ptype, policy)
+}
+
+// RemoveNamedPolicies removes authorization rules from the current named policy.
+func (e *Enforcer) RemoveNamedPolicies(ptypes []string, rules [][] string) ([]bool, []error) {
+	secs := make([]string, 0)
+	for range ptypes {
+		secs = append(secs, "p")
+	}
+	return e.removePolicies(secs, ptypes, rules)
 }
 
 // RemoveFilteredNamedPolicy removes an authorization rule from the current named policy, field filters can be specified.

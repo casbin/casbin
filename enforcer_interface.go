@@ -89,12 +89,14 @@ type IEnforcer interface {
 	HasPolicy(params ...interface{}) bool
 	HasNamedPolicy(ptype string, params ...interface{}) bool
 	AddPolicy(params ...interface{}) (bool, error)
-	AddPolicies(rules ...interface{}) [][]interface{}
+	AddPolicies(rules [][]string) ([]bool, []error)
 	AddNamedPolicy(ptype string, params ...interface{}) (bool, error)
+	AddNamedPolicies(ptypes []string, rules [][]string) ([]bool, []error)
 	RemovePolicy(params ...interface{}) (bool, error)
-	RemovePolicies(rules ...interface{}) [][]interface{}
+	RemovePolicies(rules [][]string) ([]bool, []error)
 	RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) (bool, error)
 	RemoveNamedPolicy(ptype string, params ...interface{}) (bool, error)
+	RemoveNamedPolicies(ptypes []string, rules [][]string) ([]bool, []error)
 	RemoveFilteredNamedPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error)
 	HasGroupingPolicy(params ...interface{}) bool
 	HasNamedGroupingPolicy(ptype string, params ...interface{}) bool
