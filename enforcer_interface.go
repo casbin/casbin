@@ -89,8 +89,10 @@ type IEnforcer interface {
 	HasPolicy(params ...interface{}) bool
 	HasNamedPolicy(ptype string, params ...interface{}) bool
 	AddPolicy(params ...interface{}) (bool, error)
+	AddPolicies(rules ...interface{}) [][]interface{}
 	AddNamedPolicy(ptype string, params ...interface{}) (bool, error)
 	RemovePolicy(params ...interface{}) (bool, error)
+	RemovePolicies(rules ...interface{}) [][]interface{}
 	RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) (bool, error)
 	RemoveNamedPolicy(ptype string, params ...interface{}) (bool, error)
 	RemoveFilteredNamedPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error)
