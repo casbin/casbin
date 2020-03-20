@@ -179,3 +179,163 @@ func TestIPMatch(t *testing.T) {
 	testIPMatch(t, "10.0.0.11", "10.0.0.0/8", true)
 	testIPMatch(t, "11.0.0.123", "10.0.0.0/8", false)
 }
+
+func testRegexMatchFunc(t *testing.T, res bool, err string, args ...interface{}) {
+	t.Helper()
+	myRes, myErr := RegexMatchFunc(args...)
+	myErrStr := ""
+
+	if myErr != nil {
+		myErrStr = myErr.Error()
+	}
+
+	if myRes != res || err != myErrStr {
+		t.Errorf("%v returns %v %v, supposed to be %v %v", args, myRes, myErr, res, err)
+	}
+}
+
+func testKeyMatchFunc(t *testing.T, res bool, err string, args ...interface{}) {
+	t.Helper()
+	myRes, myErr := KeyMatchFunc(args...)
+	myErrStr := ""
+
+	if myErr != nil {
+		myErrStr = myErr.Error()
+	}
+
+	if myRes != res || err != myErrStr {
+		t.Errorf("%v returns %v %v, supposed to be %v %v", args, myRes, myErr, res, err)
+	}
+}
+
+func testKeyMatch2Func(t *testing.T, res bool, err string, args ...interface{}) {
+	t.Helper()
+	myRes, myErr := KeyMatch2Func(args...)
+	myErrStr := ""
+
+	if myErr != nil {
+		myErrStr = myErr.Error()
+	}
+
+	if myRes != res || err != myErrStr {
+		t.Errorf("%v returns %v %v, supposed to be %v %v", args, myRes, myErr, res, err)
+	}
+}
+
+func testKeyMatch3Func(t *testing.T, res bool, err string, args ...interface{}) {
+	t.Helper()
+	myRes, myErr := KeyMatch3Func(args...)
+	myErrStr := ""
+
+	if myErr != nil {
+		myErrStr = myErr.Error()
+	}
+
+	if myRes != res || err != myErrStr {
+		t.Errorf("%v returns %v %v, supposed to be %v %v", args, myRes, myErr, res, err)
+	}
+}
+
+func testKeyMatch4Func(t *testing.T, res bool, err string, args ...interface{}) {
+	t.Helper()
+	myRes, myErr := KeyMatch4Func(args...)
+	myErrStr := ""
+
+	if myErr != nil {
+		myErrStr = myErr.Error()
+	}
+
+	if myRes != res || err != myErrStr {
+		t.Errorf("%v returns %v %v, supposed to be %v %v", args, myRes, myErr, res, err)
+	}
+}
+
+func testIPMatchFunc(t *testing.T, res bool, err string, args ...interface{}) {
+	t.Helper()
+	myRes, myErr := IPMatchFunc(args...)
+	myErrStr := ""
+
+	if myErr != nil {
+		myErrStr = myErr.Error()
+	}
+
+	if myRes != res || err != myErrStr {
+		t.Errorf("%v returns %v %v, supposed to be %v %v", args, myRes, myErr, res, err)
+	}
+}
+
+func TestRegexMatchFunc(t *testing.T) {
+	testRegexMatchFunc(t, false, "regexMatch: Expected 2 arguments, but got 1", "/topic/create")
+	testRegexMatchFunc(t, false, "regexMatch: Expected 2 arguments, but got 3", "/topic/create/123", "/topic/create", "/topic/update")
+	testRegexMatchFunc(t, false, "regexMatch: Argument must be a string", "/topic/create", false)
+	testRegexMatchFunc(t, true, "", "/topic/create/123", "/topic/create")
+}
+
+func TestKeyMatchFunc(t *testing.T) {
+	testKeyMatchFunc(t, false, "keyMatch: Expected 2 arguments, but got 1", "/foo")
+	testKeyMatchFunc(t, false, "keyMatch: Expected 2 arguments, but got 3", "/foo/create/123", "/foo/*", "/foo/update/123")
+	testKeyMatchFunc(t, false, "keyMatch: Argument must be a string", "/foo", true)
+	testKeyMatchFunc(t, false, "", "/foo/bar", "/foo")
+	testKeyMatchFunc(t, true, "", "/foo/bar", "/foo/*")
+	testKeyMatchFunc(t, true, "", "/foo/bar", "/foo*")
+}
+
+func TestKeyMatch2Func(t *testing.T) {
+	testKeyMatch2Func(t, false, "keyMatch2: Expected 2 arguments, but got 1", "/")
+	testKeyMatch2Func(t, false, "keyMatch2: Expected 2 arguments, but got 3", "/foo/create/123", "/*", "/foo/update/123")
+	testKeyMatch2Func(t, false, "keyMatch2: Argument must be a string", "/foo", true)
+
+	testKeyMatch2Func(t, false, "", "/", "/:resource")
+	testKeyMatch2Func(t, true, "", "/resource1", "/:resource")
+
+	testKeyMatch2Func(t, true, "", "/foo", "/foo")
+	testKeyMatch2Func(t, true, "", "/foo", "/foo*")
+	testKeyMatch2Func(t, false, "", "/foo", "/foo/*")
+}
+
+func TestKeyMatch3Func(t *testing.T) {
+	testKeyMatch3Func(t, false, "keyMatch3: Expected 2 arguments, but got 1", "/")
+	testKeyMatch3Func(t, false, "keyMatch3: Expected 2 arguments, but got 3", "/foo/create/123", "/*", "/foo/update/123")
+	testKeyMatch3Func(t, false, "keyMatch3: Argument must be a string", "/foo", true)
+
+	testKeyMatch3Func(t, true, "", "/foo", "/foo")
+	testKeyMatch3Func(t, true, "", "/foo", "/foo*")
+	testKeyMatch3Func(t, false, "", "/foo", "/foo/*")
+	testKeyMatch3Func(t, false, "", "/foo/bar", "/foo")
+	testKeyMatch3Func(t, false, "", "/foo/bar", "/foo*")
+	testKeyMatch3Func(t, true, "", "/foo/bar", "/foo/*")
+	testKeyMatch3Func(t, false, "", "/foobar", "/foo")
+	testKeyMatch3Func(t, false, "", "/foobar", "/foo*")
+	testKeyMatch3Func(t, false, "", "/foobar", "/foo/*")
+
+	testKeyMatch3Func(t, false, "", "/", "/{resource}")
+	testKeyMatch3Func(t, true, "", "/resource1", "/{resource}")
+	testKeyMatch3Func(t, false, "", "/myid", "/{id}/using/{resId}")
+	testKeyMatch3Func(t, true, "", "/myid/using/myresid", "/{id}/using/{resId}")
+
+	testKeyMatch3Func(t, false, "", "/proxy/myid", "/proxy/{id}/*")
+	testKeyMatch3Func(t, true, "", "/proxy/myid/", "/proxy/{id}/*")
+	testKeyMatch3Func(t, true, "", "/proxy/myid/res", "/proxy/{id}/*")
+	testKeyMatch3Func(t, true, "", "/proxy/myid/res/res2", "/proxy/{id}/*")
+	testKeyMatch3Func(t, true, "", "/proxy/myid/res/res2/res3", "/proxy/{id}/*")
+	testKeyMatch3Func(t, false, "", "/proxy/", "/proxy/{id}/*")
+}
+
+func TestKeyMatch4Func(t *testing.T) {
+	testKeyMatch4Func(t, false, "keyMatch4: Expected 2 arguments, but got 1", "/parent/123/child/123")
+	testKeyMatch4Func(t, false, "keyMatch4: Expected 2 arguments, but got 3", "/parent/123/child/123", "/parent/{id}/child/{id}", true)
+	testKeyMatch4Func(t, false, "keyMatch4: Argument must be a string", "/parent/123/child/123", true)
+
+	testKeyMatch4Func(t, true, "", "/parent/123/child/123", "/parent/{id}/child/{id}")
+	testKeyMatch4Func(t, false, "", "/parent/123/child/456", "/parent/{id}/child/{id}")
+
+	testKeyMatch4Func(t, true, "", "/parent/123/child/123", "/parent/{id}/child/{another_id}")
+	testKeyMatch4Func(t, true, "", "/parent/123/child/456", "/parent/{id}/child/{another_id}")
+
+}
+
+func TestIPMatchFunc(t *testing.T) {
+	testIPMatchFunc(t, false, "ipMatch: Expected 2 arguments, but got 1", "192.168.2.123")
+	testIPMatchFunc(t, false, "ipMatch: Argument must be a string", "192.168.2.123", 128)
+	testIPMatchFunc(t, true, "", "192.168.2.123", "192.168.2.0/24")
+}
