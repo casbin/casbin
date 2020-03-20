@@ -319,7 +319,7 @@ func (e *Enforcer) EnableLog(enable bool) {
 }
 
 // EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
-func (e *Enforcer) EnableAutoNotifyWatcher(enable bool)  {
+func (e *Enforcer) EnableAutoNotifyWatcher(enable bool) {
 	e.autoNotifyWatcher = enable
 }
 
@@ -344,10 +344,10 @@ func (e *Enforcer) BuildRoleLinks() error {
 }
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
-func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (bool, error) {
+func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (isOk bool, err error) {
 	defer func() {
-		if err := recover(); err != nil {
-			fmt.Errorf("panic: %v", err)
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic: %v", r)
 		}
 	}()
 
