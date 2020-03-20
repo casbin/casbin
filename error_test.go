@@ -134,6 +134,21 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err.Error())
 	}
 
+	rules := [][]string {
+			{"admin", "domain3", "data1", "read"},
+	}
+
+	_, errArr1 := e.AddPolicies(rules)
+
+	for _, err := range errArr1{
+		if err == nil {
+			t.Errorf("Should be an error here.")
+		} else {
+			t.Log("Test on error: ")
+			t.Log(err.Error())
+		}
+	}
+
 	_, err2 := e.RemoveFilteredPolicy(1, "domain1", "data1")
 
 	if err2 == nil {
@@ -152,6 +167,20 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err3.Error())
 	}
 
+	rules = [][]string {
+		{"admin", "domain2", "data2", "read"},
+	}
+
+	_, errArr2 := e.RemovePolicies(rules)
+
+	for _, err := range errArr2{
+		if err == nil {
+			t.Errorf("Should be an error here.")
+		} else {
+			t.Log("Test on error: ")
+			t.Log(err.Error())
+		}
+	}
 	_, err4 := e.AddGroupingPolicy("bob", "admin2")
 
 	if err4 == nil {
