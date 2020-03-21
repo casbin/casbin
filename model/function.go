@@ -37,6 +37,7 @@ func LoadFunctionMap() FunctionMap {
 	fm.AddFunction("keyMatch4", util.KeyMatch4Func)
 	fm.AddFunction("regexMatch", util.RegexMatchFunc)
 	fm.AddFunction("ipMatch", util.IPMatchFunc)
+	fm.AddFunction("globMatch", util.GlobMatchFunc)
 
 	return fm
 }

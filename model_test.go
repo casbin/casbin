@@ -17,9 +17,9 @@ package casbin
 import (
 	"testing"
 
-	"github.com/casbin/casbin/v2/persist/file-adapter"
+	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
 	"github.com/casbin/casbin/v2/rbac"
-	"github.com/casbin/casbin/v2/rbac/default-role-manager"
+	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -463,6 +463,25 @@ func TestIPMatchModel(t *testing.T) {
 	testEnforce(t, e, "192.168.0.1", "data1", "write", false)
 	testEnforce(t, e, "192.168.0.1", "data2", "read", false)
 	testEnforce(t, e, "192.168.0.1", "data2", "write", false)
+}
+
+func TestGlobMatchModel(t *testing.T) {
+	e, _ := NewEnforcer("examples/glob_model.conf", "examples/glob_policy.csv")
+	testEnforce(t, e, "u1", "/foo/", "read", true)
+	testEnforce(t, e, "u1", "/foo", "read", false)
+	testEnforce(t, e, "u1", "/foo/subprefix", "read", true)
+	testEnforce(t, e, "u1", "foo", "read", false)
+
+	testEnforce(t, e, "u2", "/foosubprefix", "read", true)
+	testEnforce(t, e, "u2", "/foo/subprefix", "read", false)
+	testEnforce(t, e, "u2", "foo", "read", false)
+
+	testEnforce(t, e, "u3", "/prefix/foo/subprefix", "read", true)
+	testEnforce(t, e, "u3", "/prefix/foo/", "read", true)
+	testEnforce(t, e, "u3", "/prefix/foo", "read", false)
+
+	testEnforce(t, e, "u4", "/foo", "read", false)
+	testEnforce(t, e, "u4", "foo", "read", true)
 }
 
 func TestPriorityModel(t *testing.T) {
