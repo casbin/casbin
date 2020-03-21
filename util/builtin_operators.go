@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"path"
 	"regexp"
 	"strings"
 
@@ -249,6 +250,28 @@ func IPMatchFunc(args ...interface{}) (interface{}, error) {
 	ip2 := args[1].(string)
 
 	return bool(IPMatch(ip1, ip2)), nil
+}
+
+func GlobMatch(key1 string, key2 string) bool {
+	ok, err := path.Match(key2, key1)
+	if err != nil {
+		panic(err)
+	}
+
+	return ok
+
+}
+
+// GlobMatchFunc is the wrapper for GlobMatch.
+func GlobMatchFunc(args ...interface{}) (interface{}, error) {
+	if err := validateVariadicArgs(2, args...); err != nil {
+		return false, errors.New(fmt.Sprintf("%s: %s", "globMatch", err))
+	}
+
+	name1 := args[0].(string)
+	name2 := args[1].(string)
+
+	return GlobMatch(name1, name2), nil
 }
 
 // GenerateGFunction is the factory method of the g(_, _) function.
