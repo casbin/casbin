@@ -114,9 +114,9 @@ func (a *Adapter) AddPolicy(sec string, ptype string, rule []string) error {
 }
 
 // AddPolicies adds policy rules to the storage.
-func (a *Adapter) AddPolicies(secs []string, ptypes []string, rules [][]string) []error {
+func (a *Adapter) AddPolicies(sec string, ptype string, rules [][]string) []error {
 	errs := make([]error, 0)
-	for i := 0 ; i < len(secs) ; i++ {
+	for i := 0 ; i < len(rules) ; i++ {
 		errs = append(errs, errors.New("not implemented"))
 	}
 	return errs
@@ -128,9 +128,9 @@ func (a *Adapter) RemovePolicy(sec string, ptype string, rule []string) error {
 }
 
 // RemovePolicies removes policy rules from the storage.
-func (a *Adapter) RemovePolicies(secs []string, ptypes []string, rules [][]string) []error {
+func (a *Adapter) RemovePolicies(sec string, ptype string, rules [][]string) []error {
 	errs := make([]error, 0)
-	for i := 0 ; i < len(secs) ; i++ {
+	for i := 0 ; i < len(rules) ; i++ {
 		errs = append(errs, errors.New("not implemented"))
 	}
 	return errs

@@ -14,6 +14,10 @@
 
 package casbin
 
+import (
+	"github.com/casbin/casbin/v2/persist"
+)
+
 const (
 	notImplemented = "not implemented"
 )
@@ -45,8 +49,8 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 
 // addPolicies adds rules to the current policy.
 // removePolicies removes rules from the current policy.
-func (e *Enforcer) addPolicies(secs []string, ptypes []string, rules [][]string) ([]bool, []error) {
-	rulesAdded := e.model.AddPolicies(secs, ptypes, rules)
+func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) ([]bool, []error) {
+	rulesAdded := e.model.AddPolicies(sec, ptype, rules)
 	errs := make([]error, len(rulesAdded))
 	for i, isRuleAdded := range rulesAdded {
 		if !isRuleAdded {
@@ -55,7 +59,7 @@ func (e *Enforcer) addPolicies(secs []string, ptypes []string, rules [][]string)
 	}
 
 	if e.adapter != nil && e.autoSave {
-		newErrs := e.adapter.AddPolicies(secs, ptypes, rules)
+		newErrs := e.adapter.(persist.AdapterEx).AddPolicies(sec, ptype, rules)
 		for i, err := range newErrs {
 			if err != nil {
 				if err.Error() != notImplemented {
@@ -104,8 +108,8 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 }
 
 // removePolicies removes rules from the current policy.
-func (e *Enforcer) removePolicies(secs []string, ptypes []string, rules [][]string) ([]bool, []error) {
-	rulesRemoved := e.model.RemovePolicies(secs, ptypes, rules)
+func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) ([]bool, []error) {
+	rulesRemoved := e.model.RemovePolicies(sec, ptype, rules)
 	errs := make([]error, len(rulesRemoved))
 	for i, isRuleRemoved := range rulesRemoved {
 		if !isRuleRemoved {
@@ -114,7 +118,7 @@ func (e *Enforcer) removePolicies(secs []string, ptypes []string, rules [][]stri
 	}
 
 	if e.adapter != nil && e.autoSave {
-		newErrs := e.adapter.RemovePolicies(secs, ptypes, rules)
+		newErrs := e.adapter.(persist.AdapterEx).RemovePolicies(sec, ptype, rules)
 		for i, err := range newErrs {
 			if err != nil {
 				if err.Error() != notImplemented {

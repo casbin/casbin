@@ -15,29 +15,11 @@
 package persist
 
 import (
-	"strings"
-
 	"github.com/casbin/casbin/v2/model"
 )
 
-// LoadPolicyLine loads a text line as a policy rule to model.
-func LoadPolicyLine(line string, model model.Model) {
-	if line == "" || strings.HasPrefix(line, "#") {
-		return
-	}
-
-	tokens := strings.Split(line, ",")
-	for i := 0; i < len(tokens); i++ {
-		tokens[i] = strings.TrimSpace(tokens[i])
-	}
-
-	key := tokens[0]
-	sec := key[:1]
-	model[sec][key].Policy = append(model[sec][key].Policy, tokens[1:])
-}
-
-// Adapter is the interface for Casbin adapters.
-type Adapter interface {
+// AdapterEX is the interface for Casbin adapters with multiple add and remove policy functions.
+type AdapterEx interface {
 	// LoadPolicy loads all policy rules from the storage.
 	LoadPolicy(model model.Model) error
 	// SavePolicy saves all policy rules to the storage.
@@ -46,9 +28,15 @@ type Adapter interface {
 	// AddPolicy adds a policy rule to the storage.
 	// This is part of the Auto-Save feature.
 	AddPolicy(sec string, ptype string, rule []string) error
+	// AddPolicies adds policy rules to the storage.
+	// This is part of the Auto-Save feature.
+	AddPolicies(sec string, ptype string, rules [][]string) []error
 	// RemovePolicy removes a policy rule from the storage.
 	// This is part of the Auto-Save feature.
 	RemovePolicy(sec string, ptype string, rule []string) error
+	// RemovePolicies removes policy rules from the storage.
+	// This is part of the Auto-Save feature.
+	RemovePolicies(sec string, ptype string, rules [][]string) []error
 	// RemoveFilteredPolicy removes policy rules that match the filter from the storage.
 	// This is part of the Auto-Save feature.
 	RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error

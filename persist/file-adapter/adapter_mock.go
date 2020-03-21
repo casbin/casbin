@@ -90,9 +90,9 @@ func (a *AdapterMock) AddPolicy(sec string, ptype string, rule []string) error {
 }
 
 // AddPolicies removes policy rules from the storage.
-func (a *AdapterMock) AddPolicies(secs []string, ptypes []string, rules [][]string) []error {
+func (a *AdapterMock) AddPolicies(sec string, ptype string, rules [][]string) []error {
 	errs := make([]error, 0)
-	for i := 0 ; i < len(secs) ; i++ {
+	for i := 0 ; i < len(rules) ; i++ {
 		errs = append(errs, a.GetMockErr())
 	}
 	return errs
@@ -104,9 +104,9 @@ func (a *AdapterMock) RemovePolicy(sec string, ptype string, rule []string) erro
 }
 
 // RemovePolicies removes policy rules from the storage.
-func (a *AdapterMock) RemovePolicies(secs []string, ptypes []string, rules [][]string) []error {
+func (a *AdapterMock) RemovePolicies(sec string, ptype string, rules [][]string) []error {
 	errs := make([]error, 0)
-	for i := 0 ; i < len(secs) ; i++ {
+	for i := 0 ; i < len(rules) ; i++ {
 		errs = append(errs, a.GetMockErr())
 	}
 	return errs
