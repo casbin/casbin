@@ -16,6 +16,7 @@ package casbin
 
 import (
 	"testing"
+	
 	"github.com/casbin/casbin/v2/persist/file-adapter"
 )
 
