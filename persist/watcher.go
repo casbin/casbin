@@ -14,6 +14,8 @@
 
 package persist
 
+import "github.com/casbin/casbin/v2/model"
+
 // Watcher is the interface for Casbin watchers.
 type Watcher interface {
 	// SetUpdateCallback sets the callback function that the watcher will call
@@ -26,4 +28,21 @@ type Watcher interface {
 	Update() error
 	// Close stops and releases the watcher, the callback function will not be called any more.
 	Close()
+}
+
+// WatcherEx is the strengthen for Casbin watchers.
+type WatcherEx interface {
+	Watcher
+	// UpdateForAddPolicy calls the update callback of other instances to synchronize their policy.
+	// It is called after Enforcer.AddPolicy()
+	UpdateForAddPolicy(params ...interface{}) error
+	// UPdateForRemovePolicy calls the update callback of other instances to synchronize their policy.
+	// It is called after Enforcer.RemovePolicy()
+	UpdateForRemovePolicy(params ...interface{}) error
+	// UpdateForRemoveFilteredPolicy calls the update callback of other instances to synchronize their policy.
+	// It is called after Enforcer.RemoveFilteredNamedGroupingPolicy()
+	UpdateForRemoveFilteredPolicy(fieldIndex int, fieldValues ...string) error
+	// UpdateForSavePolicy calls the update callback of other instances to synchronize their policy.
+	// It is called after Enforcer.RemoveFilteredNamedGroupingPolicy()
+	UpdateForSavePolicy(model model.Model) error
 }

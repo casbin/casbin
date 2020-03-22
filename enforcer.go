@@ -303,6 +303,10 @@ func (e *Enforcer) SavePolicy() error {
 		return err
 	}
 	if e.watcher != nil {
+		watcher, ok := e.watcher.(persist.WatcherEx)
+		if ok {
+			return watcher.UpdateForSavePolicy(e.model)
+		}
 		return e.watcher.Update()
 	}
 	return nil
