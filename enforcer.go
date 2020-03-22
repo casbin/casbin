@@ -303,7 +303,12 @@ func (e *Enforcer) SavePolicy() error {
 		return err
 	}
 	if e.watcher != nil {
+		watcher, ok := e.watcher.(persist.WatcherEx)
+		if ok {
+			return watcher.UpdateForSavePolicy(e.model)
+		}
 		return e.watcher.Update()
+
 	}
 	return nil
 }
@@ -319,7 +324,7 @@ func (e *Enforcer) EnableLog(enable bool) {
 }
 
 // EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
-func (e *Enforcer) EnableAutoNotifyWatcher(enable bool)  {
+func (e *Enforcer) EnableAutoNotifyWatcher(enable bool) {
 	e.autoNotifyWatcher = enable
 }
 
