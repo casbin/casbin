@@ -162,6 +162,7 @@ func TestModifyPolicyAPI(t *testing.T) {
 	}
 
 	e.AddPolicies(rules)
+	e.AddPolicies(rules)
 
 	testGetPolicy(t, e, [][]string{
 		{"data2_admin", "data2", "read"},
@@ -172,6 +173,7 @@ func TestModifyPolicyAPI(t *testing.T) {
 		{"leyo", "data4", "read"},
 		{"ham", "data4", "write"}})
 
+	e.RemovePolicies(rules)
 	e.RemovePolicies(rules)
 
 	namedPolicy := []string{"eve", "data3", "read"}
@@ -218,8 +220,10 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 	e.RemoveNamedGroupingPolicy("g", namedGroupingPolicy)
 
 	e.AddNamedGroupingPolicies("g", groupingRules)
+	e.AddNamedGroupingPolicies("g", groupingRules)
 	testGetRoles(t, e, "ham", []string{"data4_admin"})
 	testGetRoles(t, e, "jack", []string{"data5_admin"})
+	e.RemoveNamedGroupingPolicies("g", groupingRules)
 	e.RemoveNamedGroupingPolicies("g", groupingRules)
 
 	testGetRoles(t, e, "alice", []string{})
