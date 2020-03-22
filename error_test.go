@@ -16,7 +16,6 @@ package casbin
 
 import (
 	"testing"
-
 	"github.com/casbin/casbin/v2/persist/file-adapter"
 )
 
@@ -135,18 +134,16 @@ func TestMockAdapterErrors(t *testing.T) {
 	}
 
 	rules := [][]string {
-			{"admin", "domain3", "data1", "read"},
+			{"admin", "domain4", "data1", "read"},
 	}
 
-	_, errArr1 := e.AddPolicies(rules)
+	_, err = e.AddPolicies(rules)
 
-	for _, err := range errArr1{
-		if err == nil {
-			t.Errorf("Should be an error here.")
-		} else {
-			t.Log("Test on error: ")
-			t.Log(err.Error())
-		}
+	if err == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		t.Log("Test on error: ")
+		t.Log(err.Error())
 	}
 
 	_, err2 := e.RemoveFilteredPolicy(1, "domain1", "data1")
@@ -168,18 +165,16 @@ func TestMockAdapterErrors(t *testing.T) {
 	}
 
 	rules = [][]string {
-		{"admin", "domain2", "data2", "read"},
+		{"admin", "domain4", "data1", "read"},
 	}
 
-	_, errArr2 := e.RemovePolicies(rules)
+	_, err = e.RemovePolicies(rules)
 
-	for _, err := range errArr2{
-		if err == nil {
-			t.Errorf("Should be an error here.")
-		} else {
-			t.Log("Test on error: ")
-			t.Log(err.Error())
-		}
+	if err == nil {
+		t.Errorf("Should be an error here.")
+	} else {
+		t.Log("Test on error: ")
+		t.Log(err.Error())
 	}
 	_, err4 := e.AddGroupingPolicy("bob", "admin2")
 

@@ -102,16 +102,17 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) bool {
 }
 
 // AddPolicies adds policy rules to the model.
-func (model Model) AddPolicies(sec string, ptype string, rules [][]string) []bool {
-	addRules := make([]bool, 0)
+func (model Model) AddPolicies(sec string, ptype string, rules [][]string) bool {
 	for i := 0 ; i < len(rules) ; i++{
-		if !model.HasPolicy(sec, ptype, rules[i]) {
-			model[sec][ptype].Policy = append(model[sec][ptype].Policy, rules[i])
-			addRules = append(addRules, true)
+		if model.HasPolicy(sec, ptype, rules[i]) {
+			return false
 		}
-		addRules = append(addRules, false)
 	}
-	return addRules
+
+	for i := 0 ; i < len(rules) ; i++{
+		model[sec][ptype].Policy = append(model[sec][ptype].Policy, rules[i])
+	}
+	return true
 }
 
 // RemovePolicy removes a policy rule from the model.
@@ -127,18 +128,25 @@ func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
 }
 
 // RemovePolicies removes policy rules from the model.
-func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) []bool {
-	removeRules := make([]bool, 0)
+func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
+	indexes := make([]uint, 0)
+	OUTER : for j := 0 ; j < len(rules) ; j++ {
+		for i, r := range model[sec][ptype].Policy {
+			if util.ArrayEquals(rules[j], r) {
+				indexes = append(indexes, uint(i))
+				continue OUTER
+			}
+		}
+		return false
+	}
 	for j := 0 ; j < len(rules) ; j++ {
 		for i, r := range model[sec][ptype].Policy {
 			if util.ArrayEquals(rules[j], r) {
 				model[sec][ptype].Policy = append(model[sec][ptype].Policy[:i], model[sec][ptype].Policy[i+1:]...)
-				removeRules = append(removeRules, true)
 			}
 		}
-		removeRules = append(removeRules, false)
 	}
-	return removeRules
+	return true
 }
 
 // RemoveFilteredPolicy removes policy rules based on field filters from the model.

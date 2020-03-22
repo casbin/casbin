@@ -14,9 +14,7 @@
 
 package casbin
 
-import (
-	"github.com/casbin/casbin/v2/persist"
-)
+import "github.com/casbin/casbin/v2/persist"
 
 const (
 	notImplemented = "not implemented"
@@ -49,37 +47,28 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 
 // addPolicies adds rules to the current policy.
 // removePolicies removes rules from the current policy.
-func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) ([]bool, []error) {
+func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool, error) {
 	rulesAdded := e.model.AddPolicies(sec, ptype, rules)
-	errs := make([]error, len(rulesAdded))
-	for i, isRuleAdded := range rulesAdded {
-		if !isRuleAdded {
-			errs[i] = nil
-		}
+	if !rulesAdded {
+		return rulesAdded, nil
 	}
-
+	
 	if e.adapter != nil && e.autoSave {
-		newErrs := e.adapter.(persist.AdapterEx).AddPolicies(sec, ptype, rules)
-		for i, err := range newErrs {
-			if err != nil {
-				if err.Error() != notImplemented {
-					errs[i] = err
-				}
+		if err := e.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, rules); err != nil {
+			if err.Error() != notImplemented {
+				return rulesAdded, err
 			}
 		}
-		return rulesAdded, errs
 	}
 
 	if e.watcher !=nil && e.autoNotifyWatcher {
 		err := e.watcher.Update()
 		if err != nil {
-			for i := range rulesAdded {
-				errs[i] = err
-			}
+			return rulesAdded, err
 		}
 	}
 
-	return rulesAdded, errs
+	return rulesAdded, nil
 }
 
 // removePolicy removes a rule from the current policy.
@@ -108,37 +97,28 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 }
 
 // removePolicies removes rules from the current policy.
-func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) ([]bool, []error) {
+func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (bool, error) {
 	rulesRemoved := e.model.RemovePolicies(sec, ptype, rules)
-	errs := make([]error, len(rulesRemoved))
-	for i, isRuleRemoved := range rulesRemoved {
-		if !isRuleRemoved {
-			errs[i] = nil
-		}
+	if !rulesRemoved {
+		return rulesRemoved, nil
 	}
 
 	if e.adapter != nil && e.autoSave {
-		newErrs := e.adapter.(persist.AdapterEx).RemovePolicies(sec, ptype, rules)
-		for i, err := range newErrs {
-			if err != nil {
-				if err.Error() != notImplemented {
-					errs[i] = err
-				}
+		if err := e.adapter.(persist.BatchAdapter).RemovePolicies(sec, ptype, rules); err != nil {
+			if err.Error() != notImplemented {
+				return rulesRemoved, err
 			}
 		}
-		return rulesRemoved, errs
 	}
 
 	if e.watcher !=nil && e.autoNotifyWatcher {
 		err := e.watcher.Update()
 		if err != nil {
-			for i := range rulesRemoved {
-				errs[i] = err
-			}
+			return rulesRemoved, err
 		}
 	}
 
-	return rulesRemoved, errs
+	return rulesRemoved, nil
 }
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.

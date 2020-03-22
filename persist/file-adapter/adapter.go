@@ -114,12 +114,8 @@ func (a *Adapter) AddPolicy(sec string, ptype string, rule []string) error {
 }
 
 // AddPolicies adds policy rules to the storage.
-func (a *Adapter) AddPolicies(sec string, ptype string, rules [][]string) []error {
-	errs := make([]error, 0)
-	for i := 0 ; i < len(rules) ; i++ {
-		errs = append(errs, errors.New("not implemented"))
-	}
-	return errs
+func (a *Adapter) AddPolicies(sec string, ptype string, rules [][]string) error {
+	return errors.New("not implemented")
 }
 
 // RemovePolicy removes a policy rule from the storage.
@@ -128,12 +124,8 @@ func (a *Adapter) RemovePolicy(sec string, ptype string, rule []string) error {
 }
 
 // RemovePolicies removes policy rules from the storage.
-func (a *Adapter) RemovePolicies(sec string, ptype string, rules [][]string) []error {
-	errs := make([]error, 0)
-	for i := 0 ; i < len(rules) ; i++ {
-		errs = append(errs, errors.New("not implemented"))
-	}
-	return errs
+func (a *Adapter) RemovePolicies(sec string, ptype string, rules [][]string) error {
+	return errors.New("not implemented")
 }
 
 // RemoveFilteredPolicy removes policy rules that match the filter from the storage.
