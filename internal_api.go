@@ -14,6 +14,8 @@
 
 package casbin
 
+import "github.com/casbin/casbin/v2/persist"
+
 const (
 	notImplemented = "not implemented"
 )
@@ -33,10 +35,22 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 		}
 	}
 
-	if e.watcher !=nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return ruleAdded, err
+	if e.watcher != nil && e.autoNotifyWatcher {
+		watcher, ok := e.watcher.(persist.WatcherEx)
+		if ok {
+			inter := make([]interface{}, len(rule))
+			for index, value := range rule {
+				inter[index] = value
+			}
+
+			if err := watcher.UpdateForAddPolicy(inter...); err != nil {
+				return ruleAdded, err
+			}
+		} else {
+			err := e.watcher.Update()
+			if err != nil {
+				return ruleAdded, err
+			}
 		}
 	}
 
@@ -58,10 +72,22 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		}
 	}
 
-	if e.watcher !=nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return ruleRemoved, err
+	if e.watcher != nil && e.autoNotifyWatcher {
+		watcher, ok := e.watcher.(persist.WatcherEx)
+		if ok {
+			inter := make([]interface{}, len(rule))
+			for index, value := range rule {
+				inter[index] = value
+			}
+
+			if err := watcher.UpdateForRemovePolicy(inter...); err != nil {
+				return ruleRemoved, err
+			}
+		} else {
+			err := e.watcher.Update()
+			if err != nil {
+				return ruleRemoved, err
+			}
 		}
 	}
 
@@ -83,10 +109,16 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 		}
 	}
 
-	if e.watcher !=nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return ruleRemoved, err
+	if e.watcher != nil && e.autoNotifyWatcher {
+		watcher, ok := e.watcher.(persist.WatcherEx)
+		if ok {
+			if err := watcher.UpdateForRemoveFilteredPolicy(fieldIndex, fieldValues...); err != nil {
+				return ruleRemoved, err
+			}
+		} else {
+			if err := e.watcher.Update(); err != nil {
+				return ruleRemoved, err
+			}
 		}
 	}
 
