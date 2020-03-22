@@ -52,7 +52,10 @@ func testKeyMatch2(t *testing.T, key1 string, key2 string, res bool) {
 
 func testGlobMatch(t *testing.T, key1 string, key2 string, res bool) {
 	t.Helper()
-	myRes := GlobMatch(key1, key2)
+	myRes, err := GlobMatch(key1, key2)
+	if err != nil {
+		panic(err)
+	}
 	t.Logf("%s < %s: %t", key1, key2, myRes)
 
 	if myRes != res {
