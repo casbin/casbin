@@ -252,14 +252,9 @@ func IPMatchFunc(args ...interface{}) (interface{}, error) {
 	return bool(IPMatch(ip1, ip2)), nil
 }
 
-func GlobMatch(key1 string, key2 string) bool {
-	ok, err := path.Match(key2, key1)
-	if err != nil {
-		panic(err)
-	}
-
-	return ok
-
+// GlobMatch determines whether key1 matches the pattern of key2 using glob pattern
+func GlobMatch(key1 string, key2 string) (bool, error) {
+	return path.Match(key2, key1)
 }
 
 // GlobMatchFunc is the wrapper for GlobMatch.
@@ -271,7 +266,7 @@ func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return GlobMatch(name1, name2), nil
+	return GlobMatch(name1, name2)
 }
 
 // GenerateGFunction is the factory method of the g(_, _) function.
