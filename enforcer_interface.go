@@ -49,6 +49,9 @@ type IEnforcer interface {
 	EnableAutoBuildRoleLinks(autoBuildRoleLinks bool)
 	BuildRoleLinks() error
 	Enforce(rvals ...interface{}) (bool, error)
+	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
+	EnforceEx(rvals ...interface{}) (bool, [][]string, error)
+	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, [][]string, error)
 
 	/* RBAC API */
 	GetRolesForUser(name string) ([]string, error)

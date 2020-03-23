@@ -17,6 +17,7 @@ package casbin
 import (
 	"testing"
 
+	"github.com/casbin/casbin/v2/effect"
 	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
 	"github.com/casbin/casbin/v2/rbac"
 	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
@@ -41,6 +42,15 @@ func testDomainEnforce(t *testing.T, e *Enforcer, sub string, dom string, obj st
 	t.Helper()
 	if myRes, _ := e.Enforce(sub, dom, obj, act); myRes != res {
 		t.Errorf("%s, %s, %s, %s: %t, supposed to be %t", sub, dom, obj, act, myRes, res)
+	}
+}
+
+func testEnforceEx(t *testing.T, e *Enforcer, sub string, obj string, act string, res [][]string) {
+	t.Helper()
+	_, myRes, _ := e.EnforceEx(sub, obj, act)
+
+	if ok := util.Array2DEquals(res, myRes); !ok {
+		t.Error("Key: ", myRes, ", supposed to be ", res)
 	}
 }
 
@@ -514,4 +524,47 @@ func TestRBACModelInMultiLines(t *testing.T) {
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", false)
 	testEnforce(t, e, "bob", "data2", "write", true)
+}
+func TestEnforceEx(t *testing.T) {
+	e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	e.SetEffector(effect.NewDefaultEffectorEx())
+
+	testEnforceEx(t, e, "alice", "data1", "read", [][]string{[]string{"alice", "data1", "read"}})
+	testEnforceEx(t, e, "alice", "data1", "write", [][]string{})
+	testEnforceEx(t, e, "alice", "data2", "read", [][]string{})
+	testEnforceEx(t, e, "alice", "data2", "write", [][]string{})
+	testEnforceEx(t, e, "bob", "data1", "read", [][]string{})
+	testEnforceEx(t, e, "bob", "data1", "write", [][]string{})
+	testEnforceEx(t, e, "bob", "data2", "read", [][]string{})
+	testEnforceEx(t, e, "bob", "data2", "write", [][]string{[]string{"bob", "data2", "write"}})
+
+	e, _ = NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e.SetEffector(effect.NewDefaultEffectorEx())
+
+	testEnforceEx(t, e, "alice", "data1", "read", [][]string{[]string{"alice", "data1", "read"}})
+	testEnforceEx(t, e, "alice", "data1", "write", [][]string{})
+	testEnforceEx(t, e, "alice", "data2", "read", [][]string{[]string{"data2_admin", "data2", "read"}})
+	testEnforceEx(t, e, "alice", "data2", "write", [][]string{[]string{"data2_admin", "data2", "write"}})
+	testEnforceEx(t, e, "bob", "data1", "read", [][]string{})
+	testEnforceEx(t, e, "bob", "data1", "write", [][]string{})
+	testEnforceEx(t, e, "bob", "data2", "read", [][]string{})
+	testEnforceEx(t, e, "bob", "data2", "write", [][]string{[]string{"bob", "data2", "write"}})
+
+	e, _ = NewEnforcer("examples/priority_model.conf", "examples/priority_policy.csv")
+	e.SetEffector(effect.NewDefaultEffectorEx())
+	testEnforceEx(t, e, "alice", "data1", "read", [][]string{[]string{"alice", "data1", "read", "allow"}})
+	testEnforceEx(t, e, "alice", "data1", "write", [][]string{[]string{"data1_deny_group", "data1", "write", "deny"}})
+	testEnforceEx(t, e, "alice", "data2", "read", [][]string{})
+	testEnforceEx(t, e, "alice", "data2", "write", [][]string{})
+	testEnforceEx(t, e, "bob", "data1", "write", [][]string{})
+	testEnforceEx(t, e, "bob", "data2", "read", [][]string{[]string{"data2_allow_group", "data2", "read", "allow"}})
+	testEnforceEx(t, e, "bob", "data2", "write", [][]string{[]string{"bob", "data2", "write", "deny"}})
+
+	e, _ = NewEnforcer("examples/enforce_ex_model.conf", "examples/enforce_ex_policy.csv")
+	e.SetEffector(effect.NewDefaultEffectorEx())
+
+	testEnforceEx(t, e, "alice", "data1", "read", [][]string{[]string{"alice", "data1", "read"}})
+	testEnforceEx(t, e, "alice", "data1", "write", [][]string{})
+	testEnforceEx(t, e, "alice", "data2", "read", [][]string{[]string{"data2_admin", "data2", "read"}})
+	testEnforceEx(t, e, "alice", "data2", "write", [][]string{[]string{"alice", "data2", "write"}, []string{"data2_admin", "data2", "write"}})
 }

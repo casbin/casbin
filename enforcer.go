@@ -319,7 +319,7 @@ func (e *Enforcer) EnableLog(enable bool) {
 }
 
 // EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
-func (e *Enforcer) EnableAutoNotifyWatcher(enable bool)  {
+func (e *Enforcer) EnableAutoNotifyWatcher(enable bool) {
 	e.autoNotifyWatcher = enable
 }
 
@@ -511,6 +511,197 @@ func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
 // EnforceWithMatcher use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error) {
 	return e.enforce(matcher, rvals...)
+}
+
+func (e *Enforcer) enforceEx(matcher string, rvals ...interface{}) (bool, [][]string, error) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Errorf("panic: %v", err)
+		}
+	}()
+
+	if !e.enabled {
+		return true, nil, nil
+	}
+
+	functions := model.FunctionMap{}
+	for k, v := range e.fm {
+		functions[k] = v
+	}
+	if _, ok := e.model["g"]; ok {
+		for key, ast := range e.model["g"] {
+			rm := ast.RM
+			functions[key] = util.GenerateGFunction(rm)
+		}
+	}
+	var expString string
+	if matcher == "" {
+		expString = e.model["m"]["m"].Value
+	} else {
+		expString = matcher
+	}
+	expression, err := govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+	if err != nil {
+		return false, nil, err
+	}
+
+	rTokens := make(map[string]int, len(e.model["r"]["r"].Tokens))
+	for i, token := range e.model["r"]["r"].Tokens {
+		rTokens[token] = i
+	}
+	pTokens := make(map[string]int, len(e.model["p"]["p"].Tokens))
+	for i, token := range e.model["p"]["p"].Tokens {
+		pTokens[token] = i
+	}
+
+	parameters := enforceParameters{
+		rTokens: rTokens,
+		rVals:   rvals,
+
+		pTokens: pTokens,
+	}
+
+	var policyEffects []effect.Effect
+	var matcherResults []float64
+	var hitResults [][]string
+	if policyLen := len(e.model["p"]["p"].Policy); policyLen != 0 {
+		policyEffects = make([]effect.Effect, policyLen)
+		matcherResults = make([]float64, policyLen)
+		if len(e.model["r"]["r"].Tokens) != len(rvals) {
+			return false, nil, fmt.Errorf(
+				"invalid request size: expected %d, got %d, rvals: %v",
+				len(e.model["r"]["r"].Tokens),
+				len(rvals),
+				rvals)
+		}
+		for i, pvals := range e.model["p"]["p"].Policy {
+			// log.LogPrint("Policy Rule: ", pvals)
+			if len(e.model["p"]["p"].Tokens) != len(pvals) {
+				return false, nil, fmt.Errorf(
+					"invalid policy size: expected %d, got %d, pvals: %v",
+					len(e.model["p"]["p"].Tokens),
+					len(pvals),
+					pvals)
+			}
+
+			parameters.pVals = pvals
+
+			result, err := expression.Eval(parameters)
+			// log.LogPrint("Result: ", result)
+
+			if err != nil {
+				return false, nil, err
+			}
+
+			switch result := result.(type) {
+			case bool:
+				if !result {
+					policyEffects[i] = effect.Indeterminate
+					continue
+				}
+			case float64:
+				if result == 0 {
+					policyEffects[i] = effect.Indeterminate
+					continue
+				} else {
+					matcherResults[i] = result
+				}
+			default:
+				return false, nil, errors.New("matcher result should be bool, int or float")
+			}
+
+			if j, ok := parameters.pTokens["p_eft"]; ok {
+				eft := parameters.pVals[j]
+				if eft == "allow" {
+					policyEffects[i] = effect.Allow
+				} else if eft == "deny" {
+					policyEffects[i] = effect.Deny
+				} else {
+					policyEffects[i] = effect.Indeterminate
+				}
+			} else {
+				policyEffects[i] = effect.Allow
+			}
+
+			isHit, err := e.eft.(effect.EffectorEx).IsHit(e.model["e"]["e"].Value, policyEffects[i])
+			if err != nil {
+				return false, nil, err
+			}
+
+			if isHit {
+				hitResults = append(hitResults, parameters.pVals)
+			}
+
+			if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
+				break
+			}
+
+		}
+	} else {
+		policyEffects = make([]effect.Effect, 1)
+		matcherResults = make([]float64, 1)
+
+		parameters.pVals = make([]string, len(parameters.pTokens))
+
+		result, err := expression.Eval(parameters)
+		// log.LogPrint("Result: ", result)
+
+		if err != nil {
+			return false, nil, err
+		}
+
+		if result.(bool) {
+			policyEffects[0] = effect.Allow
+		} else {
+			policyEffects[0] = effect.Indeterminate
+		}
+	}
+
+	// log.LogPrint("Rule Results: ", policyEffects)
+
+	result, err := e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults)
+	if err != nil {
+		return false, nil, err
+	}
+
+	// Log request.
+	if log.GetLogger().IsEnabled() {
+		var reqStr strings.Builder
+		reqStr.WriteString("Request: ")
+		for i, rval := range rvals {
+			if i != len(rvals)-1 {
+				reqStr.WriteString(fmt.Sprintf("%v, ", rval))
+			} else {
+				reqStr.WriteString(fmt.Sprintf("%v", rval))
+			}
+		}
+		reqStr.WriteString(fmt.Sprintf(" ---> %t", result))
+
+		reqStr.WriteString("Hit Policy: \n")
+		for _, token := range hitResults {
+			for i, pval := range token {
+				if i != len(token)-1 {
+					reqStr.WriteString(fmt.Sprintf("%v, ", pval))
+				} else {
+					reqStr.WriteString(fmt.Sprintf("%v \n", pval))
+				}
+			}
+		}
+
+		log.LogPrint(reqStr.String())
+	}
+
+	return result, hitResults, nil
+}
+
+// EnforceEx decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
+func (e *Enforcer) EnforceEx(rvals ...interface{}) (bool, [][]string, error) {
+	return e.enforceEx("", rvals...)
+}
+
+// EnforceExWithMatcher use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
+func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, [][]string, error) {
+	return e.enforceEx(matcher, rvals...)
 }
 
 // assumes bounds have already been checked
