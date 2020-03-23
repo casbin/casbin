@@ -16,8 +16,6 @@ package casbin
 
 import (
 	"testing"
-
-	"github.com/casbin/casbin/v2/model"
 )
 
 type SampleWatcher struct {
@@ -42,35 +40,4 @@ func TestSetWatcher(t *testing.T) {
 	e.SetWatcher(sampleWatcher)
 
 	e.SavePolicy() //calls watcher.Update()
-}
-
-type SampleWatcherEx struct {
-	SampleWatcher
-}
-
-func (w SampleWatcherEx) UpdateForAddPolicy(params ...string) error {
-	return nil
-}
-func (w SampleWatcherEx) UpdateForRemovePolicy(params ...string) error {
-	return nil
-}
-
-func (w SampleWatcherEx) UpdateForRemoveFilteredPolicy(fieldIndex int, fieldValues ...string) error {
-	return nil
-}
-
-func (w SampleWatcherEx) UpdateForSavePolicy(model model.Model) error {
-	return nil
-}
-
-func TestSetWatcherEx(t *testing.T) {
-	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
-
-	sampleWatcherEx := SampleWatcherEx{}
-	e.SetWatcher(sampleWatcherEx)
-
-	e.SavePolicy()                           // calls watcherEx.UpdateForSavePolicy()
-	e.AddPolicy("admin", "data1", "read")    // calls watcherEx.UpdateForAddPolicy()
-	e.RemovePolicy("admin", "data1", "read") // calls watcherEx.UpdateForRemovePolicy()
-	e.RemoveFilteredPolicy(1, "data1")       // calls watcherEx.UpdateForRemoveFilteredPolicy()
 }
