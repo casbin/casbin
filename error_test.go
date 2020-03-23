@@ -16,7 +16,7 @@ package casbin
 
 import (
 	"testing"
-	
+
 	"github.com/casbin/casbin/v2/persist/file-adapter"
 )
 
@@ -137,7 +137,6 @@ func TestMockAdapterErrors(t *testing.T) {
 	rules := [][]string {
 			{"admin", "domain4", "data1", "read"},
 	}
-
 	_, err = e.AddPolicies(rules)
 
 	if err == nil {

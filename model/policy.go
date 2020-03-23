@@ -129,11 +129,9 @@ func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
 
 // RemovePolicies removes policy rules from the model.
 func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
-	indexes := make([]uint, 0)
 	OUTER : for j := 0 ; j < len(rules) ; j++ {
-		for i, r := range model[sec][ptype].Policy {
+		for _, r := range model[sec][ptype].Policy {
 			if util.ArrayEquals(rules[j], r) {
-				indexes = append(indexes, uint(i))
 				continue OUTER
 			}
 		}

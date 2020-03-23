@@ -198,7 +198,7 @@ func IPMatch(ip1 string, ip2 string) bool {
 
 		return objIP1.Equal(objIP2)
 	}
-	
+
 	return cidr.Contains(objIP1)
 }
 
