@@ -14,9 +14,7 @@
 
 package casbin
 
-import (
-	"testing"
-)
+import "testing"
 
 type SampleWatcher struct {
 }
