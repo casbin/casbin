@@ -80,7 +80,7 @@ func (e *CachedEnforcer) getCachedResult(key string) (res bool, ok bool) {
 	e.locker.RLock()
 	defer e.locker.RUnlock()
 	res, ok = e.m[key]
-	return res, ok
+	return
 }
 
 func (e *CachedEnforcer) setCachedResult(key string, res bool) {
