@@ -48,10 +48,10 @@ type SampleWatcherEx struct {
 	SampleWatcher
 }
 
-func (w SampleWatcherEx) UpdateForAddPolicy(params ...interface{}) error {
+func (w SampleWatcherEx) UpdateForAddPolicy(params ...string) error {
 	return nil
 }
-func (w SampleWatcherEx) UpdateForRemovePolicy(params ...interface{}) error {
+func (w SampleWatcherEx) UpdateForRemovePolicy(params ...string) error {
 	return nil
 }
 
