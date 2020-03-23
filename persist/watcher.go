@@ -35,10 +35,10 @@ type WatcherEx interface {
 	Watcher
 	// UpdateForAddPolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.AddPolicy()
-	UpdateForAddPolicy(params ...interface{}) error
+	UpdateForAddPolicy(params ...string) error
 	// UPdateForRemovePolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.RemovePolicy()
-	UpdateForRemovePolicy(params ...interface{}) error
+	UpdateForRemovePolicy(params ...string) error
 	// UpdateForRemoveFilteredPolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.RemoveFilteredNamedGroupingPolicy()
 	UpdateForRemoveFilteredPolicy(fieldIndex int, fieldValues ...string) error

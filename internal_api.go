@@ -36,22 +36,13 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
-		watcher, ok := e.watcher.(persist.WatcherEx)
-		if ok {
-			inter := make([]interface{}, len(rule))
-			for index, value := range rule {
-				inter[index] = value
-			}
-
-			if err := watcher.UpdateForAddPolicy(inter...); err != nil {
-				return ruleAdded, err
-			}
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForAddPolicy(rule...)
 		} else {
-			err := e.watcher.Update()
-			if err != nil {
-				return ruleAdded, err
-			}
+			err = e.watcher.Update()
 		}
+		return ruleAdded, err
 	}
 
 	return ruleAdded, nil
@@ -99,22 +90,14 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
-		watcher, ok := e.watcher.(persist.WatcherEx)
-		if ok {
-			inter := make([]interface{}, len(rule))
-			for index, value := range rule {
-				inter[index] = value
-			}
-
-			if err := watcher.UpdateForRemovePolicy(inter...); err != nil {
-				return ruleRemoved, err
-			}
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForRemovePolicy(rule...)
 		} else {
-			err := e.watcher.Update()
-			if err != nil {
-				return ruleRemoved, err
-			}
+			err = e.watcher.Update()
 		}
+		return ruleRemoved, err
+
 	}
 
 	return ruleRemoved, nil
@@ -161,16 +144,13 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
-		watcher, ok := e.watcher.(persist.WatcherEx)
-		if ok {
-			if err := watcher.UpdateForRemoveFilteredPolicy(fieldIndex, fieldValues...); err != nil {
-				return ruleRemoved, err
-			}
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForRemoveFilteredPolicy(fieldIndex, fieldValues...)
 		} else {
-			if err := e.watcher.Update(); err != nil {
-				return ruleRemoved, err
-			}
+			err = e.watcher.Update()
 		}
+		return ruleRemoved, err
 	}
 
 	return ruleRemoved, nil
