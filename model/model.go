@@ -99,7 +99,7 @@ func NewModel() Model {
 	return m
 }
 
-// NewModel creates a model from a .CONF file.
+// NewModelFromFile creates a model from a .CONF file.
 func NewModelFromFile(path string) (Model, error) {
 	m := NewModel()
 
@@ -111,7 +111,7 @@ func NewModelFromFile(path string) (Model, error) {
 	return m, nil
 }
 
-// NewModel creates a model from a string which contains model text.
+// NewModelFromString creates a model from a string which contains model text.
 func NewModelFromString(text string) (Model, error) {
 	m := NewModel()
 

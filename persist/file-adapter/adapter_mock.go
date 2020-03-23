@@ -89,8 +89,18 @@ func (a *AdapterMock) AddPolicy(sec string, ptype string, rule []string) error {
 	return a.GetMockErr()
 }
 
+// AddPolicies removes policy rules from the storage.
+func (a *AdapterMock) AddPolicies(sec string, ptype string, rules [][]string) error {
+	return a.GetMockErr()
+}
+
 // RemovePolicy removes a policy rule from the storage.
 func (a *AdapterMock) RemovePolicy(sec string, ptype string, rule []string) error {
+	return a.GetMockErr()
+}
+
+// RemovePolicies removes policy rules from the storage.
+func (a *AdapterMock) RemovePolicies(sec string, ptype string, rules [][]string) error {
 	return a.GetMockErr()
 }
 
