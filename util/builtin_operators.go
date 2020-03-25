@@ -29,7 +29,7 @@ import (
 // validate the variadic parameter size and type as string
 func validateVariadicArgs(expectedLen int, args ...interface{}) error {
 	if len(args) != expectedLen {
-		return errors.New(fmt.Sprintf("Expected %d arguments, but got %d", expectedLen, len(args)))
+		return fmt.Errorf("Expected %d arguments, but got %d", expectedLen, len(args))
 	}
 
 	for _, p := range args {
@@ -59,7 +59,7 @@ func KeyMatch(key1 string, key2 string) bool {
 // KeyMatchFunc is the wrapper for KeyMatch.
 func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 	if err := validateVariadicArgs(2, args...); err != nil {
-		return false, errors.New(fmt.Sprintf("%s: %s", "keyMatch", err))
+		return false, fmt.Errorf("%s: %s", "keyMatch", err)
 	}
 
 	name1 := args[0].(string)
@@ -88,7 +88,7 @@ func KeyMatch2(key1 string, key2 string) bool {
 // KeyMatch2Func is the wrapper for KeyMatch2.
 func KeyMatch2Func(args ...interface{}) (interface{}, error) {
 	if err := validateVariadicArgs(2, args...); err != nil {
-		return false, errors.New(fmt.Sprintf("%s: %s", "keyMatch2", err))
+		return false, fmt.Errorf("%s: %s", "keyMatch2", err)
 	}
 
 	name1 := args[0].(string)
@@ -117,7 +117,7 @@ func KeyMatch3(key1 string, key2 string) bool {
 // KeyMatch3Func is the wrapper for KeyMatch3.
 func KeyMatch3Func(args ...interface{}) (interface{}, error) {
 	if err := validateVariadicArgs(2, args...); err != nil {
-		return false, errors.New(fmt.Sprintf("%s: %s", "keyMatch3", err))
+		return false, fmt.Errorf("%s: %s", "keyMatch3", err)
 	}
 
 	name1 := args[0].(string)
@@ -189,7 +189,7 @@ func KeyMatch4(key1 string, key2 string) bool {
 // KeyMatch4Func is the wrapper for KeyMatch4.
 func KeyMatch4Func(args ...interface{}) (interface{}, error) {
 	if err := validateVariadicArgs(2, args...); err != nil {
-		return false, errors.New(fmt.Sprintf("%s: %s", "keyMatch4", err))
+		return false, fmt.Errorf("%s: %s", "keyMatch4", err)
 	}
 
 	name1 := args[0].(string)
@@ -210,7 +210,7 @@ func RegexMatch(key1 string, key2 string) bool {
 // RegexMatchFunc is the wrapper for RegexMatch.
 func RegexMatchFunc(args ...interface{}) (interface{}, error) {
 	if err := validateVariadicArgs(2, args...); err != nil {
-		return false, errors.New(fmt.Sprintf("%s: %s", "regexMatch", err))
+		return false, fmt.Errorf("%s: %s", "regexMatch", err)
 	}
 
 	name1 := args[0].(string)
@@ -243,7 +243,7 @@ func IPMatch(ip1 string, ip2 string) bool {
 // IPMatchFunc is the wrapper for IPMatch.
 func IPMatchFunc(args ...interface{}) (interface{}, error) {
 	if err := validateVariadicArgs(2, args...); err != nil {
-		return false, errors.New(fmt.Sprintf("%s: %s", "ipMatch", err))
+		return false, fmt.Errorf("%s: %s", "ipMatch", err)
 	}
 
 	ip1 := args[0].(string)
@@ -260,7 +260,7 @@ func GlobMatch(key1 string, key2 string) (bool, error) {
 // GlobMatchFunc is the wrapper for GlobMatch.
 func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 	if err := validateVariadicArgs(2, args...); err != nil {
-		return false, errors.New(fmt.Sprintf("%s: %s", "globMatch", err))
+		return false, fmt.Errorf("%s: %s", "globMatch", err)
 	}
 
 	name1 := args[0].(string)
