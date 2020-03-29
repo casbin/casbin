@@ -30,12 +30,14 @@ type IEnforcer interface {
 	InitWithFile(modelPath string, policyPath string) error
 	InitWithAdapter(modelPath string, adapter persist.Adapter) error
 	InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error
+	initialize()
 	LoadModel() error
 	GetModel() model.Model
 	SetModel(m model.Model)
 	GetAdapter() persist.Adapter
 	SetAdapter(adapter persist.Adapter)
 	SetWatcher(watcher persist.Watcher) error
+	GetRoleManager() rbac.RoleManager;
 	SetRoleManager(rm rbac.RoleManager)
 	SetEffector(eft effect.Effector)
 	ClearPolicy()
@@ -45,10 +47,13 @@ type IEnforcer interface {
 	SavePolicy() error
 	EnableEnforce(enable bool)
 	EnableLog(enable bool)
+	EnableAutoNotifyWatcher(enable bool)
 	EnableAutoSave(autoSave bool)
 	EnableAutoBuildRoleLinks(autoBuildRoleLinks bool)
 	BuildRoleLinks() error
+	enforce(matcher string, rvals ...interface{}) (bool, error)
 	Enforce(rvals ...interface{}) (bool, error)
+	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
 
 	/* RBAC API */
 	GetRolesForUser(name string) ([]string, error)
@@ -68,6 +73,13 @@ type IEnforcer interface {
 	DeleteUser(user string) (bool, error)
 	DeleteRole(role string) (bool, error)
 	DeletePermission(permission ...string) (bool, error)
+
+	/* RBAC API with domains*/
+	GetUsersForRoleInDomain(name string, domain string) []string;
+	GetRolesForUserInDomain(name string, domain string) []string;
+	GetPermissionsForUserInDomain(user string, domain string) [][]string;
+	AddRoleForUserInDomain(user string, role string, domain string) (bool, error);
+	DeleteRoleForUserInDomain(user string, role string, domain string) (bool, error);
 
 	/* Management API */
 	GetAllSubjects() []string
