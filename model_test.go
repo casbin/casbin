@@ -57,6 +57,19 @@ func TestBasicModel(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestBasicModelWithoutSpaces(t *testing.T) {
+	e, _ := NewEnforcer("examples/basic_model_without_spaces.conf", "examples/basic_policy.csv")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
 func TestBasicModelNoPolicy(t *testing.T) {
 	e, _ := NewEnforcer("examples/basic_model.conf")
 
