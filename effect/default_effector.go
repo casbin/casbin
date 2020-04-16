@@ -27,49 +27,54 @@ func NewDefaultEffector() *DefaultEffector {
 }
 
 // MergeEffects merges all matching results collected by the enforcer into a single decision.
-func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, results []float64) (bool, error) {
+func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, results []float64) (bool, int, error) {
 	result := false
+	explainIndex := -1
 	if expr == "some(where (p_eft == allow))" {
 		result = false
-		for _, eft := range effects {
+		for i, eft := range effects {
 			if eft == Allow {
 				result = true
+				explainIndex = i
 				break
 			}
 		}
 	} else if expr == "!some(where (p_eft == deny))" {
 		result = true
-		for _, eft := range effects {
+		for i, eft := range effects {
 			if eft == Deny {
 				result = false
+				explainIndex = i
 				break
 			}
 		}
 	} else if expr == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" {
 		result = false
-		for _, eft := range effects {
+		for i, eft := range effects {
 			if eft == Allow {
 				result = true
 			} else if eft == Deny {
 				result = false
+				explainIndex = i
 				break
 			}
 		}
 	} else if expr == "priority(p_eft) || deny" {
 		result = false
-		for _, eft := range effects {
+		for i, eft := range effects {
 			if eft != Indeterminate {
 				if eft == Allow {
 					result = true
 				} else {
 					result = false
 				}
+				explainIndex = i
 				break
 			}
 		}
 	} else {
-		return false, errors.New("unsupported effect")
+		return false, -1, errors.New("unsupported effect")
 	}
 
-	return result, nil
+	return result, explainIndex, nil
 }

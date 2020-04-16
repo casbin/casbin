@@ -154,11 +154,11 @@ func TestModifyPolicyAPI(t *testing.T) {
 	e.AddPolicy("eve", "data3", "read")
 	e.AddPolicy("eve", "data3", "read")
 
-	rules :=[][] string {
-				[]string {"jack", "data4", "read"},
-				[]string {"katy", "data4", "write"},
-				[]string {"leyo", "data4", "read"},
-				[]string {"ham", "data4", "write"},
+	rules := [][]string{
+		{"jack", "data4", "read"},
+		{"katy", "data4", "write"},
+		{"leyo", "data4", "read"},
+		{"ham", "data4", "write"},
 	}
 
 	e.AddPolicies(rules)
@@ -202,9 +202,9 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 	e.AddGroupingPolicy("bob", "data1_admin")
 	e.AddGroupingPolicy("eve", "data3_admin")
 
-	groupingRules := [][]string {
-					{"ham", "data4_admin"},
-					{"jack", "data5_admin"},
+	groupingRules := [][]string{
+		{"ham", "data4_admin"},
+		{"jack", "data5_admin"},
 	}
 
 	e.AddGroupingPolicies(groupingRules)
