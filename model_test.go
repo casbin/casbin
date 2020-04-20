@@ -23,7 +23,7 @@ import (
 	"github.com/casbin/casbin/v2/util"
 )
 
-func testEnforce(t *testing.T, e *Enforcer, sub string, obj interface{}, act string, res bool) {
+func testEnforce(t *testing.T, e *Enforcer, sub interface{}, obj interface{}, act string, res bool) {
 	t.Helper()
 	if myRes, _ := e.Enforce(sub, obj, act); myRes != res {
 		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, myRes, res)
@@ -527,4 +527,36 @@ func TestRBACModelInMultiLines(t *testing.T) {
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", false)
 	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
+type testSub struct {
+	Name string
+	Age  int
+}
+
+func newTestSubject(name string, age int) testSub {
+	s := testSub{}
+	s.Name = name
+	s.Age = age
+	return s
+}
+
+func TestABACPolicy(t *testing.T) {
+	e, _ := NewEnforcer("examples/abac_rule_model.conf", "examples/abac_rule_policy.csv")
+	sub1 := newTestSubject("alice", 16)
+	sub2 := newTestSubject("alice", 20)
+	sub3 := newTestSubject("alice", 65)
+
+	testEnforce(t, e, sub1, "/data1", "read", false)
+	testEnforce(t, e, sub1, "/data2", "read", false)
+	testEnforce(t, e, sub1, "/data1", "write", false)
+	testEnforce(t, e, sub1, "/data2", "write", true)
+	testEnforce(t, e, sub2, "/data1", "read", true)
+	testEnforce(t, e, sub2, "/data2", "read", false)
+	testEnforce(t, e, sub2, "/data1", "write", false)
+	testEnforce(t, e, sub2, "/data2", "write", true)
+	testEnforce(t, e, sub3, "/data1", "read", true)
+	testEnforce(t, e, sub3, "/data2", "read", false)
+	testEnforce(t, e, sub3, "/data1", "write", false)
+	testEnforce(t, e, sub3, "/data2", "write", false)
 }
