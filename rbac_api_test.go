@@ -17,6 +17,7 @@ package casbin
 import (
 	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"testing"
+	"fmt"
 
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
@@ -269,8 +270,9 @@ func TestImplicitPermissionAPIWithDomain(t *testing.T) {
 func testGetImplicitUsers(t *testing.T, e *Enforcer, res []string, permission ...string) {
 	t.Helper()
 	myRes, _ := e.GetImplicitUsersForPermission(permission...)
+	fmt.Println(myRes)
+	t.Log(myRes)
 	t.Log("Implicit users for permission: ", permission, ": ", myRes)
-
 	if !util.ArrayEquals(res, myRes) {
 		t.Error("Implicit users for permission: ", permission, ": ", myRes, ", supposed to be ", res)
 	}

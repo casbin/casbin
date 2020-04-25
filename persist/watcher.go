@@ -18,7 +18,7 @@ package persist
 type Watcher interface {
 	// SetUpdateCallback sets the callback function that the watcher will call
 	// when the policy in DB has been changed by other instances.
-	// A classic callback is Enforcer.LoadPolicy().
+	// A classic callback is Enforcer.LoadPolicy().	
 	SetUpdateCallback(func(string)) error
 	// Update calls the update callback of other instances to synchronize their policy.
 	// It is usually called after changing the policy in DB, like Enforcer.SavePolicy(),
