@@ -146,13 +146,12 @@ func testGetEvalValue(t *testing.T, s string, res []string) {
 	t.Helper()
 	myRes := GetEvalValue(s)
 
-	if ArrayEquals(myRes, res) {
+	if !ArrayEquals(myRes, res) {
 		t.Errorf("%s: %s supposed to be %s", s, myRes, res)
 	}
 }
 
 func TestGetEvalValue(t *testing.T) {
 	testGetEvalValue(t, "eval(a) && a && b && c", []string{"a"})
-	testGetEvalValue(t, "eval((a) && (b)) && a && b && c", []string{"(a) && (b)"})
-	testGetEvalValue(t, "eval(a) && a && b && c", []string{"a"})
+	testGetEvalValue(t, "eval(a) && eval(b) && a && b && c", []string{"a", "b"})
 }

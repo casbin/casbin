@@ -427,16 +427,8 @@ func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (ok bool, err e
 
 			if hasEval {
 				ruleNames := util.GetEvalValue(expString)
-				if err != nil {
-					return false, err
-				}
-
 				var expWithRule = expString
-				for i, ruleName := range ruleNames {
-					if i%2 == 0 {
-						continue
-					}
-
+				for _, ruleName := range ruleNames {
 					if j, ok := parameters.pTokens[ruleName]; ok {
 						rule := util.EscapeAssertion(pvals[j])
 						expWithRule = util.ReplaceEval(expWithRule, rule)
