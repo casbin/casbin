@@ -152,18 +152,23 @@ func SetSubtract(a []string, b []string) []string {
 
 // HasEval determine whether matcher contains function eval
 func HasEval(s string) (bool, error) {
-	return regexp.MatchString(`\beval\((.*)\)`, s)
+	return regexp.MatchString(`\beval\((?P<rule>[^),]*)\)`, s)
 }
 
 // ReplaceEval replace function eval with the value of its parameters
 func ReplaceEval(s string, rule string) string {
-	reg := regexp.MustCompile(`\beval\((.*)\)`)
+	reg := regexp.MustCompile(`\beval\((?P<rule>[^),]*)\)`)
 
 	return reg.ReplaceAllString(s, "("+rule+")")
 }
 
 // GetEvalValue returns the parameters of function eval
 func GetEvalValue(s string) []string {
-	reg := regexp.MustCompile(`\beval\((.*)\)`)
-	return reg.FindStringSubmatch(s)
+	reg := regexp.MustCompile(`\beval\((?P<rule>[^),]*)\)`)
+	subMatch := reg.FindAllStringSubmatch(s, -1)
+	var rules []string
+	for _, rule := range subMatch {
+		rules = append(rules, rule[1])
+	}
+	return rules
 }
