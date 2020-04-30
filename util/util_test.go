@@ -116,7 +116,7 @@ func TestSetEquals(t *testing.T) {
 
 func testContainEval(t *testing.T, s string, res bool) {
 	t.Helper()
-	myRes, _ := HasEval(s)
+	myRes := HasEval(s)
 	if myRes != res {
 		t.Errorf("%s: %t, supposed to be %t", s, myRes, res)
 	}
@@ -153,5 +153,7 @@ func testGetEvalValue(t *testing.T, s string, res []string) {
 
 func TestGetEvalValue(t *testing.T) {
 	testGetEvalValue(t, "eval(a) && a && b && c", []string{"a"})
+	testGetEvalValue(t, "a && eval(a) && b && c", []string{"a"})
 	testGetEvalValue(t, "eval(a) && eval(b) && a && b && c", []string{"a", "b"})
+	testGetEvalValue(t, "a && eval(a) && eval(b) && b && c", []string{"a", "b"})
 }

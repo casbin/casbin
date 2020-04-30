@@ -373,10 +373,7 @@ func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (ok bool, err e
 	}
 
 	var expression *govaluate.EvaluableExpression
-	hasEval, err := util.HasEval(expString)
-	if err != nil {
-		return false, err
-	}
+	hasEval := util.HasEval(expString)
 
 	if !hasEval {
 		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
