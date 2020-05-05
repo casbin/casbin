@@ -350,7 +350,7 @@ func (e *Enforcer) BuildRoleLinks() error {
 }
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
-func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (ok bool, err error) {
+func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("panic: %v", r)
@@ -406,6 +406,7 @@ func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (ok bool, err e
 
 	var policyEffects []effect.Effect
 	var matcherResults []float64
+
 	if policyLen := len(e.model["p"]["p"].Policy); policyLen != 0 {
 		policyEffects = make([]effect.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
@@ -511,9 +512,15 @@ func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (ok bool, err e
 
 	// log.LogPrint("Rule Results: ", policyEffects)
 
-	result, err := e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults)
+	result, explainIndex, err := e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults)
 	if err != nil {
 		return false, err
+	}
+
+	if explains != nil {
+		if explainIndex != -1 {
+			*explains = e.model["p"]["p"].Policy[explainIndex]
+		}
 	}
 
 	// Log request.
@@ -527,7 +534,20 @@ func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (ok bool, err e
 				reqStr.WriteString(fmt.Sprintf("%v", rval))
 			}
 		}
-		reqStr.WriteString(fmt.Sprintf(" ---> %t", result))
+		reqStr.WriteString(fmt.Sprintf(" ---> %t\n", result))
+
+		if explains != nil {
+			reqStr.WriteString("Hit Policy: ")
+			for i, pval := range *explains {
+				if i != len(*explains)-1 {
+					reqStr.WriteString(fmt.Sprintf("%v, ", pval))
+				} else {
+					reqStr.WriteString(fmt.Sprintf("%v \n", pval))
+				}
+			}
+
+		}
+
 		log.LogPrint(reqStr.String())
 	}
 
@@ -536,12 +556,26 @@ func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (ok bool, err e
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
 func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
-	return e.enforce("", rvals...)
+	return e.enforce("", nil, rvals...)
 }
 
 // EnforceWithMatcher use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error) {
-	return e.enforce(matcher, rvals...)
+	return e.enforce(matcher, nil, rvals...)
+}
+
+// EnforceEx explain enforcement by informing matched rules
+func (e *Enforcer) EnforceEx(rvals ...interface{}) (bool, []string, error) {
+	explain := []string{}
+	result, err := e.enforce("", &explain, rvals...)
+	return result, explain, err
+}
+
+// EnforceExWithMatcher use a custom matcher and explain enforcement by informing matched rules
+func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error) {
+	explain := []string{}
+	result, err := e.enforce(matcher, &explain, rvals...)
+	return result, explain, err
 }
 
 // assumes bounds have already been checked
