@@ -371,9 +371,15 @@ func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (ok bool, err e
 	} else {
 		expString = matcher
 	}
-	expression, err := govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
-	if err != nil {
-		return false, err
+
+	var expression *govaluate.EvaluableExpression
+	hasEval := util.HasEval(expString)
+
+	if !hasEval {
+		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+		if err != nil {
+			return false, err
+		}
 	}
 
 	rTokens := make(map[string]int, len(e.model["r"]["r"].Tokens))
@@ -415,6 +421,25 @@ func (e *Enforcer) enforce(matcher string, rvals ...interface{}) (ok bool, err e
 			}
 
 			parameters.pVals = pvals
+
+			if hasEval {
+				ruleNames := util.GetEvalValue(expString)
+				var expWithRule = expString
+				for _, ruleName := range ruleNames {
+					if j, ok := parameters.pTokens[ruleName]; ok {
+						rule := util.EscapeAssertion(pvals[j])
+						expWithRule = util.ReplaceEval(expWithRule, rule)
+					} else {
+						return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
+					}
+
+					expression, err = govaluate.NewEvaluableExpressionWithFunctions(expWithRule, functions)
+					if err != nil {
+						return false, fmt.Errorf("p.sub_rule should satisfy the syntax of matcher: %s", err)
+					}
+				}
+
+			}
 
 			result, err := expression.Eval(parameters)
 			// log.LogPrint("Result: ", result)

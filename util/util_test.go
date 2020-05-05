@@ -113,3 +113,47 @@ func TestSetEquals(t *testing.T) {
 	testSetEquals(t, []string{"a", "b", "c"}, []string{"a", "c", "b"}, true)
 	testSetEquals(t, []string{"a", "b", "c"}, []string{}, false)
 }
+
+func testContainEval(t *testing.T, s string, res bool) {
+	t.Helper()
+	myRes := HasEval(s)
+	if myRes != res {
+		t.Errorf("%s: %t, supposed to be %t", s, myRes, res)
+	}
+}
+func TestContainEval(t *testing.T) {
+	testContainEval(t, "eval() && a && b && c", true)
+	testContainEval(t, "eval) && a && b && c", false)
+	testContainEval(t, "eval)( && a && b && c", false)
+	testContainEval(t, "eval(c * (a + b)) && a && b && c", true)
+	testContainEval(t, "xeval() && a && b && c", false)
+}
+
+func testReplaceEval(t *testing.T, s string, rule string, res string) {
+	t.Helper()
+	myRes := ReplaceEval(s, rule)
+
+	if myRes != res {
+		t.Errorf("%s: %s supposed to be %s", s, myRes, res)
+	}
+}
+func TestReplaceEval(t *testing.T) {
+	testReplaceEval(t, "eval() && a && b && c", "a", "(a) && a && b && c")
+	testReplaceEval(t, "eval() && a && b && c", "(a)", "((a)) && a && b && c")
+}
+
+func testGetEvalValue(t *testing.T, s string, res []string) {
+	t.Helper()
+	myRes := GetEvalValue(s)
+
+	if !ArrayEquals(myRes, res) {
+		t.Errorf("%s: %s supposed to be %s", s, myRes, res)
+	}
+}
+
+func TestGetEvalValue(t *testing.T) {
+	testGetEvalValue(t, "eval(a) && a && b && c", []string{"a"})
+	testGetEvalValue(t, "a && eval(a) && b && c", []string{"a"})
+	testGetEvalValue(t, "eval(a) && eval(b) && a && b && c", []string{"a", "b"})
+	testGetEvalValue(t, "a && eval(a) && eval(b) && b && c", []string{"a", "b"})
+}
