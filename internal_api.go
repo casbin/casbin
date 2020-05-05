@@ -35,11 +35,14 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 		}
 	}
 
-	if e.watcher !=nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return ruleAdded, err
+	if e.watcher != nil && e.autoNotifyWatcher {
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForAddPolicy(rule...)
+		} else {
+			err = e.watcher.Update()
 		}
+		return ruleAdded, err
 	}
 
 	return ruleAdded, nil
@@ -86,11 +89,15 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		}
 	}
 
-	if e.watcher !=nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return ruleRemoved, err
+	if e.watcher != nil && e.autoNotifyWatcher {
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForRemovePolicy(rule...)
+		} else {
+			err = e.watcher.Update()
 		}
+		return ruleRemoved, err
+
 	}
 
 	return ruleRemoved, nil
@@ -136,11 +143,14 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 		}
 	}
 
-	if e.watcher !=nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return ruleRemoved, err
+	if e.watcher != nil && e.autoNotifyWatcher {
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForRemoveFilteredPolicy(fieldIndex, fieldValues...)
+		} else {
+			err = e.watcher.Update()
 		}
+		return ruleRemoved, err
 	}
 
 	return ruleRemoved, nil
