@@ -90,6 +90,8 @@ func TestKeyMatch2(t *testing.T) {
 	testKeyMatch2(t, "/alice/all", "/:id/all", true)
 	testKeyMatch2(t, "/alice", "/:id/all", false)
 	testKeyMatch2(t, "/alice/all", "/:id", false)
+
+	testKeyMatch2(t, "/alice/all", "/:/all", false)
 }
 
 func testKeyMatch3(t *testing.T, key1 string, key2 string, res bool) {
@@ -125,6 +127,8 @@ func TestKeyMatch3(t *testing.T) {
 	testKeyMatch3(t, "/proxy/myid/res/res2", "/proxy/{id}/*", true)
 	testKeyMatch3(t, "/proxy/myid/res/res2/res3", "/proxy/{id}/*", true)
 	testKeyMatch3(t, "/proxy/", "/proxy/{id}/*", false)
+
+	testKeyMatch3(t, "/myid/using/myresid", "/{id/using/{resId}", false)
 }
 
 func testKeyMatch4(t *testing.T, key1 string, key2 string, res bool) {
@@ -149,6 +153,8 @@ func TestKeyMatch4(t *testing.T) {
 	testKeyMatch4(t, "/parent/123/child/456/book/123", "/parent/{id}/child/{id}/book/{id}", false)
 	testKeyMatch4(t, "/parent/123/child/456/book/", "/parent/{id}/child/{id}/book/{id}", false)
 	testKeyMatch4(t, "/parent/123/child/456", "/parent/{id}/child/{id}/book/{id}", false)
+
+	testKeyMatch4(t, "/parent/123/child/123", "/parent/{i/d}/child/{i/d}", false)
 }
 
 func testRegexMatch(t *testing.T, key1 string, key2 string, res bool) {

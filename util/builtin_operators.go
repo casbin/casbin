@@ -73,14 +73,8 @@ func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 func KeyMatch2(key1 string, key2 string) bool {
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 
-	re := regexp.MustCompile(`(.*):[^/]+(.*)`)
-	for {
-		if !strings.Contains(key2, "/:") {
-			break
-		}
-
-		key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
-	}
+	re := regexp.MustCompile(`:[^/]+`)
+	key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
 
 	return RegexMatch(key1, "^"+key2+"$")
 }
@@ -102,14 +96,8 @@ func KeyMatch2Func(args ...interface{}) (interface{}, error) {
 func KeyMatch3(key1 string, key2 string) bool {
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 
-	re := regexp.MustCompile(`(.*)\{[^/]+\}(.*)`)
-	for {
-		if !strings.Contains(key2, "/{") {
-			break
-		}
-
-		key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
-	}
+	re := regexp.MustCompile(`\{[^/]+\}`)
+	key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
 
 	return RegexMatch(key1, "^"+key2+"$")
 }
@@ -144,14 +132,8 @@ func KeyMatch4(key1 string, key2 string) bool {
 		}
 	}
 
-	re := regexp.MustCompile(`(.*)\{[^/]+\}(.*)`)
-	for {
-		if !strings.Contains(key2, "/{") {
-			break
-		}
-
-		key2 = re.ReplaceAllString(key2, "$1([^/]+)$2")
-	}
+	re := regexp.MustCompile(`\{[^/]+\}`)
+	key2 = re.ReplaceAllString(key2, "$1([^/]+)$2")
 
 	re = regexp.MustCompile("^" + key2 + "$")
 	values := re.FindStringSubmatch(key1)
