@@ -138,7 +138,6 @@ func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool 
 func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]string, error) {
 	res := []string{}
 	roleSet := make(map[string]bool)
-	roleSet[name] = true
 
 	q := make([]string, 0)
 	q = append(q, name)

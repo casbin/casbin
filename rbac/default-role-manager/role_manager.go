@@ -71,18 +71,25 @@ func (rm *RoleManager) hasRole(name string) bool {
 func (rm *RoleManager) createRole(name string) *Role {
 	role, _ := rm.allRoles.LoadOrStore(name, newRole(name))
 
+	return role.(*Role)
+}
+
+func (rm *RoleManager) getRole(name string) *Role {
+	res := newRole(name)
+	role, _ := rm.allRoles.LoadOrStore(name, newRole(name))
+
+	res.roles = append(res.roles, role.(*Role).roles...)
+
 	if rm.hasPattern {
 		rm.allRoles.Range(func(key, value interface{}) bool {
-			if rm.matchingFunc(name, key.(string)) && name!=key.(string) {
-				// Add new role to matching role
-				role1, _ := rm.allRoles.LoadOrStore(key.(string), newRole(key.(string)))
-				role.(*Role).addRole(role1.(*Role))
+			if rm.matchingFunc(name, key.(string)) && name != key.(string) {
+				res.roles = append(res.roles, value.(*Role).roles...)
 			}
 			return true
 		})
 	}
 
-	return role.(*Role)
+	return res
 }
 
 // Clear clears all stored data and resets the role manager to the initial state.
@@ -147,7 +154,7 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 		return false, nil
 	}
 
-	role1 := rm.createRole(name1)
+	role1 := rm.getRole(name1)
 	return role1.hasRole(name2, rm.maxHierarchyLevel), nil
 }
 
@@ -164,7 +171,7 @@ func (rm *RoleManager) GetRoles(name string, domain ...string) ([]string, error)
 		return []string{}, nil
 	}
 
-	roles := rm.createRole(name).getRoles()
+	roles := rm.getRole(name).getRoles()
 	if len(domain) == 1 {
 		for i := range roles {
 			roles[i] = roles[i][len(domain[0])+2:]

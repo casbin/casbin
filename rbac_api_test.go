@@ -195,7 +195,8 @@ func testGetImplicitRoles(t *testing.T, e *Enforcer, name string, res []string) 
 	t.Helper()
 	myRes, _ := e.GetImplicitRolesForUser(name)
 	t.Log("Implicit roles for ", name, ": ", myRes)
-
+	sort.Strings(myRes)
+	sort.Strings(res)
 	if !util.ArrayEquals(res, myRes) {
 		t.Error("Implicit roles for ", name, ": ", myRes, ", supposed to be ", res)
 	}
@@ -228,7 +229,7 @@ func TestImplicitRoleAPI(t *testing.T) {
 		t.Error(err)
 	}
 
-	testGetImplicitRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin", "/book/*", "book_group"})
+	testGetImplicitRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin", "book_group"})
 	testGetRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin"})
 }
 

@@ -297,6 +297,11 @@ func TestRBACModelWithPattern(t *testing.T) {
 	// of checking whether "/book/:id" equals the obj: "/book/1", it checks whether the pattern matches.
 	// You can see it as normal RBAC: "/book/:id" == "/book/1" becomes KeyMatch2("/book/:id", "/book/1")
 	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("KeyMatch2", util.KeyMatch2)
+	err := e.BuildRoleLinks()
+	if err != nil {
+		t.Error(err)
+	}
+
 	testEnforce(t, e, "alice", "/book/1", "GET", true)
 	testEnforce(t, e, "alice", "/book/2", "GET", true)
 	testEnforce(t, e, "alice", "/pen/1", "GET", true)
@@ -309,6 +314,11 @@ func TestRBACModelWithPattern(t *testing.T) {
 	// AddMatchingFunc() is actually setting a function because only one function is allowed,
 	// so when we set "KeyMatch3", we are actually replacing "KeyMatch2" with "KeyMatch3".
 	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("KeyMatch3", util.KeyMatch3)
+	err = e.BuildRoleLinks()
+	if err != nil {
+		t.Error(err)
+	}
+
 	testEnforce(t, e, "alice", "/book2/1", "GET", true)
 	testEnforce(t, e, "alice", "/book2/2", "GET", true)
 	testEnforce(t, e, "alice", "/pen2/1", "GET", true)
@@ -317,6 +327,25 @@ func TestRBACModelWithPattern(t *testing.T) {
 	testEnforce(t, e, "bob", "/book2/2", "GET", false)
 	testEnforce(t, e, "bob", "/pen2/1", "GET", true)
 	testEnforce(t, e, "bob", "/pen2/2", "GET", true)
+
+	e, _ = NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("KeyMatch2", util.KeyMatch2)
+
+	e.ClearPolicy()
+	e.AddPolicy("book_admin", "/book/1", "GET")
+	e.AddPolicy("pen_admin", "/pen/1", "GET")
+	e.AddPolicy("bob_admin", "/bob/1", "GET")
+	e.AddPolicy("*", "/data1", "GET")
+	e.AddGroupingPolicy("*", "book_admin")
+	e.AddGroupingPolicy("*", "pen_admin")
+	e.AddGroupingPolicy("bob", "bob_admin")
+
+	testEnforce(t, e, "alice", "/data1", "GET", false)
+	testEnforce(t, e, "*", "/data1", "GET", true)
+
+	testGetImplicitRoles(t, e, "alice", []string{"book_admin", "pen_admin"})
+	testGetImplicitRoles(t, e, "test", []string{"book_admin", "pen_admin"})
+	testGetImplicitRoles(t, e, "bob", []string{"book_admin", "pen_admin", "bob_admin"})
 }
 
 type testCustomRoleManager struct{}
