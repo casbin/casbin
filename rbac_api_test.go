@@ -126,6 +126,16 @@ func TestRoleAPI(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestEnforcer_AddRolesForUser(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	e.AddRolesForUser("alice", []string{"data1_admin", "data2_admin", "data3_admin"})
+	testGetRoles(t, e, "alice", []string{"data1_admin", "data2_admin", "data3_admin"})
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data2", "read", true)
+	testEnforce(t, e, "alice", "data2", "write", true)
+}
+
 func testGetPermissions(t *testing.T, e *Enforcer, name string, res [][]string) {
 	t.Helper()
 	myRes := e.GetPermissionsForUser(name)
