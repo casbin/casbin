@@ -77,14 +77,20 @@ func BenchmarkRBACModelMedium(b *testing.B) {
 	e, _ := NewEnforcer("examples/rbac_model.conf")
 	// Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
 	e.EnableAutoBuildRoleLinks(false)
+
 	// 1000 roles, 100 resources.
+	pPolicies := make([][]string, 0)
 	for i := 0; i < 1000; i++ {
-		e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read")
+		pPolicies = append(pPolicies, []string{fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read"})
 	}
+	e.AddPolicies(pPolicies)
+
 	// 10000 users.
+	gPolicies := make([][]string, 0)
 	for i := 0; i < 10000; i++ {
-		e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10))
+		gPolicies = append(gPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10)})
 	}
+
 	e.BuildRoleLinks()
 
 	b.ResetTimer()
@@ -97,14 +103,21 @@ func BenchmarkRBACModelLarge(b *testing.B) {
 	e, _ := NewEnforcer("examples/rbac_model.conf")
 	// Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
 	e.EnableAutoBuildRoleLinks(false)
+
 	// 10000 roles, 1000 resources.
+	pPolicies := make([][]string, 0)
 	for i := 0; i < 10000; i++ {
-		e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read")
+		pPolicies = append(pPolicies, []string{fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read"})
 	}
+	e.AddPolicies(pPolicies)
+
 	// 100000 users.
+	gPolicies := make([][]string, 0)
 	for i := 0; i < 100000; i++ {
-		e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10))
+		gPolicies = append(gPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10)})
 	}
+	e.AddGroupingPolicies(gPolicies)
+
 	e.BuildRoleLinks()
 
 	b.ResetTimer()
