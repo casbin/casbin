@@ -19,8 +19,8 @@ import (
 	"time"
 
 	"github.com/Knetic/govaluate"
-	"github.com/casbin/casbin/v2/persist"
 	"github.com/casbin/casbin/v2/log"
+	"github.com/casbin/casbin/v2/persist"
 )
 
 // SyncedEnforcer wraps Enforcer and provides synchronized access
@@ -58,7 +58,7 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 			e.autoLoadRunning = false
 		}()
 		n := 1
-		log.Print("Start automatically load policy")
+		log.LogPrintf("Start automatically load policy")
 		for {
 			select {
 			case <-ticker.C:
@@ -68,7 +68,7 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 				// log.Print("Load policy for time: ", n)
 				n++
 			case <-e.stopAutoLoad:
-				log.Print("Stop automatically load policy")
+				log.LogPrintf("Stop automatically load policy")
 				return
 			}
 		}
