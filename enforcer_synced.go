@@ -15,12 +15,12 @@
 package casbin
 
 import (
-	"log"
 	"sync"
 	"time"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/persist"
+	"github.com/casbin/casbin/v2/log"
 )
 
 // SyncedEnforcer wraps Enforcer and provides synchronized access
