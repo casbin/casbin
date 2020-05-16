@@ -349,6 +349,11 @@ func (e *Enforcer) BuildRoleLinks() error {
 	return e.model.BuildRoleLinks(e.rm)
 }
 
+// BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
+func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, rules [][]string) error {
+	return e.model.BuildIncrementalRoleLinks(e.rm, op, "g", ptype, rules)
+}
+
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) {
 	defer func() {
