@@ -155,7 +155,14 @@ func (c *Config) parseBuffer(buf *bufio.Reader) error {
 				canWrite = true
 			}
 
-			if _, err := buffer.Write(p); err != nil {
+			end := len(p)
+			for i, value := range p {
+				if value == DEFAULT_COMMENT[0] || value == DEFAULT_COMMENT_SEM[0] {
+					end = i
+					break
+				}
+			}
+			if _, err := buffer.Write(p[:end]); err != nil {
 				return err
 			}
 		}

@@ -560,3 +560,16 @@ func TestABACPolicy(t *testing.T) {
 	testEnforce(t, e, sub3, "/data1", "write", false)
 	testEnforce(t, e, sub3, "/data2", "write", false)
 }
+
+func TestCommentModel(t *testing.T) {
+	e, _ := NewEnforcer("examples/comment_model.conf", "examples/basic_policy.csv")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
