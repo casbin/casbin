@@ -44,7 +44,12 @@ func TestGet(t *testing.T) {
 	if v := config.String("mysql::mysql.master.host"); v != "10.0.0.1" {
 		t.Errorf("Get failure: expected different value for mysql::mysql.master.host (expected: [%#v] got: [%#v])", "10.0.0.1", v)
 	}
-
+	if v := config.String("mysql::mysql.master.user"); v != "root" {
+		t.Errorf("Get failure: expected different value for mysql::mysql.master.user (expected: [%#v] got: [%#v])", "root", v)
+	}
+	if v := config.String("mysql::mysql.master.pass"); v != "89dds)2$" {
+		t.Errorf("Get failure: expected different value for mysql::mysql.master.pass (expected: [%#v] got: [%#v])", "89dds)2$", v)
+	}
 	// math::key test
 	if v, err := config.Int64("math::math.i64"); err != nil || v != 64 {
 		t.Errorf("Get failure: expected different value for math::math.i64 (expected: [%#v] got: [%#v])", 64, v)
