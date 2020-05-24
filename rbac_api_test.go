@@ -23,9 +23,9 @@ import (
 	"github.com/casbin/casbin/v2/util"
 )
 
-func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
+func testGetRoles(t *testing.T, e *Enforcer, res []string, name string, domain ...string) {
 	t.Helper()
-	myRes, err := e.GetRolesForUser(name)
+	myRes, err := e.GetRolesForUser(name, domain...)
 	if err != nil {
 		t.Error("Roles for ", name, " could not be fetched: ", err.Error())
 	}
@@ -36,9 +36,9 @@ func testGetRoles(t *testing.T, e *Enforcer, name string, res []string) {
 	}
 }
 
-func testGetUsers(t *testing.T, e *Enforcer, name string, res []string) {
+func testGetUsers(t *testing.T, e *Enforcer, res []string, name string, domain ...string) {
 	t.Helper()
-	myRes, err := e.GetUsersForRole(name)
+	myRes, err := e.GetUsersForRole(name, domain...)
 	switch err {
 	case nil:
 		break
@@ -70,38 +70,38 @@ func testHasRole(t *testing.T, e *Enforcer, name string, role string, res bool) 
 func TestRoleAPI(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	testGetRoles(t, e, "alice", []string{"data2_admin"})
-	testGetRoles(t, e, "bob", []string{})
-	testGetRoles(t, e, "data2_admin", []string{})
-	testGetRoles(t, e, "non_exist", []string{})
+	testGetRoles(t, e, []string{"data2_admin"}, "alice")
+	testGetRoles(t, e, []string{}, "bob")
+	testGetRoles(t, e, []string{}, "data2_admin")
+	testGetRoles(t, e, []string{}, "non_exist")
 
 	testHasRole(t, e, "alice", "data1_admin", false)
 	testHasRole(t, e, "alice", "data2_admin", true)
 
 	e.AddRoleForUser("alice", "data1_admin")
 
-	testGetRoles(t, e, "alice", []string{"data1_admin", "data2_admin"})
-	testGetRoles(t, e, "bob", []string{})
-	testGetRoles(t, e, "data2_admin", []string{})
+	testGetRoles(t, e, []string{"data1_admin", "data2_admin"}, "alice")
+	testGetRoles(t, e, []string{}, "bob")
+	testGetRoles(t, e, []string{}, "data2_admin")
 
 	e.DeleteRoleForUser("alice", "data1_admin")
 
-	testGetRoles(t, e, "alice", []string{"data2_admin"})
-	testGetRoles(t, e, "bob", []string{})
-	testGetRoles(t, e, "data2_admin", []string{})
+	testGetRoles(t, e, []string{"data2_admin"}, "alice")
+	testGetRoles(t, e, []string{}, "bob")
+	testGetRoles(t, e, []string{}, "data2_admin")
 
 	e.DeleteRolesForUser("alice")
 
-	testGetRoles(t, e, "alice", []string{})
-	testGetRoles(t, e, "bob", []string{})
-	testGetRoles(t, e, "data2_admin", []string{})
+	testGetRoles(t, e, []string{}, "alice")
+	testGetRoles(t, e, []string{}, "bob")
+	testGetRoles(t, e, []string{}, "data2_admin")
 
 	e.AddRoleForUser("alice", "data1_admin")
 	e.DeleteUser("alice")
 
-	testGetRoles(t, e, "alice", []string{})
-	testGetRoles(t, e, "bob", []string{})
-	testGetRoles(t, e, "data2_admin", []string{})
+	testGetRoles(t, e, []string{}, "alice")
+	testGetRoles(t, e, []string{}, "bob")
+	testGetRoles(t, e, []string{}, "data2_admin")
 
 	e.AddRoleForUser("alice", "data2_admin")
 
@@ -130,7 +130,7 @@ func TestEnforcer_AddRolesForUser(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	e.AddRolesForUser("alice", []string{"data1_admin", "data2_admin", "data3_admin"})
-	testGetRoles(t, e, "alice", []string{"data1_admin", "data2_admin", "data3_admin"})
+	testGetRoles(t, e, []string{"data1_admin", "data2_admin", "data3_admin"}, "alice")
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data2", "read", true)
 	testEnforce(t, e, "alice", "data2", "write", true)
@@ -239,7 +239,7 @@ func TestImplicitRoleAPI(t *testing.T) {
 	}
 
 	testGetImplicitRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin", "/book/*", "book_group"})
-	testGetRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin"})
+	testGetRoles(t, e, []string{"/book/1/2/3/4/5", "pen_admin"}, "cathy")
 }
 
 func testGetImplicitPermissions(t *testing.T, e *Enforcer, name string, res [][]string) {
