@@ -21,14 +21,14 @@ import (
 )
 
 // GetRolesForUser gets the roles that a user has.
-func (e *Enforcer) GetRolesForUser(name string) ([]string, error) {
-	res, err := e.model["g"]["g"].RM.GetRoles(name)
+func (e *Enforcer) GetRolesForUser(name string, domain ...string) ([]string, error) {
+	res, err := e.model["g"]["g"].RM.GetRoles(name, domain...)
 	return res, err
 }
 
 // GetUsersForRole gets the users that has a role.
-func (e *Enforcer) GetUsersForRole(name string) ([]string, error) {
-	res, err := e.model["g"]["g"].RM.GetUsers(name)
+func (e *Enforcer) GetUsersForRole(name string, domain ...string) ([]string, error) {
+	res, err := e.model["g"]["g"].RM.GetUsers(name, domain...)
 	return res, err
 }
 
@@ -58,17 +58,17 @@ func (e *Enforcer) AddRoleForUser(user string, role string) (bool, error) {
 // AddRolesForUser adds roles for a user.
 // Returns false if the user already has the roles (aka not affected).
 func (e *Enforcer) AddRolesForUser(user string, roles []string) (bool, error) {
-    f := false
-    for _, r := range roles {
-        b, err := e.AddGroupingPolicy(user, r)
-        if err != nil {
-            return false, err
-        }
-        if b {
-            f = true
-        }
-    }
-    return f, nil
+	f := false
+	for _, r := range roles {
+		b, err := e.AddGroupingPolicy(user, r)
+		if err != nil {
+			return false, err
+		}
+		if b {
+			f = true
+		}
+	}
+	return f, nil
 }
 
 // DeleteRoleForUser deletes a role for a user.
