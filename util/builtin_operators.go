@@ -123,45 +123,32 @@ func KeyMatch4(key1 string, key2 string) bool {
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 
 	tokens := []string{}
-	j := -1
-	for i, c := range key2 {
-		if c == '{' {
-			j = i
-		} else if c == '}' {
-			tokens = append(tokens, key2[j:i+1])
-		}
-	}
 
-	re := regexp.MustCompile(`\{[^/]+\}`)
-	key2 = re.ReplaceAllString(key2, "$1([^/]+)$2")
+	re := regexp.MustCompile(`\{([^/]+)\}`)
+	key2 = re.ReplaceAllStringFunc(key2, func(s string) string {
+		tokens = append(tokens, s[1:len(s)-1])
+		return "([^/]+)"
+	})
 
 	re = regexp.MustCompile("^" + key2 + "$")
-	values := re.FindStringSubmatch(key1)
-	if values == nil {
+	matches := re.FindStringSubmatch(key1)
+	if matches == nil {
 		return false
 	}
-	values = values[1:]
+	matches = matches[1:]
 
-	if len(tokens) != len(values) {
+	if len(tokens) != len(matches) {
 		panic(errors.New("KeyMatch4: number of tokens is not equal to number of values"))
 	}
 
-	m := map[string][]string{}
-	for i := 0; i < len(tokens); i++ {
-		if _, ok := m[tokens[i]]; !ok {
-			m[tokens[i]] = []string{}
+	values := map[string]string{}
+
+	for key, token := range tokens {
+		if _, ok := values[token]; !ok {
+			values[token] = matches[key]
 		}
-
-		m[tokens[i]] = append(m[tokens[i]], values[i])
-	}
-
-	for _, values := range m {
-		if len(values) > 1 {
-			for i := 1; i < len(values); i++ {
-				if values[i] != values[0] {
-					return false
-				}
-			}
+		if values[token] != matches[key] {
+			return false
 		}
 	}
 
