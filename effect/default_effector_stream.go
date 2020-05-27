@@ -5,26 +5,26 @@ type DefaultEffectorStream struct {
 	done bool
 	res bool
 	expr string
-	idx uint
-	cap uint
-	expl []uint
+	idx int
+	cap int
+	expl int
 }
 
-func (s DefaultEffectorStream) Current() bool {
+func (s *DefaultEffectorStream) Next() bool {
 	if !s.done {
 		panic("done should be true")
 	}
 	return s.res
 }
 
-func (s DefaultEffectorStream) Explain() []uint {
+func (s *DefaultEffectorStream) Explain() int {
 	if !s.done {
 		panic("done should be true")
 	}
 	return s.expl
 }
 
-func (s DefaultEffectorStream) PushEffect(eft Effect) bool {
+func (s *DefaultEffectorStream) PushEffect(eft Effect) bool {
 	hasPolicy := s.cap > 1
 
 	if s.expr == "some(where (p_eft == allow))" {
@@ -33,7 +33,7 @@ func (s DefaultEffectorStream) PushEffect(eft Effect) bool {
 			s.res = true
 
 			if hasPolicy {
-				s.expl = append(s.expl, s.idx)
+				s.expl = s.idx
 			}
 		}
 	} else if s.expr == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" {
@@ -41,14 +41,14 @@ func (s DefaultEffectorStream) PushEffect(eft Effect) bool {
 			s.res = true
 
 			if hasPolicy {
-				s.expl = append(s.expl, s.idx)
+				s.expl = s.idx
 			}
 		} else if eft == Deny {
 			s.done = true
 			s.res = false
 
 			if hasPolicy {
-				s.expl = append(s.expl, s.idx)
+				s.expl = s.idx
 			}
 		}
 	} else if s.expr == "!some(where (p_eft == deny))" {
@@ -57,7 +57,7 @@ func (s DefaultEffectorStream) PushEffect(eft Effect) bool {
 			s.res = false
 
 			if hasPolicy {
-				s.expl = append(s.expl, s.idx)
+				s.expl = s.idx
 			}
 		}
 	} else if s.expr == "priority(p_eft) || deny" && eft != Indeterminate {
@@ -69,7 +69,7 @@ func (s DefaultEffectorStream) PushEffect(eft Effect) bool {
 		s.done = true
 
 		if hasPolicy {
-			s.expl = append(s.expl, s.idx)
+			s.expl = s.idx
 		}
 	}
 

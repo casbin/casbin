@@ -2,7 +2,7 @@ package effect
 
 // EffectorStream is the interface for effector stream.
 type EffectorStream interface {
-	Current() bool
-	Explain() []uint
+	Next() bool
+	Explain() int
 	PushEffect(eft Effect) bool
 }
