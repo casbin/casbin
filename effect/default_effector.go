@@ -14,8 +14,6 @@
 
 package effect
 
-import "errors"
-
 // DefaultEffector is default effector for Casbin.
 type DefaultEffector struct {
 }
@@ -26,55 +24,27 @@ func NewDefaultEffector() *DefaultEffector {
 	return &e
 }
 
-// MergeEffects merges all matching results collected by the enforcer into a single decision.
-func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, results []float64) (bool, int, error) {
-	result := false
-	explainIndex := -1
-	if expr == "some(where (p_eft == allow))" {
-		result = false
-		for i, eft := range effects {
-			if eft == Allow {
-				result = true
-				explainIndex = i
-				break
-			}
-		}
-	} else if expr == "!some(where (p_eft == deny))" {
-		result = true
-		for i, eft := range effects {
-			if eft == Deny {
-				result = false
-				explainIndex = i
-				break
-			}
-		}
-	} else if expr == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" {
-		result = false
-		for i, eft := range effects {
-			if eft == Allow {
-				result = true
-			} else if eft == Deny {
-				result = false
-				explainIndex = i
-				break
-			}
-		}
-	} else if expr == "priority(p_eft) || deny" {
-		result = false
-		for i, eft := range effects {
-			if eft != Indeterminate {
-				if eft == Allow {
-					result = true
-				} else {
-					result = false
-				}
-				explainIndex = i
-				break
-			}
-		}
-	} else {
-		return false, -1, errors.New("unsupported effect")
+func (e * DefaultEffector) NewStream(expr string, cap uint) (EffectorStream) {
+	if !(cap>0) {
+		panic("cap should be greater than 0")
 	}
 
-	return result, explainIndex, nil
+	var res bool
+	if expr=="some(where (p_eft == allow))" || expr=="some(where (p_eft == allow)) && !some(where (p_eft == deny))" || expr=="priority(p_eft) || deny" {
+		res = false
+	} else if expr=="!some(where (p_eft == deny))" {
+		res = true
+	} else {
+		panic("unsupported effect: " + expr)
+	}
+
+	var des DefaultEffectorStream
+	des.done = false
+	des.res = res
+	des.expr = expr
+	des.cap = cap
+	des.idx = 0
+	des.expl = make([]uint, 0)
+
+	return des
 }
