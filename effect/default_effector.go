@@ -24,7 +24,7 @@ func NewDefaultEffector() *DefaultEffector {
 	return &e
 }
 
-func (e * DefaultEffector) NewStream(expr string, cap uint) (EffectorStream) {
+func (e *DefaultEffector) NewStream(expr string, cap int) (DefaultEffectorStream) {
 	if !(cap>0) {
 		panic("cap should be greater than 0")
 	}
@@ -38,13 +38,13 @@ func (e * DefaultEffector) NewStream(expr string, cap uint) (EffectorStream) {
 		panic("unsupported effect: " + expr)
 	}
 
-	var des DefaultEffectorStream
+	des := DefaultEffectorStream{}
 	des.done = false
 	des.res = res
 	des.expr = expr
 	des.cap = cap
 	des.idx = 0
-	des.expl = make([]uint, 0)
+	des.expl = -1
 
 	return des
 }
