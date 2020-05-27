@@ -10,21 +10,21 @@ type DefaultEffectorStream struct {
 	expl []uint
 }
 
-func (s *DefaultEffectorStream) Current() bool {
+func (s DefaultEffectorStream) Current() bool {
 	if !s.done {
-		panic()
+		panic("done should be true")
 	}
 	return s.res
 }
 
-func (s *DefaultEffectorStream) Explain() []uint {
+func (s DefaultEffectorStream) Explain() []uint {
 	if !s.done {
-		panic()
+		panic("done should be true")
 	}
 	return s.expl
 }
 
-func (s *DefaultEffectorStream) PushEffect(eft Effect) bool {
+func (s DefaultEffectorStream) PushEffect(eft Effect) bool {
 	hasPolicy := s.cap > 1
 
 	if s.expr == "some(where (p_eft == allow))" {
