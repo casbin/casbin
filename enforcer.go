@@ -355,7 +355,7 @@ func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, ru
 }
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
-func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) {
+func (e *Enforcer) enforce(matcher string, explains *[][]string, rvals ...interface{}) (ok bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("panic: %v", r)
@@ -516,11 +516,16 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	// log.LogPrint("Rule Results: ", policyEffects)
 
 	result := eftStream.Next()
-	explainIndex := eftStream.Explain()
+	explainIndexes := eftStream.Explain()
 
 	if explains != nil {
-		if explainIndex != -1 {
-			*explains = e.model["p"]["p"].Policy[explainIndex]
+		if explainIndexes != nil {
+			var tempExpl [][]string = [][]string{}
+			for _, index := range explainIndexes {
+				// *explains = e.model["p"]["p"].Policy[explainIndex]
+				tempExpl = append(tempExpl, e.model["p"]["p"].Policy[index])
+			}
+			*explains = tempExpl
 		}
 	}
 
@@ -539,11 +544,13 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 		if explains != nil {
 			reqStr.WriteString("Hit Policy: ")
-			for i, pval := range *explains {
-				if i != len(*explains)-1 {
-					reqStr.WriteString(fmt.Sprintf("%v, ", pval))
-				} else {
-					reqStr.WriteString(fmt.Sprintf("%v \n", pval))
+			for _, policy := range *explains {
+				for i, pval := range policy {
+					if i != len(policy)-1 {
+						reqStr.WriteString(fmt.Sprintf("%v, ", pval))
+					} else {
+						reqStr.WriteString(fmt.Sprintf("%v \n", pval))
+					}
 				}
 			}
 
@@ -566,15 +573,15 @@ func (e *Enforcer) EnforceWithMatcher(matcher string, rvals ...interface{}) (boo
 }
 
 // EnforceEx explain enforcement by informing matched rules
-func (e *Enforcer) EnforceEx(rvals ...interface{}) (bool, []string, error) {
-	explain := []string{}
+func (e *Enforcer) EnforceEx(rvals ...interface{}) (bool, [][]string, error) {
+	explain := [][]string{}
 	result, err := e.enforce("", &explain, rvals...)
 	return result, explain, err
 }
 
 // EnforceExWithMatcher use a custom matcher and explain enforcement by informing matched rules
-func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error) {
-	explain := []string{}
+func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, [][]string, error) {
+	explain := [][]string{}
 	result, err := e.enforce(matcher, &explain, rvals...)
 	return result, explain, err
 }
