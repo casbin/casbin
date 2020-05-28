@@ -7,7 +7,13 @@ type DefaultEffectorStream struct {
 	expr string
 	idx int
 	cap int
-	expl int
+	expl []int
+}
+
+func pushIndex(truthValue bool, s *[]int, index int) {
+	if truthValue {
+		*s = append(*s, index)
+	}
 }
 
 func (s *DefaultEffectorStream) Next() bool {
@@ -17,7 +23,7 @@ func (s *DefaultEffectorStream) Next() bool {
 	return s.res
 }
 
-func (s *DefaultEffectorStream) Explain() int {
+func (s *DefaultEffectorStream) Explain() []int {
 	if !s.done {
 		panic("done should be true")
 	}
@@ -31,46 +37,27 @@ func (s *DefaultEffectorStream) PushEffect(eft Effect) bool {
 		if eft == Allow {
 			s.done = true
 			s.res = true
-
-			if hasPolicy {
-				s.expl = s.idx
-			}
+			pushIndex(hasPolicy, &s.expl, s.idx)
 		}
 	} else if s.expr == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" {
 		if eft == Allow {
 			s.res = true
-
-			if hasPolicy {
-				s.expl = s.idx
-			}
+			pushIndex(hasPolicy, &s.expl, s.idx)
 		} else if eft == Deny {
 			s.done = true
 			s.res = false
-
-			if hasPolicy {
-				s.expl = s.idx
-			}
+			pushIndex(hasPolicy, &s.expl, s.idx)
 		}
 	} else if s.expr == "!some(where (p_eft == deny))" {
 		if eft == Deny {
 			s.done = true
 			s.res = false
-
-			if hasPolicy {
-				s.expl = s.idx
-			}
+			pushIndex(hasPolicy, &s.expl, s.idx)
 		}
 	} else if s.expr == "priority(p_eft) || deny" && eft != Indeterminate {
-		if eft == Allow {
-			s.res = true
-		} else {
-			s.res = false
-		}
+		s.res = eft == Allow
 		s.done = true
-
-		if hasPolicy {
-			s.expl = s.idx
-		}
+		pushIndex(hasPolicy, &s.expl, s.idx)
 	}
 
 	if s.idx + 1 == s.cap {
