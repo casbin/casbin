@@ -44,7 +44,7 @@ func (e *DefaultEffector) NewStream(expr string, cap int) (DefaultEffectorStream
 	des.expr = expr
 	des.cap = cap
 	des.idx = 0
-	des.expl = -1
+	des.expl = make([]int, 0)
 
 	return des
 }
