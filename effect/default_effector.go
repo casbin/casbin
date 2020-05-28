@@ -38,13 +38,7 @@ func (e *DefaultEffector) NewStream(expr string, cap int) (DefaultEffectorStream
 		panic("unsupported effect: " + expr)
 	}
 
-	des := DefaultEffectorStream{}
-	des.done = false
-	des.res = res
-	des.expr = expr
-	des.cap = cap
-	des.idx = 0
-	des.expl = make([]int, 0)
+	des := DefaultEffectorStream{false, res, expr, 0, cap, make([]int, 0)}
 
 	return des
 }
