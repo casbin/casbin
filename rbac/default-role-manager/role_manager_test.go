@@ -51,6 +51,15 @@ func testPrintRoles(t *testing.T, rm rbac.RoleManager, name string, res []string
 	}
 }
 
+func testPrintRolesWithDomain(t *testing.T, rm rbac.RoleManager, name string, domain string, res []string) {
+	t.Helper()
+	myRes, _ := rm.GetRoles(name, domain)
+
+	if !util.ArrayEquals(myRes, res) {
+		t.Errorf("%s: %s, supposed to be %s", name, myRes, res)
+	}
+}
+
 func TestRole(t *testing.T) {
 	rm := NewRoleManager(3)
 	rm.AddLink("u1", "g1")
@@ -220,4 +229,48 @@ func TestClear(t *testing.T) {
 	testRole(t, rm, "u4", "g1", false)
 	testRole(t, rm, "u4", "g2", false)
 	testRole(t, rm, "u4", "g3", false)
+}
+
+func TestDomainPartternRole(t *testing.T) {
+	rm := NewRoleManager(10)
+	rm.(*RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2, true)
+
+	rm.AddLink("u1", "g1", "domain1")
+	rm.AddLink("u2", "g1", "domain2")
+	rm.AddLink("u3", "g1", "*")
+	rm.AddLink("u4", "g2", "domain3")
+	// Current role inheritance tree after deleting the links:
+	//       domain1:g1    domain2:g1			domain3:g2
+	//		   /      \    /      \					|
+	//	 domain1:u1    *:g1     domain2:u2		domain3:u4
+	// 					|
+	// 				   *:u3
+	testDomainRole(t, rm, "u1", "g1", "domain1", true)
+	testDomainRole(t, rm, "u2", "g1", "domain1", false)
+	testDomainRole(t, rm, "u2", "g1", "domain2", true)
+	testDomainRole(t, rm, "u3", "g1", "domain1", true)
+	testDomainRole(t, rm, "u3", "g1", "domain2", true)
+	testDomainRole(t, rm, "u1", "g2", "domain1", false)
+	testDomainRole(t, rm, "u4", "g2", "domain3", true)
+	testDomainRole(t, rm, "u3", "g2", "domain3", false)
+
+	testPrintRolesWithDomain(t, rm, "u3", "domain1", []string{"g1"})
+	testPrintRolesWithDomain(t, rm, "u1", "domain1", []string{"g1"})
+	testPrintRolesWithDomain(t, rm, "u3", "domain2", []string{"g1"})
+	testPrintRolesWithDomain(t, rm, "u1", "domain2", []string{})
+	testPrintRolesWithDomain(t, rm, "u4", "domain3", []string{"g2"})
+}
+
+func TestAllMatchingFunc(t *testing.T) {
+	rm := NewRoleManager(10)
+	rm.(*RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2)
+	rm.(*RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2, true)
+
+	rm.AddLink("/book/:id", "book_group", "*")
+	// Current role inheritance tree after deleting the links:
+	//  		*:book_group
+	//				|
+	// 			*:/book/:id
+	testDomainRole(t, rm, "/book/1", "book_group", "domain1", true)
+	testDomainRole(t, rm, "/book/2", "book_group", "domain1", true)
 }
