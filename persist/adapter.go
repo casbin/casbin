@@ -17,7 +17,7 @@ package persist
 import (
 	"strings"
 
-	"github.com/casbin/casbin/v2/model"
+	"github.com/casbin/casbin/v3/model"
 )
 
 // LoadPolicyLine loads a text line as a policy rule to model.
