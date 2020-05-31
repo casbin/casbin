@@ -51,11 +51,11 @@ type IEnforcer interface {
 	EnableAutoSave(autoSave bool)
 	EnableAutoBuildRoleLinks(autoBuildRoleLinks bool)
 	BuildRoleLinks() error
-	enforce(matcher string, explains *[]string, rvals ...interface{}) (bool, error)
+	enforce(matcher string, explains *[][]string, rvals ...interface{}) (bool, error)
 	Enforce(rvals ...interface{}) (bool, error)
 	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
-	EnforceEx(rvals ...interface{}) (bool, []string, error)
-	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error)
+	EnforceEx(rvals ...interface{}) (bool, [][]string, error)
+	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, [][]string, error)
 
 	/* RBAC API */
 	GetRolesForUser(name string, domain ...string) ([]string, error)
