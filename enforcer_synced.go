@@ -125,8 +125,8 @@ func (e *SyncedEnforcer) BuildRoleLinks() error {
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
 func (e *SyncedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
-	e.m.Lock()
-	defer e.m.Unlock()
+	e.m.RLock()
+	defer e.m.RUnlock()
 	return e.Enforcer.Enforce(rvals...)
 }
 
