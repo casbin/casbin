@@ -40,10 +40,10 @@ type Filter struct {
 
 // NewFilteredAdapter is the constructor for FilteredAdapter.
 func NewFilteredAdapter(filePath string) *FilteredAdapter {
-	a := FilteredAdapter{}
-	a.filtered = true
-	a.Adapter = NewAdapter(filePath)
-	return &a
+	return &FilteredAdapter{
+		filtered: true,
+		Adapter:  NewAdapter(filePath),
+	}
 }
 
 // LoadPolicy loads all policy rules from the storage.

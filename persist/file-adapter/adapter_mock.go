@@ -34,9 +34,7 @@ type AdapterMock struct {
 
 // NewAdapterMock is the constructor for AdapterMock.
 func NewAdapterMock(filePath string) *AdapterMock {
-	a := AdapterMock{}
-	a.filePath = filePath
-	return &a
+	return &AdapterMock{filePath: filePath}
 }
 
 // LoadPolicy loads all policy rules from the storage.
