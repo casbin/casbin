@@ -380,7 +380,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	if matcher == "" {
 		expString = e.model["m"]["m"].Value
 	} else {
-		expString = matcher
+		expString = util.RemoveComments(util.EscapeAssertion(matcher))
 	}
 
 	var expression *govaluate.EvaluableExpression
