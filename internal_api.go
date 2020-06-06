@@ -59,7 +59,6 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 }
 
 // addPolicies adds rules to the current policy.
-// removePolicies removes rules from the current policy.
 func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool, error) {
 	rulesAdded := e.model.AddPolicies(sec, ptype, rules)
 	if !rulesAdded {
