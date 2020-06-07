@@ -59,15 +59,14 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 }
 
 // addPolicies adds rules to the current policy.
-// removePolicies removes rules from the current policy.
 func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	rulesAdded, effects := e.model.AddPolicies(sec, ptype, rules)
+	rulesAdded := e.model.AddPolicies(sec, ptype, rules)
 	if !rulesAdded {
 		return rulesAdded, nil
 	}
 
 	if sec == "g" {
-		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, effects)
+		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
 		if err != nil {
 			return rulesAdded, err
 		}
@@ -129,13 +128,13 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 
 // removePolicies removes rules from the current policy.
 func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	rulesRemoved, effects := e.model.RemovePolicies(sec, ptype, rules)
+	rulesRemoved := e.model.RemovePolicies(sec, ptype, rules)
 	if !rulesRemoved {
 		return rulesRemoved, nil
 	}
 
 	if sec == "g" {
-		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effects)
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, rules)
 		if err != nil {
 			return rulesRemoved, err
 		}
