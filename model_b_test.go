@@ -95,7 +95,7 @@ func BenchmarkRBACModelMedium(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("user5001", "data150", "read")
+		e.Enforce("user5001", "data99", "read")
 	}
 }
 
@@ -122,7 +122,7 @@ func BenchmarkRBACModelLarge(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("user50001", "data1500", "read")
+		e.Enforce("user50001", "data999", "read")
 	}
 }
 
