@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 )
 
 func BenchmarkRoleManagerSmall(b *testing.B) {
@@ -27,7 +26,7 @@ func BenchmarkRoleManagerSmall(b *testing.B) {
 
 	e.BuildRoleLinks()
 
-	rm := defaultrolemanager.NewRoleManager(1)
+	rm := e.GetRoleManager()
 
 	for i := 0; i < b.N; i++ {
 		for j := 0; j < 100; j++ {
@@ -56,7 +55,7 @@ func BenchmarkRoleManagerMedium(b *testing.B) {
 
 	e.BuildRoleLinks()
 
-	rm := defaultrolemanager.NewRoleManager(1)
+	rm := e.GetRoleManager()
 
 	for i := 0; i < b.N; i++ {
 		for j := 0; j < 1000; j++ {
@@ -85,8 +84,8 @@ func BenchmarkRoleManagerLarge(b *testing.B) {
 
 	e.BuildRoleLinks()
 
-	rm := defaultrolemanager.NewRoleManager(1)
-
+	rm := e.GetRoleManager()
+	
 	for i := 0; i < b.N; i++ {
 		for j := 0; j < 10000; j++ {
 			rm.HasLink("user501", fmt.Sprintf("group%d", j))
