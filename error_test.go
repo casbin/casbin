@@ -125,7 +125,10 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", adapter)
 
-	_, err := e.AddPolicy("admin", "domain3", "data1", "read")
+	added, err := e.AddPolicy("admin", "domain3", "data1", "read")
+	if added {
+		t.Errorf("added should be false")
+	}
 
 	if err == nil {
 		t.Errorf("Should be an error here.")
@@ -134,10 +137,13 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err.Error())
 	}
 
-	rules := [][]string {
-			{"admin", "domain4", "data1", "read"},
+	rules := [][]string{
+		{"admin", "domain4", "data1", "read"},
 	}
-	_, err = e.AddPolicies(rules)
+	added, err = e.AddPolicies(rules)
+	if added {
+		t.Errorf("added should be false")
+	}
 
 	if err == nil {
 		t.Errorf("Should be an error here.")
@@ -146,7 +152,10 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err.Error())
 	}
 
-	_, err2 := e.RemoveFilteredPolicy(1, "domain1", "data1")
+	removed, err2 := e.RemoveFilteredPolicy(1, "domain1", "data1")
+	if removed {
+		t.Errorf("removed should be false")
+	}
 
 	if err2 == nil {
 		t.Errorf("Should be an error here.")
@@ -155,7 +164,10 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err2.Error())
 	}
 
-	_, err3 := e.RemovePolicy("admin", "domain2", "data2", "read")
+	removed, err3 := e.RemovePolicy("admin", "domain2", "data2", "read")
+	if removed {
+		t.Errorf("removed should be false")
+	}
 
 	if err3 == nil {
 		t.Errorf("Should be an error here.")
@@ -164,11 +176,14 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err3.Error())
 	}
 
-	rules = [][]string {
+	rules = [][]string{
 		{"admin", "domain4", "data1", "read"},
 	}
 
-	_, err = e.RemovePolicies(rules)
+	removed, err = e.RemovePolicies(rules)
+	if removed {
+		t.Errorf("removed should be false")
+	}
 
 	if err == nil {
 		t.Errorf("Should be an error here.")
@@ -176,7 +191,11 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log("Test on error: ")
 		t.Log(err.Error())
 	}
-	_, err4 := e.AddGroupingPolicy("bob", "admin2")
+
+	added, err4 := e.AddGroupingPolicy("bob", "admin2")
+	if added {
+		t.Errorf("added should be false")
+	}
 
 	if err4 == nil {
 		t.Errorf("Should be an error here.")
@@ -185,7 +204,10 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err4.Error())
 	}
 
-	_, err5 := e.AddNamedGroupingPolicy("g", []string{"eve", "admin2", "domain1"})
+	added, err5 := e.AddNamedGroupingPolicy("g", []string{"eve", "admin2", "domain1"})
+	if added {
+		t.Errorf("added should be false")
+	}
 
 	if err5 == nil {
 		t.Errorf("Should be an error here.")
@@ -194,7 +216,10 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err5.Error())
 	}
 
-	_, err6 := e.AddNamedPolicy("p", []string{"admin2", "domain2", "data2", "write"})
+	added, err6 := e.AddNamedPolicy("p", []string{"admin2", "domain2", "data2", "write"})
+	if added {
+		t.Errorf("added should be false")
+	}
 
 	if err6 == nil {
 		t.Errorf("Should be an error here.")
@@ -203,7 +228,10 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err6.Error())
 	}
 
-	_, err7 := e.RemoveGroupingPolicy("bob", "admin2")
+	removed, err7 := e.RemoveGroupingPolicy("bob", "admin2")
+	if removed {
+		t.Errorf("removed should be false")
+	}
 
 	if err7 == nil {
 		t.Errorf("Should be an error here.")
@@ -212,7 +240,10 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err7.Error())
 	}
 
-	_, err8 := e.RemoveFilteredGroupingPolicy(0, "bob")
+	removed, err8 := e.RemoveFilteredGroupingPolicy(0, "bob")
+	if removed {
+		t.Errorf("removed should be false")
+	}
 
 	if err8 == nil {
 		t.Errorf("Should be an error here.")
@@ -221,7 +252,10 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err8.Error())
 	}
 
-	_, err9 := e.RemoveNamedGroupingPolicy("g", []string{"alice", "admin", "domain1"})
+	removed, err9 := e.RemoveNamedGroupingPolicy("g", []string{"alice", "admin", "domain1"})
+	if removed {
+		t.Errorf("removed should be false")
+	}
 
 	if err9 == nil {
 		t.Errorf("Should be an error here.")
@@ -230,7 +264,10 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err9.Error())
 	}
 
-	_, err10 := e.RemoveFilteredNamedGroupingPolicy("g", 0, "eve")
+	removed, err10 := e.RemoveFilteredNamedGroupingPolicy("g", 0, "eve")
+	if removed {
+		t.Errorf("removed should be false")
+	}
 
 	if err10 == nil {
 		t.Errorf("Should be an error here.")
