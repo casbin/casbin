@@ -24,13 +24,12 @@ import (
 )
 
 const defaultDomain string = "casbin::default"
-const tempDomain string = "casbin::temp"
 
 type MatchingFunc func(arg1, arg2 string) bool
 
 // RoleManager provides a default implementation for the RoleManager interface
 type RoleManager struct {
-	allRoles           map[string]*sync.Map
+	allDomains         *sync.Map
 	maxHierarchyLevel  int
 	hasPattern         bool
 	matchingFunc       MatchingFunc
@@ -42,8 +41,8 @@ type RoleManager struct {
 // default RoleManager implementation.
 func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 	rm := RoleManager{}
-	rm.allRoles = make(map[string]*sync.Map)
-	rm.allRoles[defaultDomain] = &sync.Map{}
+	rm.allDomains = &sync.Map{}
+	rm.allDomains.LoadOrStore(defaultDomain, new(Roles))
 	rm.maxHierarchyLevel = maxHierarchyLevel
 	rm.hasPattern = false
 	rm.hasDomainPattern = false
@@ -68,71 +67,39 @@ func (rm *RoleManager) AddMatchingFunc(name string, fn MatchingFunc, forDomain .
 	return nil
 }
 
-func (rm *RoleManager) generateTempDomain(domain string) {
-	if _, ok := rm.allRoles[domain]; !ok {
-		rm.allRoles[domain] = &sync.Map{}
-	}
+func (rm *RoleManager) generateTempRoles(domain string) *Roles {
+	rm.allDomains.LoadOrStore(domain, new(Roles))
 
 	patternDomain := []string{domain}
-	for k := range rm.allRoles {
-		if rm.domainMatchingFunc(domain, k) {
-			patternDomain = append(patternDomain, k)
+	rm.allDomains.Range(func(key, value interface{}) bool {
+		if rm.domainMatchingFunc(domain, key.(string)) {
+			patternDomain = append(patternDomain, key.(string))
 		}
-	}
+		return true
+	})
 
+	allRoles := new(Roles)
 	for _, domain := range patternDomain {
-		rm.allRoles[domain].Range(func(key, value interface{}) bool {
+		value, _ := rm.allDomains.LoadOrStore(domain, new(Roles))
+		value.(*Roles).Range(func(key, value interface{}) bool {
 			role2 := value.(*Role)
+			role1 := allRoles.createRole(role2.name, rm.matchingFunc)
 			for _, v := range role2.roles {
-				rm.AddLink(role2.name, v.name, tempDomain)
+				role3 := allRoles.createRole(v.name, rm.matchingFunc)
+				role1.addRole(role3)
 			}
 
 			return true
 		})
 	}
-}
 
-func (rm *RoleManager) hasRole(name string, domain string) bool {
-	var ok bool
-	if rm.hasPattern {
-		rm.allRoles[domain].Range(func(key, value interface{}) bool {
-			if rm.matchingFunc(name, key.(string)) {
-				ok = true
-			}
-			return true
-		})
-	} else {
-		_, ok = rm.allRoles[domain].Load(name)
-	}
-
-	return ok
-}
-
-func (rm *RoleManager) createRole(name string, domain string) *Role {
-	if _, ok := rm.allRoles[domain]; !ok {
-		rm.allRoles[domain] = &sync.Map{}
-	}
-
-	role, _ := rm.allRoles[domain].LoadOrStore(name, newRole(name))
-
-	if rm.hasPattern {
-		rm.allRoles[domain].Range(func(key, value interface{}) bool {
-			if rm.matchingFunc(name, key.(string)) && name != key.(string) {
-				// Add new role to matching role
-				role1, _ := rm.allRoles[domain].LoadOrStore(key.(string), newRole(key.(string)))
-				role.(*Role).addRole(role1.(*Role))
-			}
-			return true
-		})
-	}
-
-	return role.(*Role)
+	return allRoles
 }
 
 // Clear clears all stored data and resets the role manager to the initial state.
 func (rm *RoleManager) Clear() error {
-	rm.allRoles = make(map[string]*sync.Map)
-	rm.allRoles[defaultDomain] = &sync.Map{}
+	rm.allDomains = &sync.Map{}
+	rm.allDomains.LoadOrStore(defaultDomain, new(Roles))
 	return nil
 }
 
@@ -145,8 +112,10 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 		return errors.ERR_DOMAIN_PARAMETER
 	}
 
-	role1 := rm.createRole(name1, domain[0])
-	role2 := rm.createRole(name2, domain[0])
+	allRoles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
+
+	role1 := allRoles.(*Roles).createRole(name1, rm.matchingFunc)
+	role2 := allRoles.(*Roles).createRole(name2, rm.matchingFunc)
 	role1.addRole(role2)
 	return nil
 }
@@ -160,12 +129,14 @@ func (rm *RoleManager) DeleteLink(name1 string, name2 string, domain ...string) 
 		return errors.ERR_DOMAIN_PARAMETER
 	}
 
-	if !rm.hasRole(name1, domain[0]) || !rm.hasRole(name2, domain[0]) {
+	allRoles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
+
+	if !allRoles.(*Roles).hasRole(name1, rm.matchingFunc) || !allRoles.(*Roles).hasRole(name1, rm.matchingFunc) {
 		return errors.ERR_NAMES12_NOT_FOUND
 	}
 
-	role1 := rm.createRole(name1, domain[0])
-	role2 := rm.createRole(name2, domain[0])
+	role1 := allRoles.(*Roles).createRole(name1, rm.matchingFunc)
+	role2 := allRoles.(*Roles).createRole(name2, rm.matchingFunc)
 	role1.deleteRole(role2)
 	return nil
 }
@@ -182,19 +153,19 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 		return true, nil
 	}
 
+	var allRoles *Roles
 	if rm.hasDomainPattern {
-		rm.generateTempDomain(domain[0])
-		domain = []string{tempDomain}
-		defer func() {
-			rm.allRoles[tempDomain] = &sync.Map{}
-		}()
+		allRoles = rm.generateTempRoles(domain[0])
+	} else {
+		roles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
+		allRoles = roles.(*Roles)
 	}
 
-	if !rm.hasRole(name1, domain[0]) || !rm.hasRole(name2, domain[0]) {
+	if !allRoles.hasRole(name1, rm.matchingFunc) || !allRoles.hasRole(name2, rm.matchingFunc) {
 		return false, nil
 	}
 
-	role1 := rm.createRole(name1, domain[0])
+	role1 := allRoles.createRole(name1, rm.matchingFunc)
 	return role1.hasRole(name2, rm.maxHierarchyLevel), nil
 }
 
@@ -206,19 +177,19 @@ func (rm *RoleManager) GetRoles(name string, domain ...string) ([]string, error)
 		return nil, errors.ERR_DOMAIN_PARAMETER
 	}
 
+	var allRoles *Roles
 	if rm.hasDomainPattern {
-		rm.generateTempDomain(domain[0])
-		domain = []string{tempDomain}
-		defer func() {
-			rm.allRoles[tempDomain] = &sync.Map{}
-		}()
+		allRoles = rm.generateTempRoles(domain[0])
+	} else {
+		roles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
+		allRoles = roles.(*Roles)
 	}
 
-	if !rm.hasRole(name, domain[0]) {
+	if !allRoles.hasRole(name, rm.matchingFunc) {
 		return []string{}, nil
 	}
 
-	roles := rm.createRole(name, domain[0]).getRoles()
+	roles := allRoles.createRole(name, rm.matchingFunc).getRoles()
 
 	return roles, nil
 }
@@ -232,20 +203,20 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 		return nil, errors.ERR_DOMAIN_PARAMETER
 	}
 
+	var allRoles *Roles
 	if rm.hasDomainPattern {
-		rm.generateTempDomain(domain[0])
-		domain = []string{tempDomain}
-		defer func() {
-			rm.allRoles[tempDomain] = &sync.Map{}
-		}()
+		allRoles = rm.generateTempRoles(domain[0])
+	} else {
+		roles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
+		allRoles = roles.(*Roles)
 	}
 
-	if !rm.hasRole(name, domain[0]) {
+	if !allRoles.hasRole(name, rm.domainMatchingFunc) {
 		return nil, errors.ERR_NAME_NOT_FOUND
 	}
 
 	names := []string{}
-	rm.allRoles[domain[0]].Range(func(_, value interface{}) bool {
+	allRoles.Range(func(_, value interface{}) bool {
 		role := value.(*Role)
 		if role.hasDirectRole(name) {
 			names = append(names, role.name)
@@ -260,8 +231,8 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 func (rm *RoleManager) PrintRoles() error {
 	if log.GetLogger().IsEnabled() {
 		var sb strings.Builder
-		for _, value := range rm.allRoles {
-			value.Range(func(_, value interface{}) bool {
+		rm.allDomains.Range(func(_, value interface{}) bool {
+			value.(*Roles).Range(func(_, value interface{}) bool {
 				if text := value.(*Role).toString(); text != "" {
 					if sb.Len() == 0 {
 						sb.WriteString(text)
@@ -272,10 +243,50 @@ func (rm *RoleManager) PrintRoles() error {
 				}
 				return true
 			})
-		}
+
+			return true
+		})
 		log.LogPrint(sb.String())
 	}
 	return nil
+}
+
+// Roles represents all roles in a domain
+type Roles struct {
+	sync.Map
+}
+
+func (roles *Roles) hasRole(name string, matchingFunc MatchingFunc) bool {
+	var ok bool
+	if matchingFunc != nil {
+		roles.Range(func(key, value interface{}) bool {
+			if matchingFunc(name, key.(string)) {
+				ok = true
+			}
+			return true
+		})
+	} else {
+		_, ok = roles.Load(name)
+	}
+
+	return ok
+}
+
+func (roles *Roles) createRole(name string, matchingFunc MatchingFunc) *Role {
+	role, _ := roles.LoadOrStore(name, newRole(name))
+
+	if matchingFunc != nil {
+		roles.Range(func(key, value interface{}) bool {
+			if matchingFunc(name, key.(string)) && name != key.(string) {
+				// Add new role to matching role
+				role1, _ := roles.LoadOrStore(key.(string), newRole(key.(string)))
+				role.(*Role).addRole(role1.(*Role))
+			}
+			return true
+		})
+	}
+
+	return role.(*Role)
 }
 
 // Role represents the data structure for a role in RBAC.
