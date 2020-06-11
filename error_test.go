@@ -177,9 +177,8 @@ func TestMockAdapterErrors(t *testing.T) {
 	}
 
 	rules = [][]string{
-		{"admin", "domain4", "data1", "read"},
+		{"admin", "domain1", "data1", "read"},
 	}
-
 	removed, err = e.RemovePolicies(rules)
 	if removed {
 		t.Errorf("removed should be false")

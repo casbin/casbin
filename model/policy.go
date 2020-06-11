@@ -20,7 +20,13 @@ import (
 	"github.com/casbin/casbin/v2/util"
 )
 
-type PolicyOp int
+type (
+	PolicyOp int
+
+	// PersistFn is passed into model mutation actions. It allows us to persist the data (if required) after we have
+	// first confirmed it is valid to do so. An example would be when we need to call `model.HasPolicy(...)` first.
+	PersistFn func() error
+)
 
 const (
 	PolicyAdd PolicyOp = iota
@@ -108,43 +114,54 @@ func (model Model) HasPolicy(sec string, ptype string, rule []string) bool {
 }
 
 // AddPolicy adds a policy rule to the model.
-func (model Model) AddPolicy(sec string, ptype string, rule []string) bool {
+func (model Model) AddPolicy(persist PersistFn, sec string, ptype string, rule []string) (bool, error) {
 	if !model.HasPolicy(sec, ptype, rule) {
+		if err := persist(); err != nil {
+			return false, err
+		}
 		model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
-		return true
+		return true, nil
 	}
-	return false
+	return false, nil
 }
 
 // AddPolicies adds policy rules to the model.
-func (model Model) AddPolicies(sec string, ptype string, rules [][]string) bool {
+func (model Model) AddPolicies(persist PersistFn, sec string, ptype string, rules [][]string) (bool, error) {
 	for i := 0; i < len(rules); i++ {
 		if model.HasPolicy(sec, ptype, rules[i]) {
-			return false
+			return false, nil
 		}
+	}
+
+	if err := persist(); err != nil {
+		return false, err
 	}
 
 	for i := 0; i < len(rules); i++ {
 		model[sec][ptype].Policy = append(model[sec][ptype].Policy, rules[i])
 	}
 
-	return true
+	return true, nil
 }
 
 // RemovePolicy removes a policy rule from the model.
-func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
+func (model Model) RemovePolicy(persist PersistFn, sec string, ptype string, rule []string) (bool, error) {
+	if err := persist(); err != nil {
+		return false, err
+	}
+
 	for i, r := range model[sec][ptype].Policy {
 		if util.ArrayEquals(rule, r) {
 			model[sec][ptype].Policy = append(model[sec][ptype].Policy[:i], model[sec][ptype].Policy[i+1:]...)
-			return true
+			return true, nil
 		}
 	}
 
-	return false
+	return false, nil
 }
 
 // RemovePolicies removes policy rules from the model.
-func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
+func (model Model) RemovePolicies(persist PersistFn, sec string, ptype string, rules [][]string) (bool, error) {
 OUTER:
 	for j := 0; j < len(rules); j++ {
 		for _, r := range model[sec][ptype].Policy {
@@ -152,7 +169,11 @@ OUTER:
 				continue OUTER
 			}
 		}
-		return false
+		return false, nil
+	}
+
+	if err := persist(); err != nil {
+		return false, err
 	}
 
 	for j := 0; j < len(rules); j++ {
@@ -162,11 +183,11 @@ OUTER:
 			}
 		}
 	}
-	return true
+	return true, nil
 }
 
 // RemoveFilteredPolicy removes policy rules based on field filters from the model.
-func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, [][]string) {
+func (model Model) RemoveFilteredPolicy(persist PersistFn, sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, [][]string, error) {
 	var tmp [][]string
 	var effects [][]string
 	res := false
@@ -187,8 +208,12 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 		}
 	}
 
+	if err := persist(); err != nil {
+		return res, effects, err
+	}
+
 	model[sec][ptype].Policy = tmp
-	return res, effects
+	return res, effects, nil
 }
 
 // GetValuesForFieldInPolicy gets all values for a field for all rules in a policy, duplicated values are removed.

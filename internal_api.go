@@ -25,15 +25,21 @@ const (
 
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
-	if e.adapter != nil && e.autoSave {
-		if err := e.adapter.AddPolicy(sec, ptype, rule); err != nil {
-			if err.Error() != notImplemented {
-				return false, err
+	persistFn := func() error {
+		if e.adapter != nil && e.autoSave {
+			if err := e.adapter.AddPolicy(sec, ptype, rule); err != nil {
+				if err.Error() != notImplemented {
+					return err
+				}
 			}
 		}
+		return nil
 	}
 
-	ruleAdded := e.model.AddPolicy(sec, ptype, rule)
+	ruleAdded, err := e.model.AddPolicy(persistFn, sec, ptype, rule)
+	if err != nil {
+		return false, err
+	}
 	if !ruleAdded {
 		return ruleAdded, nil
 	}
@@ -60,15 +66,21 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 
 // addPolicies adds rules to the current policy.
 func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	if e.adapter != nil && e.autoSave {
-		if err := e.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, rules); err != nil {
-			if err.Error() != notImplemented {
-				return false, err
+	persistFn := func() error {
+		if e.adapter != nil && e.autoSave {
+			if err := e.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, rules); err != nil {
+				if err.Error() != notImplemented {
+					return err
+				}
 			}
 		}
+		return nil
 	}
 
-	rulesAdded := e.model.AddPolicies(sec, ptype, rules)
+	rulesAdded, err := e.model.AddPolicies(persistFn, sec, ptype, rules)
+	if err != nil {
+		return false, err
+	}
 	if !rulesAdded {
 		return rulesAdded, nil
 	}
@@ -92,15 +104,21 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
-	if e.adapter != nil && e.autoSave {
-		if err := e.adapter.RemovePolicy(sec, ptype, rule); err != nil {
-			if err.Error() != notImplemented {
-				return false, err
+	persistFn := func() error {
+		if e.adapter != nil && e.autoSave {
+			if err := e.adapter.RemovePolicy(sec, ptype, rule); err != nil {
+				if err.Error() != notImplemented {
+					return err
+				}
 			}
 		}
+		return nil
 	}
 
-	ruleRemoved := e.model.RemovePolicy(sec, ptype, rule)
+	ruleRemoved, err := e.model.RemovePolicy(persistFn, sec, ptype, rule)
+	if err != nil {
+		return false, err
+	}
 	if !ruleRemoved {
 		return ruleRemoved, nil
 	}
@@ -128,15 +146,21 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 
 // removePolicies removes rules from the current policy.
 func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	if e.adapter != nil && e.autoSave {
-		if err := e.adapter.(persist.BatchAdapter).RemovePolicies(sec, ptype, rules); err != nil {
-			if err.Error() != notImplemented {
-				return false, err
+	persistFn := func() error {
+		if e.adapter != nil && e.autoSave {
+			if err := e.adapter.(persist.BatchAdapter).RemovePolicies(sec, ptype, rules); err != nil {
+				if err.Error() != notImplemented {
+					return err
+				}
 			}
 		}
+		return nil
 	}
 
-	rulesRemoved := e.model.RemovePolicies(sec, ptype, rules)
+	rulesRemoved, err := e.model.RemovePolicies(persistFn, sec, ptype, rules)
+	if err != nil {
+		return false, err
+	}
 	if !rulesRemoved {
 		return rulesRemoved, nil
 	}
@@ -160,15 +184,21 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.
 func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
-	if e.adapter != nil && e.autoSave {
-		if err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
-			if err.Error() != notImplemented {
-				return false, err
+	persistFn := func() error {
+		if e.adapter != nil && e.autoSave {
+			if err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
+				if err.Error() != notImplemented {
+					return err
+				}
 			}
 		}
+		return nil
 	}
 
-	ruleRemoved, effects := e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	ruleRemoved, effects, err := e.model.RemoveFilteredPolicy(persistFn, sec, ptype, fieldIndex, fieldValues...)
+	if err != nil {
+		return false, err
+	}
 	if !ruleRemoved {
 		return ruleRemoved, nil
 	}
