@@ -20,7 +20,9 @@ import (
 	"github.com/casbin/casbin/v2/util"
 )
 
-type PolicyOp int
+type (
+	PolicyOp int
+)
 
 const (
 	PolicyAdd PolicyOp = iota
@@ -107,28 +109,27 @@ func (model Model) HasPolicy(sec string, ptype string, rule []string) bool {
 	return false
 }
 
-// AddPolicy adds a policy rule to the model.
-func (model Model) AddPolicy(sec string, ptype string, rule []string) bool {
-	if !model.HasPolicy(sec, ptype, rule) {
-		model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
-		return true
-	}
-	return false
-}
-
-// AddPolicies adds policy rules to the model.
-func (model Model) AddPolicies(sec string, ptype string, rules [][]string) bool {
+// HasPolicies determines whether a model has any of the specified policies. If one is found we return false.
+func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool {
 	for i := 0; i < len(rules); i++ {
 		if model.HasPolicy(sec, ptype, rules[i]) {
-			return false
+			return true
 		}
 	}
 
+	return false
+}
+
+// AddPolicy adds a policy rule to the model.
+func (model Model) AddPolicy(sec string, ptype string, rule []string) {
+	model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
+}
+
+// AddPolicies adds policy rules to the model.
+func (model Model) AddPolicies(sec string, ptype string, rules [][]string) {
 	for i := 0; i < len(rules); i++ {
 		model[sec][ptype].Policy = append(model[sec][ptype].Policy, rules[i])
 	}
-
-	return true
 }
 
 // RemovePolicy removes a policy rule from the model.
@@ -145,16 +146,6 @@ func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
 
 // RemovePolicies removes policy rules from the model.
 func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
-OUTER:
-	for j := 0; j < len(rules); j++ {
-		for _, r := range model[sec][ptype].Policy {
-			if util.ArrayEquals(rules[j], r) {
-				continue OUTER
-			}
-		}
-		return false
-	}
-
 	for j := 0; j < len(rules); j++ {
 		for i, r := range model[sec][ptype].Policy {
 			if util.ArrayEquals(rules[j], r) {
