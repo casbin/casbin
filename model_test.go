@@ -575,7 +575,7 @@ func TestCommentModel(t *testing.T) {
 
 func TestDomainMatchModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domain_pattern_model.conf", "examples/rbac_with_domain_pattern_policy.csv")
-	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2, true)
+	e.rm.(*defaultrolemanager.RoleManager).AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
 
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
@@ -592,7 +592,7 @@ func TestDomainMatchModel(t *testing.T) {
 func TestAllMatchModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_all_pattern_model.conf", "examples/rbac_with_all_pattern_policy.csv")
 	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2)
-	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2, true)
+	e.rm.(*defaultrolemanager.RoleManager).AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
 
 	testDomainEnforce(t, e, "alice", "domain1", "/book/1", "read", true)
 	testDomainEnforce(t, e, "alice", "domain1", "/book/1", "write", false)

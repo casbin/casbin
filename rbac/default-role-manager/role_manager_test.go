@@ -233,7 +233,7 @@ func TestClear(t *testing.T) {
 
 func TestDomainPartternRole(t *testing.T) {
 	rm := NewRoleManager(10)
-	rm.(*RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2, true)
+	rm.(*RoleManager).AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
 
 	rm.AddLink("u1", "g1", "domain1")
 	rm.AddLink("u2", "g1", "domain2")
@@ -264,7 +264,7 @@ func TestDomainPartternRole(t *testing.T) {
 func TestAllMatchingFunc(t *testing.T) {
 	rm := NewRoleManager(10)
 	rm.(*RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2)
-	rm.(*RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2, true)
+	rm.(*RoleManager).AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
 
 	rm.AddLink("/book/:id", "book_group", "*")
 	// Current role inheritance tree after deleting the links:

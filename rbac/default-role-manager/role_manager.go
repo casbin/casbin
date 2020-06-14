@@ -50,33 +50,30 @@ func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 	return &rm
 }
 
-// e.BuildRoleLinks must be called after AddMatchingFunc().
-//
-// example: e.GetRoleManager().(*defaultrolemanager.RoleManager).AddMatchingFunc('matcher', util.KeyMatch)
-func (rm *RoleManager) AddMatchingFunc(name string, fn MatchingFunc, forDomain ...bool) error {
-	if len(forDomain) == 1 && forDomain[0] {
-		rm.hasDomainPattern = true
-		rm.domainMatchingFunc = fn
-		return nil
-	} else if len(forDomain) > 1 {
-		return errors.ERR_USE_DOMAIN_PARAMETER
-	}
-
+// AddMatchingFunc support use pattern in g
+func (rm *RoleManager) AddMatchingFunc(name string, fn MatchingFunc) {
 	rm.hasPattern = true
 	rm.matchingFunc = fn
-	return nil
+}
+
+// AddDomainMatchingFunc support use domain pattern in g
+func (rm *RoleManager) AddDomainMatchingFunc(name string, fn MatchingFunc) {
+	rm.hasDomainPattern = true
+	rm.domainMatchingFunc = fn
 }
 
 func (rm *RoleManager) generateTempRoles(domain string) *Roles {
 	rm.allDomains.LoadOrStore(domain, new(Roles))
 
 	patternDomain := []string{domain}
-	rm.allDomains.Range(func(key, value interface{}) bool {
-		if rm.domainMatchingFunc(domain, key.(string)) {
-			patternDomain = append(patternDomain, key.(string))
-		}
-		return true
-	})
+	if rm.hasDomainPattern {
+		rm.allDomains.Range(func(key, value interface{}) bool {
+			if rm.domainMatchingFunc(domain, key.(string)) {
+				patternDomain = append(patternDomain, key.(string))
+			}
+			return true
+		})
+	}
 
 	allRoles := new(Roles)
 	for _, domain := range patternDomain {
@@ -114,9 +111,9 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 
 	allRoles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
 
-	role1 := allRoles.(*Roles).createRole(name1, rm.matchingFunc)
-	role2 := allRoles.(*Roles).createRole(name2, rm.matchingFunc)
-	role1.addRole(role2)
+	role1, _ := allRoles.(*Roles).LoadOrStore(name1, newRole(name1))
+	role2, _ := allRoles.(*Roles).LoadOrStore(name2, newRole(name2))
+	role1.(*Role).addRole(role2.(*Role))
 	return nil
 }
 
@@ -131,13 +128,15 @@ func (rm *RoleManager) DeleteLink(name1 string, name2 string, domain ...string) 
 
 	allRoles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
 
-	if !allRoles.(*Roles).hasRole(name1, rm.matchingFunc) || !allRoles.(*Roles).hasRole(name1, rm.matchingFunc) {
+	_, ok1 := allRoles.(*Roles).Load(name1)
+	_, ok2 := allRoles.(*Roles).Load(name1)
+	if !ok1 || !ok2 {
 		return errors.ERR_NAMES12_NOT_FOUND
 	}
 
-	role1 := allRoles.(*Roles).createRole(name1, rm.matchingFunc)
-	role2 := allRoles.(*Roles).createRole(name2, rm.matchingFunc)
-	role1.deleteRole(role2)
+	role1, _ := allRoles.(*Roles).LoadOrStore(name1, newRole(name1))
+	role2, _ := allRoles.(*Roles).LoadOrStore(name2, newRole(name2))
+	role1.(*Role).deleteRole(role2.(*Role))
 	return nil
 }
 
@@ -154,7 +153,7 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 	}
 
 	var allRoles *Roles
-	if rm.hasDomainPattern {
+	if rm.hasDomainPattern || rm.hasPattern {
 		allRoles = rm.generateTempRoles(domain[0])
 	} else {
 		roles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
@@ -178,7 +177,7 @@ func (rm *RoleManager) GetRoles(name string, domain ...string) ([]string, error)
 	}
 
 	var allRoles *Roles
-	if rm.hasDomainPattern {
+	if rm.hasDomainPattern || rm.hasPattern {
 		allRoles = rm.generateTempRoles(domain[0])
 	} else {
 		roles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
@@ -204,7 +203,7 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 	}
 
 	var allRoles *Roles
-	if rm.hasDomainPattern {
+	if rm.hasDomainPattern || rm.hasPattern {
 		allRoles = rm.generateTempRoles(domain[0])
 	} else {
 		roles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
