@@ -15,9 +15,10 @@
 package casbin
 
 import (
-	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"sort"
 	"testing"
+
+	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
@@ -233,10 +234,6 @@ func TestImplicitRoleAPI(t *testing.T) {
 	e, _ = NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
 
 	e.GetRoleManager().(*defaultrolemanager.RoleManager).AddMatchingFunc("matcher", util.KeyMatch)
-	err := e.BuildRoleLinks()
-	if err != nil {
-		t.Error(err)
-	}
 
 	testGetImplicitRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin", "/book/*", "book_group"})
 	testGetRoles(t, e, []string{"/book/1/2/3/4/5", "pen_admin"}, "cathy")
