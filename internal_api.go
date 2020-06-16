@@ -99,7 +99,7 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
 	if e.shouldPersist() {
-		if err := e.adapter.(persist.BatchAdapter).RemovePolicy(sec, ptype, rule); err != nil {
+		if err := e.adapter.RemovePolicy(sec, ptype, rule); err != nil {
 			if err.Error() != notImplemented {
 				return false, err
 			}
