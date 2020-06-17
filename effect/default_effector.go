@@ -59,7 +59,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, results []
 				break
 			}
 		}
-	} else if expr == "some(where (p.eft == allow)) || !some(where (p.eft == deny))" {
+	} else if expr == "some(where (p_eft == allow)) || !some(where (p_eft == deny))" {
 		result = true
 		for i, eft := range effects {
 			if eft == Allow {
