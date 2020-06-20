@@ -153,9 +153,7 @@ func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
 // RemovePolicies removes policy rules from the model.
 func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
 	for _, rule := range rules {
-		if ok := model.RemovePolicy(sec, ptype, rule); !ok {
-			return false
-		}
+		model.RemovePolicy(sec, ptype, rule)
 	}
 	return true
 }
