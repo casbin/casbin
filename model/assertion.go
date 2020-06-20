@@ -25,11 +25,12 @@ import (
 // Assertion represents an expression in a section of the model.
 // For example: r = sub, obj, act
 type Assertion struct {
-	Key    string
-	Value  string
-	Tokens []string
-	Policy [][]string
-	RM     rbac.RoleManager
+	Key       string
+	Value     string
+	Tokens    []string
+	Policy    [][]string
+	PolicyMap map[string]int
+	RM        rbac.RoleManager
 }
 
 func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
