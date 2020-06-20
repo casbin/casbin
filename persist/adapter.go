@@ -21,7 +21,7 @@ import (
 )
 
 // LoadPolicyLine loads a text line as a policy rule to model.
-func LoadPolicyLine(line string, model model.Model) {
+func LoadPolicyLine(line string, m model.Model) {
 	if line == "" || strings.HasPrefix(line, "#") {
 		return
 	}
@@ -33,7 +33,10 @@ func LoadPolicyLine(line string, model model.Model) {
 
 	key := tokens[0]
 	sec := key[:1]
-	model[sec][key].Policy = append(model[sec][key].Policy, tokens[1:])
+	m[sec][key].Mutex.Lock()
+	defer m[sec][key].Mutex.Unlock()
+	m[sec][key].Policy = append(m[sec][key].Policy, tokens[1:])
+	m[sec][key].PolicyMap[strings.Join(tokens[1:], model.DefaultSep)] = len(m[sec][key].Policy) - 1
 }
 
 // Adapter is the interface for Casbin adapters.
