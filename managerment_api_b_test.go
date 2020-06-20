@@ -34,7 +34,7 @@ func BenchmarkHasPolicySmall(b *testing.B) {
 }
 
 func BenchmarkHasPolicyMedium(b *testing.B) {
-	e, _ := NewEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewEnforcer("examples/basic_model.conf", false)
 
 	// 1000 roles, 100 resources.
 	pPolicies := make([][]string, 0)
@@ -50,7 +50,7 @@ func BenchmarkHasPolicyMedium(b *testing.B) {
 }
 
 func BenchmarkHasPolicyLarge(b *testing.B) {
-	e, _ := NewEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewEnforcer("examples/basic_model.conf", false)
 
 	// 10000 roles, 1000 resources.
 	pPolicies := make([][]string, 0)
@@ -80,7 +80,7 @@ func BenchmarkAddPolicySmall(b *testing.B) {
 }
 
 func BenchmarkAddPolicyMedium(b *testing.B) {
-	e, _ := NewEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewEnforcer("examples/basic_model.conf", false)
 
 	// 1000 roles, 100 resources.
 	pPolicies := make([][]string, 0)
@@ -96,7 +96,7 @@ func BenchmarkAddPolicyMedium(b *testing.B) {
 }
 
 func BenchmarkAddPolicyLarge(b *testing.B) {
-	e, _ := NewEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewEnforcer("examples/basic_model.conf", false)
 
 	// 10000 roles, 1000 resources.
 	pPolicies := make([][]string, 0)
@@ -126,7 +126,7 @@ func BenchmarkRemovePolicySmall(b *testing.B) {
 }
 
 func BenchmarkRemovePolicyMedium(b *testing.B) {
-	e, _ := NewEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewEnforcer("examples/basic_model.conf", false)
 
 	// 1000 roles, 100 resources.
 	pPolicies := make([][]string, 0)
@@ -142,7 +142,7 @@ func BenchmarkRemovePolicyMedium(b *testing.B) {
 }
 
 func BenchmarkRemovePolicyLarge(b *testing.B) {
-	e, _ := NewEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewEnforcer("examples/basic_model.conf", false)
 
 	// 10000 roles, 1000 resources.
 	pPolicies := make([][]string, 0)
