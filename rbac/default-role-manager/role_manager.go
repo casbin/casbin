@@ -51,13 +51,13 @@ func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 }
 
 // AddMatchingFunc support use pattern in g
-func (rm *RoleManager) AddMatchingFunc(name string, fn MatchingFunc) {
+func (rm *RoleManager) AddMatchingFunc(fn MatchingFunc) {
 	rm.hasPattern = true
 	rm.matchingFunc = fn
 }
 
 // AddDomainMatchingFunc support use domain pattern in g
-func (rm *RoleManager) AddDomainMatchingFunc(name string, fn MatchingFunc) {
+func (rm *RoleManager) AddDomainMatchingFunc(fn MatchingFunc) {
 	rm.hasDomainPattern = true
 	rm.domainMatchingFunc = fn
 }

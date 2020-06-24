@@ -296,7 +296,7 @@ func TestRBACModelWithPattern(t *testing.T) {
 	// You can see in policy that: "g2, /book/:id, book_group", so in "g2()" function in the matcher, instead
 	// of checking whether "/book/:id" equals the obj: "/book/1", it checks whether the pattern matches.
 	// You can see it as normal RBAC: "/book/:id" == "/book/1" becomes KeyMatch2("/book/:id", "/book/1")
-	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("KeyMatch2", util.KeyMatch2)
+	e.GetRoleManager().(*defaultrolemanager.RoleManager).AddMatchingFunc(util.KeyMatch2)
 	testEnforce(t, e, "alice", "/book/1", "GET", true)
 	testEnforce(t, e, "alice", "/book/2", "GET", true)
 	testEnforce(t, e, "alice", "/pen/1", "GET", true)
@@ -308,7 +308,7 @@ func TestRBACModelWithPattern(t *testing.T) {
 
 	// AddMatchingFunc() is actually setting a function because only one function is allowed,
 	// so when we set "KeyMatch3", we are actually replacing "KeyMatch2" with "KeyMatch3".
-	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("KeyMatch3", util.KeyMatch3)
+	e.GetRoleManager().(*defaultrolemanager.RoleManager).AddMatchingFunc(util.KeyMatch3)
 	testEnforce(t, e, "alice", "/book2/1", "GET", true)
 	testEnforce(t, e, "alice", "/book2/2", "GET", true)
 	testEnforce(t, e, "alice", "/pen2/1", "GET", true)
@@ -575,7 +575,7 @@ func TestCommentModel(t *testing.T) {
 
 func TestDomainMatchModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domain_pattern_model.conf", "examples/rbac_with_domain_pattern_policy.csv")
-	e.rm.(*defaultrolemanager.RoleManager).AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
+	e.GetRoleManager().(*defaultrolemanager.RoleManager).AddDomainMatchingFunc(util.KeyMatch2)
 
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
@@ -591,8 +591,8 @@ func TestDomainMatchModel(t *testing.T) {
 
 func TestAllMatchModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_all_pattern_model.conf", "examples/rbac_with_all_pattern_policy.csv")
-	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2)
-	e.rm.(*defaultrolemanager.RoleManager).AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
+	e.GetRoleManager().(*defaultrolemanager.RoleManager).AddMatchingFunc(util.KeyMatch2)
+	e.GetRoleManager().(*defaultrolemanager.RoleManager).AddDomainMatchingFunc(util.KeyMatch2)
 
 	testDomainEnforce(t, e, "alice", "domain1", "/book/1", "read", true)
 	testDomainEnforce(t, e, "alice", "domain1", "/book/1", "write", false)

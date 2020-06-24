@@ -38,7 +38,7 @@ func NewAdapter(filePath string) *Adapter {
 }
 
 // LoadPolicy loads all policy rules from the storage.
-func (a *Adapter) LoadPolicy(model model.Model) error {
+func (a *Adapter) LoadPolicy(model *model.Model) error {
 	if a.filePath == "" {
 		return errors.New("invalid file path, file path cannot be empty")
 	}
@@ -47,14 +47,14 @@ func (a *Adapter) LoadPolicy(model model.Model) error {
 }
 
 // SavePolicy saves all policy rules to the storage.
-func (a *Adapter) SavePolicy(model model.Model) error {
+func (a *Adapter) SavePolicy(model *model.Model) error {
 	if a.filePath == "" {
 		return errors.New("invalid file path, file path cannot be empty")
 	}
 
 	var tmp bytes.Buffer
 
-	for ptype, ast := range model["p"] {
+	for ptype, ast := range model.Map["p"] {
 		for _, rule := range ast.Policy {
 			tmp.WriteString(ptype + ", ")
 			tmp.WriteString(util.ArrayToString(rule))
@@ -62,7 +62,7 @@ func (a *Adapter) SavePolicy(model model.Model) error {
 		}
 	}
 
-	for ptype, ast := range model["g"] {
+	for ptype, ast := range model.Map["g"] {
 		for _, rule := range ast.Policy {
 			tmp.WriteString(ptype + ", ")
 			tmp.WriteString(util.ArrayToString(rule))
@@ -73,7 +73,7 @@ func (a *Adapter) SavePolicy(model model.Model) error {
 	return a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
 }
 
-func (a *Adapter) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
+func (a *Adapter) loadPolicyFile(model *model.Model, handler func(string, *model.Model)) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err

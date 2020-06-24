@@ -21,11 +21,16 @@ import (
 
 	"github.com/casbin/casbin/v2/config"
 	"github.com/casbin/casbin/v2/log"
+	"github.com/casbin/casbin/v2/rbac"
+	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
 )
 
 // Model represents the whole access control model.
-type Model map[string]AssertionMap
+type Model struct {
+	Map map[string]AssertionMap
+	RM  rbac.RoleManager
+}
 
 // AssertionMap is the collection of assertions, can be "r", "p", "g", "e", "m".
 type AssertionMap map[string]*Assertion
@@ -41,13 +46,13 @@ var sectionNameMap = map[string]string{
 // Minimal required sections for a model to be valid
 var requiredSections = []string{"r", "p", "e", "m"}
 
-func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) bool {
+func loadAssertion(model *Model, cfg config.ConfigInterface, sec string, key string) bool {
 	value := cfg.String(sectionNameMap[sec] + "::" + key)
 	return model.AddDef(sec, key, value)
 }
 
 // AddDef adds an assertion to the model.
-func (model Model) AddDef(sec string, key string, value string) bool {
+func (model *Model) AddDef(sec string, key string, value string) bool {
 	if value == "" {
 		return false
 	}
@@ -66,12 +71,12 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 		ast.Value = util.RemoveComments(util.EscapeAssertion(ast.Value))
 	}
 
-	_, ok := model[sec]
+	_, ok := model.Map[sec]
 	if !ok {
-		model[sec] = make(AssertionMap)
+		model.Map[sec] = make(AssertionMap)
 	}
 
-	model[sec][key] = &ast
+	model.Map[sec][key] = &ast
 	return true
 }
 
@@ -83,7 +88,7 @@ func getKeySuffix(i int) string {
 	return strconv.Itoa(i)
 }
 
-func loadSection(model Model, cfg config.ConfigInterface, sec string) {
+func loadSection(model *Model, cfg config.ConfigInterface, sec string) {
 	i := 1
 	for {
 		if !loadAssertion(model, cfg, sec, sec+getKeySuffix(i)) {
@@ -95,13 +100,15 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 }
 
 // NewModel creates an empty model.
-func NewModel() Model {
-	m := make(Model)
+func NewModel() *Model {
+	m := new(Model)
+	m.Map = make(map[string]AssertionMap)
+	m.RM = defaultrolemanager.NewRoleManager(10)
 	return m
 }
 
 // NewModelFromFile creates a model from a .CONF file.
-func NewModelFromFile(path string) (Model, error) {
+func NewModelFromFile(path string) (*Model, error) {
 	m := NewModel()
 
 	err := m.LoadModel(path)
@@ -113,7 +120,7 @@ func NewModelFromFile(path string) (Model, error) {
 }
 
 // NewModelFromString creates a model from a string which contains model text.
-func NewModelFromString(text string) (Model, error) {
+func NewModelFromString(text string) (*Model, error) {
 	m := NewModel()
 
 	err := m.LoadModelFromText(text)
@@ -125,7 +132,7 @@ func NewModelFromString(text string) (Model, error) {
 }
 
 // LoadModel loads the model from model CONF file.
-func (model Model) LoadModel(path string) error {
+func (model *Model) LoadModel(path string) error {
 	cfg, err := config.NewConfig(path)
 	if err != nil {
 		return err
@@ -135,7 +142,7 @@ func (model Model) LoadModel(path string) error {
 }
 
 // LoadModelFromText loads the model from the text.
-func (model Model) LoadModelFromText(text string) error {
+func (model *Model) LoadModelFromText(text string) error {
 	cfg, err := config.NewConfigFromText(text)
 	if err != nil {
 		return err
@@ -144,7 +151,7 @@ func (model Model) LoadModelFromText(text string) error {
 	return model.loadModelFromConfig(cfg)
 }
 
-func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
+func (model *Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	for s := range sectionNameMap {
 		loadSection(model, cfg, s)
 	}
@@ -160,15 +167,15 @@ func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	return nil
 }
 
-func (model Model) hasSection(sec string) bool {
-	section := model[sec]
+func (model *Model) hasSection(sec string) bool {
+	section := model.Map[sec]
 	return section != nil
 }
 
 // PrintModel prints the model to the log.
-func (model Model) PrintModel() {
+func (model *Model) PrintModel() {
 	log.LogPrint("Model:")
-	for k, v := range model {
+	for k, v := range model.Map {
 		for i, j := range v {
 			log.LogPrintf("%s.%s: %s", k, i, j.Value)
 		}

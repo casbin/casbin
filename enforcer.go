@@ -26,20 +26,18 @@ import (
 	"github.com/casbin/casbin/v2/persist"
 	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
 	"github.com/casbin/casbin/v2/rbac"
-	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
 )
 
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath string
-	model     model.Model
+	model     *model.Model
 	fm        model.FunctionMap
 	eft       effect.Effector
 
 	adapter persist.Adapter
 	watcher persist.Watcher
-	rm      rbac.RoleManager
 
 	enabled            bool
 	autoSave           bool
@@ -92,7 +90,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 			case string:
 				return nil, errors.New("invalid parameters for enforcer")
 			default:
-				err := e.InitWithModelAndAdapter(p0.(model.Model), params[1].(persist.Adapter))
+				err := e.InitWithModelAndAdapter(p0.(*model.Model), params[1].(persist.Adapter))
 				if err != nil {
 					return nil, err
 				}
@@ -106,7 +104,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 				return nil, err
 			}
 		default:
-			err := e.InitWithModelAndAdapter(p0.(model.Model), nil)
+			err := e.InitWithModelAndAdapter(p0.(*model.Model), nil)
 			if err != nil {
 				return nil, err
 			}
@@ -143,7 +141,7 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) er
 }
 
 // InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
-func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error {
+func (e *Enforcer) InitWithModelAndAdapter(m *model.Model, adapter persist.Adapter) error {
 	e.adapter = adapter
 
 	e.model = m
@@ -165,7 +163,6 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 }
 
 func (e *Enforcer) initialize() {
-	e.rm = defaultrolemanager.NewRoleManager(10)
 	e.eft = effect.NewDefaultEffector()
 	e.watcher = nil
 
@@ -193,12 +190,12 @@ func (e *Enforcer) LoadModel() error {
 }
 
 // GetModel gets the current model.
-func (e *Enforcer) GetModel() model.Model {
+func (e *Enforcer) GetModel() *model.Model {
 	return e.model
 }
 
 // SetModel sets the current model.
-func (e *Enforcer) SetModel(m model.Model) {
+func (e *Enforcer) SetModel(m *model.Model) {
 	e.model = m
 	e.fm = model.LoadFunctionMap()
 
@@ -223,12 +220,12 @@ func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 
 // GetRoleManager gets the current role manager.
 func (e *Enforcer) GetRoleManager() rbac.RoleManager {
-	return e.rm
+	return e.model.RM
 }
 
 // SetRoleManager sets the current role manager.
 func (e *Enforcer) SetRoleManager(rm rbac.RoleManager) {
-	e.rm = rm
+	e.model.RM = rm
 }
 
 // SetEffector sets the current effector.
@@ -341,17 +338,17 @@ func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *Enforcer) BuildRoleLinks() error {
-	err := e.rm.Clear()
+	err := e.model.RM.Clear()
 	if err != nil {
 		return err
 	}
 
-	return e.model.BuildRoleLinks(e.rm)
+	return e.model.BuildRoleLinks()
 }
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
 func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, rules [][]string) error {
-	return e.model.BuildIncrementalRoleLinks(e.rm, op, "g", ptype, rules)
+	return e.model.BuildIncrementalRoleLinks(op, "g", ptype, rules)
 }
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
@@ -370,15 +367,15 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	for k, v := range e.fm {
 		functions[k] = v
 	}
-	if _, ok := e.model["g"]; ok {
-		for key, ast := range e.model["g"] {
+	if _, ok := e.model.Map["g"]; ok {
+		for key, ast := range e.model.Map["g"] {
 			rm := ast.RM
 			functions[key] = util.GenerateGFunction(rm)
 		}
 	}
 	var expString string
 	if matcher == "" {
-		expString = e.model["m"]["m"].Value
+		expString = e.model.Map["m"]["m"].Value
 	} else {
 		expString = util.RemoveComments(util.EscapeAssertion(matcher))
 	}
@@ -393,12 +390,12 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 	}
 
-	rTokens := make(map[string]int, len(e.model["r"]["r"].Tokens))
-	for i, token := range e.model["r"]["r"].Tokens {
+	rTokens := make(map[string]int, len(e.model.Map["r"]["r"].Tokens))
+	for i, token := range e.model.Map["r"]["r"].Tokens {
 		rTokens[token] = i
 	}
-	pTokens := make(map[string]int, len(e.model["p"]["p"].Tokens))
-	for i, token := range e.model["p"]["p"].Tokens {
+	pTokens := make(map[string]int, len(e.model.Map["p"]["p"].Tokens))
+	for i, token := range e.model.Map["p"]["p"].Tokens {
 		pTokens[token] = i
 	}
 
@@ -412,22 +409,22 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	var policyEffects []effect.Effect
 	var matcherResults []float64
 
-	if policyLen := len(e.model["p"]["p"].Policy); policyLen != 0 {
+	if policyLen := len(e.model.Map["p"]["p"].Policy); policyLen != 0 {
 		policyEffects = make([]effect.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
-		if len(e.model["r"]["r"].Tokens) != len(rvals) {
+		if len(e.model.Map["r"]["r"].Tokens) != len(rvals) {
 			return false, fmt.Errorf(
 				"invalid request size: expected %d, got %d, rvals: %v",
-				len(e.model["r"]["r"].Tokens),
+				len(e.model.Map["r"]["r"].Tokens),
 				len(rvals),
 				rvals)
 		}
-		for i, pvals := range e.model["p"]["p"].Policy {
+		for i, pvals := range e.model.Map["p"]["p"].Policy {
 			// log.LogPrint("Policy Rule: ", pvals)
-			if len(e.model["p"]["p"].Tokens) != len(pvals) {
+			if len(e.model.Map["p"]["p"].Tokens) != len(pvals) {
 				return false, fmt.Errorf(
 					"invalid policy size: expected %d, got %d, pvals: %v",
-					len(e.model["p"]["p"].Tokens),
+					len(e.model.Map["p"]["p"].Tokens),
 					len(pvals),
 					pvals)
 			}
@@ -490,7 +487,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				policyEffects[i] = effect.Allow
 			}
 
-			if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
+			if e.model.Map["e"]["e"].Value == "priority(p_eft) || deny" {
 				break
 			}
 
@@ -517,14 +514,14 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	// log.LogPrint("Rule Results: ", policyEffects)
 
-	result, explainIndex, err := e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults)
+	result, explainIndex, err := e.eft.MergeEffects(e.model.Map["e"]["e"].Value, policyEffects, matcherResults)
 	if err != nil {
 		return false, err
 	}
 
 	if explains != nil {
 		if explainIndex != -1 {
-			*explains = e.model["p"]["p"].Policy[explainIndex]
+			*explains = e.model.Map["p"]["p"].Policy[explainIndex]
 		}
 	}
 

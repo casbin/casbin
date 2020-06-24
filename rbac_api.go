@@ -22,13 +22,13 @@ import (
 
 // GetRolesForUser gets the roles that a user has.
 func (e *Enforcer) GetRolesForUser(name string, domain ...string) ([]string, error) {
-	res, err := e.model["g"]["g"].RM.GetRoles(name, domain...)
+	res, err := e.model.Map["g"]["g"].RM.GetRoles(name, domain...)
 	return res, err
 }
 
 // GetUsersForRole gets the users that has a role.
 func (e *Enforcer) GetUsersForRole(name string, domain ...string) ([]string, error) {
-	res, err := e.model["g"]["g"].RM.GetUsers(name, domain...)
+	res, err := e.model.Map["g"]["g"].RM.GetUsers(name, domain...)
 	return res, err
 }
 
@@ -163,7 +163,7 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]str
 		name := q[0]
 		q = q[1:]
 
-		roles, err := e.rm.GetRoles(name, domain...)
+		roles, err := e.model.RM.GetRoles(name, domain...)
 		if err != nil {
 			return nil, err
 		}

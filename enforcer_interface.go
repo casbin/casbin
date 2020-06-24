@@ -31,11 +31,11 @@ type IEnforcer interface {
 	/* Enforcer API */
 	InitWithFile(modelPath string, policyPath string) error
 	InitWithAdapter(modelPath string, adapter persist.Adapter) error
-	InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error
+	InitWithModelAndAdapter(m *model.Model, adapter persist.Adapter) error
 	initialize()
 	LoadModel() error
-	GetModel() model.Model
-	SetModel(m model.Model)
+	GetModel() *model.Model
+	SetModel(m *model.Model)
 	GetAdapter() persist.Adapter
 	SetAdapter(adapter persist.Adapter)
 	SetWatcher(watcher persist.Watcher) error

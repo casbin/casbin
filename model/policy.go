@@ -18,7 +18,6 @@ import (
 	"strings"
 
 	"github.com/casbin/casbin/v2/log"
-	"github.com/casbin/casbin/v2/rbac"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -34,17 +33,17 @@ const (
 var DefaultSep = ","
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
-func (model Model) BuildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
+func (model *Model) BuildIncrementalRoleLinks(op PolicyOp, sec string, ptype string, rules [][]string) error {
 	if sec == "g" {
-		return model[sec][ptype].buildIncrementalRoleLinks(rm, op, rules)
+		return model.Map[sec][ptype].buildIncrementalRoleLinks(model.RM, op, rules)
 	}
 	return nil
 }
 
 // BuildRoleLinks initializes the roles in RBAC.
-func (model Model) BuildRoleLinks(rm rbac.RoleManager) error {
-	for _, ast := range model["g"] {
-		err := ast.buildRoleLinks(rm)
+func (model *Model) BuildRoleLinks() error {
+	for _, ast := range model.Map["g"] {
+		err := ast.buildRoleLinks(model.RM)
 		if err != nil {
 			return err
 		}
@@ -54,15 +53,15 @@ func (model Model) BuildRoleLinks(rm rbac.RoleManager) error {
 }
 
 // PrintPolicy prints the policy to log.
-func (model Model) PrintPolicy() {
+func (model *Model) PrintPolicy() {
 	log.LogPrint("Policy:")
-	for key, ast := range model["p"] {
+	for key, ast := range model.Map["p"] {
 		ast.Mutex.RLock()
 		defer ast.Mutex.RUnlock()
 		log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
 	}
 
-	for key, ast := range model["g"] {
+	for key, ast := range model.Map["g"] {
 		ast.Mutex.RLock()
 		defer ast.Mutex.RUnlock()
 		log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
@@ -70,15 +69,15 @@ func (model Model) PrintPolicy() {
 }
 
 // ClearPolicy clears all current policy.
-func (model Model) ClearPolicy() {
-	for _, ast := range model["p"] {
+func (model *Model) ClearPolicy() {
+	for _, ast := range model.Map["p"] {
 		ast.Mutex.Lock()
 		defer ast.Mutex.Unlock()
 		ast.Policy = nil
 		ast.PolicyMap = map[string]int{}
 	}
 
-	for _, ast := range model["g"] {
+	for _, ast := range model.Map["g"] {
 		ast.Mutex.Lock()
 		defer ast.Mutex.Unlock()
 		ast.Policy = nil
@@ -87,20 +86,20 @@ func (model Model) ClearPolicy() {
 }
 
 // GetPolicy gets all rules in a policy.
-func (model Model) GetPolicy(sec string, ptype string) [][]string {
-	model[sec][ptype].Mutex.RLock()
-	defer model[sec][ptype].Mutex.RUnlock()
-	return model[sec][ptype].Policy
+func (model *Model) GetPolicy(sec string, ptype string) [][]string {
+	model.Map[sec][ptype].Mutex.RLock()
+	defer model.Map[sec][ptype].Mutex.RUnlock()
+	return model.Map[sec][ptype].Policy
 }
 
 // GetFilteredPolicy gets rules based on field filters from a policy.
-func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) [][]string {
-	model[sec][ptype].Mutex.RLock()
-	defer model[sec][ptype].Mutex.RUnlock()
+func (model *Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) [][]string {
+	model.Map[sec][ptype].Mutex.RLock()
+	defer model.Map[sec][ptype].Mutex.RUnlock()
 
 	res := [][]string{}
 
-	for _, rule := range model[sec][ptype].Policy {
+	for _, rule := range model.Map[sec][ptype].Policy {
 		matched := true
 		for i, fieldValue := range fieldValues {
 			if fieldValue != "" && rule[fieldIndex+i] != fieldValue {
@@ -118,17 +117,17 @@ func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, f
 }
 
 // HasPolicy determines whether a model has the specified policy rule.
-func (model Model) HasPolicy(sec string, ptype string, rule []string) bool {
-	model[sec][ptype].Mutex.RLock()
-	defer model[sec][ptype].Mutex.RUnlock()
-	_, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
+func (model *Model) HasPolicy(sec string, ptype string, rule []string) bool {
+	model.Map[sec][ptype].Mutex.RLock()
+	defer model.Map[sec][ptype].Mutex.RUnlock()
+	_, ok := model.Map[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
 	return ok
 }
 
 // HasPolicies determines whether a model has any of the specified policies. If one is found we return false.
-func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool {
-	model[sec][ptype].Mutex.RLock()
-	defer model[sec][ptype].Mutex.RUnlock()
+func (model *Model) HasPolicies(sec string, ptype string, rules [][]string) bool {
+	model.Map[sec][ptype].Mutex.RLock()
+	defer model.Map[sec][ptype].Mutex.RUnlock()
 	for i := 0; i < len(rules); i++ {
 		if model.HasPolicy(sec, ptype, rules[i]) {
 			return true
@@ -139,69 +138,69 @@ func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool 
 }
 
 // AddPolicy adds a policy rule to the model.
-func (model Model) AddPolicy(sec string, ptype string, rule []string) {
-	model[sec][ptype].Mutex.Lock()
-	defer model[sec][ptype].Mutex.Unlock()
-	model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
-	model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
+func (model *Model) AddPolicy(sec string, ptype string, rule []string) {
+	model.Map[sec][ptype].Mutex.Lock()
+	defer model.Map[sec][ptype].Mutex.Unlock()
+	model.Map[sec][ptype].Policy = append(model.Map[sec][ptype].Policy, rule)
+	model.Map[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)] = len(model.Map[sec][ptype].Policy) - 1
 }
 
 // AddPolicies adds policy rules to the model.
-func (model Model) AddPolicies(sec string, ptype string, rules [][]string) {
-	model[sec][ptype].Mutex.Lock()
-	defer model[sec][ptype].Mutex.Unlock()
+func (model *Model) AddPolicies(sec string, ptype string, rules [][]string) {
+	model.Map[sec][ptype].Mutex.Lock()
+	defer model.Map[sec][ptype].Mutex.Unlock()
 	for _, rule := range rules {
-		model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
-		model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
+		model.Map[sec][ptype].Policy = append(model.Map[sec][ptype].Policy, rule)
+		model.Map[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)] = len(model.Map[sec][ptype].Policy) - 1
 	}
 }
 
 // RemovePolicy removes a policy rule from the model.
-func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
-	model[sec][ptype].Mutex.Lock()
-	defer model[sec][ptype].Mutex.Unlock()
-	index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
+func (model *Model) RemovePolicy(sec string, ptype string, rule []string) bool {
+	model.Map[sec][ptype].Mutex.Lock()
+	defer model.Map[sec][ptype].Mutex.Unlock()
+	index, ok := model.Map[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
 	if !ok {
 		return false
 	}
 
-	model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
-	delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
-	for i := index; i < len(model[sec][ptype].Policy); i++ {
-		model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
+	model.Map[sec][ptype].Policy = append(model.Map[sec][ptype].Policy[:index], model.Map[sec][ptype].Policy[index+1:]...)
+	delete(model.Map[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
+	for i := index; i < len(model.Map[sec][ptype].Policy); i++ {
+		model.Map[sec][ptype].PolicyMap[strings.Join(model.Map[sec][ptype].Policy[i], DefaultSep)] = i
 	}
 
 	return true
 }
 
 // RemovePolicies removes policy rules from the model.
-func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
-	model[sec][ptype].Mutex.Lock()
-	defer model[sec][ptype].Mutex.Unlock()
+func (model *Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
+	model.Map[sec][ptype].Mutex.Lock()
+	defer model.Map[sec][ptype].Mutex.Unlock()
 	for _, rule := range rules {
-		index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
+		index, ok := model.Map[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
 		if !ok {
 			continue
 		}
 
-		model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
-		delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
-		for i := index; i < len(model[sec][ptype].Policy); i++ {
-			model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
+		model.Map[sec][ptype].Policy = append(model.Map[sec][ptype].Policy[:index], model.Map[sec][ptype].Policy[index+1:]...)
+		delete(model.Map[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
+		for i := index; i < len(model.Map[sec][ptype].Policy); i++ {
+			model.Map[sec][ptype].PolicyMap[strings.Join(model.Map[sec][ptype].Policy[i], DefaultSep)] = i
 		}
 	}
 	return true
 }
 
 // RemoveFilteredPolicy removes policy rules based on field filters from the model.
-func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, [][]string) {
-	model[sec][ptype].Mutex.Lock()
-	defer model[sec][ptype].Mutex.Unlock()
+func (model *Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, [][]string) {
+	model.Map[sec][ptype].Mutex.Lock()
+	defer model.Map[sec][ptype].Mutex.Unlock()
 	var tmp [][]string
 	var effects [][]string
 	res := false
 	firstIndex := -1
-	for index, rule := range model[sec][ptype].Policy {
+	for index, rule := range model.Map[sec][ptype].Policy {
 		matched := true
 		for i, fieldValue := range fieldValues {
 			if fieldValue != "" && rule[fieldIndex+i] != fieldValue {
@@ -214,7 +213,7 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 			if firstIndex == -1 {
 				firstIndex = index
 			}
-			delete(model[sec][ptype].PolicyMap, strings.Join(rule, ","))
+			delete(model.Map[sec][ptype].PolicyMap, strings.Join(rule, ","))
 			effects = append(effects, rule)
 			res = true
 		} else {
@@ -222,10 +221,10 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 		}
 	}
 
-	model[sec][ptype].Policy = tmp
+	model.Map[sec][ptype].Policy = tmp
 	if firstIndex != -1 {
-		for i := firstIndex; i < len(model[sec][ptype].Policy); i++ {
-			model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
+		for i := firstIndex; i < len(model.Map[sec][ptype].Policy); i++ {
+			model.Map[sec][ptype].PolicyMap[strings.Join(model.Map[sec][ptype].Policy[i], DefaultSep)] = i
 		}
 	}
 
@@ -233,13 +232,13 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 }
 
 // GetValuesForFieldInPolicy gets all values for a field for all rules in a policy, duplicated values are removed.
-func (model Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldIndex int) []string {
-	model[sec][ptype].Mutex.RLock()
-	defer model[sec][ptype].Mutex.RUnlock()
+func (model *Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldIndex int) []string {
+	model.Map[sec][ptype].Mutex.RLock()
+	defer model.Map[sec][ptype].Mutex.RUnlock()
 
 	values := []string{}
 
-	for _, rule := range model[sec][ptype].Policy {
+	for _, rule := range model.Map[sec][ptype].Policy {
 		values = append(values, rule[fieldIndex])
 	}
 
@@ -249,10 +248,10 @@ func (model Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldInde
 }
 
 // GetValuesForFieldInPolicyAllTypes gets all values for a field for all rules in a policy of all ptypes, duplicated values are removed.
-func (model Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int) []string {
+func (model *Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int) []string {
 	values := []string{}
 
-	for ptype := range model[sec] {
+	for ptype := range model.Map[sec] {
 		values = append(values, model.GetValuesForFieldInPolicy(sec, ptype, fieldIndex)...)
 	}
 
