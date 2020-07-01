@@ -233,7 +233,7 @@ func TestImplicitRoleAPI(t *testing.T) {
 
 	e, _ = NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
 
-	e.GetRoleManager().(*defaultrolemanager.RoleManager).AddMatchingFunc("matcher", util.KeyMatch)
+	e.GetRoleManager().(*defaultrolemanager.RoleManager).AddMatchingFunc(util.KeyMatch)
 
 	testGetImplicitRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin", "/book/*", "book_group"})
 	testGetRoles(t, e, []string{"/book/1/2/3/4/5", "pen_admin"}, "cathy")
