@@ -23,7 +23,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 var (
@@ -50,8 +49,6 @@ type ConfigInterface interface {
 
 // Config represents an implementation of the ConfigInterface
 type Config struct {
-	// map is not safe.
-	sync.RWMutex
 	// Section:key=value
 	data map[string]map[string]string
 }
@@ -91,12 +88,10 @@ func (c *Config) AddConfig(section string, option string, value string) bool {
 }
 
 func (c *Config) parse(fname string) (err error) {
-	c.Lock()
 	f, err := os.Open(fname)
 	if err != nil {
 		return err
 	}
-	defer c.Unlock()
 	defer f.Close()
 
 	buf := bufio.NewReader(f)
@@ -227,8 +222,6 @@ func (c *Config) Strings(key string) []string {
 
 // Set sets the value for the specific key in the Config
 func (c *Config) Set(key string, value string) error {
-	c.Lock()
-	defer c.Unlock()
 	if len(key) == 0 {
 		return errors.New("key is empty")
 	}
