@@ -147,7 +147,7 @@ func (e *Enforcer) AddNamedPolicy(ptype string, params ...interface{}) (bool, er
 // AddNamedPolicies adds authorization rules to the current named policy.
 // If the rule already exists, the function returns false for the corresponding rule and the rule will not be added.
 // Otherwise the function returns true for the corresponding by adding the new rule.
-func (e *Enforcer) AddNamedPolicies(ptype string, rules [][] string) (bool, error) {
+func (e *Enforcer) AddNamedPolicies(ptype string, rules [][]string) (bool, error) {
 	return e.addPolicies("p", ptype, rules)
 }
 
@@ -180,7 +180,7 @@ func (e *Enforcer) RemoveNamedPolicy(ptype string, params ...interface{}) (bool,
 }
 
 // RemoveNamedPolicies removes authorization rules from the current named policy.
-func (e *Enforcer) RemoveNamedPolicies(ptype string, rules [][] string) (bool, error) {
+func (e *Enforcer) RemoveNamedPolicies(ptype string, rules [][]string) (bool, error) {
 	return e.removePolicies("p", ptype, rules)
 }
 
