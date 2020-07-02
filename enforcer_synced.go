@@ -16,6 +16,7 @@ package casbin
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/Knetic/govaluate"
@@ -28,7 +29,7 @@ type SyncedEnforcer struct {
 	*Enforcer
 	m               sync.RWMutex
 	stopAutoLoad    chan struct{}
-	autoLoadRunning bool
+	autoLoadRunning int32
 }
 
 // NewSyncedEnforcer creates a synchronized enforcer via file or DB.
@@ -41,21 +42,27 @@ func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 	}
 
 	e.stopAutoLoad = make(chan struct{}, 1)
+	e.autoLoadRunning = 0
 	return e, nil
+}
+
+// IsAudoLoadingRunning check if SyncedEnforcer is auto loading policies
+func (e *SyncedEnforcer) IsAudoLoadingRunning() bool {
+	return atomic.LoadInt32(&(e.autoLoadRunning)) != 0
 }
 
 // StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy
 func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 	// Don't start another goroutine if there is already one running
-	if e.autoLoadRunning {
+	if e.IsAudoLoadingRunning() {
 		return
 	}
-	e.autoLoadRunning = true
+	atomic.StoreInt32(&(e.autoLoadRunning), int32(1))
 	ticker := time.NewTicker(d)
 	go func() {
 		defer func() {
 			ticker.Stop()
-			e.autoLoadRunning = false
+			atomic.StoreInt32(&(e.autoLoadRunning), int32(0))
 		}()
 		n := 1
 		log.LogPrintf("Start automatically load policy")
@@ -77,7 +84,7 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 
 // StopAutoLoadPolicy causes the go routine to exit.
 func (e *SyncedEnforcer) StopAutoLoadPolicy() {
-	if e.autoLoadRunning {
+	if e.IsAudoLoadingRunning() {
 		e.stopAutoLoad <- struct{}{}
 	}
 }
