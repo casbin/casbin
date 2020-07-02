@@ -17,7 +17,6 @@ package model
 import (
 	"errors"
 	"strings"
-	"sync"
 
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
@@ -32,12 +31,9 @@ type Assertion struct {
 	Policy    [][]string
 	PolicyMap map[string]int
 	RM        rbac.RoleManager
-	Mutex     sync.RWMutex
 }
 
 func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
-	ast.Mutex.RLock()
-	defer ast.Mutex.RUnlock()
 	ast.RM = rm
 	count := strings.Count(ast.Value, "_")
 	if count < 2 {
@@ -69,8 +65,6 @@ func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp
 }
 
 func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
-	ast.Mutex.RLock()
-	defer ast.Mutex.RUnlock()
 	ast.RM = rm
 	count := strings.Count(ast.Value, "_")
 	if count < 2 {
