@@ -366,10 +366,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		return true, nil
 	}
 
-	functions := model.FunctionMap{}
-	for k, v := range e.fm {
-		functions[k] = v
-	}
+	functions := e.fm.GetFunctions()
 	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
 			rm := ast.RM
