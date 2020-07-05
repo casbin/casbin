@@ -375,3 +375,39 @@ func (e *SyncedEnforcer) AddFunction(name string, function govaluate.ExpressionF
 	defer e.m.Unlock()
 	e.Enforcer.AddFunction(name, function)
 }
+
+// AddGroupingPolicies adds role inheritance rulea to the current policy.
+// If the rule already exists, the function returns false for the corresponding policy rule and the rule will not be added.
+// Otherwise the function returns true for the corresponding policy rule by adding the new rule.
+func (e *SyncedEnforcer) AddGroupingPolicies(rules [][]string) (bool, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.AddGroupingPolicies(rules)
+}
+
+// AddNamedGroupingPolicies adds named role inheritance rules to the current policy.
+// If the rule already exists, the function returns false for the corresponding policy rule and the rule will not be added.
+// Otherwise the function returns true for the corresponding policy rule by adding the new rule.
+func (e *SyncedEnforcer) AddNamedGroupingPolicies(ptype string, rules [][]string) (bool, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.AddNamedGroupingPolicies(ptype, rules)
+}
+
+// AddPolicies adds authorization rules to the current policy.
+// If the rule already exists, the function returns false for the corresponding rule and the rule will not be added.
+// Otherwise the function returns true for the corresponding rule by adding the new rule.
+func (e *SyncedEnforcer) AddPolicies(rules [][]string) (bool, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.AddPolicies(rules)
+}
+
+// AddNamedPolicies adds authorization rules to the current named policy.
+// If the rule already exists, the function returns false for the corresponding rule and the rule will not be added.
+// Otherwise the function returns true for the corresponding by adding the new rule.
+func (e *SyncedEnforcer) AddNamedPolicies(ptype string, rules [][]string) (bool, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.AddNamedPolicies(ptype, rules)
+}
