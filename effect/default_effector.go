@@ -53,6 +53,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, results []
 		for i, eft := range effects {
 			if eft == Allow {
 				result = true
+				explainIndex = i
 			} else if eft == Deny {
 				result = false
 				explainIndex = i
