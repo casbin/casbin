@@ -15,9 +15,11 @@
 package casbin
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effect"
@@ -45,6 +47,7 @@ type Enforcer struct {
 	autoSave           bool
 	autoBuildRoleLinks bool
 	autoNotifyWatcher  bool
+	parallel           bool
 }
 
 // NewEnforcer creates an enforcer via file or DB.
@@ -173,6 +176,7 @@ func (e *Enforcer) initialize() {
 	e.autoSave = true
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
+	e.parallel = false
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -334,6 +338,11 @@ func (e *Enforcer) EnableAutoSave(autoSave bool) {
 	e.autoSave = autoSave
 }
 
+// EnableParallelEnforcing controls whether to evaluate the policies in parallel when enforcing.
+func (e *Enforcer) EnableParallelEnforcing(parallel bool) {
+	e.parallel = parallel
+}
+
 // EnableAutoBuildRoleLinks controls whether to rebuild the role inheritance relations when a role is added or deleted.
 func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 	e.autoBuildRoleLinks = autoBuildRoleLinks
@@ -366,13 +375,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		return true, nil
 	}
 
-	functions := e.fm.GetFunctions()
-	if _, ok := e.model["g"]; ok {
-		for key, ast := range e.model["g"] {
-			rm := ast.RM
-			functions[key] = util.GenerateGFunction(rm)
-		}
-	}
+	functions := e.generateFunctions()
+
 	var expString string
 	if matcher == "" {
 		expString = e.model["m"]["m"].Value
@@ -382,7 +386,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	var expression *govaluate.EvaluableExpression
 	hasEval := util.HasEval(expString)
-
 	if !hasEval {
 		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 		if err != nil {
@@ -419,78 +422,54 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				len(rvals),
 				rvals)
 		}
-		for i, pvals := range e.model["p"]["p"].Policy {
-			// log.LogPrint("Policy Rule: ", pvals)
-			if len(e.model["p"]["p"].Tokens) != len(pvals) {
-				return false, fmt.Errorf(
-					"invalid policy size: expected %d, got %d, pvals: %v",
-					len(e.model["p"]["p"].Tokens),
-					len(pvals),
-					pvals)
-			}
 
-			parameters.pVals = pvals
+		if e.parallel {
+			ctx, cancel := context.WithCancel(context.Background())
 
-			if hasEval {
-				ruleNames := util.GetEvalValue(expString)
-				var expWithRule = expString
-				for _, ruleName := range ruleNames {
-					if j, ok := parameters.pTokens[ruleName]; ok {
-						rule := util.EscapeAssertion(pvals[j])
-						expWithRule = util.ReplaceEval(expWithRule, rule)
-					} else {
-						return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
+			var wg sync.WaitGroup
+			wg.Add(len(e.model["p"]["p"].Policy))
+			errs := make(chan error, len(e.model["p"]["p"].Policy))
+
+			for i, pvals := range e.model["p"]["p"].Policy {
+				go func(i int, pvals []string, parameters enforceParameters, expression *govaluate.EvaluableExpression) {
+					defer wg.Done()
+
+					select {
+					case <-ctx.Done():
+						return
+					default:
 					}
 
-					expression, err = govaluate.NewEvaluableExpressionWithFunctions(expWithRule, functions)
+					parameters.pVals = pvals
+					var err error
+					policyEffects[i], matcherResults[i], err = e.evaluatePolicy(parameters, expression, expString, functions)
 					if err != nil {
-						return false, fmt.Errorf("p.sub_rule should satisfy the syntax of matcher: %s", err)
+						errs <- err
+						cancel()
 					}
-				}
-
+				}(i, pvals, parameters, expression)
 			}
 
-			result, err := expression.Eval(parameters)
-			// log.LogPrint("Result: ", result)
+			wg.Wait()
 
+			close(errs)
+			err := <-errs
 			if err != nil {
 				return false, err
 			}
+		} else {
+			for i, pvals := range e.model["p"]["p"].Policy {
+				parameters.pVals = pvals
+				policyEffects[i], matcherResults[i], err = e.evaluatePolicy(parameters, expression, expString, functions)
 
-			switch result := result.(type) {
-			case bool:
-				if !result {
-					policyEffects[i] = effect.Indeterminate
-					continue
+				if err != nil {
+					return false, err
 				}
-			case float64:
-				if result == 0 {
-					policyEffects[i] = effect.Indeterminate
-					continue
-				} else {
-					matcherResults[i] = result
+
+				if e.model["e"]["e"].Value == "priority(p_eft) || deny" && policyEffects[i] != effect.Indeterminate {
+					break
 				}
-			default:
-				return false, errors.New("matcher result should be bool, int or float")
 			}
-
-			if j, ok := parameters.pTokens["p_eft"]; ok {
-				eft := parameters.pVals[j]
-				if eft == "allow" {
-					policyEffects[i] = effect.Allow
-				} else if eft == "deny" {
-					policyEffects[i] = effect.Deny
-				} else {
-					policyEffects[i] = effect.Indeterminate
-				}
-			} else {
-				policyEffects[i] = effect.Allow
-			}
-
-			if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
-				break
-			}
-
 		}
 	} else {
 		policyEffects = make([]effect.Effect, 1)
@@ -547,13 +526,102 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 					reqStr.WriteString(fmt.Sprintf("%v \n", pval))
 				}
 			}
-
 		}
 
 		log.LogPrint(reqStr.String())
 	}
 
 	return result, nil
+}
+
+func (e *Enforcer) evaluatePolicy(parameters enforceParameters, expression *govaluate.EvaluableExpression, expString string, functions map[string]govaluate.ExpressionFunction) (policyEffect effect.Effect, matcherResult float64, err error) {
+	// log.LogPrint("Policy Rule: ", pvals)
+	if len(e.model["p"]["p"].Tokens) != len(parameters.pVals) {
+		err = fmt.Errorf(
+			"invalid policy size: expected %d, got %d, pvals: %v",
+			len(e.model["p"]["p"].Tokens),
+			len(parameters.pVals),
+			parameters.pVals)
+		return
+	}
+
+	if expression == nil {
+		expression, err = generateExpressionWithRule(parameters, expString, functions)
+		if err != nil {
+			return
+		}
+	}
+
+	policyEffect, matcherResult, err = evaluatePolicyHelper(expression, parameters)
+	return
+}
+
+func evaluatePolicyHelper(expression *govaluate.EvaluableExpression, parameters enforceParameters) (policyEffect effect.Effect, matcherResult float64, err error) {
+	result, err := expression.Eval(parameters)
+	// log.LogPrint("Result: ", result)
+	if err != nil {
+		return 0, 0, nil
+	}
+
+	switch result := result.(type) {
+	case bool:
+		if !result {
+			return effect.Indeterminate, 0, nil
+		}
+	case float64:
+		if result == 0 {
+			return effect.Indeterminate, 0, nil
+		} else {
+			matcherResult = result
+		}
+	default:
+		return 0, 0, errors.New("matcher result should be bool, int or float")
+	}
+
+	if i, ok := parameters.pTokens["p_eft"]; ok {
+		eft := parameters.pVals[i]
+		if eft == "allow" {
+			policyEffect = effect.Allow
+		} else if eft == "deny" {
+			policyEffect = effect.Deny
+		} else {
+			policyEffect = effect.Indeterminate
+		}
+	} else {
+		policyEffect = effect.Allow
+	}
+	return policyEffect, matcherResult, err
+}
+
+func generateExpressionWithRule(parameters enforceParameters, expString string, functions map[string]govaluate.ExpressionFunction) (expression *govaluate.EvaluableExpression, err error) {
+	ruleNames := util.GetEvalValue(expString)
+	var expWithRule = expString
+	for _, ruleName := range ruleNames {
+		if i, ok := parameters.pTokens[ruleName]; ok {
+			rule := util.EscapeAssertion(parameters.pVals[i])
+			expWithRule = util.ReplaceEval(expWithRule, rule)
+		} else {
+			return nil, errors.New("please make sure rule exists in policy when using eval() in matcher")
+		}
+
+		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expWithRule, functions)
+		if err != nil {
+			return nil, fmt.Errorf("p.sub_rule should satisfy the syntax of matcher: %s", err)
+		}
+	}
+	return expression, nil
+}
+
+func (e *Enforcer) generateFunctions() map[string]govaluate.ExpressionFunction {
+	functions := e.fm.GetFunctions()
+	if _, ok := e.model["g"]; ok {
+		for key, ast := range e.model["g"] {
+			rm := ast.RM
+			functions[key] = util.GenerateGFunction(rm)
+		}
+	}
+
+	return functions
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).

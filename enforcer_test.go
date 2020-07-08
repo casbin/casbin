@@ -17,6 +17,7 @@ package casbin
 import (
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/casbin/casbin/v2/model"
 	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
@@ -320,6 +321,21 @@ func TestEnableAutoSave(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestEnableParallelEnforcing(t *testing.T) {
+	e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+
+	e.EnableParallelEnforcing(true)
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
 func TestInitWithAdapter(t *testing.T) {
 	adapter := fileadapter.NewAdapter("examples/basic_policy.csv")
 	e, _ := NewEnforcer("examples/basic_model.conf", adapter)
@@ -461,6 +477,165 @@ func TestEnforceEx(t *testing.T) {
 	testEnforceEx(t, e, "bob", "data1", "write", []string{})
 	testEnforceEx(t, e, "bob", "data2", "read", []string{"data2_allow_group", "data2", "read", "allow"})
 	testEnforceEx(t, e, "bob", "data2", "write", []string{"bob", "data2", "write", "deny"})
+}
+
+func BenchmarkEnforceExParalleDisabled(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		e.EnableParallelEnforcing(false)
+
+		benchmarkEnforceEx(b, e, "alice", "data1", "read", []string{"alice", "data1", "read"})
+		benchmarkEnforceEx(b, e, "alice", "data1", "write", []string{})
+		benchmarkEnforceEx(b, e, "alice", "data2", "read", []string{})
+		benchmarkEnforceEx(b, e, "alice", "data2", "write", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data1", "read", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data1", "write", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data2", "read", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data2", "write", []string{"bob", "data2", "write"})
+
+		e, _ = NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+		benchmarkEnforceEx(b, e, "alice", "data1", "read", []string{"alice", "data1", "read"})
+		benchmarkEnforceEx(b, e, "alice", "data1", "write", []string{})
+		benchmarkEnforceEx(b, e, "alice", "data2", "read", []string{"data2_admin", "data2", "read"})
+		benchmarkEnforceEx(b, e, "alice", "data2", "write", []string{"data2_admin", "data2", "write"})
+		benchmarkEnforceEx(b, e, "bob", "data1", "read", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data1", "write", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data2", "read", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data2", "write", []string{"bob", "data2", "write"})
+
+		e, _ = NewEnforcer("examples/priority_model.conf", "examples/priority_policy.csv")
+
+		benchmarkEnforceEx(b, e, "alice", "data1", "read", []string{"alice", "data1", "read", "allow"})
+		benchmarkEnforceEx(b, e, "alice", "data1", "write", []string{"data1_deny_group", "data1", "write", "deny"})
+		benchmarkEnforceEx(b, e, "alice", "data2", "read", []string{})
+		benchmarkEnforceEx(b, e, "alice", "data2", "write", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data1", "write", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data2", "read", []string{"data2_allow_group", "data2", "read", "allow"})
+		benchmarkEnforceEx(b, e, "bob", "data2", "write", []string{"bob", "data2", "write", "deny"})
+	}
+}
+
+func BenchmarkEnforceExParallelEnabled(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		e.EnableParallelEnforcing(true)
+
+		benchmarkEnforceEx(b, e, "alice", "data1", "read", []string{"alice", "data1", "read"})
+		benchmarkEnforceEx(b, e, "alice", "data1", "write", []string{})
+		benchmarkEnforceEx(b, e, "alice", "data2", "read", []string{})
+		benchmarkEnforceEx(b, e, "alice", "data2", "write", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data1", "read", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data1", "write", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data2", "read", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data2", "write", []string{"bob", "data2", "write"})
+
+		e, _ = NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+		benchmarkEnforceEx(b, e, "alice", "data1", "read", []string{"alice", "data1", "read"})
+		benchmarkEnforceEx(b, e, "alice", "data1", "write", []string{})
+		benchmarkEnforceEx(b, e, "alice", "data2", "read", []string{"data2_admin", "data2", "read"})
+		benchmarkEnforceEx(b, e, "alice", "data2", "write", []string{"data2_admin", "data2", "write"})
+		benchmarkEnforceEx(b, e, "bob", "data1", "read", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data1", "write", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data2", "read", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data2", "write", []string{"bob", "data2", "write"})
+
+		e, _ = NewEnforcer("examples/priority_model.conf", "examples/priority_policy.csv")
+
+		benchmarkEnforceEx(b, e, "alice", "data1", "read", []string{"alice", "data1", "read", "allow"})
+		benchmarkEnforceEx(b, e, "alice", "data1", "write", []string{"data1_deny_group", "data1", "write", "deny"})
+		benchmarkEnforceEx(b, e, "alice", "data2", "read", []string{})
+		benchmarkEnforceEx(b, e, "alice", "data2", "write", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data1", "write", []string{})
+		benchmarkEnforceEx(b, e, "bob", "data2", "read", []string{"data2_allow_group", "data2", "read", "allow"})
+		benchmarkEnforceEx(b, e, "bob", "data2", "write", []string{"bob", "data2", "write", "deny"})
+	}
+}
+
+func BenchmarkEnforceExSlowPolicyParallelDisabled(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		modelString := `
+					[request_definition]
+					r = sub, obj, act
+
+					[policy_definition]
+					p = sub, obj, act
+
+					[role_definition]
+					g = _, _
+
+					[policy_effect]
+					e = some(where (p.eft == allow))
+
+					[matchers]
+					m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act && test(r.sub, p.sub)`
+
+		customModel, _ := model.NewModelFromString(modelString)
+		e, _ := NewEnforcer(customModel)
+		e.EnableParallelEnforcing(false)
+
+		_, _ = e.AddPolicy("alice", "data", "write")
+		_, _ = e.AddPolicy("bob", "data", "write")
+		_, _ = e.AddPolicy("cathy", "data", "write")
+
+		_, _ = e.AddRoleForUser("alice", "bob")
+		_, _ = e.AddRoleForUser("bob", "cathy")
+
+		e.AddFunction("test", func(arguments ...interface{}) (interface{}, error) {
+			time.Sleep(time.Second)
+			return true, nil
+		})
+
+		benchmarkEnforceEx(b, e, "alice", "data", "write", []string{"alice", "data", "write"})
+	}
+}
+
+func BenchmarkEnforceExSlowPolicyParallelEnabled(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		modelString := `
+					[request_definition]
+					r = sub, obj, act
+
+					[policy_definition]
+					p = sub, obj, act
+
+					[role_definition]
+					g = _, _
+
+					[policy_effect]
+					e = some(where (p.eft == allow))
+
+					[matchers]
+					m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act && test(r.sub, p.sub)`
+
+		customModel, _ := model.NewModelFromString(modelString)
+		e, _ := NewEnforcer(customModel)
+		e.EnableParallelEnforcing(true)
+
+		_, _ = e.AddPolicy("alice", "data", "write")
+		_, _ = e.AddPolicy("bob", "data", "write")
+		_, _ = e.AddPolicy("cathy", "data", "write")
+
+		_, _ = e.AddRoleForUser("alice", "bob")
+		_, _ = e.AddRoleForUser("bob", "cathy")
+
+		e.AddFunction("test", func(arguments ...interface{}) (interface{}, error) {
+			time.Sleep(time.Second)
+			return true, nil
+		})
+
+		benchmarkEnforceEx(b, e, "alice", "data", "write", []string{"alice", "data", "write"})
+	}
+}
+
+func benchmarkEnforceEx(b *testing.B, e *Enforcer, sub string, obj string, act string, res []string) {
+	b.Helper()
+	_, myRes, _ := e.EnforceEx(sub, obj, act)
+
+	if ok := util.ArrayEquals(res, myRes); !ok {
+		b.Error("Key: ", myRes, ", supposed to be ", res)
+	}
 }
 
 func TestEnforceExLog(t *testing.T) {

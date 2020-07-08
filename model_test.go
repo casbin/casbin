@@ -30,6 +30,13 @@ func testEnforce(t *testing.T, e *Enforcer, sub interface{}, obj interface{}, ac
 	}
 }
 
+func benchmarkEnforce(b *testing.B, e *Enforcer, sub interface{}, obj interface{}, act string, res bool) {
+	b.Helper()
+	if myRes, _ := e.Enforce(sub, obj, act); myRes != res {
+		b.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, myRes, res)
+	}
+}
+
 func testEnforceWithoutUsers(t *testing.T, e *Enforcer, obj string, act string, res bool) {
 	t.Helper()
 	if myRes, _ := e.Enforce(obj, act); myRes != res {

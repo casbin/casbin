@@ -21,6 +21,7 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/rbac"
@@ -240,6 +241,7 @@ func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 
 // GenerateGFunction is the factory method of the g(_, _) function.
 func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
+	var lock = sync.RWMutex{}
 	memorized := map[string]bool{}
 
 	return func(args ...interface{}) (interface{}, error) {
@@ -251,7 +253,7 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 			key += ";" + fmt.Sprintf("%v", args[index])
 		}
 
-		v, found := memorized[key]
+		v, found := readFromMemo(&lock, memorized, key)
 		if found {
 			return v, nil
 		}
@@ -265,7 +267,21 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 			v, _ = rm.HasLink(name1, name2, domain)
 		}
 
-		memorized[key] = v
+		writeToMemo(&lock, memorized, key, v)
+
 		return v, nil
 	}
+}
+
+func writeToMemo(lock *sync.RWMutex, memorized map[string]bool, key string, v bool) {
+	lock.Lock()
+	defer lock.Unlock()
+	memorized[key] = v
+}
+
+func readFromMemo(lock *sync.RWMutex, memorized map[string]bool, key string) (bool, bool) {
+	lock.RLock()
+	defer lock.RUnlock()
+	v, found := memorized[key]
+	return v, found
 }
