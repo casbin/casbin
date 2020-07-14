@@ -3,10 +3,10 @@ name: Default
 on:
   push:
     branches:
-      - master
+      - *
   pull_request:
     branches:
-      - master
+      - *
 
 jobs:
   test:
@@ -44,6 +44,3 @@ jobs:
           semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-

@@ -2,7 +2,7 @@
   "debug": true,
   "release": {
     "branches": [
-      "master"
+      "release-v2"
     ]
   },
   "plugins": [
