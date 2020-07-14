@@ -1,12 +1,6 @@
 name: Default
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+on: [push, pull_request]
 
 jobs:
   test:
@@ -32,6 +26,7 @@ jobs:
         run: go test -race -v .
 
   semantic-release:
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -44,6 +39,3 @@ jobs:
           semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-
