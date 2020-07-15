@@ -156,8 +156,12 @@ func TestModifyPolicyAPI(t *testing.T) {
 
 	rules := [][]string{
 		{"jack", "data4", "read"},
+		{"jack", "data4", "read"},
+		{"jack", "data4", "read"},
 		{"katy", "data4", "write"},
 		{"leyo", "data4", "read"},
+		{"katy", "data4", "write"},
+		{"katy", "data4", "write"},
 		{"ham", "data4", "write"},
 	}
 
