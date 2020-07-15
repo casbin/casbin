@@ -29,6 +29,7 @@ func LoadPolicyLine(line string, m model.Model) {
 	tokens := strings.Split(line, ",")
 	for i := 0; i < len(tokens); i++ {
 		tokens[i] = strings.TrimSpace(tokens[i])
+		tokens[i] = strings.Trim(tokens[i], "\"")
 	}
 
 	key := tokens[0]
