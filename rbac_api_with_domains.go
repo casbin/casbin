@@ -42,3 +42,19 @@ func (e *Enforcer) AddRoleForUserInDomain(user string, role string, domain strin
 func (e *Enforcer) DeleteRoleForUserInDomain(user string, role string, domain string) (bool, error) {
 	return e.RemoveGroupingPolicy(user, role, domain)
 }
+
+// DeleteRolesForUserInDomain deletes all roles for a user inside a domain.
+// Returns false if the user does not have any roles (aka not affected).
+func (e *Enforcer) DeleteRolesForUserInDomain(user string, domain string) (bool, error) {
+	roles, err := e.model["g"]["g"].RM.GetRoles(user, domain)
+	if err != nil {
+		return false, err
+	}
+
+	var rules [][]string
+	for _, role := range roles {
+		rules = append(rules, []string{user, role, domain})
+	}
+
+	return e.RemoveGroupingPolicies(rules)
+}
