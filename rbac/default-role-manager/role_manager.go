@@ -18,9 +18,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/casbin/casbin/v2/errors"
-	"github.com/casbin/casbin/v2/log"
-	"github.com/casbin/casbin/v2/rbac"
+	"github.com/casbin/casbin/v3/errors"
+	"github.com/casbin/casbin/v3/log"
+	"github.com/casbin/casbin/v3/rbac"
 )
 
 const defaultDomain string = "casbin::default"

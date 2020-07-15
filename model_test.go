@@ -17,10 +17,10 @@ package casbin
 import (
 	"testing"
 
-	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
-	"github.com/casbin/casbin/v2/rbac"
-	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
-	"github.com/casbin/casbin/v2/util"
+	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
+	"github.com/casbin/casbin/v3/rbac"
+	defaultrolemanager "github.com/casbin/casbin/v3/rbac/default-role-manager"
+	"github.com/casbin/casbin/v3/util"
 )
 
 func testEnforce(t *testing.T, e *Enforcer, sub interface{}, obj interface{}, act string, res bool) {

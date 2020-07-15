@@ -15,7 +15,7 @@
 package model
 
 import (
-	"github.com/casbin/casbin/v2/config"
+	"github.com/casbin/casbin/v3/config"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
