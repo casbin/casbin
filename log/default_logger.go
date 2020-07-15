@@ -25,15 +25,15 @@ type DefaultLogger struct {
 }
 
 func (l *DefaultLogger) EnableLog(enable bool) {
-    i := 0
-    if enable {
-        i = 1
-    }
-    atomic.StoreInt32(&(l.enable), int32(i))
+	i := 0
+	if enable {
+		i = 1
+	}
+	atomic.StoreInt32(&(l.enable), int32(i))
 }
 
 func (l *DefaultLogger) IsEnabled() bool {
-    return atomic.LoadInt32(&(l.enable)) != 0
+	return atomic.LoadInt32(&(l.enable)) != 0
 }
 
 func (l *DefaultLogger) Print(v ...interface{}) {
