@@ -31,7 +31,7 @@ const (
 	PolicyRemove
 )
 
-var DefaultSep = ","
+const DefaultSep = ","
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
 func (model Model) BuildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
@@ -130,8 +130,13 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) {
 // AddPolicies adds policy rules to the model.
 func (model Model) AddPolicies(sec string, ptype string, rules [][]string) {
 	for _, rule := range rules {
+		hashKey := strings.Join(rule, DefaultSep)
+		_, ok := model[sec][ptype].PolicyMap[hashKey]
+		if ok {
+			continue
+		}
 		model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
-		model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
+		model[sec][ptype].PolicyMap[hashKey] = len(model[sec][ptype].Policy) - 1
 	}
 }
 
@@ -187,7 +192,7 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 			if firstIndex == -1 {
 				firstIndex = index
 			}
-			delete(model[sec][ptype].PolicyMap, strings.Join(rule, ","))
+			delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
 			effects = append(effects, rule)
 			res = true
 		} else {

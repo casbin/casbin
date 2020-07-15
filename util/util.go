@@ -20,7 +20,7 @@ import (
 	"strings"
 )
 
-var evalReg *regexp.Regexp = regexp.MustCompile(`\beval\((?P<rule>[^),]*)\)`)
+var evalReg *regexp.Regexp = regexp.MustCompile(`\beval\((?P<rule>[^)]*)\)`)
 
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
 func EscapeAssertion(s string) string {
