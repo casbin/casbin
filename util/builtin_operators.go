@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/Knetic/govaluate"
-	"github.com/casbin/casbin/v2/rbac"
+	"github.com/casbin/casbin/v3/rbac"
 )
 
 // validate the variadic parameter size and type as string
