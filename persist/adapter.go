@@ -15,6 +15,7 @@
 package persist
 
 import (
+	"encoding/csv"
 	"strings"
 
 	"github.com/casbin/casbin/v2/model"
@@ -26,9 +27,14 @@ func LoadPolicyLine(line string, m model.Model) {
 		return
 	}
 
-	tokens := strings.Split(line, ",")
-	for i := 0; i < len(tokens); i++ {
-		tokens[i] = strings.TrimSpace(tokens[i])
+	r := csv.NewReader(strings.NewReader(line))
+	r.Comma = ','
+	r.Comment = '#'
+	r.TrimLeadingSpace = true
+
+	tokens, err := r.Read()
+	if err != nil {
+		return
 	}
 
 	key := tokens[0]
