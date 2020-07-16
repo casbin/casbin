@@ -34,7 +34,7 @@ func TestCache(t *testing.T) {
 
 	// The cache is enabled, so even if we remove a policy rule, the decision
 	// for ("alice", "data1", "read") will still be true, as it uses the cached result.
-	e.RemovePolicy("alice", "data1", "read")
+	_, _ = e.RemovePolicy("alice", "data1", "read")
 
 	testEnforceCache(t, e, "alice", "data1", "read", true)
 	testEnforceCache(t, e, "alice", "data1", "write", false)
