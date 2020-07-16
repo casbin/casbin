@@ -79,32 +79,32 @@ func TestRoleAPI(t *testing.T) {
 	testHasRole(t, e, "alice", "data1_admin", false)
 	testHasRole(t, e, "alice", "data2_admin", true)
 
-	e.AddRoleForUser("alice", "data1_admin")
+	_, _ = e.AddRoleForUser("alice", "data1_admin")
 
 	testGetRoles(t, e, []string{"data1_admin", "data2_admin"}, "alice")
 	testGetRoles(t, e, []string{}, "bob")
 	testGetRoles(t, e, []string{}, "data2_admin")
 
-	e.DeleteRoleForUser("alice", "data1_admin")
+	_, _ = e.DeleteRoleForUser("alice", "data1_admin")
 
 	testGetRoles(t, e, []string{"data2_admin"}, "alice")
 	testGetRoles(t, e, []string{}, "bob")
 	testGetRoles(t, e, []string{}, "data2_admin")
 
-	e.DeleteRolesForUser("alice")
+	_, _ = e.DeleteRolesForUser("alice")
 
 	testGetRoles(t, e, []string{}, "alice")
 	testGetRoles(t, e, []string{}, "bob")
 	testGetRoles(t, e, []string{}, "data2_admin")
 
-	e.AddRoleForUser("alice", "data1_admin")
-	e.DeleteUser("alice")
+	_, _ = e.AddRoleForUser("alice", "data1_admin")
+	_, _ = e.DeleteUser("alice")
 
 	testGetRoles(t, e, []string{}, "alice")
 	testGetRoles(t, e, []string{}, "bob")
 	testGetRoles(t, e, []string{}, "data2_admin")
 
-	e.AddRoleForUser("alice", "data2_admin")
+	_, _ = e.AddRoleForUser("alice", "data2_admin")
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -115,7 +115,7 @@ func TestRoleAPI(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "read", false)
 	testEnforce(t, e, "bob", "data2", "write", true)
 
-	e.DeleteRole("data2_admin")
+	_, _ = e.DeleteRole("data2_admin")
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -130,7 +130,7 @@ func TestRoleAPI(t *testing.T) {
 func TestEnforcer_AddRolesForUser(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	e.AddRolesForUser("alice", []string{"data1_admin", "data2_admin", "data3_admin"})
+	_, _ = e.AddRolesForUser("alice", []string{"data1_admin", "data2_admin", "data3_admin"})
 	testGetRoles(t, e, []string{"data1_admin", "data2_admin", "data3_admin"}, "alice")
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data2", "read", true)
@@ -173,28 +173,28 @@ func TestPermissionAPI(t *testing.T) {
 	testHasPermission(t, e, "bob", []string{"read"}, false)
 	testHasPermission(t, e, "bob", []string{"write"}, true)
 
-	e.DeletePermission("read")
+	_, _ = e.DeletePermission("read")
 
 	testEnforceWithoutUsers(t, e, "alice", "read", false)
 	testEnforceWithoutUsers(t, e, "alice", "write", false)
 	testEnforceWithoutUsers(t, e, "bob", "read", false)
 	testEnforceWithoutUsers(t, e, "bob", "write", true)
 
-	e.AddPermissionForUser("bob", "read")
+	_, _ = e.AddPermissionForUser("bob", "read")
 
 	testEnforceWithoutUsers(t, e, "alice", "read", false)
 	testEnforceWithoutUsers(t, e, "alice", "write", false)
 	testEnforceWithoutUsers(t, e, "bob", "read", true)
 	testEnforceWithoutUsers(t, e, "bob", "write", true)
 
-	e.DeletePermissionForUser("bob", "read")
+	_, _ = e.DeletePermissionForUser("bob", "read")
 
 	testEnforceWithoutUsers(t, e, "alice", "read", false)
 	testEnforceWithoutUsers(t, e, "alice", "write", false)
 	testEnforceWithoutUsers(t, e, "bob", "read", false)
 	testEnforceWithoutUsers(t, e, "bob", "write", true)
 
-	e.DeletePermissionsForUser("bob")
+	_, _ = e.DeletePermissionsForUser("bob")
 
 	testEnforceWithoutUsers(t, e, "alice", "read", false)
 	testEnforceWithoutUsers(t, e, "alice", "write", false)
@@ -296,8 +296,8 @@ func TestImplicitUserAPI(t *testing.T) {
 	testGetImplicitUsers(t, e, []string{"alice", "bob"}, "data2", "write")
 
 	e.ClearPolicy()
-	e.AddPolicy("admin", "data1", "read")
-	e.AddPolicy("bob", "data1", "read")
-	e.AddGroupingPolicy("alice", "admin")
+	_, _ = e.AddPolicy("admin", "data1", "read")
+	_, _ = e.AddPolicy("bob", "data1", "read")
+	_, _ = e.AddGroupingPolicy("alice", "admin")
 	testGetImplicitUsers(t, e, []string{"alice", "bob"}, "data1", "read")
 }
