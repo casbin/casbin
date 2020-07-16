@@ -118,9 +118,7 @@ func JoinSlice(a string, b ...string) []string {
 	res := make([]string, 0, len(b)+1)
 
 	res = append(res, a)
-	for _, s := range b {
-		res = append(res, s)
-	}
+	res = append(res, b...)
 
 	return res
 }

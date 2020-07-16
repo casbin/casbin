@@ -43,10 +43,13 @@ func TestSetWatcherEx(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	sampleWatcherEx := SampleWatcherEx{}
-	e.SetWatcher(sampleWatcherEx)
+	err := e.SetWatcher(sampleWatcherEx)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	e.SavePolicy()                           // calls watcherEx.UpdateForSavePolicy()
-	e.AddPolicy("admin", "data1", "read")    // calls watcherEx.UpdateForAddPolicy()
-	e.RemovePolicy("admin", "data1", "read") // calls watcherEx.UpdateForRemovePolicy()
-	e.RemoveFilteredPolicy(1, "data1")       // calls watcherEx.UpdateForRemoveFilteredPolicy()
+	_ = e.SavePolicy()                              // calls watcherEx.UpdateForSavePolicy()
+	_, _ = e.AddPolicy("admin", "data1", "read")    // calls watcherEx.UpdateForAddPolicy()
+	_, _ = e.RemovePolicy("admin", "data1", "read") // calls watcherEx.UpdateForRemovePolicy()
+	_, _ = e.RemoveFilteredPolicy(1, "data1")       // calls watcherEx.UpdateForRemoveFilteredPolicy()
 }
