@@ -355,7 +355,7 @@ func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, ru
 }
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
-func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) {
+func (e *Enforcer) enforce(matcher string, explains *[][]string, rvals ...interface{}) (ok bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("panic: %v", r)
@@ -406,12 +406,18 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		pTokens: pTokens,
 	}
 
-	var policyEffects []effect.Effect
-	var matcherResults []float64
+	policyLen := len(e.model["p"]["p"].Policy)
 
-	if policyLen := len(e.model["p"]["p"].Policy); policyLen != 0 {
-		policyEffects = make([]effect.Effect, policyLen)
-		matcherResults = make([]float64, policyLen)
+	var cap int
+	if policyLen > 0 {
+		cap = policyLen
+	} else {
+		cap = 1
+	}
+
+	eftStream := e.eft.NewStream(e.model["e"]["e"].Value, cap)
+
+	if  policyLen != 0 {
 		if len(e.model["r"]["r"].Tokens) != len(rvals) {
 			return false, fmt.Errorf(
 				"invalid request size: expected %d, got %d, rvals: %v",
@@ -419,7 +425,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				len(rvals),
 				rvals)
 		}
-		for i, pvals := range e.model["p"]["p"].Policy {
+		for _, pvals := range e.model["p"]["p"].Policy {
 			// log.LogPrint("Policy Rule: ", pvals)
 			if len(e.model["p"]["p"].Tokens) != len(pvals) {
 				return false, fmt.Errorf(
@@ -457,44 +463,33 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				return false, err
 			}
 
-			switch result := result.(type) {
-			case bool:
-				if !result {
-					policyEffects[i] = effect.Indeterminate
-					continue
-				}
-			case float64:
-				if result == 0 {
-					policyEffects[i] = effect.Indeterminate
-					continue
-				} else {
-					matcherResults[i] = result
-				}
-			default:
-				return false, errors.New("matcher result should be bool, int or float")
+			var eft effect.Effect
+			if !result.(bool) {
+				eft = effect.Indeterminate
+			} else {
+				eft = effect.Allow
 			}
 
-			if j, ok := parameters.pTokens["p_eft"]; ok {
-				eft := parameters.pVals[j]
-				if eft == "allow" {
-					policyEffects[i] = effect.Allow
-				} else if eft == "deny" {
-					policyEffects[i] = effect.Deny
+			if eft == effect.Indeterminate {
+				eft = effect.Indeterminate
+			} else if j, ok := parameters.pTokens["p_eft"]; ok {
+				pEft := parameters.pVals[j]
+				if pEft == "allow" {
+					eft = effect.Allow
+				} else if pEft == "deny" {
+					eft = effect.Deny
 				} else {
-					policyEffects[i] = effect.Indeterminate
+					eft = effect.Indeterminate
 				}
 			} else {
-				policyEffects[i] = effect.Allow
+				eft = effect.Allow
 			}
 
-			if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
+			if eftStream.PushEffect(eft) {
 				break
 			}
-
 		}
 	} else {
-		policyEffects = make([]effect.Effect, 1)
-		matcherResults = make([]float64, 1)
 
 		parameters.pVals = make([]string, len(parameters.pTokens))
 
@@ -505,23 +500,29 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			return false, err
 		}
 
+		var eft effect.Effect
 		if result.(bool) {
-			policyEffects[0] = effect.Allow
+			eft = effect.Allow
 		} else {
-			policyEffects[0] = effect.Indeterminate
+			eft = effect.Indeterminate
 		}
+
+		eftStream.PushEffect(eft);
 	}
 
 	// log.LogPrint("Rule Results: ", policyEffects)
 
-	result, explainIndex, err := e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults)
-	if err != nil {
-		return false, err
-	}
+	result := eftStream.Next()
+	explainIndexes := eftStream.Explain()
 
 	if explains != nil {
-		if explainIndex != -1 {
-			*explains = e.model["p"]["p"].Policy[explainIndex]
+		if explainIndexes != nil {
+			var tempExpl [][]string = [][]string{}
+			for _, index := range explainIndexes {
+				// *explains = e.model["p"]["p"].Policy[explainIndex]
+				tempExpl = append(tempExpl, e.model["p"]["p"].Policy[index])
+			}
+			*explains = tempExpl
 		}
 	}
 
@@ -540,11 +541,13 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 		if explains != nil {
 			reqStr.WriteString("Hit Policy: ")
-			for i, pval := range *explains {
-				if i != len(*explains)-1 {
-					reqStr.WriteString(fmt.Sprintf("%v, ", pval))
-				} else {
-					reqStr.WriteString(fmt.Sprintf("%v \n", pval))
+			for _, policy := range *explains {
+				for i, pval := range policy {
+					if i != len(policy)-1 {
+						reqStr.WriteString(fmt.Sprintf("%v, ", pval))
+					} else {
+						reqStr.WriteString(fmt.Sprintf("%v \n", pval))
+					}
 				}
 			}
 
@@ -567,15 +570,15 @@ func (e *Enforcer) EnforceWithMatcher(matcher string, rvals ...interface{}) (boo
 }
 
 // EnforceEx explain enforcement by informing matched rules
-func (e *Enforcer) EnforceEx(rvals ...interface{}) (bool, []string, error) {
-	explain := []string{}
+func (e *Enforcer) EnforceEx(rvals ...interface{}) (bool, [][]string, error) {
+	explain := [][]string{}
 	result, err := e.enforce("", &explain, rvals...)
 	return result, explain, err
 }
 
 // EnforceExWithMatcher use a custom matcher and explain enforcement by informing matched rules
-func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error) {
-	explain := []string{}
+func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, [][]string, error) {
+	explain := [][]string{}
 	result, err := e.enforce(matcher, &explain, rvals...)
 	return result, explain, err
 }

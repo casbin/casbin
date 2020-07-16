@@ -424,8 +424,10 @@ func testEnforceEx(t *testing.T, e *Enforcer, sub string, obj string, act string
 	t.Helper()
 	_, myRes, _ := e.EnforceEx(sub, obj, act)
 
-	if ok := util.ArrayEquals(res, myRes); !ok {
-		t.Error("Key: ", myRes, ", supposed to be ", res)
+	if len(myRes) != 0 {
+		if ok := util.ArrayEquals(res, myRes[0]); !ok {
+			t.Error("Key: ", myRes, ", supposed to be ", res)
+		}
 	}
 }
 
