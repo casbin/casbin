@@ -24,7 +24,7 @@ func BenchmarkHasPolicySmall(b *testing.B) {
 
 	// 100 roles, 10 resources.
 	for i := 0; i < 100; i++ {
-		e.AddPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read")
+		_, _ = e.AddPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read")
 	}
 
 	b.ResetTimer()
@@ -41,8 +41,10 @@ func BenchmarkHasPolicyMedium(b *testing.B) {
 	for i := 0; i < 1000; i++ {
 		pPolicies = append(pPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read"})
 	}
-	e.AddPolicies(pPolicies)
-
+	_, err := e.AddPolicies(pPolicies)
+	if err != nil {
+		b.Fatal(err)
+	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		e.HasPolicy(fmt.Sprintf("user%d", rand.Intn(1000)), fmt.Sprintf("data%d", rand.Intn(1000)/10), "read")
@@ -57,7 +59,10 @@ func BenchmarkHasPolicyLarge(b *testing.B) {
 	for i := 0; i < 10000; i++ {
 		pPolicies = append(pPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read"})
 	}
-	e.AddPolicies(pPolicies)
+	_, err := e.AddPolicies(pPolicies)
+	if err != nil {
+		b.Fatal(err)
+	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -70,12 +75,12 @@ func BenchmarkAddPolicySmall(b *testing.B) {
 
 	// 100 roles, 10 resources.
 	for i := 0; i < 100; i++ {
-		e.AddPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read")
+		_, _ = e.AddPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read")
 	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.AddPolicy(fmt.Sprintf("user%d", rand.Intn(100)+100), fmt.Sprintf("data%d", (rand.Intn(100)+100)/10), "read")
+		_, _ = e.AddPolicy(fmt.Sprintf("user%d", rand.Intn(100)+100), fmt.Sprintf("data%d", (rand.Intn(100)+100)/10), "read")
 	}
 }
 
@@ -87,11 +92,13 @@ func BenchmarkAddPolicyMedium(b *testing.B) {
 	for i := 0; i < 1000; i++ {
 		pPolicies = append(pPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read"})
 	}
-	e.AddPolicies(pPolicies)
-
+	_, err := e.AddPolicies(pPolicies)
+	if err != nil {
+		b.Fatal(err)
+	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.AddPolicy(fmt.Sprintf("user%d", rand.Intn(1000)+1000), fmt.Sprintf("data%d", (rand.Intn(1000)+1000)/10), "read")
+		_, _ = e.AddPolicy(fmt.Sprintf("user%d", rand.Intn(1000)+1000), fmt.Sprintf("data%d", (rand.Intn(1000)+1000)/10), "read")
 	}
 }
 
@@ -103,11 +110,14 @@ func BenchmarkAddPolicyLarge(b *testing.B) {
 	for i := 0; i < 10000; i++ {
 		pPolicies = append(pPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read"})
 	}
-	e.AddPolicies(pPolicies)
+	_, err := e.AddPolicies(pPolicies)
+	if err != nil {
+		b.Fatal(err)
+	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.AddPolicy(fmt.Sprintf("user%d", rand.Intn(10000)+10000), fmt.Sprintf("data%d", (rand.Intn(10000)+10000)/10), "read")
+		_, _ = e.AddPolicy(fmt.Sprintf("user%d", rand.Intn(10000)+10000), fmt.Sprintf("data%d", (rand.Intn(10000)+10000)/10), "read")
 	}
 }
 
@@ -116,12 +126,12 @@ func BenchmarkRemovePolicySmall(b *testing.B) {
 
 	// 100 roles, 10 resources.
 	for i := 0; i < 100; i++ {
-		e.AddPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read")
+		_, _ = e.AddPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read")
 	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.RemovePolicy(fmt.Sprintf("user%d", rand.Intn(100)), fmt.Sprintf("data%d", rand.Intn(100)/10), "read")
+		_, _ = e.RemovePolicy(fmt.Sprintf("user%d", rand.Intn(100)), fmt.Sprintf("data%d", rand.Intn(100)/10), "read")
 	}
 }
 
@@ -133,11 +143,14 @@ func BenchmarkRemovePolicyMedium(b *testing.B) {
 	for i := 0; i < 1000; i++ {
 		pPolicies = append(pPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read"})
 	}
-	e.AddPolicies(pPolicies)
+	_, err := e.AddPolicies(pPolicies)
+	if err != nil {
+		b.Fatal(err)
+	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.RemovePolicy(fmt.Sprintf("user%d", rand.Intn(1000)), fmt.Sprintf("data%d", rand.Intn(1000)/10), "read")
+		_, _ = e.RemovePolicy(fmt.Sprintf("user%d", rand.Intn(1000)), fmt.Sprintf("data%d", rand.Intn(1000)/10), "read")
 	}
 }
 
@@ -149,10 +162,13 @@ func BenchmarkRemovePolicyLarge(b *testing.B) {
 	for i := 0; i < 10000; i++ {
 		pPolicies = append(pPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read"})
 	}
-	e.AddPolicies(pPolicies)
+	_, err := e.AddPolicies(pPolicies)
+	if err != nil {
+		b.Fatal(err)
+	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.RemovePolicy(fmt.Sprintf("user%d", rand.Intn(10000)), fmt.Sprintf("data%d", rand.Intn(10000)/10), "read")
+		_, _ = e.RemovePolicy(fmt.Sprintf("user%d", rand.Intn(10000)), fmt.Sprintf("data%d", rand.Intn(10000)/10), "read")
 	}
 }

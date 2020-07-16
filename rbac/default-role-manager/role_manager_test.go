@@ -62,12 +62,12 @@ func testPrintRolesWithDomain(t *testing.T, rm rbac.RoleManager, name string, do
 
 func TestRole(t *testing.T) {
 	rm := NewRoleManager(3)
-	rm.AddLink("u1", "g1")
-	rm.AddLink("u2", "g1")
-	rm.AddLink("u3", "g2")
-	rm.AddLink("u4", "g2")
-	rm.AddLink("u4", "g3")
-	rm.AddLink("g1", "g3")
+	_ = rm.AddLink("u1", "g1")
+	_ = rm.AddLink("u2", "g1")
+	_ = rm.AddLink("u3", "g2")
+	_ = rm.AddLink("u4", "g2")
+	_ = rm.AddLink("u4", "g3")
+	_ = rm.AddLink("g1", "g3")
 
 	// Current role inheritance tree:
 	//             g3    g2
@@ -97,8 +97,8 @@ func TestRole(t *testing.T) {
 	testPrintRoles(t, rm, "g2", []string{})
 	testPrintRoles(t, rm, "g3", []string{})
 
-	rm.DeleteLink("g1", "g3")
-	rm.DeleteLink("u4", "g2")
+	_ = rm.DeleteLink("g1", "g3")
+	_ = rm.DeleteLink("u4", "g2")
 
 	// Current role inheritance tree after deleting the links:
 	//             g3    g2
@@ -131,12 +131,12 @@ func TestRole(t *testing.T) {
 
 func TestDomainRole(t *testing.T) {
 	rm := NewRoleManager(3)
-	rm.AddLink("u1", "g1", "domain1")
-	rm.AddLink("u2", "g1", "domain1")
-	rm.AddLink("u3", "admin", "domain2")
-	rm.AddLink("u4", "admin", "domain2")
-	rm.AddLink("u4", "admin", "domain1")
-	rm.AddLink("g1", "admin", "domain1")
+	_ = rm.AddLink("u1", "g1", "domain1")
+	_ = rm.AddLink("u2", "g1", "domain1")
+	_ = rm.AddLink("u3", "admin", "domain2")
+	_ = rm.AddLink("u4", "admin", "domain2")
+	_ = rm.AddLink("u4", "admin", "domain1")
+	_ = rm.AddLink("g1", "admin", "domain1")
 
 	// Current role inheritance tree:
 	//       domain1:admin    domain2:admin
@@ -165,8 +165,8 @@ func TestDomainRole(t *testing.T) {
 	testDomainRole(t, rm, "u4", "admin", "domain1", true)
 	testDomainRole(t, rm, "u4", "admin", "domain2", true)
 
-	rm.DeleteLink("g1", "admin", "domain1")
-	rm.DeleteLink("u4", "admin", "domain2")
+	_ = rm.DeleteLink("g1", "admin", "domain1")
+	_ = rm.DeleteLink("u4", "admin", "domain2")
 
 	// Current role inheritance tree after deleting the links:
 	//       domain1:admin    domain2:admin
@@ -198,12 +198,12 @@ func TestDomainRole(t *testing.T) {
 
 func TestClear(t *testing.T) {
 	rm := NewRoleManager(3)
-	rm.AddLink("u1", "g1")
-	rm.AddLink("u2", "g1")
-	rm.AddLink("u3", "g2")
-	rm.AddLink("u4", "g2")
-	rm.AddLink("u4", "g3")
-	rm.AddLink("g1", "g3")
+	_ = rm.AddLink("u1", "g1")
+	_ = rm.AddLink("u2", "g1")
+	_ = rm.AddLink("u3", "g2")
+	_ = rm.AddLink("u4", "g2")
+	_ = rm.AddLink("u4", "g3")
+	_ = rm.AddLink("g1", "g3")
 
 	// Current role inheritance tree:
 	//             g3    g2
@@ -212,7 +212,7 @@ func TestClear(t *testing.T) {
 	//         /  \
 	//       u1    u2
 
-	rm.Clear()
+	_ = rm.Clear()
 
 	// All data is cleared.
 	// No role inheritance now.
@@ -235,10 +235,10 @@ func TestDomainPartternRole(t *testing.T) {
 	rm := NewRoleManager(10)
 	rm.(*RoleManager).AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
 
-	rm.AddLink("u1", "g1", "domain1")
-	rm.AddLink("u2", "g1", "domain2")
-	rm.AddLink("u3", "g1", "*")
-	rm.AddLink("u4", "g2", "domain3")
+	_ = rm.AddLink("u1", "g1", "domain1")
+	_ = rm.AddLink("u2", "g1", "domain2")
+	_ = rm.AddLink("u3", "g1", "*")
+	_ = rm.AddLink("u4", "g2", "domain3")
 	// Current role inheritance tree after deleting the links:
 	//       domain1:g1    domain2:g1			domain3:g2
 	//		   /      \    /      \					|
@@ -266,7 +266,7 @@ func TestAllMatchingFunc(t *testing.T) {
 	rm.(*RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2)
 	rm.(*RoleManager).AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
 
-	rm.AddLink("/book/:id", "book_group", "*")
+	_ = rm.AddLink("/book/:id", "book_group", "*")
 	// Current role inheritance tree after deleting the links:
 	//  		*:book_group
 	//				|

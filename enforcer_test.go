@@ -57,7 +57,7 @@ func TestKeyMatchModelInMemory(t *testing.T) {
 	testEnforce(t, e, "cathy", "/cathy_data", "DELETE", false)
 
 	e, _ = NewEnforcer(m)
-	a.LoadPolicy(e.GetModel())
+	_ = a.LoadPolicy(e.GetModel())
 
 	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
 	testEnforce(t, e, "alice", "/alice_data/resource1", "POST", true)
@@ -106,7 +106,7 @@ func TestRBACModelInMemoryIndeterminate(t *testing.T) {
 
 	e, _ := NewEnforcer(m)
 
-	e.AddPermissionForUser("alice", "data1", "invalid")
+	_, _ = e.AddPermissionForUser("alice", "data1", "invalid")
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 }
@@ -121,11 +121,11 @@ func TestRBACModelInMemory(t *testing.T) {
 
 	e, _ := NewEnforcer(m)
 
-	e.AddPermissionForUser("alice", "data1", "read")
-	e.AddPermissionForUser("bob", "data2", "write")
-	e.AddPermissionForUser("data2_admin", "data2", "read")
-	e.AddPermissionForUser("data2_admin", "data2", "write")
-	e.AddRoleForUser("alice", "data2_admin")
+	_, _ = e.AddPermissionForUser("alice", "data1", "read")
+	_, _ = e.AddPermissionForUser("bob", "data2", "write")
+	_, _ = e.AddPermissionForUser("data2_admin", "data2", "read")
+	_, _ = e.AddPermissionForUser("data2_admin", "data2", "write")
+	_, _ = e.AddRoleForUser("alice", "data2_admin")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -162,11 +162,11 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 
 	e, _ := NewEnforcer(m)
 
-	e.AddPermissionForUser("alice", "data1", "read")
-	e.AddPermissionForUser("bob", "data2", "write")
-	e.AddPermissionForUser("data2_admin", "data2", "read")
-	e.AddPermissionForUser("data2_admin", "data2", "write")
-	e.AddRoleForUser("alice", "data2_admin")
+	_, _ = e.AddPermissionForUser("alice", "data1", "read")
+	_, _ = e.AddPermissionForUser("bob", "data2", "write")
+	_, _ = e.AddPermissionForUser("data2_admin", "data2", "read")
+	_, _ = e.AddPermissionForUser("data2_admin", "data2", "write")
+	_, _ = e.AddRoleForUser("alice", "data2_admin")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -188,8 +188,8 @@ func TestNotUsedRBACModelInMemory(t *testing.T) {
 
 	e, _ := NewEnforcer(m)
 
-	e.AddPermissionForUser("alice", "data1", "read")
-	e.AddPermissionForUser("bob", "data2", "write")
+	_, _ = e.AddPermissionForUser("alice", "data1", "read")
+	_, _ = e.AddPermissionForUser("bob", "data2", "write")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -204,7 +204,7 @@ func TestNotUsedRBACModelInMemory(t *testing.T) {
 func TestMatcherUsingInOperator(t *testing.T) {
 	// From file config
 	e, _ := NewEnforcer("examples/rbac_model_matcher_using_in_op.conf")
-	e.AddPermissionForUser("alice", "data1", "read")
+	_, _ = e.AddPermissionForUser("alice", "data1", "read")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data2", "read", true)
@@ -217,14 +217,14 @@ func TestMatcherUsingInOperator(t *testing.T) {
 func TestReloadPolicy(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	e.LoadPolicy()
+	_ = e.LoadPolicy()
 	testGetPolicy(t, e, [][]string{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
 }
 
 func TestSavePolicy(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	e.SavePolicy()
+	_ = e.SavePolicy()
 }
 
 func TestClearPolicy(t *testing.T) {
@@ -289,9 +289,9 @@ func TestEnableAutoSave(t *testing.T) {
 	e.EnableAutoSave(false)
 	// Because AutoSave is disabled, the policy change only affects the policy in Casbin enforcer,
 	// it doesn't affect the policy in the storage.
-	e.RemovePolicy("alice", "data1", "read")
+	_, _ = e.RemovePolicy("alice", "data1", "read")
 	// Reload the policy from the storage to see the effect.
-	e.LoadPolicy()
+	_ = e.LoadPolicy()
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
 	testEnforce(t, e, "alice", "data2", "read", false)
@@ -304,12 +304,12 @@ func TestEnableAutoSave(t *testing.T) {
 	e.EnableAutoSave(true)
 	// Because AutoSave is enabled, the policy change not only affects the policy in Casbin enforcer,
 	// but also affects the policy in the storage.
-	e.RemovePolicy("alice", "data1", "read")
+	_, _ = e.RemovePolicy("alice", "data1", "read")
 
 	// However, the file adapter doesn't implement the AutoSave feature, so enabling it has no effect at all here.
 
 	// Reload the policy from the storage to see the effect.
-	e.LoadPolicy()
+	_ = e.LoadPolicy()
 	testEnforce(t, e, "alice", "data1", "read", true) // Will not be false here.
 	testEnforce(t, e, "alice", "data1", "write", false)
 	testEnforce(t, e, "alice", "data2", "read", false)
@@ -337,8 +337,8 @@ func TestInitWithAdapter(t *testing.T) {
 func TestRoleLinks(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf")
 	e.EnableAutoBuildRoleLinks(false)
-	e.BuildRoleLinks()
-	e.Enforce("user501", "data9", "read")
+	_ = e.BuildRoleLinks()
+	_, _ = e.Enforce("user501", "data9", "read")
 }
 
 func TestEnforceConcurrency(t *testing.T) {
@@ -349,7 +349,7 @@ func TestEnforceConcurrency(t *testing.T) {
 	}()
 
 	e, _ := NewEnforcer("examples/rbac_model.conf")
-	e.LoadModel()
+	_ = e.LoadModel()
 
 	var wg sync.WaitGroup
 
@@ -357,7 +357,7 @@ func TestEnforceConcurrency(t *testing.T) {
 	for i := 1; i <= 10000; i++ {
 		wg.Add(1)
 		go func() {
-			e.Enforce("user501", "data9", "read")
+			_, _ = e.Enforce("user501", "data9", "read")
 			wg.Done()
 		}()
 	}
@@ -385,7 +385,7 @@ func TestGetAndSetAdapterInMem(t *testing.T) {
 
 	a2 := e2.GetAdapter()
 	e.SetAdapter(a2)
-	e.LoadPolicy()
+	_ = e.LoadPolicy()
 
 	testEnforce(t, e, "alice", "data1", "read", false)
 	testEnforce(t, e, "alice", "data1", "write", true)
@@ -398,7 +398,7 @@ func TestSetAdapterFromFile(t *testing.T) {
 
 	a := fileadapter.NewAdapter("examples/basic_policy.csv")
 	e.SetAdapter(a)
-	e.LoadPolicy()
+	_ = e.LoadPolicy()
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 }
@@ -416,7 +416,7 @@ func TestInitEmpty(t *testing.T) {
 
 	e.SetModel(m)
 	e.SetAdapter(a)
-	e.LoadPolicy()
+	_ = e.LoadPolicy()
 
 	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
 }

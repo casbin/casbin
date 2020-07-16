@@ -2,13 +2,14 @@ language: go
 
 sudo: false
 
+env:
+  - GO111MODULE=on
+
 go:
-  - "1.11"
+  - "1.11.13"
   - "1.12"
   - "1.13"
-
-before_install:
-  - go get github.com/mattn/goveralls
+  - "1.14"
 
 script:
-  - $HOME/gopath/bin/goveralls -service=travis-ci
+  - make test

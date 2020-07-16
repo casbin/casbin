@@ -40,7 +40,7 @@ func BenchmarkBasicModel(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("alice", "data1", "read")
+		_, _ = e.Enforce("alice", "data1", "read")
 	}
 }
 
@@ -49,41 +49,48 @@ func BenchmarkRBACModel(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("alice", "data2", "read")
+		_, _ = e.Enforce("alice", "data2", "read")
 	}
 }
 
 func BenchmarkRBACModelSmall(b *testing.B) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", false)
-	// Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
-	e.EnableAutoBuildRoleLinks(false)
+
 	// 100 roles, 10 resources.
 	for i := 0; i < 100; i++ {
-		e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read")
+		_, err := e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read")
+		if err != nil {
+			b.Fatal(err)
+		}
 	}
+
 	// 1000 users.
 	for i := 0; i < 1000; i++ {
-		e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10))
+		_, err := e.AddGroupingPolicy(fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10))
+		if err != nil {
+			b.Fatal(err)
+		}
 	}
-	e.BuildRoleLinks()
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("user501", "data9", "read")
+		_, _ = e.Enforce("user501", "data9", "read")
 	}
 }
 
 func BenchmarkRBACModelMedium(b *testing.B) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", false)
-	// Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
-	e.EnableAutoBuildRoleLinks(false)
 
 	// 1000 roles, 100 resources.
 	pPolicies := make([][]string, 0)
 	for i := 0; i < 1000; i++ {
 		pPolicies = append(pPolicies, []string{fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read"})
 	}
-	e.AddPolicies(pPolicies)
+
+	_, err := e.AddPolicies(pPolicies)
+	if err != nil {
+		b.Fatal(err)
+	}
 
 	// 10000 users.
 	gPolicies := make([][]string, 0)
@@ -91,38 +98,45 @@ func BenchmarkRBACModelMedium(b *testing.B) {
 		gPolicies = append(gPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10)})
 	}
 
-	e.BuildRoleLinks()
+	_, err = e.AddGroupingPolicies(gPolicies)
+	if err != nil {
+		b.Fatal(err)
+	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("user5001", "data99", "read")
+		_, _ = e.Enforce("user5001", "data99", "read")
 	}
 }
 
 func BenchmarkRBACModelLarge(b *testing.B) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", false)
-	// Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
-	e.EnableAutoBuildRoleLinks(false)
 
 	// 10000 roles, 1000 resources.
 	pPolicies := make([][]string, 0)
 	for i := 0; i < 10000; i++ {
 		pPolicies = append(pPolicies, []string{fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read"})
 	}
-	e.AddPolicies(pPolicies)
+
+	_, err := e.AddPolicies(pPolicies)
+	if err != nil {
+		b.Fatal(err)
+	}
 
 	// 100000 users.
 	gPolicies := make([][]string, 0)
 	for i := 0; i < 100000; i++ {
 		gPolicies = append(gPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("group%d", i/10)})
 	}
-	e.AddGroupingPolicies(gPolicies)
 
-	e.BuildRoleLinks()
+	_, err = e.AddGroupingPolicies(gPolicies)
+	if err != nil {
+		b.Fatal(err)
+	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("user50001", "data999", "read")
+		_, _ = e.Enforce("user50001", "data999", "read")
 	}
 }
 
@@ -131,7 +145,7 @@ func BenchmarkRBACModelWithResourceRoles(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("alice", "data1", "read")
+		_, _ = e.Enforce("alice", "data1", "read")
 	}
 }
 
@@ -140,7 +154,7 @@ func BenchmarkRBACModelWithDomains(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("alice", "domain1", "data1", "read")
+		_, _ = e.Enforce("alice", "domain1", "data1", "read")
 	}
 }
 
@@ -150,7 +164,7 @@ func BenchmarkABACModel(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("alice", data1, "read")
+		_, _ = e.Enforce("alice", data1, "read")
 	}
 }
 
@@ -159,7 +173,7 @@ func BenchmarkKeyMatchModel(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("alice", "/alice_data/resource1", "GET")
+		_, _ = e.Enforce("alice", "/alice_data/resource1", "GET")
 	}
 }
 
@@ -168,7 +182,7 @@ func BenchmarkRBACModelWithDeny(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("alice", "data1", "read")
+		_, _ = e.Enforce("alice", "data1", "read")
 	}
 }
 
@@ -177,6 +191,6 @@ func BenchmarkPriorityModel(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Enforce("alice", "data1", "read")
+		_, _ = e.Enforce("alice", "data1", "read")
 	}
 }

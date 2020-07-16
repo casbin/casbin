@@ -92,7 +92,7 @@ func (e *SyncedEnforcer) StopAutoLoadPolicy() {
 // SetWatcher sets the current watcher.
 func (e *SyncedEnforcer) SetWatcher(watcher persist.Watcher) error {
 	e.watcher = watcher
-	return watcher.SetUpdateCallback(func(string) { e.LoadPolicy() })
+	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
 }
 
 // ClearPolicy clears all policy.

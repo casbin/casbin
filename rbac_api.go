@@ -203,8 +203,8 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 		return nil, errors.New("domain should be 1 parameter")
 	}
 
-	res := [][]string{}
-	permissions := [][]string{}
+	var res [][]string
+	var permissions [][]string
 	for _, role := range roles {
 		if withDomain {
 			permissions = e.GetPermissionsForUserInDomain(role, domain[0])

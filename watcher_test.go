@@ -20,7 +20,6 @@ type SampleWatcher struct {
 }
 
 func (w SampleWatcher) Close() {
-	return
 }
 
 func (w SampleWatcher) SetUpdateCallback(func(string)) error {
@@ -32,10 +31,17 @@ func (w SampleWatcher) Update() error {
 }
 
 func TestSetWatcher(t *testing.T) {
-	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
-
+	e, err := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	if err != nil {
+		t.Fatal(err)
+	}
 	sampleWatcher := SampleWatcher{}
-	e.SetWatcher(sampleWatcher)
-
-	e.SavePolicy() //calls watcher.Update()
+	err = e.SetWatcher(sampleWatcher)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = e.SavePolicy() //calls watcher.Update()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
