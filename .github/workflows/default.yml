@@ -16,14 +16,39 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
-      - name: Get dependencies
-        run: go get -v -t -d ./...
+      - name: Run go test
+        run:  make test
 
-      - name: Test
-        run: go test -v .
+  benchmark:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: [ 1.11, 1.12, 1.13, 1.14]
+    steps:
+      - uses: actions/checkout@v2
 
-      - name: Test Race
-        run: go test -race -v .
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Run go test bench
+        run:  make benchmark
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v1
+        with:
+          version: v1.28
 
   semantic-release:
     runs-on: ubuntu-latest
