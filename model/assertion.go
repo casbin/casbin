@@ -25,11 +25,12 @@ import (
 // Assertion represents an expression in a section of the model.
 // For example: r = sub, obj, act
 type Assertion struct {
-	Key    string
-	Value  string
-	Tokens []string
-	Policy [][]string
-	RM     rbac.RoleManager
+	Key       string
+	Value     string
+	Tokens    []string
+	Policy    [][]string
+	PolicyMap map[string]int
+	RM        rbac.RoleManager
 }
 
 func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
@@ -66,10 +67,10 @@ func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp
 func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
 	ast.RM = rm
 	count := strings.Count(ast.Value, "_")
+	if count < 2 {
+		return errors.New("the number of \"_\" in role definition should be at least 2")
+	}
 	for _, rule := range ast.Policy {
-		if count < 2 {
-			return errors.New("the number of \"_\" in role definition should be at least 2")
-		}
 		if len(rule) < count {
 			return errors.New("grouping policy elements do not meet role definition")
 		}

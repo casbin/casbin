@@ -67,8 +67,8 @@ func TestUserAPIWithDomains(t *testing.T) {
 	testGetUsers(t, e, []string{}, "non_exist", "domain2")
 	testGetUsersInDomain(t, e, "non_exist", "domain2", []string{})
 
-	e.DeleteRoleForUserInDomain("alice", "admin", "domain1")
-	e.AddRoleForUserInDomain("bob", "admin", "domain1")
+	_, _ = e.DeleteRoleForUserInDomain("alice", "admin", "domain1")
+	_, _ = e.AddRoleForUserInDomain("bob", "admin", "domain1")
 
 	testGetUsers(t, e, []string{"bob"}, "admin", "domain1")
 	testGetUsersInDomain(t, e, "admin", "domain1", []string{"bob"})
@@ -110,8 +110,8 @@ func TestRoleAPIWithDomains(t *testing.T) {
 	testGetRoles(t, e, []string{}, "non_exist", "domain2")
 	testGetRolesInDomain(t, e, "non_exist", "domain2", []string{})
 
-	e.DeleteRoleForUserInDomain("alice", "admin", "domain1")
-	e.AddRoleForUserInDomain("bob", "admin", "domain1")
+	_, _ = e.DeleteRoleForUserInDomain("alice", "admin", "domain1")
+	_, _ = e.AddRoleForUserInDomain("bob", "admin", "domain1")
 
 	testGetRoles(t, e, []string{}, "alice", "domain1")
 	testGetRolesInDomain(t, e, "alice", "domain1", []string{})
@@ -136,6 +136,34 @@ func TestRoleAPIWithDomains(t *testing.T) {
 
 	testGetRoles(t, e, []string{}, "non_exist", "domain2")
 	testGetRolesInDomain(t, e, "non_exist", "domain2", []string{})
+
+	_, _ = e.AddRoleForUserInDomain("alice", "admin", "domain1")
+	_, _ = e.DeleteRolesForUserInDomain("bob", "domain1")
+
+	testGetRoles(t, e, []string{"admin"}, "alice", "domain1")
+	testGetRolesInDomain(t, e, "alice", "domain1", []string{"admin"})
+
+	testGetRoles(t, e, []string{}, "bob", "domain1")
+	testGetRolesInDomain(t, e, "bob", "domain1", []string{})
+
+	testGetRoles(t, e, []string{}, "admin", "domain1")
+	testGetRolesInDomain(t, e, "admin", "domain1", []string{})
+
+	testGetRoles(t, e, []string{}, "non_exist", "domain1")
+	testGetRolesInDomain(t, e, "non_exist", "domain1", []string{})
+
+	testGetRoles(t, e, []string{}, "alice", "domain2")
+	testGetRolesInDomain(t, e, "alice", "domain2", []string{})
+
+	testGetRoles(t, e, []string{"admin"}, "bob", "domain2")
+	testGetRolesInDomain(t, e, "bob", "domain2", []string{"admin"})
+
+	testGetRoles(t, e, []string{}, "admin", "domain2")
+	testGetRolesInDomain(t, e, "admin", "domain2", []string{})
+
+	testGetRoles(t, e, []string{}, "non_exist", "domain2")
+	testGetRolesInDomain(t, e, "non_exist", "domain2", []string{})
+
 }
 
 func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name string, domain string, res [][]string) {

@@ -20,7 +20,7 @@ import (
 	"strings"
 )
 
-var evalReg *regexp.Regexp = regexp.MustCompile(`\beval\((?P<rule>[^),]*)\)`)
+var evalReg *regexp.Regexp = regexp.MustCompile(`\beval\((?P<rule>[^)]*)\)`)
 
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
 func EscapeAssertion(s string) string {
@@ -118,9 +118,7 @@ func JoinSlice(a string, b ...string) []string {
 	res := make([]string, 0, len(b)+1)
 
 	res = append(res, a)
-	for _, s := range b {
-		res = append(res, s)
-	}
+	res = append(res, b...)
 
 	return res
 }

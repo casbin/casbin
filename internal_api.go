@@ -23,25 +23,30 @@ const (
 	notImplemented = "not implemented"
 )
 
+func (e *Enforcer) shouldPersist() bool {
+	return e.adapter != nil && e.autoSave
+}
+
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
-	ruleAdded := e.model.AddPolicy(sec, ptype, rule)
-	if !ruleAdded {
-		return ruleAdded, nil
+	if e.model.HasPolicy(sec, ptype, rule) {
+		return false, nil
 	}
+
+	if e.shouldPersist() {
+		if err := e.adapter.AddPolicy(sec, ptype, rule); err != nil {
+			if err.Error() != notImplemented {
+				return false, err
+			}
+		}
+	}
+
+	e.model.AddPolicy(sec, ptype, rule)
 
 	if sec == "g" {
 		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{rule})
 		if err != nil {
-			return ruleAdded, err
-		}
-	}
-
-	if e.adapter != nil && e.autoSave {
-		if err := e.adapter.AddPolicy(sec, ptype, rule); err != nil {
-			if err.Error() != notImplemented {
-				return ruleAdded, err
-			}
+			return true, err
 		}
 	}
 
@@ -52,47 +57,55 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 		} else {
 			err = e.watcher.Update()
 		}
-		return ruleAdded, err
+		return true, err
 	}
 
-	return ruleAdded, nil
+	return true, nil
 }
 
 // addPolicies adds rules to the current policy.
-// removePolicies removes rules from the current policy.
 func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	rulesAdded, effects := e.model.AddPolicies(sec, ptype, rules)
-	if !rulesAdded {
-		return rulesAdded, nil
+	if e.model.HasPolicies(sec, ptype, rules) {
+		return false, nil
 	}
 
-	if sec == "g" {
-		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, effects)
-		if err != nil {
-			return rulesAdded, err
+	if e.shouldPersist() {
+		if err := e.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, rules); err != nil {
+			if err.Error() != notImplemented {
+				return false, err
+			}
 		}
 	}
 
-	if e.adapter != nil && e.autoSave {
-		if err := e.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, rules); err != nil {
-			if err.Error() != notImplemented {
-				return rulesAdded, err
-			}
+	e.model.AddPolicies(sec, ptype, rules)
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
+		if err != nil {
+			return true, err
 		}
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
 		err := e.watcher.Update()
 		if err != nil {
-			return rulesAdded, err
+			return true, err
 		}
 	}
 
-	return rulesAdded, nil
+	return true, nil
 }
 
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
+	if e.shouldPersist() {
+		if err := e.adapter.RemovePolicy(sec, ptype, rule); err != nil {
+			if err.Error() != notImplemented {
+				return false, err
+			}
+		}
+	}
+
 	ruleRemoved := e.model.RemovePolicy(sec, ptype, rule)
 	if !ruleRemoved {
 		return ruleRemoved, nil
@@ -102,14 +115,6 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{rule})
 		if err != nil {
 			return ruleRemoved, err
-		}
-	}
-
-	if e.adapter != nil && e.autoSave {
-		if err := e.adapter.RemovePolicy(sec, ptype, rule); err != nil {
-			if err.Error() != notImplemented {
-				return ruleRemoved, err
-			}
 		}
 	}
 
@@ -129,23 +134,27 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 
 // removePolicies removes rules from the current policy.
 func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	rulesRemoved, effects := e.model.RemovePolicies(sec, ptype, rules)
+	if !e.model.HasPolicies(sec, ptype, rules) {
+		return false, nil
+	}
+
+	if e.shouldPersist() {
+		if err := e.adapter.(persist.BatchAdapter).RemovePolicies(sec, ptype, rules); err != nil {
+			if err.Error() != notImplemented {
+				return false, err
+			}
+		}
+	}
+
+	rulesRemoved := e.model.RemovePolicies(sec, ptype, rules)
 	if !rulesRemoved {
 		return rulesRemoved, nil
 	}
 
 	if sec == "g" {
-		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effects)
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, rules)
 		if err != nil {
 			return rulesRemoved, err
-		}
-	}
-
-	if e.adapter != nil && e.autoSave {
-		if err := e.adapter.(persist.BatchAdapter).RemovePolicies(sec, ptype, rules); err != nil {
-			if err.Error() != notImplemented {
-				return rulesRemoved, err
-			}
 		}
 	}
 
@@ -161,6 +170,14 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.
 func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
+	if e.shouldPersist() {
+		if err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
+			if err.Error() != notImplemented {
+				return false, err
+			}
+		}
+	}
+
 	ruleRemoved, effects := e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
 	if !ruleRemoved {
 		return ruleRemoved, nil
@@ -170,14 +187,6 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effects)
 		if err != nil {
 			return ruleRemoved, err
-		}
-	}
-
-	if e.adapter != nil && e.autoSave {
-		if err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
-			if err.Error() != notImplemented {
-				return ruleRemoved, err
-			}
 		}
 	}
 

@@ -177,13 +177,13 @@ func TestRBACModelWithDomains(t *testing.T) {
 func TestRBACModelWithDomainsAtRuntime(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf")
 
-	e.AddPolicy("admin", "domain1", "data1", "read")
-	e.AddPolicy("admin", "domain1", "data1", "write")
-	e.AddPolicy("admin", "domain2", "data2", "read")
-	e.AddPolicy("admin", "domain2", "data2", "write")
+	_, _ = e.AddPolicy("admin", "domain1", "data1", "read")
+	_, _ = e.AddPolicy("admin", "domain1", "data1", "write")
+	_, _ = e.AddPolicy("admin", "domain2", "data2", "read")
+	_, _ = e.AddPolicy("admin", "domain2", "data2", "write")
 
-	e.AddGroupingPolicy("alice", "admin", "domain1")
-	e.AddGroupingPolicy("bob", "admin", "domain2")
+	_, _ = e.AddGroupingPolicy("alice", "admin", "domain1")
+	_, _ = e.AddGroupingPolicy("bob", "admin", "domain2")
 
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
@@ -195,7 +195,7 @@ func TestRBACModelWithDomainsAtRuntime(t *testing.T) {
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
 
 	// Remove all policy rules related to domain1 and data1.
-	e.RemoveFilteredPolicy(1, "domain1", "data1")
+	_, _ = e.RemoveFilteredPolicy(1, "domain1", "data1")
 
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", false)
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", false)
@@ -207,7 +207,7 @@ func TestRBACModelWithDomainsAtRuntime(t *testing.T) {
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
 
 	// Remove the specified policy rule.
-	e.RemovePolicy("admin", "domain2", "data2", "read")
+	_, _ = e.RemovePolicy("admin", "domain2", "data2", "read")
 
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", false)
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", false)
@@ -223,17 +223,17 @@ func TestRBACModelWithDomainsAtRuntimeMockAdapter(t *testing.T) {
 	adapter := fileadapter.NewAdapterMock("examples/rbac_with_domains_policy.csv")
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", adapter)
 
-	e.AddPolicy("admin", "domain3", "data1", "read")
-	e.AddGroupingPolicy("alice", "admin", "domain3")
+	_, _ = e.AddPolicy("admin", "domain3", "data1", "read")
+	_, _ = e.AddGroupingPolicy("alice", "admin", "domain3")
 
 	testDomainEnforce(t, e, "alice", "domain3", "data1", "read", true)
 
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
-	e.RemoveFilteredPolicy(1, "domain1", "data1")
+	_, _ = e.RemoveFilteredPolicy(1, "domain1", "data1")
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", false)
 
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
-	e.RemovePolicy("admin", "domain2", "data2", "read")
+	_, _ = e.RemovePolicy("admin", "domain2", "data2", "read")
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", false)
 }
 
@@ -262,7 +262,7 @@ func TestRBACModelWithCustomData(t *testing.T) {
 	// You can add custom data to a grouping policy, Casbin will ignore it. It is only meaningful to the caller.
 	// This feature can be used to store information like whether "bob" is an end user (so no subject will inherit "bob")
 	// For Casbin, it is equivalent to: e.AddGroupingPolicy("bob", "data2_admin")
-	e.AddGroupingPolicy("bob", "data2_admin", "custom_data")
+	_, _ = e.AddGroupingPolicy("bob", "data2_admin", "custom_data")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -276,7 +276,7 @@ func TestRBACModelWithCustomData(t *testing.T) {
 	// You should also take the custom data as a parameter when deleting a grouping policy.
 	// e.RemoveGroupingPolicy("bob", "data2_admin") won't work.
 	// Or you can remove it by using RemoveFilteredGroupingPolicy().
-	e.RemoveGroupingPolicy("bob", "data2_admin", "custom_data")
+	_, _ = e.RemoveGroupingPolicy("bob", "data2_admin", "custom_data")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
@@ -352,7 +352,7 @@ func (rm *testCustomRoleManager) PrintRoles() error { return nil }
 func TestRBACModelWithCustomRoleManager(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	e.SetRoleManager(NewRoleManager())
-	e.LoadModel()
+	_ = e.LoadModel()
 	_ = e.LoadPolicy()
 
 	testEnforce(t, e, "alice", "data1", "read", true)
@@ -563,7 +563,6 @@ func TestABACPolicy(t *testing.T) {
 
 func TestCommentModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/comment_model.conf", "examples/basic_policy.csv")
-
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
 	testEnforce(t, e, "alice", "data2", "read", false)
@@ -572,4 +571,31 @@ func TestCommentModel(t *testing.T) {
 	testEnforce(t, e, "bob", "data1", "write", false)
 	testEnforce(t, e, "bob", "data2", "read", false)
 	testEnforce(t, e, "bob", "data2", "write", true)
+}
+
+func TestDomainMatchModel(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domain_pattern_model.conf", "examples/rbac_with_domain_pattern_policy.csv")
+	e.rm.(*defaultrolemanager.RoleManager).AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
+
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "read", false)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "write", false)
+	testDomainEnforce(t, e, "alice", "domain2", "data2", "read", true)
+	testDomainEnforce(t, e, "alice", "domain2", "data2", "write", true)
+	testDomainEnforce(t, e, "bob", "domain2", "data1", "read", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data1", "write", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "write", true)
+}
+
+func TestAllMatchModel(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_all_pattern_model.conf", "examples/rbac_with_all_pattern_policy.csv")
+	e.rm.(*defaultrolemanager.RoleManager).AddMatchingFunc("keyMatch2", util.KeyMatch2)
+	e.rm.(*defaultrolemanager.RoleManager).AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
+
+	testDomainEnforce(t, e, "alice", "domain1", "/book/1", "read", true)
+	testDomainEnforce(t, e, "alice", "domain1", "/book/1", "write", false)
+	testDomainEnforce(t, e, "alice", "domain2", "/book/1", "read", false)
+	testDomainEnforce(t, e, "alice", "domain2", "/book/1", "write", true)
 }

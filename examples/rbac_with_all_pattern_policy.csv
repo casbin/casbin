@@ -1,0 +1,4 @@
+p, alice, domain1, book_group, read
+p, alice, domain2, book_group, write
+
+g, /book/:id, book_group, *

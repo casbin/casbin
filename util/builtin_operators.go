@@ -240,19 +240,32 @@ func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 
 // GenerateGFunction is the factory method of the g(_, _) function.
 func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
+	memorized := map[string]bool{}
+
 	return func(args ...interface{}) (interface{}, error) {
 		name1 := args[0].(string)
 		name2 := args[1].(string)
 
+		key := ""
+		for index := 0; index < len(args); index++ {
+			key += ";" + fmt.Sprintf("%v", args[index])
+		}
+
+		v, found := memorized[key]
+		if found {
+			return v, nil
+		}
+
 		if rm == nil {
-			return name1 == name2, nil
+			v = name1 == name2
 		} else if len(args) == 2 {
-			res, _ := rm.HasLink(name1, name2)
-			return res, nil
+			v, _ = rm.HasLink(name1, name2)
 		} else {
 			domain := args[2].(string)
-			res, _ := rm.HasLink(name1, name2, domain)
-			return res, nil
+			v, _ = rm.HasLink(name1, name2, domain)
 		}
+
+		memorized[key] = v
+		return v, nil
 	}
 }

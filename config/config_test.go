@@ -60,13 +60,13 @@ func TestGet(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
-	config.Set("other::key1", "new test key")
+	_ = config.Set("other::key1", "new test key")
 
 	if v := config.String("other::key1"); v != "new test key" {
 		t.Errorf("Get failure: expected different value for other::key1 (expected: [%#v] got: [%#v])", "new test key", v)
 	}
 
-	config.Set("other::key1", "test key")
+	_ = config.Set("other::key1", "test key")
 
 	if v := config.String("multi1::name"); v != "r.sub==p.sub && r.obj==p.obj" {
 		t.Errorf("Get failure: expected different value for multi1::name (expected: [%#v] got: [%#v])", "r.sub==p.sub&&r.obj==p.obj", v)

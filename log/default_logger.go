@@ -14,29 +14,36 @@
 
 package log
 
-import "log"
+import (
+	"log"
+	"sync/atomic"
+)
 
 // DefaultLogger is the implementation for a Logger using golang log.
 type DefaultLogger struct {
-	enable bool
+	enable int32
 }
 
 func (l *DefaultLogger) EnableLog(enable bool) {
-	l.enable = enable
+	i := 0
+	if enable {
+		i = 1
+	}
+	atomic.StoreInt32(&(l.enable), int32(i))
 }
 
 func (l *DefaultLogger) IsEnabled() bool {
-	return l.enable
+	return atomic.LoadInt32(&(l.enable)) != 0
 }
 
 func (l *DefaultLogger) Print(v ...interface{}) {
-	if l.enable {
+	if l.IsEnabled() {
 		log.Print(v...)
 	}
 }
 
 func (l *DefaultLogger) Printf(format string, v ...interface{}) {
-	if l.enable {
+	if l.IsEnabled() {
 		log.Printf(format, v...)
 	}
 }
