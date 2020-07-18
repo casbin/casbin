@@ -237,8 +237,11 @@ func (e *Enforcer) SetEffector(eft effect.Effector) {
 }
 
 // ClearPolicy clears all policy.
-func (e *Enforcer) ClearPolicy() {
+func (e *Enforcer) ClearPolicy() error {
+	// TODO: implement ClearPolicy in adapter and move model.ClearPolicy after adapter.ClearPolicy
 	e.model.ClearPolicy()
+
+	return e.adapter.SavePolicy(e.model)
 }
 
 // LoadPolicy reloads the policy from file/database.

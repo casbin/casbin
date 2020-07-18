@@ -26,5 +26,5 @@ const (
 
 // Effector is the interface for Casbin effectors.
 type Effector interface {
-	NewStream(expr string, cap int) (EffectorStream)
+	NewStream(expr string, cap int) EffectorStream
 }

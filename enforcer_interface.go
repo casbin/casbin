@@ -42,7 +42,7 @@ type IEnforcer interface {
 	GetRoleManager() rbac.RoleManager
 	SetRoleManager(rm rbac.RoleManager)
 	SetEffector(eft effect.Effector)
-	ClearPolicy()
+	ClearPolicy() error
 	LoadPolicy() error
 	LoadFilteredPolicy(filter interface{}) error
 	IsFiltered() bool
