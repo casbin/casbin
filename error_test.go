@@ -24,9 +24,6 @@ func TestPathError(t *testing.T) {
 	_, err := NewEnforcer("hope_this_path_wont_exist", "")
 	if err == nil {
 		t.Errorf("Should be error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err.Error())
 	}
 }
 
@@ -34,17 +31,11 @@ func TestEnforcerParamError(t *testing.T) {
 	_, err := NewEnforcer(1, 2, 3)
 	if err == nil {
 		t.Errorf("Should not be error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err.Error())
 	}
 
 	_, err2 := NewEnforcer(1, "2")
 	if err2 == nil {
 		t.Errorf("Should not be error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err2.Error())
 	}
 }
 
@@ -52,9 +43,6 @@ func TestModelError(t *testing.T) {
 	_, err := NewEnforcer("examples/error/error_model.conf", "examples/error/error_policy.csv")
 	if err == nil {
 		t.Errorf("Should be error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err.Error())
 	}
 }
 
@@ -74,9 +62,6 @@ func TestEnforceError(t *testing.T) {
 	_, err := e.Enforce("wrong", "wrong")
 	if err == nil {
 		t.Errorf("Should be error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err.Error())
 	}
 }
 
@@ -113,9 +98,6 @@ func TestModelNoError(t *testing.T) {
 
 	if err == nil {
 		t.Errorf("Should be error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err.Error())
 	}
 }
 
@@ -132,9 +114,6 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err.Error())
 	}
 
 	rules := [][]string{
@@ -147,9 +126,6 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err.Error())
 	}
 
 	removed, err2 := e.RemoveFilteredPolicy(1, "domain1", "data1")
@@ -159,9 +135,6 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err2 == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err2.Error())
 	}
 
 	removed, err3 := e.RemovePolicy("admin", "domain2", "data2", "read")
@@ -171,9 +144,6 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err3 == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err3.Error())
 	}
 
 	rules = [][]string{
@@ -186,9 +156,6 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err.Error())
 	}
 
 	added, err4 := e.AddGroupingPolicy("bob", "admin2")
@@ -198,9 +165,6 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err4 == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err4.Error())
 	}
 
 	added, err5 := e.AddNamedGroupingPolicy("g", []string{"eve", "admin2", "domain1"})
@@ -210,9 +174,6 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err5 == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err5.Error())
 	}
 
 	added, err6 := e.AddNamedPolicy("p", []string{"admin2", "domain2", "data2", "write"})
@@ -222,9 +183,6 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err6 == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err6.Error())
 	}
 
 	removed, err7 := e.RemoveGroupingPolicy("bob", "admin2")
@@ -234,9 +192,6 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err7 == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err7.Error())
 	}
 
 	removed, err8 := e.RemoveFilteredGroupingPolicy(0, "bob")
@@ -246,9 +201,6 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err8 == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err8.Error())
 	}
 
 	removed, err9 := e.RemoveNamedGroupingPolicy("g", []string{"alice", "admin", "domain1"})
@@ -258,9 +210,6 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err9 == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err9.Error())
 	}
 
 	removed, err10 := e.RemoveFilteredNamedGroupingPolicy("g", 0, "eve")
@@ -270,8 +219,5 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	if err10 == nil {
 		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err10.Error())
 	}
 }

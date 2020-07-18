@@ -24,7 +24,6 @@ import (
 func testGetUsersInDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
 	t.Helper()
 	myRes := e.GetUsersForRoleInDomain(name, domain)
-	t.Log("Users for ", name, " under ", domain, ": ", myRes)
 
 	if !util.SetEquals(res, myRes) {
 		t.Error("Users for ", name, " under ", domain, ": ", myRes, ", supposed to be ", res)
@@ -34,7 +33,6 @@ func testGetUsersInDomain(t *testing.T, e *Enforcer, name string, domain string,
 func testGetRolesInDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
 	t.Helper()
 	myRes := e.GetRolesForUserInDomain(name, domain)
-	t.Log("Roles for ", name, " under ", domain, ": ", myRes)
 
 	if !util.SetEquals(res, myRes) {
 		t.Error("Roles for ", name, " under ", domain, ": ", myRes, ", supposed to be ", res)
@@ -169,7 +167,6 @@ func TestRoleAPIWithDomains(t *testing.T) {
 func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name string, domain string, res [][]string) {
 	t.Helper()
 	myRes := e.GetPermissionsForUserInDomain(name, domain)
-	t.Log("Permissions for ", name, " under ", domain, ": ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
 		t.Error("Permissions for ", name, " under ", domain, ": ", myRes, ", supposed to be ", res)
