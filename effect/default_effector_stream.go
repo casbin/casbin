@@ -3,10 +3,10 @@ package effect
 // DefaultEffectorStream is the default implementation of interface EffectorStream.
 type DefaultEffectorStream struct {
 	done bool
-	res bool
+	res  bool
 	expr string
-	idx int
-	cap int
+	idx  int
+	cap  int
 	expl []int
 }
 
@@ -60,10 +60,10 @@ func (s *DefaultEffectorStream) PushEffect(eft Effect) bool {
 		pushIndex(hasPolicy, &s.expl, s.idx)
 	}
 
-	if s.idx + 1 == s.cap {
+	if s.idx+1 == s.cap {
 		s.done = true
 	}
 	s.idx++
-	
+
 	return s.done
 }

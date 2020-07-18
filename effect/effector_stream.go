@@ -6,3 +6,4 @@ type EffectorStream interface {
 	Explain() []int
 	PushEffect(eft Effect) bool
 }
+

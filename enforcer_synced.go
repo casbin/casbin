@@ -46,15 +46,15 @@ func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 	return e, nil
 }
 
-// IsAudoLoadingRunning check if SyncedEnforcer is auto loading policies
-func (e *SyncedEnforcer) IsAudoLoadingRunning() bool {
+// IsAudoLoadRunning check if SyncedEnforcer is auto loading policies
+func (e *SyncedEnforcer) IsAudoLoadRunning() bool {
 	return atomic.LoadInt32(&(e.autoLoadRunning)) != 0
 }
 
 // StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy
 func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 	// Don't start another goroutine if there is already one running
-	if e.IsAudoLoadingRunning() {
+	if e.IsAudoLoadRunning() {
 		return
 	}
 	atomic.StoreInt32(&(e.autoLoadRunning), int32(1))
@@ -84,7 +84,7 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 
 // StopAutoLoadPolicy causes the go routine to exit.
 func (e *SyncedEnforcer) StopAutoLoadPolicy() {
-	if e.IsAudoLoadingRunning() {
+	if e.IsAudoLoadRunning() {
 		e.stopAutoLoad <- struct{}{}
 	}
 }
@@ -96,10 +96,10 @@ func (e *SyncedEnforcer) SetWatcher(watcher persist.Watcher) error {
 }
 
 // ClearPolicy clears all policy.
-func (e *SyncedEnforcer) ClearPolicy() {
+func (e *SyncedEnforcer) ClearPolicy() error {
 	e.m.Lock()
 	defer e.m.Unlock()
-	e.Enforcer.ClearPolicy()
+	return e.Enforcer.ClearPolicy()
 }
 
 // LoadPolicy reloads the policy from file/database.
@@ -371,8 +371,7 @@ func (e *SyncedEnforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIn
 
 // AddFunction adds a customized function.
 func (e *SyncedEnforcer) AddFunction(name string, function govaluate.ExpressionFunction) {
-	e.m.Lock()
-	defer e.m.Unlock()
+	// FuncionMap uses sync.Map so it's totally thread-safe
 	e.Enforcer.AddFunction(name, function)
 }
 

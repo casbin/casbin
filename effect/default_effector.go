@@ -24,15 +24,15 @@ func NewDefaultEffector() *DefaultEffector {
 	return &e
 }
 
-func (e *DefaultEffector) NewStream(expr string, cap int) (EffectorStream) {
-	if !(cap>0) {
+func (e *DefaultEffector) NewStream(expr string, cap int) EffectorStream {
+	if !(cap > 0) {
 		panic("cap should be greater than 0")
 	}
 
 	var res bool
-	if expr=="some(where (p_eft == allow))" || expr=="some(where (p_eft == allow)) && !some(where (p_eft == deny))" || expr=="priority(p_eft) || deny" {
+	if expr == "some(where (p_eft == allow))" || expr == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" || expr == "priority(p_eft) || deny" {
 		res = false
-	} else if expr=="!some(where (p_eft == deny))" {
+	} else if expr == "!some(where (p_eft == deny))" {
 		res = true
 	} else {
 		panic("unsupported effect: " + expr)
@@ -42,3 +42,4 @@ func (e *DefaultEffector) NewStream(expr string, cap int) (EffectorStream) {
 
 	return des
 }
+
