@@ -15,6 +15,8 @@
 package casbin
 
 import (
+	"time"
+
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v3/effect"
 	"github.com/casbin/casbin/v3/model"
@@ -58,6 +60,9 @@ type IEnforcer interface {
 	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
 	EnforceEx(rvals ...interface{}) (bool, [][]string, error)
 	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, [][]string, error)
+	IsAudoLoadRunning() bool
+	StartAutoLoadPolicy(d time.Duration)
+	StopAutoLoadPolicy()
 
 	/* RBAC API */
 	GetRolesForUser(name string, domain ...string) ([]string, error)
