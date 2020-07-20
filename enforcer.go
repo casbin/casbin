@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -176,7 +177,7 @@ func (e *Enforcer) initialize() {
 	e.autoSave = true
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
-	e.parallel = false
+	e.parallel = true
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -426,30 +427,52 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		if e.parallel {
 			ctx, cancel := context.WithCancel(context.Background())
 
+			n := runtime.GOMAXPROCS(0)
+
 			var wg sync.WaitGroup
-			wg.Add(len(e.model["p"]["p"].Policy))
-			errs := make(chan error, len(e.model["p"]["p"].Policy))
+			wg.Add(n)
 
-			for i, pvals := range e.model["p"]["p"].Policy {
-				go func(i int, pvals []string, parameters enforceParameters, expression *govaluate.EvaluableExpression) {
-					defer wg.Done()
-
-					select {
-					case <-ctx.Done():
-						return
-					default:
-					}
-
-					parameters.pVals = pvals
-					var err error
-					policyEffects[i], matcherResults[i], err = e.evaluatePolicy(parameters, expression, expString, functions)
-					if err != nil {
-						errs <- err
-						cancel()
-					}
-				}(i, pvals, parameters, expression)
+			type param struct {
+				i          int
+				parameters enforceParameters
+				expression *govaluate.EvaluableExpression
 			}
 
+			inputs := make(chan param, n)
+			errs := make(chan error, len(e.model["p"]["p"].Policy))
+
+			for i := 0; i < n; i++ {
+				go func() {
+					defer wg.Done()
+
+					for input := range inputs {
+						select {
+						case <-ctx.Done():
+							return
+						default:
+						}
+
+						var err error
+						policyEffects[input.i], matcherResults[input.i], err = e.evaluatePolicy(input.parameters, input.expression, expString, functions)
+						if err != nil {
+							errs <- err
+							cancel()
+						}
+					}
+				}()
+			}
+
+			for i, pvals := range e.model["p"]["p"].Policy {
+				input := param{
+					i:          i,
+					parameters: parameters,
+					expression: expression,
+				}
+				input.parameters.pVals = pvals
+				inputs <- input
+			}
+
+			close(inputs)
 			wg.Wait()
 
 			close(errs)
