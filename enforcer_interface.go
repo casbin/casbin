@@ -28,43 +28,8 @@ var _ IEnforcer = &Enforcer{}
 var _ IEnforcer = &SyncedEnforcer{}
 var _ IEnforcer = &CachedEnforcer{}
 
-// IEnforcer is the API interface of Enforcer
-type IEnforcer interface {
-	/* Enforcer API */
-	InitWithFile(modelPath string, policyPath string) error
-	InitWithAdapter(modelPath string, adapter persist.Adapter) error
-	InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error
-	initialize()
-	LoadModel() error
-	GetModel() model.Model
-	SetModel(m model.Model)
-	GetAdapter() persist.Adapter
-	SetAdapter(adapter persist.Adapter)
-	SetWatcher(watcher persist.Watcher) error
-	GetRoleManager() rbac.RoleManager
-	SetRoleManager(rm rbac.RoleManager)
-	SetEffector(eft effect.Effector)
-	ClearPolicy() error
-	LoadPolicy() error
-	LoadFilteredPolicy(filter interface{}) error
-	IsFiltered() bool
-	SavePolicy() error
-	EnableEnforce(enable bool)
-	EnableLog(enable bool)
-	EnableAutoNotifyWatcher(enable bool)
-	EnableAutoSave(autoSave bool)
-	EnableAutoBuildRoleLinks(autoBuildRoleLinks bool)
-	BuildRoleLinks() error
-	enforce(matcher string, explains *[][]string, rvals ...interface{}) (bool, error)
-	Enforce(rvals ...interface{}) (bool, error)
-	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
-	EnforceEx(rvals ...interface{}) (bool, [][]string, error)
-	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, [][]string, error)
-	IsAudoLoadRunning() bool
-	StartAutoLoadPolicy(d time.Duration)
-	StopAutoLoadPolicy()
-
-	/* RBAC API */
+// IEnforcerRbac is the Rbac API interface of Enforcer
+type IEnforcerRbac interface {
 	GetRolesForUser(name string, domain ...string) ([]string, error)
 	GetUsersForRole(name string, domain ...string) ([]string, error)
 	HasRoleForUser(name string, role string) (bool, error)
@@ -89,8 +54,10 @@ type IEnforcer interface {
 	GetPermissionsForUserInDomain(user string, domain string) [][]string
 	AddRoleForUserInDomain(user string, role string, domain string) (bool, error)
 	DeleteRoleForUserInDomain(user string, role string, domain string) (bool, error)
+}
 
-	/* Management API */
+// IEnforcerMgmg is the Management API interface of Enforcer
+type IEnforcerMgmt interface {
 	GetAllSubjects() []string
 	GetAllNamedSubjects(ptype string) []string
 	GetAllObjects() []string
@@ -132,4 +99,46 @@ type IEnforcer interface {
 	RemoveNamedGroupingPolicies(ptype string, rules [][]string) (bool, error)
 	RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error)
 	AddFunction(name string, function govaluate.ExpressionFunction)
+}
+
+// IEnforcer is the API interface of Enforcer
+type IEnforcer interface {
+	/* Management API */
+	IEnforcerMgmt
+
+	/* RBAC API */
+	IEnforcerRbac
+
+	/* Enforcer API */
+	InitWithFile(modelPath string, policyPath string) error
+	InitWithAdapter(modelPath string, adapter persist.Adapter) error
+	InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error
+	LoadModel() error
+	GetModel() model.Model
+	SetModel(m model.Model)
+	GetAdapter() persist.Adapter
+	SetAdapter(adapter persist.Adapter)
+	SetWatcher(watcher persist.Watcher) error
+	GetRoleManager() rbac.RoleManager
+	SetRoleManager(rm rbac.RoleManager)
+	SetEffector(eft effect.Effector)
+	ClearPolicy() error
+	LoadPolicy() error
+	LoadFilteredPolicy(filter interface{}) error
+	IsFiltered() bool
+	SavePolicy() error
+	EnableEnforce(enable bool)
+	EnableLog(enable bool)
+	EnableAutoNotifyWatcher(enable bool)
+	EnableAutoSave(autoSave bool)
+	EnableAutoBuildRoleLinks(autoBuildRoleLinks bool)
+	BuildRoleLinks() error
+	enforce(matcher string, explains *[][]string, rvals ...interface{}) (bool, error)
+	Enforce(rvals ...interface{}) (bool, error)
+	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
+	EnforceEx(rvals ...interface{}) (bool, [][]string, error)
+	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, [][]string, error)
+	IsAudoLoadRunning() bool
+	StartAutoLoadPolicy(d time.Duration)
+	StopAutoLoadPolicy()
 }
