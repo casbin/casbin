@@ -16,20 +16,15 @@ package casbin
 
 import (
 	"sync"
-	"sync/atomic"
-	"time"
 
 	"github.com/Knetic/govaluate"
-	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/persist"
 )
 
 // SyncedEnforcer wraps Enforcer and provides synchronized access
 type SyncedEnforcer struct {
 	*Enforcer
-	m               sync.RWMutex
-	stopAutoLoad    chan struct{}
-	autoLoadRunning int32
+	m sync.RWMutex
 }
 
 // NewSyncedEnforcer creates a synchronized enforcer via file or DB.
@@ -44,49 +39,6 @@ func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 	e.stopAutoLoad = make(chan struct{}, 1)
 	e.autoLoadRunning = 0
 	return e, nil
-}
-
-// IsAudoLoadRunning check if SyncedEnforcer is auto loading policies
-func (e *SyncedEnforcer) IsAudoLoadRunning() bool {
-	return atomic.LoadInt32(&(e.autoLoadRunning)) != 0
-}
-
-// StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy
-func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
-	// Don't start another goroutine if there is already one running
-	if e.IsAudoLoadRunning() {
-		return
-	}
-	atomic.StoreInt32(&(e.autoLoadRunning), int32(1))
-	ticker := time.NewTicker(d)
-	go func() {
-		defer func() {
-			ticker.Stop()
-			atomic.StoreInt32(&(e.autoLoadRunning), int32(0))
-		}()
-		n := 1
-		log.LogPrintf("Start automatically load policy")
-		for {
-			select {
-			case <-ticker.C:
-				// error intentionally ignored
-				_ = e.LoadPolicy()
-				// Uncomment this line to see when the policy is loaded.
-				// log.Print("Load policy for time: ", n)
-				n++
-			case <-e.stopAutoLoad:
-				log.LogPrintf("Stop automatically load policy")
-				return
-			}
-		}
-	}()
-}
-
-// StopAutoLoadPolicy causes the go routine to exit.
-func (e *SyncedEnforcer) StopAutoLoadPolicy() {
-	if e.IsAudoLoadRunning() {
-		e.stopAutoLoad <- struct{}{}
-	}
 }
 
 // SetWatcher sets the current watcher.
