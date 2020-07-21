@@ -33,7 +33,67 @@ jobs:
           go-version: ${{ matrix.go }}
 
       - name: Run go test bench
-        run:  make benchmark
+        run: make benchmark
+
+  benchmark-regressions-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: new
+
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.base_ref }}
+          path: old
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+
+      - run: go get -u golang.org/x/perf/cmd/benchstat
+
+      - name: Run benchmark for old
+        run: |
+          cd old
+          make benchmark-regressions-check | tee output.txt
+
+      - name: Run benchmark for new
+        run: |
+          cd new
+          make benchmark-regressions-check | tee output.txt
+
+      - name: Run benchstat
+        env:
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          cat << EOF > body.md
+          The computes and compares statistics about benchmarks for ${COMMIT_SHA} by [benchstat](https://github.com/golang/perf/tree/master/cmd/benchstat) with golang 1.14:
+
+          \`\`\`
+          $(benchstat old/output.txt new/output.txt | tee benchstat.log)
+          \`\`\`
+          EOF
+
+          cat body.md
+
+      - name: Add comment to PR
+        env:
+          URL: ${{ github.event.pull_request.comments_url }}
+          ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_KEY }}
+        run: |
+          curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 > ./jq
+          chmod +x ./jq
+
+          curl \
+            -X POST \
+            $URL \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token $ACCESS_TOKEN" \
+            --data '{ "body": '"$(./jq -R -s < body.md)"' }' \
+            -o /dev/null
 
   lint:
     runs-on: ubuntu-latest
@@ -51,6 +111,7 @@ jobs:
           version: v1.28
 
   semantic-release:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
