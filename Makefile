@@ -7,7 +7,7 @@ benchmark:
 	go test -bench=.
 
 benchmark-regressions-check:
-	go test -bench=. -count=5
+	go test -bench=. -count=1
 
 lint:
 	golangci-lint run --verbose

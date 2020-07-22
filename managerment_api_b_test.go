@@ -160,7 +160,7 @@ func BenchmarkRemovePolicyLarge(b *testing.B) {
 	// 10000 roles, 1000 resources.
 	pPolicies := make([][]string, 0)
 	for i := 0; i < 10000; i++ {
-		pPolicies = append(pPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read"})
+		pPolicies = append(pPolicies, []string{fmt.Sprintf("user2%d", i), fmt.Sprintf("data%d", i/10), "read"})
 	}
 	_, err := e.AddPolicies(pPolicies)
 	if err != nil {
@@ -169,6 +169,6 @@ func BenchmarkRemovePolicyLarge(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = e.RemovePolicy(fmt.Sprintf("user%d", rand.Intn(10000)), fmt.Sprintf("data%d", rand.Intn(10000)/10), "read")
+		_, _ = e.RemovePolicy(fmt.Sprintf("user2%d", rand.Intn(10000)), fmt.Sprintf("data%d", rand.Intn(10000)/10), "read")
 	}
 }
