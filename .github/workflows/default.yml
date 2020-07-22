@@ -84,16 +84,24 @@ jobs:
           URL: ${{ github.event.pull_request.comments_url }}
           ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_KEY }}
         run: |
-          curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 > ./jq
+          curl -s -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 > ./jq
           chmod +x ./jq
 
-          curl \
+          data='{ "body": '"$(./jq -R -s < body.md)"' }'
+          res=$(curl -s \
             -X POST \
-            $URL \
+            "$URL" \
             -H "Content-Type: application/json" \
             -H "Authorization: token $ACCESS_TOKEN" \
-            --data '{ "body": '"$(./jq -R -s < body.md)"' }' \
-            -o /dev/null
+            --data "$data")
+
+          echo "$res"
+
+          url=$(echo "$res" | ./jq -r '.url')
+
+          if [[ -z $url || $url == null ]]; then
+            exit 1
+          fi
 
   lint:
     runs-on: ubuntu-latest
