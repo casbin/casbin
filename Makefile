@@ -6,9 +6,6 @@ test:
 benchmark:
 	go test -bench=.
 
-benchmark-regressions-check:
-	go test -bench=. -count=5
-
 lint:
 	golangci-lint run --verbose
 
