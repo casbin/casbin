@@ -13,3 +13,4 @@ go:
 
 script:
   - make test
+  - bash ./.travis/benchmark-regressions-check.sh
