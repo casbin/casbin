@@ -243,7 +243,7 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
-	e.model.ClearPolicy()
+	e.ClearPolicy()
 	if err := e.adapter.LoadPolicy(e.model); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
 		return err
 	}
@@ -260,7 +260,7 @@ func (e *Enforcer) LoadPolicy() error {
 
 // LoadFilteredPolicy reloads a filtered policy from file/database.
 func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
-	e.model.ClearPolicy()
+	e.ClearPolicy()
 
 	var filteredAdapter persist.FilteredAdapter
 
