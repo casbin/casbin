@@ -23,7 +23,6 @@ import (
 func testStringList(t *testing.T, title string, f func() []string, res []string) {
 	t.Helper()
 	myRes := f()
-	t.Log(title+": ", myRes)
 
 	if !util.ArrayEquals(res, myRes) {
 		t.Error(title+": ", myRes, ", supposed to be ", res)
@@ -42,7 +41,6 @@ func TestGetList(t *testing.T) {
 func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	t.Helper()
 	myRes := e.GetPolicy()
-	t.Log("Policy: ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
 		t.Error("Policy: ", myRes, ", supposed to be ", res)
@@ -52,7 +50,6 @@ func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
 func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]string, fieldValues ...string) {
 	t.Helper()
 	myRes := e.GetFilteredPolicy(fieldIndex, fieldValues...)
-	t.Log("Policy for ", util.ParamsToString(fieldValues...), ": ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
 		t.Error("Policy for ", util.ParamsToString(fieldValues...), ": ", myRes, ", supposed to be ", res)
@@ -62,7 +59,6 @@ func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]st
 func testGetGroupingPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	t.Helper()
 	myRes := e.GetGroupingPolicy()
-	t.Log("Grouping policy: ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
 		t.Error("Grouping policy: ", myRes, ", supposed to be ", res)
@@ -72,7 +68,6 @@ func testGetGroupingPolicy(t *testing.T, e *Enforcer, res [][]string) {
 func testGetFilteredGroupingPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]string, fieldValues ...string) {
 	t.Helper()
 	myRes := e.GetFilteredGroupingPolicy(fieldIndex, fieldValues...)
-	t.Log("Grouping policy for ", util.ParamsToString(fieldValues...), ": ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
 		t.Error("Grouping policy for ", util.ParamsToString(fieldValues...), ": ", myRes, ", supposed to be ", res)
@@ -82,7 +77,6 @@ func testGetFilteredGroupingPolicy(t *testing.T, e *Enforcer, fieldIndex int, re
 func testHasPolicy(t *testing.T, e *Enforcer, policy []string, res bool) {
 	t.Helper()
 	myRes := e.HasPolicy(policy)
-	t.Log("Has policy ", util.ArrayToString(policy), ": ", myRes)
 
 	if res != myRes {
 		t.Error("Has policy ", util.ArrayToString(policy), ": ", myRes, ", supposed to be ", res)
@@ -92,7 +86,6 @@ func testHasPolicy(t *testing.T, e *Enforcer, policy []string, res bool) {
 func testHasGroupingPolicy(t *testing.T, e *Enforcer, policy []string, res bool) {
 	t.Helper()
 	myRes := e.HasGroupingPolicy(policy)
-	t.Log("Has grouping policy ", util.ArrayToString(policy), ": ", myRes)
 
 	if res != myRes {
 		t.Error("Has grouping policy ", util.ArrayToString(policy), ": ", myRes, ", supposed to be ", res)

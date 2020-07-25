@@ -476,4 +476,6 @@ func TestEnforceExLog(t *testing.T) {
 	testEnforceEx(t, e, "bob", "data1", "write", []string{})
 	testEnforceEx(t, e, "bob", "data2", "read", []string{})
 	testEnforceEx(t, e, "bob", "data2", "write", []string{"bob", "data2", "write"})
+
+	e.EnableLog(false)
 }
