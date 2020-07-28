@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	Err "github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 )
@@ -170,6 +171,10 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.
 func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
+	if len(fieldValues) == 0 {
+		return false, Err.INVALID_FIELDVAULES_PARAMETER
+	}
+
 	if e.shouldPersist() {
 		if err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
 			if err.Error() != notImplemented {
