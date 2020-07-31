@@ -179,6 +179,11 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 	var effects [][]string
 	res := false
 	firstIndex := -1
+
+	if len(fieldValues) == 0 {
+		return false, effects
+	}
+
 	for index, rule := range model[sec][ptype].Policy {
 		matched := true
 		for i, fieldValue := range fieldValues {
@@ -200,8 +205,8 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 		}
 	}
 
-	model[sec][ptype].Policy = tmp
 	if firstIndex != -1 {
+		model[sec][ptype].Policy = tmp
 		for i := firstIndex; i < len(model[sec][ptype].Policy); i++ {
 			model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
 		}
