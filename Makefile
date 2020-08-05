@@ -1,3 +1,6 @@
+SHELL = /bin/bash
+export PATH := $(shell yarn global bin):$(PATH)
+
 default: lint test
 
 test:
@@ -10,7 +13,6 @@ lint:
 	golangci-lint run --verbose
 
 release:
-	export PATH="$(yarn global bin):$PATH"
 	yarn global add semantic-release
 	semantic-release
 
