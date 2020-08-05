@@ -1,10 +1,15 @@
 {
   "debug": true,
-  "release": {
-    "branches": [
-      "master"
-    ]
-  },
+  "branches": [
+    {
+      "name": "master",
+      "prerelease": "beta"
+    },
+    {
+      "name": "release-2.x",
+      "range": "2.x"
+    }
+  ],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
