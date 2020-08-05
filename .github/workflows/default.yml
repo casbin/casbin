@@ -51,15 +51,13 @@ jobs:
           version: v1.28
 
   semantic-release:
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
       - name: Run semantic-release
         if: github.repository == 'casbin/casbin' && github.event_name == 'push'
-        run: |
-          export PATH="$(yarn global bin):$PATH"
-          yarn global add semantic-release
-          semantic-release
+        run: make release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
