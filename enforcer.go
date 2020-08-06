@@ -39,14 +39,16 @@ type Enforcer struct {
 	fm        model.FunctionMap
 	eft       effect.Effector
 
-	adapter persist.Adapter
-	watcher persist.Watcher
-	rm      rbac.RoleManager
+	adapter    persist.Adapter
+	watcher    persist.Watcher
+	dispatcher persist.Dispatcher
+	rm         rbac.RoleManager
 
-	enabled            bool
-	autoSave           bool
-	autoBuildRoleLinks bool
-	autoNotifyWatcher  bool
+	enabled              bool
+	autoSave             bool
+	autoBuildRoleLinks   bool
+	autoNotifyWatcher    bool
+	autoNotifyDispatcher bool
 
 	stopAutoLoad    chan struct{}
 	autoLoadRunning int32
@@ -226,6 +228,12 @@ func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
 }
 
+// SetDispatcher sets the current dispatcher.
+func (e *Enforcer) SetDispatcher(dispatcher persist.Dispatcher) error {
+	e.dispatcher = dispatcher
+	return dispatcher.SetEnforcer(e)
+}
+
 // GetRoleManager gets the current role manager.
 func (e *Enforcer) GetRoleManager() rbac.RoleManager {
 	return e.rm
@@ -285,6 +293,9 @@ func (e *Enforcer) StopAutoLoadPolicy() {
 
 // ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() error {
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return e.dispatcher.ClearPolicy()
+	}
 	// TODO: implement ClearPolicy in adapter and move model.ClearPolicy after adapter.ClearPolicy
 	e.model.ClearPolicy()
 
@@ -377,6 +388,11 @@ func (e *Enforcer) EnableLog(enable bool) {
 // EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
 func (e *Enforcer) EnableAutoNotifyWatcher(enable bool) {
 	e.autoNotifyWatcher = enable
+}
+
+// EnableautoNotifyDispatcher controls whether to save a policy rule automatically notify the Dispatcher when it is added or removed.
+func (e *Enforcer) EnableautoNotifyDispatcher(enable bool) {
+	e.autoNotifyDispatcher = enable
 }
 
 // EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.
