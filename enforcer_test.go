@@ -420,7 +420,7 @@ func TestInitEmpty(t *testing.T) {
 
 	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
 }
-func testEnforceEx(t *testing.T, e *Enforcer, sub string, obj string, act string, res []string) {
+func testEnforceEx(t *testing.T, e *Enforcer, sub, obj, act interface{}, res []string) {
 	t.Helper()
 	_, myRes, _ := e.EnforceEx(sub, obj, act)
 
@@ -461,6 +461,10 @@ func TestEnforceEx(t *testing.T) {
 	testEnforceEx(t, e, "bob", "data1", "write", []string{})
 	testEnforceEx(t, e, "bob", "data2", "read", []string{"data2_allow_group", "data2", "read", "allow"})
 	testEnforceEx(t, e, "bob", "data2", "write", []string{"bob", "data2", "write", "deny"})
+
+	e, _ = NewEnforcer("examples/abac_model.conf")
+	obj := struct{ Owner string }{Owner: "alice"}
+	testEnforceEx(t, e, "alice", obj, "write", []string{})
 }
 
 func TestEnforceExLog(t *testing.T) {
