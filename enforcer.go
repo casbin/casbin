@@ -35,14 +35,16 @@ type Enforcer struct {
 	fm        model.FunctionMap
 	eft       effect.Effector
 
-	adapter persist.Adapter
-	watcher persist.Watcher
-	rm      rbac.RoleManager
+	adapter    persist.Adapter
+	watcher    persist.Watcher
+	dispatcher persist.Dispatcher
+	rm         rbac.RoleManager
 
-	enabled            bool
-	autoSave           bool
-	autoBuildRoleLinks bool
-	autoNotifyWatcher  bool
+	enabled              bool
+	autoSave             bool
+	autoBuildRoleLinks   bool
+	autoNotifyWatcher    bool
+	autoNotifyDispatcher bool
 
 	logger log.Logger
 }
@@ -139,8 +141,6 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) er
 	if err != nil {
 		return err
 	}
-
-	m.SetLogger(e.logger)
 
 	err = e.InitWithModelAndAdapter(m, adapter)
 	if err != nil {
@@ -240,6 +240,12 @@ func (e *Enforcer) SetAdapter(adapter persist.Adapter) {
 func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 	e.watcher = watcher
 	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
+}
+
+// SetDispatcher sets the current dispatcher.
+func (e *Enforcer) SetDispatcher(dispatcher persist.Dispatcher) error {
+	e.dispatcher = dispatcher
+	return dispatcher.SetEnforcer(e)
 }
 
 // GetRoleManager gets the current role manager.
@@ -361,6 +367,11 @@ func (e *Enforcer) IsLogEnabled() bool {
 // EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
 func (e *Enforcer) EnableAutoNotifyWatcher(enable bool) {
 	e.autoNotifyWatcher = enable
+}
+
+// EnableAutoNotifyDispatcher controls whether to save a policy rule automatically notify the Dispatcher when it is added or removed.
+func (e *Enforcer) EnableAutoNotifyDispatcher(enable bool) {
+	e.autoNotifyDispatcher = enable
 }
 
 // EnableAutoSave controls whether to save a policy rule automatically to the adapter when it is added or removed.

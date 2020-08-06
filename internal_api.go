@@ -34,6 +34,10 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 		return false, nil
 	}
 
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.AddPolicies(sec, ptype, [][]string{rule})
+	}
+
 	if e.shouldPersist() {
 		if err := e.adapter.AddPolicy(sec, ptype, rule); err != nil {
 			if err.Error() != notImplemented {
@@ -70,6 +74,10 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 		return false, nil
 	}
 
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
+	}
+
 	if e.shouldPersist() {
 		if err := e.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, rules); err != nil {
 			if err.Error() != notImplemented {
@@ -99,6 +107,10 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.RemovePolicies(sec, ptype, [][]string{rule})
+	}
+
 	if e.shouldPersist() {
 		if err := e.adapter.RemovePolicy(sec, ptype, rule); err != nil {
 			if err.Error() != notImplemented {
@@ -176,6 +188,10 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 		return false, nil
 	}
 
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.RemovePolicies(sec, ptype, rules)
+	}
+
 	if e.shouldPersist() {
 		if err := e.adapter.(persist.BatchAdapter).RemovePolicies(sec, ptype, rules); err != nil {
 			if err.Error() != notImplemented {
@@ -210,6 +226,10 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
 	if len(fieldValues) == 0 {
 		return false, Err.INVALID_FIELDVAULES_PARAMETER
+	}
+
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
 	}
 
 	if e.shouldPersist() {
