@@ -56,7 +56,7 @@ type IEnforcerRbac interface {
 	DeleteRoleForUserInDomain(user string, role string, domain string) (bool, error)
 }
 
-// IEnforcerMgmg is the Management API interface of Enforcer
+// IEnforcerMgmt is the Management API interface of Enforcer
 type IEnforcerMgmt interface {
 	GetAllSubjects() []string
 	GetAllNamedSubjects(ptype string) []string
@@ -119,6 +119,8 @@ type IEnforcer interface {
 	GetAdapter() persist.Adapter
 	SetAdapter(adapter persist.Adapter)
 	SetWatcher(watcher persist.Watcher) error
+	GetDispatcher() persist.Dispatcher
+	SetDispatcher(persist.Dispatcher) error
 	GetRoleManager() rbac.RoleManager
 	SetRoleManager(rm rbac.RoleManager)
 	SetEffector(eft effect.Effector)

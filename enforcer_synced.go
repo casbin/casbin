@@ -47,6 +47,17 @@ func (e *SyncedEnforcer) SetWatcher(watcher persist.Watcher) error {
 	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
 }
 
+// GetDispatcher gets the current dispatcher.
+func (e *SyncedEnforcer) GetDispatcher() persist.Dispatcher {
+	return e.dispatcher
+}
+
+// SetDispatcher sets the current dispatcher.
+func (e *SyncedEnforcer) SetDispatcher(dispatcher persist.Dispatcher) error {
+	e.dispatcher = dispatcher
+	return dispatcher.SetEnforcer(e)
+}
+
 // ClearPolicy clears all policy.
 func (e *SyncedEnforcer) ClearPolicy() error {
 	e.m.Lock()

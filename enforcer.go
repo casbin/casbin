@@ -180,6 +180,7 @@ func (e *Enforcer) initialize() {
 	e.autoSave = true
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
+	e.autoNotifyDispatcher = true
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -226,6 +227,11 @@ func (e *Enforcer) SetAdapter(adapter persist.Adapter) {
 func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 	e.watcher = watcher
 	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
+}
+
+// GetDispatcher gets the current dispatcher.
+func (e *Enforcer) GetDispatcher() persist.Dispatcher {
+	return e.dispatcher
 }
 
 // SetDispatcher sets the current dispatcher.
