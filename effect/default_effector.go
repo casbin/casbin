@@ -59,6 +59,17 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, results []
 				break
 			}
 		}
+	} else if expr == "some(where (p_eft == allow)) || !some(where (p_eft == deny))" {
+		result = true
+		for i, eft := range effects {
+			if eft == Allow {
+				result = true
+				explainIndex = i
+				break
+			} else if eft == Deny {
+				result = false
+			}
+		}
 	} else if expr == "priority(p_eft) || deny" {
 		result = false
 		for i, eft := range effects {
