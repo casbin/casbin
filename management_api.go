@@ -215,7 +215,7 @@ func (e *Enforcer) AddGroupingPolicy(params ...interface{}) (bool, error) {
 	return e.AddNamedGroupingPolicy("g", params...)
 }
 
-// AddGroupingPolicies adds role inheritance rulea to the current policy.
+// AddGroupingPolicies adds role inheritance rules to the current policy.
 // If the rule already exists, the function returns false for the corresponding policy rule and the rule will not be added.
 // Otherwise the function returns true for the corresponding policy rule by adding the new rule.
 func (e *Enforcer) AddGroupingPolicies(rules [][]string) (bool, error) {
@@ -254,7 +254,7 @@ func (e *Enforcer) RemoveGroupingPolicy(params ...interface{}) (bool, error) {
 	return e.RemoveNamedGroupingPolicy("g", params...)
 }
 
-// RemoveGroupingPolicies removes role inheritance rulea from the current policy.
+// RemoveGroupingPolicies removes role inheritance rules from the current policy.
 func (e *Enforcer) RemoveGroupingPolicies(rules [][]string) (bool, error) {
 	return e.RemoveNamedGroupingPolicies("g", rules)
 }
