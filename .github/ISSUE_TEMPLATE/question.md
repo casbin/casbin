@@ -7,10 +7,16 @@ assignees: hsluoyz
 
 ---
 
+**Want to prioritize this issue? Try:**
+
+[![issuehunt-to-marktext](https://github.com/BoostIO/issuehunt-materials/raw/master/v1/issuehunt-button-v1.svg)](https://issuehunt.io/r/casbin/casbin/issues)
+
+------
+
 **What's your scenario? What do you want to achieve?**
 Your answer here
 
-**Your model**
+**Your model:**
 
 ```ini
 [request_definition]
@@ -29,7 +35,7 @@ e = some(where (p.eft == allow))
 m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 ```
 
-**Your policy**
+**Your policy:**
 
 ```
 p, alice, data1, read
@@ -40,7 +46,7 @@ p, data2_admin, data2, write
 g, alice, data2_admin
 ```
 
-**Your request(s)**
+**Your request(s):**
 
 ```
 alice, data2, read ---> false (expected: true)

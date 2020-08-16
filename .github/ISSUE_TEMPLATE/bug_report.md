@@ -7,6 +7,12 @@ assignees: hsluoyz
 
 ---
 
+**Want to prioritize this issue? Try:**
+
+[![issuehunt-to-marktext](https://github.com/BoostIO/issuehunt-materials/raw/master/v1/issuehunt-button-v1.svg)](https://issuehunt.io/r/casbin/casbin/issues)
+
+------
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
