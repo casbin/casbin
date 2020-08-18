@@ -45,6 +45,7 @@ type Enforcer struct {
 	autoSave           bool
 	autoBuildRoleLinks bool
 	autoNotifyWatcher  bool
+	autoClearPolicies  bool
 }
 
 // NewEnforcer creates an enforcer via file or DB.
@@ -173,6 +174,7 @@ func (e *Enforcer) initialize() {
 	e.autoSave = true
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
+	e.autoClearPolicies = true
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -260,7 +262,9 @@ func (e *Enforcer) LoadPolicy() error {
 
 // LoadFilteredPolicy reloads a filtered policy from file/database.
 func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
-	e.model.ClearPolicy()
+	if e.autoClearPolicies == true {
+		e.model.ClearPolicy()
+	}
 
 	var filteredAdapter persist.FilteredAdapter
 
@@ -337,6 +341,11 @@ func (e *Enforcer) EnableAutoSave(autoSave bool) {
 // EnableAutoBuildRoleLinks controls whether to rebuild the role inheritance relations when a role is added or deleted.
 func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 	e.autoBuildRoleLinks = autoBuildRoleLinks
+}
+
+// EnableAutoClearPolicies controls whether the policies are removed when the filteredPolicies is called
+func (e *Enforcer) EnableAutoClearPolicies(autoClearPolicies bool) {
+	e.autoClearPolicies = autoClearPolicies
 }
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
