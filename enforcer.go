@@ -262,7 +262,7 @@ func (e *Enforcer) LoadPolicy() error {
 
 // LoadFilteredPolicy reloads a filtered policy from file/database.
 func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
-	if e.autoClearPolicies == true {
+	if e.autoClearPolicies {
 		e.model.ClearPolicy()
 	}
 
