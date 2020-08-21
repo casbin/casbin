@@ -45,6 +45,7 @@ type IEnforcer interface {
 	ClearPolicy()
 	LoadPolicy() error
 	LoadFilteredPolicy(filter interface{}) error
+	LoadIncrementalFilteredPolicy(filter interface{}) error
 	IsFiltered() bool
 	SavePolicy() error
 	EnableEnforce(enable bool)
