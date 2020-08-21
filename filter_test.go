@@ -93,8 +93,7 @@ func TestAppendFilteredPolicy(t *testing.T) {
 	testHasPolicy(t, e, []string{"admin", "domain2", "data2", "read"}, false)
 
 	//disable clear policy and load second domain
-	e.EnableAutoClearPolicies(false)
-	if err := e.LoadFilteredPolicy(&fileadapter.Filter{
+	if err := e.LoadIncrementalFilteredPolicy(&fileadapter.Filter{
 		P: []string{"", "domain2"},
 		G: []string{"", "", "domain2"},
 	}); err != nil {
