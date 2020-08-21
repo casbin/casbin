@@ -45,7 +45,6 @@ type Enforcer struct {
 	autoSave           bool
 	autoBuildRoleLinks bool
 	autoNotifyWatcher  bool
-	autoClearPolicies  bool
 }
 
 // NewEnforcer creates an enforcer via file or DB.
@@ -174,7 +173,6 @@ func (e *Enforcer) initialize() {
 	e.autoSave = true
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
-	e.autoClearPolicies = true
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -260,12 +258,7 @@ func (e *Enforcer) LoadPolicy() error {
 	return nil
 }
 
-// LoadFilteredPolicy reloads a filtered policy from file/database.
-func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
-	if e.autoClearPolicies {
-		e.model.ClearPolicy()
-	}
-
+func (e *Enforcer) loadFilteredPolicy(filter interface{}) error {
 	var filteredAdapter persist.FilteredAdapter
 
 	// Attempt to cast the Adapter as a FilteredAdapter
@@ -287,6 +280,18 @@ func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
 		}
 	}
 	return nil
+}
+
+// LoadFilteredPolicy reloads a filtered policy from file/database.
+func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
+	e.model.ClearPolicy()
+
+	return e.loadFilteredPolicy(filter)
+}
+
+// LoadIncrementalFilteredPolicy append a filtered policy from file/database.
+func (e *Enforcer) LoadIncrementalFilteredPolicy(filter interface{}) error {
+	return e.loadFilteredPolicy(filter)
 }
 
 // IsFiltered returns true if the loaded policy has been filtered.
@@ -341,11 +346,6 @@ func (e *Enforcer) EnableAutoSave(autoSave bool) {
 // EnableAutoBuildRoleLinks controls whether to rebuild the role inheritance relations when a role is added or deleted.
 func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 	e.autoBuildRoleLinks = autoBuildRoleLinks
-}
-
-// EnableAutoClearPolicies controls whether the policies are removed when the filteredPolicies is called
-func (e *Enforcer) EnableAutoClearPolicies(autoClearPolicies bool) {
-	e.autoClearPolicies = autoClearPolicies
 }
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
