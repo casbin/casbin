@@ -561,6 +561,32 @@ func TestABACPolicy(t *testing.T) {
 	testEnforce(t, e, sub3, "/data2", "write", false)
 }
 
+type testAuthor struct {
+	Author string
+}
+
+func newTestAuthor(name string) testAuthor {
+	s := testAuthor{}
+	s.Author = name
+	return s
+}
+
+func TestABACWithRBACPolicy(t *testing.T) {
+	e, _ := NewEnforcer("examples/abac_with_rbac.conf", "examples/abac_with_rbac.csv")
+
+	post := newTestAuthor("bob")
+
+	ok, err := e.Enforce("alice", post, "write")
+	if err != nil || ok != true {
+		t.Fatal("expected Enforce returns true, nil, but got", ok, err)
+	}
+
+	ok, err = e.Enforce("bob", post, "write")
+	if err != nil || ok != true {
+		t.Fatal("expected Enforce returns true, nil, but got", ok, err)
+	}
+}
+
 func TestCommentModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/comment_model.conf", "examples/basic_policy.csv")
 	testEnforce(t, e, "alice", "data1", "read", true)
