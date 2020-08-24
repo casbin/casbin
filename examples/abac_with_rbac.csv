@@ -1,0 +1,4 @@
+p, admin, post, write
+p, r.sub == r.obj.Author, post, write
+
+g, alice, admin
