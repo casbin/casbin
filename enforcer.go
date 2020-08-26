@@ -506,6 +506,10 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 		}
 	} else {
+		if hasEval && len(e.model["p"]["p"].Policy) == 0 {
+			return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
+		}
+
 		policyEffects = make([]effect.Effect, 1)
 		matcherResults = make([]float64, 1)
 
@@ -533,7 +537,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	}
 
 	if explains != nil {
-		if explainIndex != -1 {
+		if explainIndex != -1 && len(e.model["p"]["p"].Policy) > explainIndex {
 			*explains = e.model["p"]["p"].Policy[explainIndex]
 		}
 	}
