@@ -17,7 +17,7 @@ package casbin
 import (
 	"testing"
 
-	"github.com/casbin/casbin/v2/persist/file-adapter"
+	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
 )
 
 func TestPathError(t *testing.T) {
@@ -70,8 +70,16 @@ func TestModelError(t *testing.T) {
 
 func TestEnforceError(t *testing.T) {
 	e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-
 	_, err := e.Enforce("wrong", "wrong")
+	if err == nil {
+		t.Errorf("Should be error here.")
+	} else {
+		t.Log("Test on error: ")
+		t.Log(err.Error())
+	}
+
+	e, _ = NewEnforcer("examples/abac_rule_model.conf")
+	_, err = e.Enforce("wang", "wang", "wang")
 	if err == nil {
 		t.Errorf("Should be error here.")
 	} else {
