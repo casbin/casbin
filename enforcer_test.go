@@ -230,7 +230,7 @@ func TestSavePolicy(t *testing.T) {
 func TestClearPolicy(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	e.ClearPolicy()
+	_ = e.ClearPolicy()
 }
 
 func TestEnableEnforce(t *testing.T) {

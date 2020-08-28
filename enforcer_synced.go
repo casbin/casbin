@@ -95,11 +95,17 @@ func (e *SyncedEnforcer) SetWatcher(watcher persist.Watcher) error {
 	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
 }
 
+// SetDispatcher sets the current dispatcher.
+func (e *SyncedEnforcer) SetDispatcher(dispatcher persist.Dispatcher) error {
+	e.dispatcher = dispatcher
+	return dispatcher.SetEnforcer(e)
+}
+
 // ClearPolicy clears all policy.
-func (e *SyncedEnforcer) ClearPolicy() {
+func (e *SyncedEnforcer) ClearPolicy() error {
 	e.m.Lock()
 	defer e.m.Unlock()
-	e.Enforcer.ClearPolicy()
+	return e.Enforcer.ClearPolicy()
 }
 
 // LoadPolicy reloads the policy from file/database.
@@ -417,4 +423,20 @@ func (e *SyncedEnforcer) AddNamedPolicies(ptype string, rules [][]string) (bool,
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.AddNamedPolicies(ptype, rules)
+}
+
+func (e *SyncedEnforcer) Lock() {
+	e.m.Lock()
+}
+
+func (e *SyncedEnforcer) Unlock() {
+	e.m.Unlock()
+}
+
+func (e *SyncedEnforcer) RLock() {
+	e.m.RLock()
+}
+
+func (e *SyncedEnforcer) RUnlock() {
+	e.m.RUnlock()
 }

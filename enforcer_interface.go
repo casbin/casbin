@@ -39,10 +39,11 @@ type IEnforcer interface {
 	GetAdapter() persist.Adapter
 	SetAdapter(adapter persist.Adapter)
 	SetWatcher(watcher persist.Watcher) error
+	SetDispatcher(persist.Dispatcher) error
 	GetRoleManager() rbac.RoleManager
 	SetRoleManager(rm rbac.RoleManager)
 	SetEffector(eft effect.Effector)
-	ClearPolicy()
+	ClearPolicy() error
 	LoadPolicy() error
 	LoadFilteredPolicy(filter interface{}) error
 	LoadIncrementalFilteredPolicy(filter interface{}) error
@@ -51,6 +52,7 @@ type IEnforcer interface {
 	EnableEnforce(enable bool)
 	EnableLog(enable bool)
 	EnableAutoNotifyWatcher(enable bool)
+	EnableAutoNotifyDispatcher(enable bool)
 	EnableAutoSave(autoSave bool)
 	EnableAutoBuildRoleLinks(autoBuildRoleLinks bool)
 	BuildRoleLinks() error

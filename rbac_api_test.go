@@ -295,7 +295,7 @@ func TestImplicitUserAPI(t *testing.T) {
 	testGetImplicitUsers(t, e, []string{"alice"}, "data2", "read")
 	testGetImplicitUsers(t, e, []string{"alice", "bob"}, "data2", "write")
 
-	e.ClearPolicy()
+	_ = e.ClearPolicy()
 	_, _ = e.AddPolicy("admin", "data1", "read")
 	_, _ = e.AddPolicy("bob", "data1", "read")
 	_, _ = e.AddGroupingPolicy("alice", "admin")
