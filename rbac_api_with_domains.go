@@ -16,13 +16,13 @@ package casbin
 
 // GetUsersForRoleInDomain gets the users that has a role inside a domain. Add by Gordon
 func (e *Enforcer) GetUsersForRoleInDomain(name string, domain string) []string {
-	res, _ := e.model["g"]["g"].RM.GetUsers(name, domain)
+	res, _ := e.model.GetRoleManager("g", "g").GetUsers(name, domain)
 	return res
 }
 
 // GetRolesForUserInDomain gets the roles that a user has inside a domain.
 func (e *Enforcer) GetRolesForUserInDomain(name string, domain string) []string {
-	res, _ := e.model["g"]["g"].RM.GetRoles(name, domain)
+	res, _ := e.model.GetRoleManager("g", "g").GetRoles(name, domain)
 	return res
 }
 
@@ -46,7 +46,7 @@ func (e *Enforcer) DeleteRoleForUserInDomain(user string, role string, domain st
 // DeleteRolesForUserInDomain deletes all roles for a user inside a domain.
 // Returns false if the user does not have any roles (aka not affected).
 func (e *Enforcer) DeleteRolesForUserInDomain(user string, domain string) (bool, error) {
-	roles, err := e.model["g"]["g"].RM.GetRoles(user, domain)
+	roles, err := e.model.GetRoleManager("g", "g").GetRoles(user, domain)
 	if err != nil {
 		return false, err
 	}

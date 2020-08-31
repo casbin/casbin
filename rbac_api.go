@@ -22,13 +22,13 @@ import (
 
 // GetRolesForUser gets the roles that a user has.
 func (e *Enforcer) GetRolesForUser(name string, domain ...string) ([]string, error) {
-	res, err := e.model["g"]["g"].RM.GetRoles(name, domain...)
+	res, err := e.model.GetRoleManager("g", "g").GetRoles(name, domain...)
 	return res, err
 }
 
 // GetUsersForRole gets the users that has a role.
 func (e *Enforcer) GetUsersForRole(name string, domain ...string) ([]string, error) {
-	res, err := e.model["g"]["g"].RM.GetUsers(name, domain...)
+	res, err := e.model.GetRoleManager("g", "g").GetUsers(name, domain...)
 	return res, err
 }
 

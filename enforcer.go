@@ -35,7 +35,7 @@ import (
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath string
-	model     model.Model
+	model     *model.Model
 	fm        model.FunctionMap
 	eft       effect.Effector
 
@@ -99,7 +99,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 			case string:
 				return nil, errors.New("invalid parameters for enforcer")
 			default:
-				err := e.InitWithModelAndAdapter(p0.(model.Model), params[1].(persist.Adapter))
+				err := e.InitWithModelAndAdapter(p0.(*model.Model), params[1].(persist.Adapter))
 				if err != nil {
 					return nil, err
 				}
@@ -113,7 +113,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 				return nil, err
 			}
 		default:
-			err := e.InitWithModelAndAdapter(p0.(model.Model), nil)
+			err := e.InitWithModelAndAdapter(p0.(*model.Model), nil)
 			if err != nil {
 				return nil, err
 			}
@@ -150,7 +150,7 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) er
 }
 
 // InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
-func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error {
+func (e *Enforcer) InitWithModelAndAdapter(m *model.Model, adapter persist.Adapter) error {
 	e.adapter = adapter
 
 	e.model = m
@@ -200,12 +200,12 @@ func (e *Enforcer) LoadModel() error {
 }
 
 // GetModel gets the current model.
-func (e *Enforcer) GetModel() model.Model {
+func (e *Enforcer) GetModel() *model.Model {
 	return e.model
 }
 
 // SetModel sets the current model.
-func (e *Enforcer) SetModel(m model.Model) {
+func (e *Enforcer) SetModel(m *model.Model) {
 	e.model = m
 	e.fm = model.LoadFunctionMap()
 
@@ -432,16 +432,10 @@ func (e *Enforcer) enforce(matcher string, explains *[][]string, rvals ...interf
 		return true, nil
 	}
 
-	functions := e.fm.GetFunctions()
-	if _, ok := e.model["g"]; ok {
-		for key, ast := range e.model["g"] {
-			rm := ast.RM
-			functions[key] = util.GenerateGFunction(rm)
-		}
-	}
+	functions := e.model.GenerateFunctions(e.fm)
 	var expString string
 	if matcher == "" {
-		expString = e.model["m"]["m"].Value
+		expString = e.model.GetMatcher()
 	} else {
 		expString = util.RemoveComments(util.EscapeAssertion(matcher))
 	}
@@ -456,14 +450,8 @@ func (e *Enforcer) enforce(matcher string, explains *[][]string, rvals ...interf
 		}
 	}
 
-	rTokens := make(map[string]int, len(e.model["r"]["r"].Tokens))
-	for i, token := range e.model["r"]["r"].Tokens {
-		rTokens[token] = i
-	}
-	pTokens := make(map[string]int, len(e.model["p"]["p"].Tokens))
-	for i, token := range e.model["p"]["p"].Tokens {
-		pTokens[token] = i
-	}
+	rTokens := e.model.GetTokens("r", "r")
+	pTokens := e.model.GetTokens("p", "p")
 
 	parameters := enforceParameters{
 		rTokens: rTokens,
@@ -471,32 +459,29 @@ func (e *Enforcer) enforce(matcher string, explains *[][]string, rvals ...interf
 
 		pTokens: pTokens,
 	}
-
-	policyLen := len(e.model["p"]["p"].Policy)
-
+	policies := e.model.GetPolicy("p", "p")
+	policyLen := len(policies)
 	var cap int
 	if policyLen > 0 {
 		cap = policyLen
 	} else {
 		cap = 1
 	}
-
-	eftStream := e.eft.NewStream(e.model["e"]["e"].Value, cap)
-
+	eftStream := e.eft.NewStream(e.model.GetEffectExpression(), cap)
 	if policyLen != 0 {
-		if len(e.model["r"]["r"].Tokens) != len(rvals) {
+		if len(parameters.rTokens) != len(rvals) {
 			return false, fmt.Errorf(
 				"invalid request size: expected %d, got %d, rvals: %v",
-				len(e.model["r"]["r"].Tokens),
+				len(parameters.rTokens),
 				len(rvals),
 				rvals)
 		}
-		for _, pvals := range e.model["p"]["p"].Policy {
+		for _, pvals := range policies {
 			// log.LogPrint("Policy Rule: ", pvals)
-			if len(e.model["p"]["p"].Tokens) != len(pvals) {
+			if len(parameters.pTokens) != len(pvals) {
 				return false, fmt.Errorf(
 					"invalid policy size: expected %d, got %d, pvals: %v",
-					len(e.model["p"]["p"].Tokens),
+					len(parameters.pTokens),
 					len(pvals),
 					pvals)
 			}
@@ -585,8 +570,8 @@ func (e *Enforcer) enforce(matcher string, explains *[][]string, rvals ...interf
 		if explainIndexes != nil {
 			var tempExpl [][]string = [][]string{}
 			for _, index := range explainIndexes {
-				// *explains = e.model["p"]["p"].Policy[explainIndex]
-				tempExpl = append(tempExpl, e.model["p"]["p"].Policy[index])
+				// *explains = e.model.data["p"]["p"].Policy[explainIndex]
+				tempExpl = append(tempExpl, policies[index])
 			}
 			*explains = tempExpl
 		}

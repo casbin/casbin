@@ -35,7 +35,7 @@ func (w SampleWatcherEx) UpdateForRemoveFilteredPolicy(fieldIndex int, fieldValu
 	return nil
 }
 
-func (w SampleWatcherEx) UpdateForSavePolicy(model model.Model) error {
+func (w SampleWatcherEx) UpdateForSavePolicy(model *model.Model) error {
 	return nil
 }
 
