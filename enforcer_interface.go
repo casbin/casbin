@@ -56,7 +56,7 @@ type IEnforcerRbac interface {
 	DeleteRoleForUserInDomain(user string, role string, domain string) (bool, error)
 }
 
-// IEnforcerMgmg is the Management API interface of Enforcer
+// IEnforcerMgmt is the Management API interface of Enforcer
 type IEnforcerMgmt interface {
 	GetAllSubjects() []string
 	GetAllNamedSubjects(ptype string) []string
@@ -112,10 +112,10 @@ type IEnforcer interface {
 	/* Enforcer API */
 	InitWithFile(modelPath string, policyPath string) error
 	InitWithAdapter(modelPath string, adapter persist.Adapter) error
-	InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error
+	InitWithModelAndAdapter(m *model.Model, adapter persist.Adapter) error
 	LoadModel() error
-	GetModel() model.Model
-	SetModel(m model.Model)
+	GetModel() *model.Model
+	SetModel(m *model.Model)
 	GetAdapter() persist.Adapter
 	SetAdapter(adapter persist.Adapter)
 	SetWatcher(watcher persist.Watcher) error

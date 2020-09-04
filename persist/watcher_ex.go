@@ -30,5 +30,5 @@ type WatcherEx interface {
 	UpdateForRemoveFilteredPolicy(fieldIndex int, fieldValues ...string) error
 	// UpdateForSavePolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.RemoveFilteredNamedGroupingPolicy()
-	UpdateForSavePolicy(model model.Model) error
+	UpdateForSavePolicy(model *model.Model) error
 }
