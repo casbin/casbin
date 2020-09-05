@@ -249,14 +249,14 @@ func (e *Enforcer) SetEffector(eft effect.Effector) {
 	e.eft = eft
 }
 
-func (e *Enforcer) IsAudoLoadRunning() bool {
+func (e *Enforcer) IsAutoLoadRunning() bool {
 	return atomic.LoadInt32(&(e.autoLoadRunning)) != 0
 }
 
 // StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy
 func (e *Enforcer) StartAutoLoadPolicy(d time.Duration) {
 	// Don't start another goroutine if there is already one running
-	if e.IsAudoLoadRunning() {
+	if e.IsAutoLoadRunning() {
 		return
 	}
 	atomic.StoreInt32(&(e.autoLoadRunning), int32(1))
@@ -286,7 +286,7 @@ func (e *Enforcer) StartAutoLoadPolicy(d time.Duration) {
 
 // StopAutoLoadPolicy causes the go routine to exit.
 func (e *Enforcer) StopAutoLoadPolicy() {
-	if e.IsAudoLoadRunning() {
+	if e.IsAutoLoadRunning() {
 		e.stopAutoLoad <- struct{}{}
 	}
 }
@@ -296,10 +296,13 @@ func (e *Enforcer) ClearPolicy() error {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return e.dispatcher.ClearPolicy()
 	}
-	// TODO: implement ClearPolicy in adapter and move model.ClearPolicy after adapter.ClearPolicy
-	e.model.ClearPolicy()
 
-	return e.adapter.SavePolicy(e.model)
+	if err := e.adapter.ClearPolicy(); err != nil {
+		return err
+	}
+
+	e.model.ClearPolicy()
+	return nil
 }
 
 // LoadPolicy reloads the policy from file/database.
@@ -390,8 +393,8 @@ func (e *Enforcer) EnableAutoNotifyWatcher(enable bool) {
 	e.autoNotifyWatcher = enable
 }
 
-// EnableautoNotifyDispatcher controls whether to save a policy rule automatically notify the Dispatcher when it is added or removed.
-func (e *Enforcer) EnableautoNotifyDispatcher(enable bool) {
+// EnableAutoNotifyDispatcher controls whether to save a policy rule automatically notify the Dispatcher when it is added or removed.
+func (e *Enforcer) EnableAutoNotifyDispatcher(enable bool) {
 	e.autoNotifyDispatcher = enable
 }
 

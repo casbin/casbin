@@ -119,6 +119,7 @@ type IEnforcer interface {
 	GetAdapter() persist.Adapter
 	SetAdapter(adapter persist.Adapter)
 	SetWatcher(watcher persist.Watcher) error
+	SetDispatcher(dispatcher persist.Dispatcher) error
 	GetRoleManager() rbac.RoleManager
 	SetRoleManager(rm rbac.RoleManager)
 	SetEffector(eft effect.Effector)
@@ -132,13 +133,14 @@ type IEnforcer interface {
 	EnableAutoNotifyWatcher(enable bool)
 	EnableAutoSave(autoSave bool)
 	EnableAutoBuildRoleLinks(autoBuildRoleLinks bool)
+	EnableAutoNotifyDispatcher(enable bool)
 	BuildRoleLinks() error
 	enforce(matcher string, explains *[][]string, rvals ...interface{}) (bool, error)
 	Enforce(rvals ...interface{}) (bool, error)
 	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
 	EnforceEx(rvals ...interface{}) (bool, [][]string, error)
 	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, [][]string, error)
-	IsAudoLoadRunning() bool
+	IsAutoLoadRunning() bool
 	StartAutoLoadPolicy(d time.Duration)
 	StopAutoLoadPolicy()
 }

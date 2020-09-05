@@ -74,6 +74,14 @@ func (a *Adapter) SavePolicy(model *model.Model) error {
 	return a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
 }
 
+// ClearPolicy remove all policy rules from the storage.
+func (a *Adapter) ClearPolicy() error {
+	if a.filePath == "" {
+		return errors.New("invalid file path, file path cannot be empty")
+	}
+	return a.savePolicyFile("")
+}
+
 func (a *Adapter) loadPolicyFile(model *model.Model, handler func(string, *model.Model)) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {

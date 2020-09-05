@@ -50,6 +50,11 @@ func (a *AdapterMock) SavePolicy(model *model.Model) error {
 	return nil
 }
 
+// ClearPolicy remove all policy rules from the storage.
+func (a *AdapterMock) ClearPolicy() error {
+	return nil
+}
+
 func (a *AdapterMock) loadPolicyFile(model *model.Model, handler func(string, *model.Model)) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {

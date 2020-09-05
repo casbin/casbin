@@ -48,6 +48,8 @@ type Adapter interface {
 	LoadPolicy(model *model.Model) error
 	// SavePolicy saves all policy rules to the storage.
 	SavePolicy(model *model.Model) error
+	// ClearPolicy remove all policy rules from the storage.
+	ClearPolicy() error
 
 	// AddPolicy adds a policy rule to the storage.
 	// This is part of the Auto-Save feature.
