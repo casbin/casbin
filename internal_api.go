@@ -16,8 +16,10 @@ package casbin
 
 import (
 	Err "github.com/casbin/casbin/v3/errors"
+	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
+	"github.com/casbin/casbin/v3/util"
 )
 
 const (
@@ -65,6 +67,9 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 		return true, err
 	}
 
+	if log.GetLogger().IsEnabled() {
+		log.LogPrintf("Policy Management, Type: AddPolicy Assertion: %s::%s\nrule: %s", sec, ptype, util.ArrayToString(rule))
+	}
 	return true, nil
 }
 
@@ -102,6 +107,9 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 		}
 	}
 
+	if log.GetLogger().IsEnabled() {
+		log.LogPrintf("Policy Management, Type: AddPolicies Assertion: %s::%s\nrules: %s", sec, ptype, util.Array2DToString(rules))
+	}
 	return true, nil
 }
 
@@ -142,6 +150,9 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 
 	}
 
+	if log.GetLogger().IsEnabled() {
+		log.LogPrintf("Policy Management, Type: RemovePolicy Assertion %s::%s\nrule: %s", sec, ptype, util.ArrayToString(rule))
+	}
 	return ruleRemoved, nil
 }
 
@@ -182,6 +193,9 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 		}
 	}
 
+	if log.GetLogger().IsEnabled() {
+		log.LogPrintf("Policy Management, Type: RemovePolicies Assertion %s::%s\nrules: %s", sec, ptype, util.Array2DToString(rules))
+	}
 	return rulesRemoved, nil
 }
 
@@ -225,5 +239,8 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 		return ruleRemoved, err
 	}
 
+	if log.GetLogger().IsEnabled() {
+		log.LogPrintf("Policy Management, Type: RemoveFilteredPolicy Assertion: %s::%s\nrules: %s", sec, ptype, util.Array2DToString(effects))
+	}
 	return ruleRemoved, nil
 }

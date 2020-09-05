@@ -299,7 +299,15 @@ func (e *Enforcer) ClearPolicy() error {
 	// TODO: implement ClearPolicy in adapter and move model.ClearPolicy after adapter.ClearPolicy
 	e.model.ClearPolicy()
 
-	return e.adapter.SavePolicy(e.model)
+	if err := e.adapter.SavePolicy(e.model); err != nil {
+		return err
+	}
+
+	if log.GetLogger().IsEnabled() {
+		log.LogPrint("Policy Management, Clear all policy")
+	}
+
+	return nil
 }
 
 // LoadPolicy reloads the policy from file/database.
