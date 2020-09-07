@@ -35,7 +35,7 @@ import (
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath string
-	model     *model.Model
+	model     model.Model
 	fm        model.FunctionMap
 	eft       effect.Effector
 
@@ -99,7 +99,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 			case string:
 				return nil, errors.New("invalid parameters for enforcer")
 			default:
-				err := e.InitWithModelAndAdapter(p0.(*model.Model), params[1].(persist.Adapter))
+				err := e.InitWithModelAndAdapter(p0.(model.Model), params[1].(persist.Adapter))
 				if err != nil {
 					return nil, err
 				}
@@ -113,7 +113,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 				return nil, err
 			}
 		default:
-			err := e.InitWithModelAndAdapter(p0.(*model.Model), nil)
+			err := e.InitWithModelAndAdapter(p0.(model.Model), nil)
 			if err != nil {
 				return nil, err
 			}
@@ -150,7 +150,7 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) er
 }
 
 // InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
-func (e *Enforcer) InitWithModelAndAdapter(m *model.Model, adapter persist.Adapter) error {
+func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error {
 	e.adapter = adapter
 
 	e.model = m
@@ -200,12 +200,12 @@ func (e *Enforcer) LoadModel() error {
 }
 
 // GetModel gets the current model.
-func (e *Enforcer) GetModel() *model.Model {
+func (e *Enforcer) GetModel() model.Model {
 	return e.model
 }
 
 // SetModel sets the current model.
-func (e *Enforcer) SetModel(m *model.Model) {
+func (e *Enforcer) SetModel(m model.Model) {
 	e.model = m
 	e.fm = model.LoadFunctionMap()
 

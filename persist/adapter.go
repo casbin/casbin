@@ -22,7 +22,7 @@ import (
 )
 
 // LoadPolicyLine loads a text line as a policy rule to model.
-func LoadPolicyLine(line string, m *model.Model) {
+func LoadPolicyLine(line string, m model.Model) {
 	if line == "" || strings.HasPrefix(line, "#") {
 		return
 	}
@@ -45,9 +45,9 @@ func LoadPolicyLine(line string, m *model.Model) {
 // Adapter is the interface for Casbin adapters.
 type Adapter interface {
 	// LoadPolicy loads all policy rules from the storage.
-	LoadPolicy(model *model.Model) error
+	LoadPolicy(model model.Model) error
 	// SavePolicy saves all policy rules to the storage.
-	SavePolicy(model *model.Model) error
+	SavePolicy(model model.Model) error
 
 	// AddPolicy adds a policy rule to the storage.
 	// This is part of the Auto-Save feature.

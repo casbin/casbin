@@ -40,17 +40,17 @@ func NewAdapterMock(filePath string) *AdapterMock {
 }
 
 // LoadPolicy loads all policy rules from the storage.
-func (a *AdapterMock) LoadPolicy(model *model.Model) error {
+func (a *AdapterMock) LoadPolicy(model model.Model) error {
 	err := a.loadPolicyFile(model, persist.LoadPolicyLine)
 	return err
 }
 
 // SavePolicy saves all policy rules to the storage.
-func (a *AdapterMock) SavePolicy(model *model.Model) error {
+func (a *AdapterMock) SavePolicy(model model.Model) error {
 	return nil
 }
 
-func (a *AdapterMock) loadPolicyFile(model *model.Model, handler func(string, *model.Model)) error {
+func (a *AdapterMock) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
