@@ -46,15 +46,15 @@ func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 	return e, nil
 }
 
-// IsAudoLoadingRunning check if SyncedEnforcer is auto loading policies
-func (e *SyncedEnforcer) IsAudoLoadingRunning() bool {
+// IsAutoLoadingRunning check if SyncedEnforcer is auto loading policies
+func (e *SyncedEnforcer) IsAutoLoadingRunning() bool {
 	return atomic.LoadInt32(&(e.autoLoadRunning)) != 0
 }
 
 // StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy
 func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 	// Don't start another goroutine if there is already one running
-	if e.IsAudoLoadingRunning() {
+	if e.IsAutoLoadingRunning() {
 		return
 	}
 	atomic.StoreInt32(&(e.autoLoadRunning), int32(1))
@@ -84,7 +84,7 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 
 // StopAutoLoadPolicy causes the go routine to exit.
 func (e *SyncedEnforcer) StopAutoLoadPolicy() {
-	if e.IsAudoLoadingRunning() {
+	if e.IsAutoLoadingRunning() {
 		e.stopAutoLoad <- struct{}{}
 	}
 }
