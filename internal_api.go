@@ -32,12 +32,35 @@ func (e *Enforcer) shouldPersist() bool {
 
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
-	if e.model.HasPolicy(sec, ptype, rule) {
-		return false, nil
-	}
-
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.AddPolicies(sec, ptype, [][]string{rule})
+	}
+
+	if result, err := e.AddPolicyInternal(sec, ptype, rule); err != nil || !result {
+		return result, err
+	}
+
+	if e.watcher != nil && e.autoNotifyWatcher {
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForAddPolicy(rule...)
+		} else {
+			err = e.watcher.Update()
+		}
+		return true, err
+	}
+
+	if log.GetLogger().IsEnabled() {
+		log.LogPrintf("Policy Management, Type: AddPolicy Assertion: %s::%s\nrule: %s", sec, ptype, util.ArrayToString(rule))
+	}
+
+	return true, nil
+}
+
+// AddPolicyInternal adds a rule to model and adapter.
+func (e *Enforcer) AddPolicyInternal(sec string, ptype string, rule []string) (bool, error) {
+	if e.model.HasPolicy(sec, ptype, rule) {
+		return false, nil
 	}
 
 	if e.shouldPersist() {
@@ -57,30 +80,37 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 		}
 	}
 
-	if e.watcher != nil && e.autoNotifyWatcher {
-		var err error
-		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForAddPolicy(rule...)
-		} else {
-			err = e.watcher.Update()
-		}
-		return true, err
-	}
-
-	if log.GetLogger().IsEnabled() {
-		log.LogPrintf("Policy Management, Type: AddPolicy Assertion: %s::%s\nrule: %s", sec, ptype, util.ArrayToString(rule))
-	}
 	return true, nil
 }
 
 // addPolicies adds rules to the current policy.
 func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	if e.model.HasPolicies(sec, ptype, rules) {
-		return false, nil
-	}
-
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
+	}
+
+	if result, err := e.AddPoliciesInternal(sec, ptype, rules); err != nil || !result {
+		return result, err
+	}
+
+	if e.watcher != nil && e.autoNotifyWatcher {
+		err := e.watcher.Update()
+		if err != nil {
+			return true, err
+		}
+	}
+
+	if log.GetLogger().IsEnabled() {
+		log.LogPrintf("Policy Management, Type: AddPolicies Assertion: %s::%s\nrules: %s", sec, ptype, util.Array2DToString(rules))
+	}
+
+	return true, nil
+}
+
+// AddPoliciesInternal adds rules to model and adapter.
+func (e *Enforcer) AddPoliciesInternal(sec string, ptype string, rules [][]string) (bool, error) {
+	if e.model.HasPolicies(sec, ptype, rules) {
+		return false, nil
 	}
 
 	if e.shouldPersist() {
@@ -100,16 +130,6 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 		}
 	}
 
-	if e.watcher != nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return true, err
-		}
-	}
-
-	if log.GetLogger().IsEnabled() {
-		log.LogPrintf("Policy Management, Type: AddPolicies Assertion: %s::%s\nrules: %s", sec, ptype, util.Array2DToString(rules))
-	}
 	return true, nil
 }
 
@@ -119,6 +139,31 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		return true, e.dispatcher.RemovePolicies(sec, ptype, [][]string{rule})
 	}
 
+	ruleRemoved, err := e.RemovePolicyInternal(sec, ptype, rule)
+	if err != nil || !ruleRemoved {
+		return ruleRemoved, err
+	}
+
+	if e.watcher != nil && e.autoNotifyWatcher {
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForRemovePolicy(rule...)
+		} else {
+			err = e.watcher.Update()
+		}
+		return ruleRemoved, err
+
+	}
+
+	if log.GetLogger().IsEnabled() {
+		log.LogPrintf("Policy Management, Type: RemovePolicy Assertion %s::%s\nrule: %s", sec, ptype, util.ArrayToString(rule))
+	}
+
+	return ruleRemoved, nil
+}
+
+// RemovePolicyInternal removes a rule from model and adapter.
+func (e *Enforcer) RemovePolicyInternal(sec string, ptype string, rule []string) (bool, error) {
 	if e.shouldPersist() {
 		if err := e.adapter.RemovePolicy(sec, ptype, rule); err != nil {
 			if err.Error() != notImplemented {
@@ -139,31 +184,38 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		}
 	}
 
-	if e.watcher != nil && e.autoNotifyWatcher {
-		var err error
-		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForRemovePolicy(rule...)
-		} else {
-			err = e.watcher.Update()
-		}
-		return ruleRemoved, err
-
-	}
-
-	if log.GetLogger().IsEnabled() {
-		log.LogPrintf("Policy Management, Type: RemovePolicy Assertion %s::%s\nrule: %s", sec, ptype, util.ArrayToString(rule))
-	}
 	return ruleRemoved, nil
 }
 
 // removePolicies removes rules from the current policy.
 func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	if !e.model.HasPolicies(sec, ptype, rules) {
-		return false, nil
-	}
-
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.RemovePolicies(sec, ptype, rules)
+	}
+
+	rulesRemoved, err := e.RemovePoliciesInternal(sec, ptype, rules)
+	if err != nil || !rulesRemoved {
+		return rulesRemoved, err
+	}
+
+	if e.watcher != nil && e.autoNotifyWatcher {
+		err := e.watcher.Update()
+		if err != nil {
+			return rulesRemoved, err
+		}
+	}
+
+	if log.GetLogger().IsEnabled() {
+		log.LogPrintf("Policy Management, Type: RemovePolicies Assertion %s::%s\nrules: %s", sec, ptype, util.Array2DToString(rules))
+	}
+
+	return rulesRemoved, nil
+}
+
+// RemovePoliciesInternal removes rules from model and adapter.
+func (e *Enforcer) RemovePoliciesInternal(sec string, ptype string, rules [][]string) (bool, error) {
+	if !e.model.HasPolicies(sec, ptype, rules) {
+		return false, nil
 	}
 
 	if e.shouldPersist() {
@@ -186,47 +238,18 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 		}
 	}
 
-	if e.watcher != nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return rulesRemoved, err
-		}
-	}
-
-	if log.GetLogger().IsEnabled() {
-		log.LogPrintf("Policy Management, Type: RemovePolicies Assertion %s::%s\nrules: %s", sec, ptype, util.Array2DToString(rules))
-	}
 	return rulesRemoved, nil
 }
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.
 func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
-	if len(fieldValues) == 0 {
-		return false, Err.INVALID_FIELDVAULES_PARAMETER
-	}
-
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
 	}
 
-	if e.shouldPersist() {
-		if err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
-			if err.Error() != notImplemented {
-				return false, err
-			}
-		}
-	}
-
-	ruleRemoved, effects := e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
-	if !ruleRemoved {
-		return ruleRemoved, nil
-	}
-
-	if sec == "g" {
-		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effects)
-		if err != nil {
-			return ruleRemoved, err
-		}
+	ruleRemoved, effects, err := e.RemoveFilteredPolicyInternal(sec, ptype, fieldIndex, fieldValues...)
+	if err != nil || !ruleRemoved {
+		return ruleRemoved, err
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
@@ -242,5 +265,35 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 	if log.GetLogger().IsEnabled() {
 		log.LogPrintf("Policy Management, Type: RemoveFilteredPolicy Assertion: %s::%s\nrules: %s", sec, ptype, util.Array2DToString(effects))
 	}
+
 	return ruleRemoved, nil
+}
+
+// RemoveFilteredPolicyInternal removes rules based on field filters from model and adapter.
+func (e *Enforcer) RemoveFilteredPolicyInternal(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, [][]string, error) {
+	if len(fieldValues) == 0 {
+		return false, nil, Err.INVALID_FIELDVAULES_PARAMETER
+	}
+
+	if e.shouldPersist() {
+		if err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
+			if err.Error() != notImplemented {
+				return false, nil, err
+			}
+		}
+	}
+
+	ruleRemoved, effects := e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	if !ruleRemoved {
+		return ruleRemoved, effects, nil
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effects)
+		if err != nil {
+			return ruleRemoved, effects, err
+		}
+	}
+
+	return ruleRemoved, effects, nil
 }
