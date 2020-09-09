@@ -17,6 +17,8 @@ package casbin
 import (
 	"strings"
 	"sync"
+
+	"github.com/casbin/casbin/v3/log"
 )
 
 // CachedEnforcer wraps Enforcer and provides decision cache
@@ -65,6 +67,13 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 	}
 
 	if res, ok := e.getCachedResult(key.String()); ok {
+		if log.GetLogger().IsEnabled() {
+			var str []string
+			for _, rval := range rvals {
+				str = append(str, rval.(string))
+			}
+			log.LogPrintf("Request: %v -> %v (cached)", strings.Join(str, " ,"), res)
+		}
 		return res, nil
 	}
 	res, err := e.Enforcer.Enforce(rvals...)
@@ -92,4 +101,7 @@ func (e *CachedEnforcer) setCachedResult(key string, res bool) {
 // InvalidateCache deletes all the existing cached decisions.
 func (e *CachedEnforcer) InvalidateCache() {
 	e.m = make(map[string]bool)
+	if log.GetLogger().IsEnabled() {
+		log.LogPrint("Clean all Cache")
+	}
 }

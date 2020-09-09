@@ -91,6 +91,16 @@ func ArrayToString(s []string) string {
 	return strings.Join(s, ", ")
 }
 
+// Array2DToString gets a printable string for a string array.
+func Array2DToString(s [][]string) string {
+	var str strings.Builder
+	for _, v := range s {
+		str.WriteString(strings.Join(v, ", "))
+		str.WriteString("\n")
+	}
+	return str.String()
+}
+
 // ParamsToString gets a printable string for variable number of parameters.
 func ParamsToString(s ...string) string {
 	return strings.Join(s, ", ")
