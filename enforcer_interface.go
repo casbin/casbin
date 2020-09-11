@@ -101,15 +101,6 @@ type IEnforcerMgmt interface {
 	AddFunction(name string, function govaluate.ExpressionFunction)
 }
 
-// IEnforcerInternal is the Internal API interface of Enforcer
-type IEnforcerInternal interface {
-	AddPolicyInternal(sec string, ptype string, rule []string) (bool, error)
-	AddPoliciesInternal(sec string, ptype string, rules [][]string) (bool, error)
-	RemovePolicyInternal(sec string, ptype string, rule []string) (bool, error)
-	RemovePoliciesInternal(sec string, ptype string, rules [][]string) (bool, error)
-	RemoveFilteredPolicyInternal(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, [][]string, error)
-}
-
 // IEnforcer is the API interface of Enforcer
 type IEnforcer interface {
 	/* Management API */
@@ -118,8 +109,6 @@ type IEnforcer interface {
 	/* RBAC API */
 	IEnforcerRbac
 
-	/* Internal API */
-	IEnforcerInternal
 	/* Enforcer API */
 	InitWithFile(modelPath string, policyPath string) error
 	InitWithAdapter(modelPath string, adapter persist.Adapter) error

@@ -23,6 +23,7 @@ import (
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v3/effect"
+	"github.com/casbin/casbin/v3/internal"
 	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
@@ -44,6 +45,7 @@ type Enforcer struct {
 	dispatcher persist.Dispatcher
 	rm         rbac.RoleManager
 
+	internal             internal.PolicyManager
 	enabled              bool
 	autoSave             bool
 	autoBuildRoleLinks   bool
@@ -156,9 +158,8 @@ func (e *Enforcer) InitWithModelAndAdapter(m *model.Model, adapter persist.Adapt
 	e.model = m
 	e.model.PrintModel()
 	e.fm = model.LoadFunctionMap()
-
 	e.initialize()
-
+	e.internal = internal.NewPolicyManager(m, adapter, e.rm)
 	// Do not initialize the full policy when using a filtered adapter
 	fa, ok := e.adapter.(persist.FilteredAdapter)
 	if e.adapter != nil && (!ok || ok && !fa.IsFiltered()) {
@@ -208,7 +209,7 @@ func (e *Enforcer) GetModel() *model.Model {
 func (e *Enforcer) SetModel(m *model.Model) {
 	e.model = m
 	e.fm = model.LoadFunctionMap()
-
+	e.internal = internal.NewPolicyManager(m, e.adapter, e.rm)
 	e.initialize()
 }
 
@@ -220,6 +221,12 @@ func (e *Enforcer) GetAdapter() persist.Adapter {
 // SetAdapter sets the current adapter.
 func (e *Enforcer) SetAdapter(adapter persist.Adapter) {
 	e.adapter = adapter
+	e.internal = internal.NewPolicyManager(e.model, adapter, e.rm)
+}
+
+// GetInternalController gets the current internal controller.
+func (e *Enforcer) GetInternalController() internal.PolicyManager {
+	return e.internal
 }
 
 // SetWatcher sets the current watcher.
@@ -242,6 +249,7 @@ func (e *Enforcer) GetRoleManager() rbac.RoleManager {
 // SetRoleManager sets the current role manager.
 func (e *Enforcer) SetRoleManager(rm rbac.RoleManager) {
 	e.rm = rm
+	e.internal = internal.NewPolicyManager(e.model, e.adapter, rm)
 }
 
 // SetEffector sets the current effector.
