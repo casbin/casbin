@@ -57,7 +57,7 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
 	}
 
-	result, err := e.internal.AddPolicies(sec, ptype, rules, e.shouldPersist())
+	result, effects, err := e.internal.AddPolicies(sec, ptype, rules, e.shouldPersist())
 	if err != nil || !result {
 		return result, err
 	}
@@ -70,7 +70,7 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 	}
 
 	if log.GetLogger().IsEnabled() {
-		log.LogPrintf("Policy Management, Type: AddPolicies Assertion: %s::%s\nrules: %s", sec, ptype, util.Array2DToString(rules))
+		log.LogPrintf("Policy Management, Type: AddPolicies Assertion: %s::%s\nrules: %s", sec, ptype, util.Array2DToString(effects))
 	}
 
 	return true, nil
@@ -111,7 +111,7 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 		return true, e.dispatcher.RemovePolicies(sec, ptype, rules)
 	}
 
-	rulesRemoved, err := e.internal.RemovePolicies(sec, ptype, rules, e.shouldPersist())
+	rulesRemoved, effects, err := e.internal.RemovePolicies(sec, ptype, rules, e.shouldPersist())
 	if err != nil || !rulesRemoved {
 		return rulesRemoved, err
 	}
@@ -124,7 +124,7 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 	}
 
 	if log.GetLogger().IsEnabled() {
-		log.LogPrintf("Policy Management, Type: RemovePolicies Assertion %s::%s\nrules: %s", sec, ptype, util.Array2DToString(rules))
+		log.LogPrintf("Policy Management, Type: RemovePolicies Assertion %s::%s\nrules: %s", sec, ptype, util.Array2DToString(effects))
 	}
 
 	return rulesRemoved, nil

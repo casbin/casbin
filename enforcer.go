@@ -224,8 +224,8 @@ func (e *Enforcer) SetAdapter(adapter persist.Adapter) {
 	e.internal = internal.NewPolicyManager(e.model, adapter, e.rm)
 }
 
-// GetInternalController gets the current internal controller.
-func (e *Enforcer) GetInternalController() internal.PolicyManager {
+// GetPolicyManager gets the current policy manager.
+func (e *Enforcer) GetPolicyManager() internal.PolicyManager {
 	return e.internal
 }
 

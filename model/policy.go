@@ -276,3 +276,31 @@ func (model *Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int
 
 	return values
 }
+
+// RemoveExistPolicy remove the policy rules already in the model.
+func (model *Model) RemoveExistPolicy(sec string, ptype string, rules [][]string) [][]string {
+	model.mutex.RLock()
+	defer model.mutex.RUnlock()
+	var res [][]string
+	for _, rule := range rules {
+		if _, ok := model.data[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]; !ok {
+			res = append(res, rule)
+		}
+	}
+
+	return res
+}
+
+// RemoveNotExistPolicy removes the policy rules not in the model
+func (model *Model) RemoveNotExistPolicy(sec string, ptype string, rules [][]string) [][]string {
+	model.mutex.RLock()
+	defer model.mutex.RUnlock()
+	var res [][]string
+	for _, rule := range rules {
+		if _, ok := model.data[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]; ok {
+			res = append(res, rule)
+		}
+	}
+
+	return res
+}

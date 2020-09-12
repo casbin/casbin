@@ -1,3 +1,17 @@
+// Copyright 2020 The casbin Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package internal
 
 import (
@@ -10,9 +24,9 @@ import (
 // PolicyManager is the policy manager for model and adapter
 type PolicyManager interface {
 	AddPolicy(sec string, ptype string, rule []string, shouldPersist bool) (bool, error)
-	AddPolicies(sec string, ptype string, rules [][]string, shouldPersist bool) (bool, error)
+	AddPolicies(sec string, ptype string, rules [][]string, shouldPersist bool) (bool, [][]string, error)
 	RemovePolicy(sec string, ptype string, rule []string, shouldPersist bool) (bool, error)
-	RemovePolicies(sec string, ptype string, rules [][]string, shouldPersist bool) (bool, error)
+	RemovePolicies(sec string, ptype string, rules [][]string, shouldPersist bool) (bool, [][]string, error)
 	RemoveFilteredPolicy(sec string, ptype string, shouldPersist bool, fieldIndex int, fieldValues ...string) (bool, [][]string, error)
 }
 
@@ -26,7 +40,7 @@ const (
 	notImplemented = "not implemented"
 )
 
-// NewPolicyManager is the constructor for InternalController
+// NewPolicyManager is the constructor for PolicyManager
 func NewPolicyManager(model *model.Model, adapter persist.Adapter, rm rbac.RoleManager) PolicyManager {
 	return &policyManager{
 		model:   model,
@@ -62,15 +76,16 @@ func (p *policyManager) AddPolicy(sec string, ptype string, rule []string, shoul
 }
 
 // AddPolicies adds rules to model and adapter.
-func (p *policyManager) AddPolicies(sec string, ptype string, rules [][]string, shouldPersist bool) (bool, error) {
-	if p.model.HasPolicies(sec, ptype, rules) {
-		return false, nil
+func (p *policyManager) AddPolicies(sec string, ptype string, rules [][]string, shouldPersist bool) (bool, [][]string, error) {
+	rules = p.model.RemoveExistPolicy(sec, ptype, rules)
+	if len(rules) == 0 {
+		return true, nil, nil
 	}
 
 	if shouldPersist {
 		if err := p.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, rules); err != nil {
 			if err.Error() != notImplemented {
-				return false, err
+				return false, nil, err
 			}
 		}
 	}
@@ -80,11 +95,11 @@ func (p *policyManager) AddPolicies(sec string, ptype string, rules [][]string, 
 	if sec == "g" {
 		err := p.model.BuildIncrementalRoleLinks(p.rm, model.PolicyAdd, "g", ptype, rules)
 		if err != nil {
-			return true, err
+			return true, rules, err
 		}
 	}
 
-	return true, nil
+	return true, rules, nil
 }
 
 // RemovePolicy removes a rule from model and adapter.
@@ -113,32 +128,33 @@ func (p *policyManager) RemovePolicy(sec string, ptype string, rule []string, sh
 }
 
 // RemovePolicies removes rules from model and adapter.
-func (p *policyManager) RemovePolicies(sec string, ptype string, rules [][]string, shouldPersist bool) (bool, error) {
-	if !p.model.HasPolicies(sec, ptype, rules) {
-		return false, nil
+func (p *policyManager) RemovePolicies(sec string, ptype string, rules [][]string, shouldPersist bool) (bool, [][]string, error) {
+	rules = p.model.RemoveNotExistPolicy(sec, ptype, rules)
+	if len(rules) == 0 {
+		return true, nil, nil
 	}
 
 	if shouldPersist {
 		if err := p.adapter.(persist.BatchAdapter).RemovePolicies(sec, ptype, rules); err != nil {
 			if err.Error() != notImplemented {
-				return false, err
+				return false, nil, err
 			}
 		}
 	}
 
 	rulesRemoved := p.model.RemovePolicies(sec, ptype, rules)
 	if !rulesRemoved {
-		return rulesRemoved, nil
+		return rulesRemoved, rules, nil
 	}
 
 	if sec == "g" {
 		err := p.model.BuildIncrementalRoleLinks(p.rm, model.PolicyRemove, "g", ptype, rules)
 		if err != nil {
-			return rulesRemoved, err
+			return rulesRemoved, rules, err
 		}
 	}
 
-	return rulesRemoved, nil
+	return rulesRemoved, rules, nil
 }
 
 // RemoveFilteredPolicy removes rules based on field filters from model and adapter.
