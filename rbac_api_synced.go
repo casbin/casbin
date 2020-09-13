@@ -45,10 +45,10 @@ func (e *SyncedEnforcer) AddRoleForUser(user string, role string, domain ...stri
 
 // DeleteRoleForUser deletes a role for a user.
 // Returns false if the user does not have the role (aka not affected).
-func (e *SyncedEnforcer) DeleteRoleForUser(user string, role string) (bool, error) {
+func (e *SyncedEnforcer) DeleteRoleForUser(user string, role string, domain ...string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.DeleteRoleForUser(user, role)
+	return e.Enforcer.DeleteRoleForUser(user, role, domain ...)
 }
 
 // DeleteRolesForUser deletes all roles for a user.
