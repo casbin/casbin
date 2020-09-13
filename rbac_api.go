@@ -91,8 +91,13 @@ func (e *Enforcer) AddRolesForUser(user string, roles []string, domain ...string
 
 // DeleteRoleForUser deletes a role for a user.
 // Returns false if the user does not have the role (aka not affected).
-func (e *Enforcer) DeleteRoleForUser(user string, role string) (bool, error) {
-	return e.RemoveGroupingPolicy(user, role)
+func (e *Enforcer) DeleteRoleForUser(user string, role string, domain ...string) (bool, error) {
+	if len(domain) ==0 {
+		return e.RemoveGroupingPolicy(user, role)
+	}else if len(domain) > 1 {
+		return false, errors.ERR_DOMAIN_PARAMETER
+	}
+	return e.RemoveGroupingPolicy(user, role, domain[0])
 }
 
 // DeleteRolesForUser deletes all roles for a user.
