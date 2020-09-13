@@ -64,7 +64,7 @@ type IEnforcer interface {
 	GetRolesForUser(name string, domain ...string) ([]string, error)
 	GetUsersForRole(name string, domain ...string) ([]string, error)
 	HasRoleForUser(name string, role string, domain ...string) (bool, error)
-	AddRoleForUser(user string, role string) (bool, error)
+	AddRoleForUser(user string, role string, domain ...string) (bool, error)
 	AddPermissionForUser(user string, permission ...string) (bool, error)
 	DeletePermissionForUser(user string, permission ...string) (bool, error)
 	DeletePermissionsForUser(user string) (bool, error)

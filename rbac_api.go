@@ -15,8 +15,7 @@
 package casbin
 
 import (
-	"errors"
-
+	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -51,8 +50,13 @@ func (e *Enforcer) HasRoleForUser(name string, role string, domain ...string) (b
 
 // AddRoleForUser adds a role for a user.
 // Returns false if the user already has the role (aka not affected).
-func (e *Enforcer) AddRoleForUser(user string, role string) (bool, error) {
-	return e.AddGroupingPolicy(user, role)
+func (e *Enforcer) AddRoleForUser(user string, role string, domain ...string) (bool, error) {
+	if len(domain) ==0 {
+		return e.AddGroupingPolicy(user, role)
+	}else if len(domain) > 1 {
+		return false, errors.ERR_DOMAIN_PARAMETER
+	}
+	return e.AddGroupingPolicy(user, role, domain[0])
 }
 
 // AddRolesForUser adds roles for a user.
@@ -200,7 +204,7 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 	if len(domain) == 1 {
 		withDomain = true
 	} else if len(domain) > 1 {
-		return nil, errors.New("domain should be 1 parameter")
+		return nil, errors.ERR_DOMAIN_PARAMETER
 	}
 
 	var res [][]string

@@ -37,10 +37,10 @@ func (e *SyncedEnforcer) HasRoleForUser(name string, role string, domain ...stri
 
 // AddRoleForUser adds a role for a user.
 // Returns false if the user already has the role (aka not affected).
-func (e *SyncedEnforcer) AddRoleForUser(user string, role string) (bool, error) {
+func (e *SyncedEnforcer) AddRoleForUser(user string, role string, domain ...string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.AddRoleForUser(user, role)
+	return e.Enforcer.AddRoleForUser(user, role, domain ...)
 }
 
 // DeleteRoleForUser deletes a role for a user.
