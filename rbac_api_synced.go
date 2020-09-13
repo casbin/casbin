@@ -29,10 +29,10 @@ func (e *SyncedEnforcer) GetUsersForRole(name string, domain ...string) ([]strin
 }
 
 // HasRoleForUser determines whether a user has a role.
-func (e *SyncedEnforcer) HasRoleForUser(name string, role string) (bool, error) {
+func (e *SyncedEnforcer) HasRoleForUser(name string, role string, domain ...string) (bool, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.HasRoleForUser(name, role)
+	return e.Enforcer.HasRoleForUser(name, role, domain...)
 }
 
 // AddRoleForUser adds a role for a user.

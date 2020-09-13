@@ -33,8 +33,8 @@ func (e *Enforcer) GetUsersForRole(name string, domain ...string) ([]string, err
 }
 
 // HasRoleForUser determines whether a user has a role.
-func (e *Enforcer) HasRoleForUser(name string, role string) (bool, error) {
-	roles, err := e.GetRolesForUser(name)
+func (e *Enforcer) HasRoleForUser(name string, role string, domain ...string) (bool, error) {
+	roles, err := e.GetRolesForUser(name,domain ...)
 	if err != nil {
 		return false, err
 	}
