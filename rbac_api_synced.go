@@ -108,10 +108,10 @@ func (e *SyncedEnforcer) DeletePermissionsForUser(user string) (bool, error) {
 }
 
 // GetPermissionsForUser gets permissions for a user or role.
-func (e *SyncedEnforcer) GetPermissionsForUser(user string) [][]string {
+func (e *SyncedEnforcer) GetPermissionsForUser(user string, domain ...string) [][]string {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.GetPermissionsForUser(user)
+	return e.Enforcer.GetPermissionsForUser(user, domain ...)
 }
 
 // HasPermissionForUser determines whether a user has a permission.

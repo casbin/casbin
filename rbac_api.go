@@ -173,8 +173,13 @@ func (e *Enforcer) DeletePermissionsForUser(user string) (bool, error) {
 }
 
 // GetPermissionsForUser gets permissions for a user or role.
-func (e *Enforcer) GetPermissionsForUser(user string) [][]string {
-	return e.GetFilteredPolicy(0, user)
+func (e *Enforcer) GetPermissionsForUser(user string, domain ...string) [][]string {
+	if len(domain) == 0 {
+		return e.GetFilteredPolicy(0, user)
+	}else if len(domain) > 1{
+		return nil
+	}
+	return e.GetFilteredPolicy(0, user, domain[0])
 }
 
 // HasPermissionForUser determines whether a user has a permission.
