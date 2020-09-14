@@ -102,8 +102,24 @@ func (e *Enforcer) DeleteRoleForUser(user string, role string, domain ...string)
 
 // DeleteRolesForUser deletes all roles for a user.
 // Returns false if the user does not have any roles (aka not affected).
-func (e *Enforcer) DeleteRolesForUser(user string) (bool, error) {
-	return e.RemoveFilteredGroupingPolicy(0, user)
+func (e *Enforcer) DeleteRolesForUser(user string, domain ...string) (bool, error) {
+	if len(domain) == 0 {
+		return e.RemoveFilteredGroupingPolicy(0, user)
+	}else if len(domain) > 1 {
+		return false,errors.ERR_DOMAIN_PARAMETER
+	}
+
+	roles, err := e.model["g"]["g"].RM.GetRoles(user, domain[0])
+	if err != nil {
+		return false, err
+	}
+
+	var rules [][]string
+	for _, role := range roles {
+		rules = append(rules, []string{user, role, domain[0]})
+	}
+
+	return e.RemoveGroupingPolicies(rules)
 }
 
 // DeleteUser deletes a user.
