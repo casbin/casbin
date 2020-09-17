@@ -33,7 +33,7 @@ func (e *Enforcer) GetUsersForRole(name string, domain ...string) ([]string, err
 
 // HasRoleForUser determines whether a user has a role.
 func (e *Enforcer) HasRoleForUser(name string, role string, domain ...string) (bool, error) {
-	roles, err := e.GetRolesForUser(name,domain ...)
+	roles, err := e.GetRolesForUser(name, domain...)
 	if err != nil {
 		return false, err
 	}
@@ -51,9 +51,9 @@ func (e *Enforcer) HasRoleForUser(name string, role string, domain ...string) (b
 // AddRoleForUser adds a role for a user.
 // Returns false if the user already has the role (aka not affected).
 func (e *Enforcer) AddRoleForUser(user string, role string, domain ...string) (bool, error) {
-	if len(domain) ==0 {
+	if len(domain) == 0 {
 		return e.AddGroupingPolicy(user, role)
-	}else if len(domain) > 1 {
+	} else if len(domain) > 1 {
 		return false, errors.ERR_DOMAIN_PARAMETER
 	}
 	return e.AddGroupingPolicy(user, role, domain[0])
@@ -73,9 +73,9 @@ func (e *Enforcer) AddRolesForUser(user string, roles []string, domain ...string
 				f = true
 			}
 		}
-	}else if len(domain) > 1 {
-		return false,errors.ERR_DOMAIN_PARAMETER
-	}else {
+	} else if len(domain) > 1 {
+		return false, errors.ERR_DOMAIN_PARAMETER
+	} else {
 		for _, r := range roles {
 			b, err := e.AddGroupingPolicy(user, r, domain[0])
 			if err != nil {
@@ -92,9 +92,9 @@ func (e *Enforcer) AddRolesForUser(user string, roles []string, domain ...string
 // DeleteRoleForUser deletes a role for a user.
 // Returns false if the user does not have the role (aka not affected).
 func (e *Enforcer) DeleteRoleForUser(user string, role string, domain ...string) (bool, error) {
-	if len(domain) ==0 {
+	if len(domain) == 0 {
 		return e.RemoveGroupingPolicy(user, role)
-	}else if len(domain) > 1 {
+	} else if len(domain) > 1 {
 		return false, errors.ERR_DOMAIN_PARAMETER
 	}
 	return e.RemoveGroupingPolicy(user, role, domain[0])
@@ -105,8 +105,8 @@ func (e *Enforcer) DeleteRoleForUser(user string, role string, domain ...string)
 func (e *Enforcer) DeleteRolesForUser(user string, domain ...string) (bool, error) {
 	if len(domain) == 0 {
 		return e.RemoveFilteredGroupingPolicy(0, user)
-	}else if len(domain) > 1 {
-		return false,errors.ERR_DOMAIN_PARAMETER
+	} else if len(domain) > 1 {
+		return false, errors.ERR_DOMAIN_PARAMETER
 	}
 
 	roles, err := e.model["g"]["g"].RM.GetRoles(user, domain[0])
@@ -176,7 +176,7 @@ func (e *Enforcer) DeletePermissionsForUser(user string) (bool, error) {
 func (e *Enforcer) GetPermissionsForUser(user string, domain ...string) [][]string {
 	if len(domain) == 0 {
 		return e.GetFilteredPolicy(0, user)
-	}else if len(domain) > 1{
+	} else if len(domain) > 1 {
 		return nil
 	}
 	return e.GetFilteredPolicy(0, user, domain[0])
