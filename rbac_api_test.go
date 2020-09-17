@@ -131,61 +131,38 @@ func TestRoleAPI_Domains(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	testHasRole(t, e, "alice", "admin", true, "domain1")
-
 	testHasRole(t, e, "alice", "admin", false, "domain2")
-
 	testGetRoles(t, e, []string{"admin"}, "alice", "domain1")
-
 	testGetRoles(t, e, []string{}, "bob", "domain1")
-
 	testGetRoles(t, e, []string{}, "admin", "domain1")
-
 	testGetRoles(t, e, []string{}, "non_exist", "domain1")
-
 	testGetRoles(t, e, []string{}, "alice", "domain2")
-
 	testGetRoles(t, e, []string{"admin"}, "bob", "domain2")
-
 	testGetRoles(t, e, []string{}, "admin", "domain2")
-
 	testGetRoles(t, e, []string{}, "non_exist", "domain2")
 
 	_, _ = e.DeleteRoleForUser("alice", "admin", "domain1")
 	_, _ = e.AddRoleForUser("bob", "admin", "domain1")
 
 	testGetRoles(t, e, []string{}, "alice", "domain1")
-
 	testGetRoles(t, e, []string{"admin"}, "bob", "domain1")
-
 	testGetRoles(t, e, []string{}, "admin", "domain1")
-
 	testGetRoles(t, e, []string{}, "non_exist", "domain1")
-
 	testGetRoles(t, e, []string{}, "alice", "domain2")
-
 	testGetRoles(t, e, []string{"admin"}, "bob", "domain2")
-
 	testGetRoles(t, e, []string{}, "admin", "domain2")
-
 	testGetRoles(t, e, []string{}, "non_exist", "domain2")
 
 	_, _ = e.AddRoleForUser("alice", "admin", "domain1")
 	_, _ = e.DeleteRolesForUser("bob", "domain1")
 
 	testGetRoles(t, e, []string{"admin"}, "alice", "domain1")
-
 	testGetRoles(t, e, []string{}, "bob", "domain1")
-
 	testGetRoles(t, e, []string{}, "admin", "domain1")
-
 	testGetRoles(t, e, []string{}, "non_exist", "domain1")
-
 	testGetRoles(t, e, []string{}, "alice", "domain2")
-
 	testGetRoles(t, e, []string{"admin"}, "bob", "domain2")
-
 	testGetRoles(t, e, []string{}, "admin", "domain2")
-
 	testGetRoles(t, e, []string{}, "non_exist", "domain2")
 
 	_, _ = e.AddRolesForUser("bob", []string{"admin", "admin1", "admin2"}, "domain1")
@@ -196,7 +173,6 @@ func TestRoleAPI_Domains(t *testing.T) {
 	testGetPermissions(t, e, "admin", [][]string{{"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}}, "domain2")
 
 }
-
 
 func TestEnforcer_AddRolesForUser(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
