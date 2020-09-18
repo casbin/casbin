@@ -92,12 +92,12 @@ func TestCasbinJsGetPermissionForUser(t *testing.T) {
 	}
 }
 
-func TestCasbinJsGetPermissionForUserSynced(t *testing.T) {
+func TestCasbinJsGetPermissionForUser2(t *testing.T) {
 	e, err := NewSyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	if err != nil {
 		panic(err)
 	}
-	target_str, _ := CasbinJsGetPermissionForUserSynced(e, "alice")
+	target_str, _ := CasbinJsGetPermissionForUser(e, "alice")
 	t.Log("GetPermissionForUser Alice", string(target_str))
 	alice_target := make(map[string][]string)
 	err = json.Unmarshal(target_str, &alice_target)
@@ -125,7 +125,7 @@ func TestCasbinJsGetPermissionForUserSynced(t *testing.T) {
 		t.Errorf("Test error: Alice cannot write data2")
 	}
 
-	target_str, _ = CasbinJsGetPermissionForUserSynced(e, "bob")
+	target_str, _ = CasbinJsGetPermissionForUser(e, "bob")
 	t.Log("GetPermissionForUser Bob", string(target_str))
 	bob_target := make(map[string][]string)
 	err = json.Unmarshal(target_str, &bob_target)
