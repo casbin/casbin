@@ -16,14 +16,9 @@ package casbin
 
 import (
 	"encoding/json"
-	"errors"
 )
 
 func CasbinJsGetPermissionForUser(e IEnforcer, user string) ([]byte, error) {
-	_, ok := e.(IEnforcer)
-	if !ok {
-		return nil, errors.New("Unsupported type")
-	}
 	policy, err := e.GetImplicitPermissionsForUser(user)
 	if err != nil {
 		return nil, err
