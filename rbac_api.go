@@ -109,17 +109,7 @@ func (e *Enforcer) DeleteRolesForUser(user string, domain ...string) (bool, erro
 		return false, errors.ERR_DOMAIN_PARAMETER
 	}
 
-	roles, err := e.model["g"]["g"].RM.GetRoles(user, domain[0])
-	if err != nil {
-		return false, err
-	}
-
-	var rules [][]string
-	for _, role := range roles {
-		rules = append(rules, []string{user, role, domain[0]})
-	}
-
-	return e.RemoveGroupingPolicies(rules)
+	return e.RemoveFilteredGroupingPolicy(0, user, "", domain[0])
 }
 
 // DeleteUser deletes a user.
