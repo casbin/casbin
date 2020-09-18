@@ -25,27 +25,43 @@ func testEnforceCache(t *testing.T, e *CachedEnforcer, sub string, obj interface
 
 func TestCache(t *testing.T) {
 	e, _ := NewCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-	// The cache is enabled by default for NewCachedEnforcer.
+	// The cache is enabled it will auto clear cache by default for NewCachedEnforcer.
 
 	testEnforceCache(t, e, "alice", "data1", "read", true)
 	testEnforceCache(t, e, "alice", "data1", "write", false)
 	testEnforceCache(t, e, "alice", "data2", "read", false)
 	testEnforceCache(t, e, "alice", "data2", "write", false)
 
-	// The cache is enabled, so even if we remove a policy rule, the decision
-	// for ("alice", "data1", "read") will still be true, as it uses the cached result.
+	// The cache will be remove because of the autoClearCache is true.
 	_, _ = e.RemovePolicy("alice", "data1", "read")
 
-	testEnforceCache(t, e, "alice", "data1", "read", true)
+	testEnforceCache(t, e, "alice", "data1", "read", false)
 	testEnforceCache(t, e, "alice", "data1", "write", false)
 	testEnforceCache(t, e, "alice", "data2", "read", false)
 	testEnforceCache(t, e, "alice", "data2", "write", false)
 
-	// Now we invalidate the cache, then all first-coming Enforce() has to be evaluated in real-time.
-	// The decision for ("alice", "data1", "read") will be false now.
-	e.InvalidateCache()
+	// The cache is enabled and the autoClearCache is false, so even if we add a policy rule, the decision
+	// for ("alice", "data1", "read") will still be true, as it uses the cached result.
+	e.AutoClearCache(false)
+	_, _ = e.AddPolicy("alice", "data1", "read")
 
 	testEnforceCache(t, e, "alice", "data1", "read", false)
+	testEnforceCache(t, e, "alice", "data1", "write", false)
+	testEnforceCache(t, e, "alice", "data2", "read", false)
+	testEnforceCache(t, e, "alice", "data2", "write", false)
+
+	_, _ = e.RemovePolicy("alice", "data1", "read")
+	testEnforceCache(t, e, "alice", "data1", "read", false)
+	testEnforceCache(t, e, "alice", "data1", "write", false)
+	testEnforceCache(t, e, "alice", "data2", "read", false)
+	testEnforceCache(t, e, "alice", "data2", "write", false)
+
+	e.AutoClearCache(true)
+	_, _ = e.AddPolicy("alice", "data1", "read")
+	// Now we make autoClearCache is true. So the cache will be clear after addPolicy auto.
+	// The decision for ("alice", "data1", "read") will be true now.
+
+	testEnforceCache(t, e, "alice", "data1", "read", true)
 	testEnforceCache(t, e, "alice", "data1", "write", false)
 	testEnforceCache(t, e, "alice", "data2", "read", false)
 	testEnforceCache(t, e, "alice", "data2", "write", false)
