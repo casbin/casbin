@@ -419,14 +419,15 @@ func (e *SyncedEnforcer) AddNamedPolicies(ptype string, rules [][]string) (bool,
 	return e.Enforcer.AddNamedPolicies(ptype, rules)
 }
 
-// GetImplicitUsersForPermission gets implicit users for a permission.
+// GetImplicitPermissionsForUser gets implicit permissions for a user or role.
+// Compared to GetPermissionsForUser(), this function retrieves permissions for inherited roles.
 // For example:
 // p, admin, data1, read
-// p, bob, data1, read
+// p, alice, data2, read
 // g, alice, admin
 //
-// GetImplicitUsersForPermission("data1", "read") will get: ["alice", "bob"].
-// Note: only users will be returned, roles (2nd arg in "g") will be excluded.
+// GetPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
+// But GetImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
 func (e *SyncedEnforcer) GetImplicitPermissionsForUser(user string, domain ...string) ([][]string, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
