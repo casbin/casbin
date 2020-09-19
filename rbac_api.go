@@ -51,39 +51,25 @@ func (e *Enforcer) HasRoleForUser(name string, role string, domain ...string) (b
 // AddRoleForUser adds a role for a user.
 // Returns false if the user already has the role (aka not affected).
 func (e *Enforcer) AddRoleForUser(user string, role string, domain ...string) (bool, error) {
-	if len(domain) == 0 {
-		return e.AddGroupingPolicy(user, role)
-	} else if len(domain) > 1 {
-		return false, errors.ERR_DOMAIN_PARAMETER
-	}
-	return e.AddGroupingPolicy(user, role, domain[0])
+	args := []string{user, role}
+	args = append(args, domain...)
+	return e.AddGroupingPolicy(args)
 }
 
 // AddRolesForUser adds roles for a user.
 // Returns false if the user already has the roles (aka not affected).
 func (e *Enforcer) AddRolesForUser(user string, roles []string, domain ...string) (bool, error) {
 	f := false
-	if len(domain) == 0 {
-		for _, r := range roles {
-			b, err := e.AddGroupingPolicy(user, r)
-			if err != nil {
-				return false, err
-			}
-			if b {
-				f = true
-			}
+	for _, r := range roles {
+		args := []string{user, r}
+		args = append(args, domain...)
+		b, err := e.AddGroupingPolicy(args)
+
+		if err != nil {
+			return false, err
 		}
-	} else if len(domain) > 1 {
-		return false, errors.ERR_DOMAIN_PARAMETER
-	} else {
-		for _, r := range roles {
-			b, err := e.AddGroupingPolicy(user, r, domain[0])
-			if err != nil {
-				return false, err
-			}
-			if b {
-				f = true
-			}
+		if b {
+			f = true
 		}
 	}
 	return f, nil
@@ -92,24 +78,23 @@ func (e *Enforcer) AddRolesForUser(user string, roles []string, domain ...string
 // DeleteRoleForUser deletes a role for a user.
 // Returns false if the user does not have the role (aka not affected).
 func (e *Enforcer) DeleteRoleForUser(user string, role string, domain ...string) (bool, error) {
-	if len(domain) == 0 {
-		return e.RemoveGroupingPolicy(user, role)
-	} else if len(domain) > 1 {
-		return false, errors.ERR_DOMAIN_PARAMETER
-	}
-	return e.RemoveGroupingPolicy(user, role, domain[0])
+	args := []string{user, role}
+	args = append(args, domain...)
+	return e.RemoveGroupingPolicy(args)
 }
 
 // DeleteRolesForUser deletes all roles for a user.
 // Returns false if the user does not have any roles (aka not affected).
 func (e *Enforcer) DeleteRolesForUser(user string, domain ...string) (bool, error) {
+	var args []string
 	if len(domain) == 0 {
-		return e.RemoveFilteredGroupingPolicy(0, user)
+		args = []string{user}
 	} else if len(domain) > 1 {
 		return false, errors.ERR_DOMAIN_PARAMETER
+	} else {
+		args = []string{user, "", domain[0]}
 	}
-
-	return e.RemoveFilteredGroupingPolicy(0, user, "", domain[0])
+	return e.RemoveFilteredGroupingPolicy(0, args...)
 }
 
 // DeleteUser deletes a user.
@@ -164,12 +149,9 @@ func (e *Enforcer) DeletePermissionsForUser(user string) (bool, error) {
 
 // GetPermissionsForUser gets permissions for a user or role.
 func (e *Enforcer) GetPermissionsForUser(user string, domain ...string) [][]string {
-	if len(domain) == 0 {
-		return e.GetFilteredPolicy(0, user)
-	} else if len(domain) > 1 {
-		return nil
-	}
-	return e.GetFilteredPolicy(0, user, domain[0])
+	args := []string{user}
+	args = append(args, domain...)
+	return e.GetFilteredPolicy(0, args...)
 }
 
 // HasPermissionForUser determines whether a user has a permission.
@@ -230,21 +212,11 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 
 	roles = append([]string{user}, roles...)
 
-	withDomain := false
-	if len(domain) == 1 {
-		withDomain = true
-	} else if len(domain) > 1 {
-		return nil, errors.ERR_DOMAIN_PARAMETER
-	}
-
 	var res [][]string
 	var permissions [][]string
 	for _, role := range roles {
-		if withDomain {
-			permissions = e.GetPermissionsForUserInDomain(role, domain[0])
-		} else {
-			permissions = e.GetPermissionsForUser(role)
-		}
+		permissions = e.GetPermissionsForUser(role, domain...)
+
 		res = append(res, permissions...)
 	}
 
