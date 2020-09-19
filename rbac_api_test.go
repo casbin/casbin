@@ -178,6 +178,12 @@ func TestEnforcer_AddRolesForUser(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	_, _ = e.AddRolesForUser("alice", []string{"data1_admin", "data2_admin", "data3_admin"})
+	// The "alice" already has "data2_admin" , it will be return false. So "alice" just has "data2_admin".
+	testGetRoles(t, e, []string{"data2_admin"}, "alice")
+	// delete role
+	_, _ = e.DeleteRoleForUser("alice", "data2_admin")
+
+	_, _ = e.AddRolesForUser("alice", []string{"data1_admin", "data2_admin", "data3_admin"})
 	testGetRoles(t, e, []string{"data1_admin", "data2_admin", "data3_admin"}, "alice")
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data2", "read", true)
