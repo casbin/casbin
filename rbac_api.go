@@ -59,20 +59,13 @@ func (e *Enforcer) AddRoleForUser(user string, role string, domain ...string) (b
 // AddRolesForUser adds roles for a user.
 // Returns false if the user already has the roles (aka not affected).
 func (e *Enforcer) AddRolesForUser(user string, roles []string, domain ...string) (bool, error) {
-	f := false
-	for _, r := range roles {
-		args := []string{user, r}
-		args = append(args, domain...)
-		b, err := e.AddGroupingPolicy(args)
-
-		if err != nil {
-			return false, err
-		}
-		if b {
-			f = true
-		}
+	var rules [][]string
+	for _, role := range roles {
+		rule := []string{user, role}
+		rule = append(rule, domain...)
+		rules = append(rules, rule)
 	}
-	return f, nil
+	return e.AddGroupingPolicies(rules)
 }
 
 // DeleteRoleForUser deletes a role for a user.
