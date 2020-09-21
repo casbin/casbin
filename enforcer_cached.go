@@ -100,7 +100,9 @@ func (e *CachedEnforcer) InvalidateCache() {
 // Otherwise the function returns true by adding the new rule.
 func (e *CachedEnforcer) AddPolicy(params ...interface{}) (bool, error) {
 	ok, err := e.AddNamedPolicy("p", params...)
-	e.InvalidateCache()
+	if ok {
+		e.InvalidateCache()
+	}
 	return ok, err
 }
 
@@ -109,20 +111,26 @@ func (e *CachedEnforcer) AddPolicy(params ...interface{}) (bool, error) {
 // Otherwise the function returns true for the corresponding rule by adding the new rule.
 func (e *CachedEnforcer) AddPolicies(rules [][]string) (bool, error) {
 	ok, err := e.AddNamedPolicies("p", rules)
-	e.InvalidateCache()
+	if ok {
+		e.InvalidateCache()
+	}
 	return ok, err
 }
 
 // RemovePolicy removes an authorization rule from the current policy.
 func (e *CachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
 	ok, err := e.RemoveNamedPolicy("p", params...)
-	e.InvalidateCache()
+	if ok {
+		e.InvalidateCache()
+	}
 	return ok, err
 }
 
 // RemovePolicies removes authorization rules from the current policy.
 func (e *CachedEnforcer) RemovePolicies(rules [][]string) (bool, error) {
 	ok, err := e.RemoveNamedPolicies("p", rules)
-	e.InvalidateCache()
+	if ok {
+		e.InvalidateCache()
+	}
 	return ok, err
 }
