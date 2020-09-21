@@ -22,10 +22,9 @@ import (
 // CachedEnforcer wraps Enforcer and provides decision cache
 type CachedEnforcer struct {
 	*Enforcer
-	m              map[string]bool
-	enableCache    bool
-	autoClearCache bool
-	locker         *sync.RWMutex
+	m           map[string]bool
+	enableCache bool
+	locker      *sync.RWMutex
 }
 
 // NewCachedEnforcer creates a cached enforcer via file or DB.
@@ -38,7 +37,6 @@ func NewCachedEnforcer(params ...interface{}) (*CachedEnforcer, error) {
 	}
 
 	e.enableCache = true
-	e.autoClearCache = true
 	e.m = make(map[string]bool)
 	e.locker = new(sync.RWMutex)
 	return e, nil
@@ -47,11 +45,6 @@ func NewCachedEnforcer(params ...interface{}) (*CachedEnforcer, error) {
 // EnableCache determines whether to enable cache on Enforce(). When enableCache is enabled, cached result (true | false) will be returned for previous decisions.
 func (e *CachedEnforcer) EnableCache(enableCache bool) {
 	e.enableCache = enableCache
-}
-
-// AutoClear determines whether to clear cache after any operation for policy. if AutoClear is true, cache will be clear after update policy.
-func (e *CachedEnforcer) AutoClearCache(autoClearCache bool) {
-	e.autoClearCache = autoClearCache
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
@@ -107,9 +100,7 @@ func (e *CachedEnforcer) InvalidateCache() {
 // Otherwise the function returns true by adding the new rule.
 func (e *CachedEnforcer) AddPolicy(params ...interface{}) (bool, error) {
 	ok, err := e.AddNamedPolicy("p", params...)
-	if e.autoClearCache {
-		e.InvalidateCache()
-	}
+	e.InvalidateCache()
 	return ok, err
 }
 
@@ -118,9 +109,7 @@ func (e *CachedEnforcer) AddPolicy(params ...interface{}) (bool, error) {
 // Otherwise the function returns true for the corresponding rule by adding the new rule.
 func (e *CachedEnforcer) AddPolicies(rules [][]string) (bool, error) {
 	ok, err := e.AddNamedPolicies("p", rules)
-	if e.autoClearCache {
-		e.InvalidateCache()
-	}
+	e.InvalidateCache()
 	return ok, err
 }
 
@@ -134,8 +123,6 @@ func (e *CachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
 // RemovePolicies removes authorization rules from the current policy.
 func (e *CachedEnforcer) RemovePolicies(rules [][]string) (bool, error) {
 	ok, err := e.RemoveNamedPolicies("p", rules)
-	if e.autoClearCache {
-		e.InvalidateCache()
-	}
+	e.InvalidateCache()
 	return ok, err
 }

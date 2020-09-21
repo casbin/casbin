@@ -42,26 +42,14 @@ func TestCache(t *testing.T) {
 
 	// The cache is enabled and the autoClearCache is false, so even if we add a policy rule, the decision
 	// for ("alice", "data1", "read") will still be true, as it uses the cached result.
-	e.AutoClearCache(false)
 	_, _ = e.AddPolicy("alice", "data1", "read")
-
-	testEnforceCache(t, e, "alice", "data1", "read", false)
+	testEnforceCache(t, e, "alice", "data1", "read", true)
 	testEnforceCache(t, e, "alice", "data1", "write", false)
 	testEnforceCache(t, e, "alice", "data2", "read", false)
 	testEnforceCache(t, e, "alice", "data2", "write", false)
 
 	_, _ = e.RemovePolicy("alice", "data1", "read")
 	testEnforceCache(t, e, "alice", "data1", "read", false)
-	testEnforceCache(t, e, "alice", "data1", "write", false)
-	testEnforceCache(t, e, "alice", "data2", "read", false)
-	testEnforceCache(t, e, "alice", "data2", "write", false)
-
-	e.AutoClearCache(true)
-	_, _ = e.AddPolicy("alice", "data1", "read")
-	// Now we make autoClearCache is true. So the cache will be clear after addPolicy auto.
-	// The decision for ("alice", "data1", "read") will be true now.
-
-	testEnforceCache(t, e, "alice", "data1", "read", true)
 	testEnforceCache(t, e, "alice", "data1", "write", false)
 	testEnforceCache(t, e, "alice", "data2", "read", false)
 	testEnforceCache(t, e, "alice", "data2", "write", false)
