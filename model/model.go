@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v3/rbac"
@@ -29,10 +28,7 @@ import (
 )
 
 // Model represents the whole access control model.
-type Model struct {
-	data  map[string]AssertionMap
-	mutex sync.RWMutex
-}
+type Model map[string]AssertionMap
 
 // AssertionMap is the collection of assertions, can be "r", "p", "g", "e", "m".
 type AssertionMap map[string]*Assertion
@@ -48,19 +44,17 @@ var sectionNameMap = map[string]string{
 // Minimal required sections for a model to be valid
 var requiredSections = []string{"r", "p", "e", "m"}
 
-func loadAssertion(model *Model, cfg config.ConfigInterface, sec string, key string) bool {
+func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) bool {
 	value := cfg.String(sectionNameMap[sec] + "::" + key)
 	return model.addDef(sec, key, value)
 }
 
 // AddDef adds an assertion to the model.
-func (model *Model) AddDef(sec string, key string, value string) bool {
-	model.mutex.Lock()
-	defer model.mutex.Unlock()
+func (model Model) AddDef(sec string, key string, value string) bool {
 	return model.addDef(sec, key, value)
 }
 
-func (model *Model) addDef(sec string, key string, value string) bool {
+func (model Model) addDef(sec string, key string, value string) bool {
 	if value == "" {
 		return false
 	}
@@ -79,12 +73,12 @@ func (model *Model) addDef(sec string, key string, value string) bool {
 		ast.Value = util.RemoveComments(util.EscapeAssertion(ast.Value))
 	}
 
-	_, ok := model.data[sec]
+	_, ok := model[sec]
 	if !ok {
-		model.data[sec] = make(AssertionMap)
+		model[sec] = make(AssertionMap)
 	}
 
-	model.data[sec][key] = &ast
+	model[sec][key] = &ast
 	return true
 }
 
@@ -96,7 +90,7 @@ func getKeySuffix(i int) string {
 	return strconv.Itoa(i)
 }
 
-func loadSection(model *Model, cfg config.ConfigInterface, sec string) {
+func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 	i := 1
 	for {
 		if !loadAssertion(model, cfg, sec, sec+getKeySuffix(i)) {
@@ -108,14 +102,13 @@ func loadSection(model *Model, cfg config.ConfigInterface, sec string) {
 }
 
 // NewModel creates an empty model.
-func NewModel() *Model {
-	m := new(Model)
-	m.data = make(map[string]AssertionMap)
+func NewModel() Model {
+	m := make(Model)
 	return m
 }
 
 // NewModelFromFile creates a model from a .CONF file.
-func NewModelFromFile(path string) (*Model, error) {
+func NewModelFromFile(path string) (Model, error) {
 	m := NewModel()
 
 	err := m.LoadModel(path)
@@ -127,7 +120,7 @@ func NewModelFromFile(path string) (*Model, error) {
 }
 
 // NewModelFromString creates a model from a string which contains model text.
-func NewModelFromString(text string) (*Model, error) {
+func NewModelFromString(text string) (Model, error) {
 	m := NewModel()
 
 	err := m.LoadModelFromText(text)
@@ -139,7 +132,7 @@ func NewModelFromString(text string) (*Model, error) {
 }
 
 // LoadModel loads the model from model CONF file.
-func (model *Model) LoadModel(path string) error {
+func (model Model) LoadModel(path string) error {
 	cfg, err := config.NewConfig(path)
 	if err != nil {
 		return err
@@ -149,7 +142,7 @@ func (model *Model) LoadModel(path string) error {
 }
 
 // LoadModelFromText loads the model from the text.
-func (model *Model) LoadModelFromText(text string) error {
+func (model Model) LoadModelFromText(text string) error {
 	cfg, err := config.NewConfigFromText(text)
 	if err != nil {
 		return err
@@ -158,9 +151,7 @@ func (model *Model) LoadModelFromText(text string) error {
 	return model.loadModelFromConfig(cfg)
 }
 
-func (model *Model) loadModelFromConfig(cfg config.ConfigInterface) error {
-	model.mutex.Lock()
-	defer model.mutex.Unlock()
+func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	for s := range sectionNameMap {
 		loadSection(model, cfg, s)
 	}
@@ -176,17 +167,15 @@ func (model *Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	return nil
 }
 
-func (model *Model) hasSection(sec string) bool {
-	section := model.data[sec]
+func (model Model) hasSection(sec string) bool {
+	section := model[sec]
 	return section != nil
 }
 
 // PrintModel prints the model to the log.
-func (model *Model) PrintModel() {
-	model.mutex.RLock()
-	defer model.mutex.RUnlock()
+func (model Model) PrintModel() {
 	log.LogPrint("Model:")
-	for k, v := range model.data {
+	for k, v := range model {
 		for i, j := range v {
 			log.LogPrintf("%s.%s: %s", k, i, j.Value)
 		}
@@ -194,32 +183,24 @@ func (model *Model) PrintModel() {
 }
 
 // GetMatcher gets the matcher.
-func (model *Model) GetMatcher() string {
-	model.mutex.RLock()
-	defer model.mutex.RUnlock()
-	return model.data["m"]["m"].Value
+func (model Model) GetMatcher() string {
+	return model["m"]["m"].Value
 }
 
 // GetEffectExpression gets the effect expression.
-func (model *Model) GetEffectExpression() string {
-	model.mutex.RLock()
-	defer model.mutex.RUnlock()
-	return model.data["e"]["e"].Value
+func (model Model) GetEffectExpression() string {
+	return model["e"]["e"].Value
 }
 
 // GetRoleManager gets the current role manager used in ptype.
-func (model *Model) GetRoleManager(sec string, ptype string) rbac.RoleManager {
-	model.mutex.RLock()
-	defer model.mutex.RUnlock()
-	return model.data[sec][ptype].RM
+func (model Model) GetRoleManager(sec string, ptype string) rbac.RoleManager {
+	return model[sec][ptype].RM
 }
 
 // GetTokens returns a map with all the tokens
-func (model *Model) GetTokens(sec string, ptype string) map[string]int {
-	model.mutex.RLock()
-	defer model.mutex.RUnlock()
-	tokens := make(map[string]int, len(model.data[sec][ptype].Tokens))
-	for i, token := range model.data[sec][ptype].Tokens {
+func (model Model) GetTokens(sec string, ptype string) map[string]int {
+	tokens := make(map[string]int, len(model[sec][ptype].Tokens))
+	for i, token := range model[sec][ptype].Tokens {
 		tokens[token] = i
 	}
 
@@ -227,24 +208,20 @@ func (model *Model) GetTokens(sec string, ptype string) map[string]int {
 }
 
 // GetPtypes returns a slice for all ptype
-func (model *Model) GetPtypes(sec string) []string {
-	model.mutex.RLock()
-	defer model.mutex.RUnlock()
+func (model Model) GetPtypes(sec string) []string {
 	var res []string
-	for k := range model.data[sec] {
+	for k := range model[sec] {
 		res = append(res, k)
 	}
 	return res
 }
 
 // GenerateFunctions return a map with all the functions
-func (model *Model) GenerateFunctions(fm FunctionMap) map[string]govaluate.ExpressionFunction {
-	model.mutex.RLock()
-	defer model.mutex.RUnlock()
+func (model Model) GenerateFunctions(fm FunctionMap) map[string]govaluate.ExpressionFunction {
 	functions := fm.GetFunctions()
 
-	if _, ok := model.data["g"]; ok {
-		for key, ast := range model.data["g"] {
+	if _, ok := model["g"]; ok {
+		for key, ast := range model["g"] {
 			rm := ast.RM
 			functions[key] = util.GenerateGFunction(rm)
 		}
