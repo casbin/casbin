@@ -29,34 +29,34 @@ func (e *SyncedEnforcer) GetUsersForRole(name string, domain ...string) ([]strin
 }
 
 // HasRoleForUser determines whether a user has a role.
-func (e *SyncedEnforcer) HasRoleForUser(name string, role string) (bool, error) {
+func (e *SyncedEnforcer) HasRoleForUser(name string, role string, domain ...string) (bool, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.HasRoleForUser(name, role)
+	return e.Enforcer.HasRoleForUser(name, role, domain...)
 }
 
 // AddRoleForUser adds a role for a user.
 // Returns false if the user already has the role (aka not affected).
-func (e *SyncedEnforcer) AddRoleForUser(user string, role string) (bool, error) {
+func (e *SyncedEnforcer) AddRoleForUser(user string, role string, domain ...string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.AddRoleForUser(user, role)
+	return e.Enforcer.AddRoleForUser(user, role, domain ...)
 }
 
 // DeleteRoleForUser deletes a role for a user.
 // Returns false if the user does not have the role (aka not affected).
-func (e *SyncedEnforcer) DeleteRoleForUser(user string, role string) (bool, error) {
+func (e *SyncedEnforcer) DeleteRoleForUser(user string, role string, domain ...string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.DeleteRoleForUser(user, role)
+	return e.Enforcer.DeleteRoleForUser(user, role, domain ...)
 }
 
 // DeleteRolesForUser deletes all roles for a user.
 // Returns false if the user does not have any roles (aka not affected).
-func (e *SyncedEnforcer) DeleteRolesForUser(user string) (bool, error) {
+func (e *SyncedEnforcer) DeleteRolesForUser(user string, domain ...string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.DeleteRolesForUser(user)
+	return e.Enforcer.DeleteRolesForUser(user, domain ...)
 }
 
 // DeleteUser deletes a user.
@@ -108,10 +108,10 @@ func (e *SyncedEnforcer) DeletePermissionsForUser(user string) (bool, error) {
 }
 
 // GetPermissionsForUser gets permissions for a user or role.
-func (e *SyncedEnforcer) GetPermissionsForUser(user string) [][]string {
+func (e *SyncedEnforcer) GetPermissionsForUser(user string, domain ...string) [][]string {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.GetPermissionsForUser(user)
+	return e.Enforcer.GetPermissionsForUser(user, domain ...)
 }
 
 // HasPermissionForUser determines whether a user has a permission.

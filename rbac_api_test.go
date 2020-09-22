@@ -55,9 +55,9 @@ func testGetUsers(t *testing.T, e *Enforcer, res []string, name string, domain .
 	}
 }
 
-func testHasRole(t *testing.T, e *Enforcer, name string, role string, res bool) {
+func testHasRole(t *testing.T, e *Enforcer, name string, role string, res bool, domain ...string) {
 	t.Helper()
-	myRes, err := e.HasRoleForUser(name, role)
+	myRes, err := e.HasRoleForUser(name, role, domain...)
 	if err != nil {
 		t.Error("HasRoleForUser returned an error: ", err.Error())
 	}
@@ -127,8 +127,61 @@ func TestRoleAPI(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 }
 
+func TestRoleAPI_Domains(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+
+	testHasRole(t, e, "alice", "admin", true, "domain1")
+	testHasRole(t, e, "alice", "admin", false, "domain2")
+	testGetRoles(t, e, []string{"admin"}, "alice", "domain1")
+	testGetRoles(t, e, []string{}, "bob", "domain1")
+	testGetRoles(t, e, []string{}, "admin", "domain1")
+	testGetRoles(t, e, []string{}, "non_exist", "domain1")
+	testGetRoles(t, e, []string{}, "alice", "domain2")
+	testGetRoles(t, e, []string{"admin"}, "bob", "domain2")
+	testGetRoles(t, e, []string{}, "admin", "domain2")
+	testGetRoles(t, e, []string{}, "non_exist", "domain2")
+
+	_, _ = e.DeleteRoleForUser("alice", "admin", "domain1")
+	_, _ = e.AddRoleForUser("bob", "admin", "domain1")
+
+	testGetRoles(t, e, []string{}, "alice", "domain1")
+	testGetRoles(t, e, []string{"admin"}, "bob", "domain1")
+	testGetRoles(t, e, []string{}, "admin", "domain1")
+	testGetRoles(t, e, []string{}, "non_exist", "domain1")
+	testGetRoles(t, e, []string{}, "alice", "domain2")
+	testGetRoles(t, e, []string{"admin"}, "bob", "domain2")
+	testGetRoles(t, e, []string{}, "admin", "domain2")
+	testGetRoles(t, e, []string{}, "non_exist", "domain2")
+
+	_, _ = e.AddRoleForUser("alice", "admin", "domain1")
+	_, _ = e.DeleteRolesForUser("bob", "domain1")
+
+	testGetRoles(t, e, []string{"admin"}, "alice", "domain1")
+	testGetRoles(t, e, []string{}, "bob", "domain1")
+	testGetRoles(t, e, []string{}, "admin", "domain1")
+	testGetRoles(t, e, []string{}, "non_exist", "domain1")
+	testGetRoles(t, e, []string{}, "alice", "domain2")
+	testGetRoles(t, e, []string{"admin"}, "bob", "domain2")
+	testGetRoles(t, e, []string{}, "admin", "domain2")
+	testGetRoles(t, e, []string{}, "non_exist", "domain2")
+
+	_, _ = e.AddRolesForUser("bob", []string{"admin", "admin1", "admin2"}, "domain1")
+
+	testGetRoles(t, e, []string{"admin", "admin1", "admin2"}, "bob", "domain1")
+
+	testGetPermissions(t, e, "admin", [][]string{{"admin", "domain1", "data1", "read"}, {"admin", "domain1", "data1", "write"}}, "domain1")
+	testGetPermissions(t, e, "admin", [][]string{{"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}}, "domain2")
+
+}
+
 func TestEnforcer_AddRolesForUser(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	_, _ = e.AddRolesForUser("alice", []string{"data1_admin", "data2_admin", "data3_admin"})
+	// The "alice" already has "data2_admin" , it will be return false. So "alice" just has "data2_admin".
+	testGetRoles(t, e, []string{"data2_admin"}, "alice")
+	// delete role
+	_, _ = e.DeleteRoleForUser("alice", "data2_admin")
 
 	_, _ = e.AddRolesForUser("alice", []string{"data1_admin", "data2_admin", "data3_admin"})
 	testGetRoles(t, e, []string{"data1_admin", "data2_admin", "data3_admin"}, "alice")
@@ -137,9 +190,9 @@ func TestEnforcer_AddRolesForUser(t *testing.T) {
 	testEnforce(t, e, "alice", "data2", "write", true)
 }
 
-func testGetPermissions(t *testing.T, e *Enforcer, name string, res [][]string) {
+func testGetPermissions(t *testing.T, e *Enforcer, name string, res [][]string, domain ...string) {
 	t.Helper()
-	myRes := e.GetPermissionsForUser(name)
+	myRes := e.GetPermissionsForUser(name, domain...)
 	t.Log("Permissions for ", name, ": ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {

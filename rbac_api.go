@@ -15,8 +15,7 @@
 package casbin
 
 import (
-	"errors"
-
+	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -33,8 +32,8 @@ func (e *Enforcer) GetUsersForRole(name string, domain ...string) ([]string, err
 }
 
 // HasRoleForUser determines whether a user has a role.
-func (e *Enforcer) HasRoleForUser(name string, role string) (bool, error) {
-	roles, err := e.GetRolesForUser(name)
+func (e *Enforcer) HasRoleForUser(name string, role string, domain ...string) (bool, error) {
+	roles, err := e.GetRolesForUser(name, domain...)
 	if err != nil {
 		return false, err
 	}
@@ -51,36 +50,44 @@ func (e *Enforcer) HasRoleForUser(name string, role string) (bool, error) {
 
 // AddRoleForUser adds a role for a user.
 // Returns false if the user already has the role (aka not affected).
-func (e *Enforcer) AddRoleForUser(user string, role string) (bool, error) {
-	return e.AddGroupingPolicy(user, role)
+func (e *Enforcer) AddRoleForUser(user string, role string, domain ...string) (bool, error) {
+	args := []string{user, role}
+	args = append(args, domain...)
+	return e.AddGroupingPolicy(args)
 }
 
 // AddRolesForUser adds roles for a user.
 // Returns false if the user already has the roles (aka not affected).
-func (e *Enforcer) AddRolesForUser(user string, roles []string) (bool, error) {
-	f := false
-	for _, r := range roles {
-		b, err := e.AddGroupingPolicy(user, r)
-		if err != nil {
-			return false, err
-		}
-		if b {
-			f = true
-		}
+func (e *Enforcer) AddRolesForUser(user string, roles []string, domain ...string) (bool, error) {
+	var rules [][]string
+	for _, role := range roles {
+		rule := []string{user, role}
+		rule = append(rule, domain...)
+		rules = append(rules, rule)
 	}
-	return f, nil
+	return e.AddGroupingPolicies(rules)
 }
 
 // DeleteRoleForUser deletes a role for a user.
 // Returns false if the user does not have the role (aka not affected).
-func (e *Enforcer) DeleteRoleForUser(user string, role string) (bool, error) {
-	return e.RemoveGroupingPolicy(user, role)
+func (e *Enforcer) DeleteRoleForUser(user string, role string, domain ...string) (bool, error) {
+	args := []string{user, role}
+	args = append(args, domain...)
+	return e.RemoveGroupingPolicy(args)
 }
 
 // DeleteRolesForUser deletes all roles for a user.
 // Returns false if the user does not have any roles (aka not affected).
-func (e *Enforcer) DeleteRolesForUser(user string) (bool, error) {
-	return e.RemoveFilteredGroupingPolicy(0, user)
+func (e *Enforcer) DeleteRolesForUser(user string, domain ...string) (bool, error) {
+	var args []string
+	if len(domain) == 0 {
+		args = []string{user}
+	} else if len(domain) > 1 {
+		return false, errors.ERR_DOMAIN_PARAMETER
+	} else {
+		args = []string{user, "", domain[0]}
+	}
+	return e.RemoveFilteredGroupingPolicy(0, args...)
 }
 
 // DeleteUser deletes a user.
@@ -134,8 +141,10 @@ func (e *Enforcer) DeletePermissionsForUser(user string) (bool, error) {
 }
 
 // GetPermissionsForUser gets permissions for a user or role.
-func (e *Enforcer) GetPermissionsForUser(user string) [][]string {
-	return e.GetFilteredPolicy(0, user)
+func (e *Enforcer) GetPermissionsForUser(user string, domain ...string) [][]string {
+	args := []string{user}
+	args = append(args, domain...)
+	return e.GetFilteredPolicy(0, args...)
 }
 
 // HasPermissionForUser determines whether a user has a permission.
@@ -196,21 +205,11 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 
 	roles = append([]string{user}, roles...)
 
-	withDomain := false
-	if len(domain) == 1 {
-		withDomain = true
-	} else if len(domain) > 1 {
-		return nil, errors.New("domain should be 1 parameter")
-	}
-
 	var res [][]string
 	var permissions [][]string
 	for _, role := range roles {
-		if withDomain {
-			permissions = e.GetPermissionsForUserInDomain(role, domain[0])
-		} else {
-			permissions = e.GetPermissionsForUser(role)
-		}
+		permissions = e.GetPermissionsForUser(role, domain...)
+
 		res = append(res, permissions...)
 	}
 
