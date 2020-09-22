@@ -446,11 +446,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				for _, ruleName := range ruleNames {
 					if j, ok := parameters.pTokens[ruleName]; ok {
 						rule := util.EscapeAssertion(pvals[j])
-						if strings.Contains(rule, ">") || strings.Contains(rule, "<") || strings.Contains(rule, "=") {
-							expWithRule = util.ReplaceEval(expWithRule, rule)
-						} else {
-							expWithRule = util.ReplaceEval(expWithRule, "false")
-						}
+						expWithRule = util.ReplaceEval(expWithRule, rule)
 					} else {
 						return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
 					}
