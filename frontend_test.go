@@ -97,5 +97,8 @@ func TestCasbinJsGetPermissionForUser2(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	_, _ = CasbinJsGetPermissionForUser(e, "alice") // make sure CasbinJsGetPermissionForUser can be used with a SyncedEnforcer.
+	_, err = CasbinJsGetPermissionForUser(e, "alice") // make sure CasbinJsGetPermissionForUser can be used with a SyncedEnforcer.
+	if err != nil {
+		t.Errorf("Test error: %s", err)
+	}
 }
