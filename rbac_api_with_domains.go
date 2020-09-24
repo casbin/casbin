@@ -14,6 +14,8 @@
 
 package casbin
 
+import "strings"
+
 // GetUsersForRoleInDomain gets the users that has a role inside a domain. Add by Gordon
 func (e *Enforcer) GetUsersForRoleInDomain(name string, domain string) []string {
 	res, _ := e.model["g"]["g"].RM.GetUsers(name, domain)
@@ -57,4 +59,28 @@ func (e *Enforcer) DeleteRolesForUserInDomain(user string, domain string) (bool,
 	}
 
 	return e.RemoveGroupingPolicies(rules)
+}
+
+func (e *Enforcer) GetAllDomainsForUser(user string) ([]string, bool) {
+	sections := e.model["g"]
+	var domains []string
+	for _, assertion := range sections {
+		count := strings.Count(assertion.Value, "_")
+		if count < 3 {
+			continue
+		}
+		for _, policy := range assertion.Policy {
+			matched := false
+			for _, str := range policy {
+				if str == user || user == "" {
+					matched = true
+				}
+			}
+			if matched {
+				domains = append(domains, policy[count-1])
+			}
+		}
+	}
+	return domains, true
+
 }

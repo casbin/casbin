@@ -176,6 +176,15 @@ func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name string, domain s
 	}
 }
 
+func testGetAllDomainsForUser(t *testing.T, e *Enforcer, name string, res []string) {
+	myRes, _ := e.GetAllDomainsForUser(name)
+	t.Log("Domains for ", name, ": ", myRes)
+
+	if !util.ArrayEquals(res, myRes) {
+		t.Error("Domains for ", name, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func TestPermissionAPIInDomain(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
@@ -188,4 +197,7 @@ func TestPermissionAPIInDomain(t *testing.T) {
 	testGetPermissionsInDomain(t, e, "bob", "domain2", [][]string{})
 	testGetPermissionsInDomain(t, e, "admin", "domain2", [][]string{{"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}})
 	testGetPermissionsInDomain(t, e, "non_exist", "domain2", [][]string{})
+
+	testGetAllDomainsForUser(t, e, "alice", []string{"domain1"})
+	testGetAllDomainsForUser(t, e, "", []string{"domain1", "domain2"})
 }
