@@ -176,6 +176,16 @@ func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name string, domain s
 	}
 }
 
+func testGetImplicitPermissionsForUserForAllDomains(t *testing.T, e *Enforcer, name string, res [][]string) {
+	t.Helper()
+	myRes, _ := e.GetImplicitPermissionsForUserForAllDomains(name)
+	t.Log("Permissions for ", name, ": ", myRes)
+
+	if !util.Array2DEquals(res, myRes) {
+		t.Error("Permissions for ", name, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func testGetAllDomainsForUser(t *testing.T, e *Enforcer, name string, res []string) {
 	myRes, _ := e.GetAllDomainsForUser(name)
 	t.Log("Domains for ", name, ": ", myRes)
@@ -200,4 +210,8 @@ func TestPermissionAPIInDomain(t *testing.T) {
 
 	testGetAllDomainsForUser(t, e, "alice", []string{"domain1"})
 	testGetAllDomainsForUser(t, e, "", []string{"domain1", "domain2"})
+
+	testGetImplicitPermissionsForUserForAllDomains(t, e, "alice", [][]string{{"admin", "domain1", "data1", "read"}, {"admin", "domain1", "data1", "write"}})
+	testGetImplicitPermissionsForUserForAllDomains(t, e, "bob", [][]string{{"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}})
+	testGetImplicitPermissionsForUserForAllDomains(t, e, "", [][]string{{"admin", "domain1", "data1", "read"}, {"admin", "domain1", "data1", "write"}, {"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}})
 }

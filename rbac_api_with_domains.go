@@ -84,3 +84,18 @@ func (e *Enforcer) GetAllDomainsForUser(user string) ([]string, bool) {
 	return domains, true
 
 }
+
+func (e *Enforcer) GetImplicitPermissionsForUserForAllDomains(user string) ([][]string, error) {
+	domains, _ := e.GetAllDomainsForUser(user)
+	var res [][]string
+	for _, domain := range domains {
+		e.GetPermissionsForUser(user, domain)
+		permission, err := e.GetImplicitPermissionsForUser(user, domain)
+		res = append(res, permission...)
+		if err != nil {
+			return res, err
+		}
+	}
+
+	return res, nil
+}
