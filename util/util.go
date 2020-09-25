@@ -72,6 +72,22 @@ func Array2DEquals(a [][]string, b [][]string) bool {
 	return true
 }
 
+func Array2DEqualsOutOfOrder(a [][]string, b [][]string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	len := len(a)
+	count := 0
+	for _, va := range a {
+		for _, vb := range b {
+			if ArrayEquals(va, vb) {
+				count++
+			}
+		}
+	}
+	return len == count
+}
+
 // ArrayRemoveDuplicates removes any duplicated elements in a string array.
 func ArrayRemoveDuplicates(s *[]string) {
 	found := make(map[string]bool)

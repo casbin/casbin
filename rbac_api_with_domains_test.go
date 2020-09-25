@@ -46,7 +46,7 @@ func testGetRolesForUserForAllDomains(t *testing.T, e *Enforcer, name string, re
 	myRes := e.GetRolesForUserForAllDomains(name)
 	t.Log("Roles For ", name, ": ", res)
 
-	if !util.Array2DEquals(res, myRes) {
+	if !util.Array2DEqualsOutOfOrder(res, myRes) {
 		t.Error("Roles for ", name, ": ", myRes, ", supposed to be ", res)
 	}
 }
@@ -199,7 +199,7 @@ func testGetImplicitPermissionsForUserForAllDomains(t *testing.T, e *Enforcer, n
 	myRes, _ := e.GetImplicitPermissionsForUserForAllDomains(name)
 	t.Log("Permissions for ", name, ": ", myRes)
 
-	if !util.Array2DEquals(res, myRes) {
+	if !util.Array2DEqualsOutOfOrder(res, myRes) {
 		t.Error("Permissions for ", name, ": ", myRes, ", supposed to be ", res)
 	}
 }
