@@ -41,6 +41,16 @@ func testGetRolesInDomain(t *testing.T, e *Enforcer, name string, domain string,
 	}
 }
 
+func testGetRolesForUserForAllDomains(t *testing.T, e *Enforcer, name string, res [][]string) {
+	t.Helper()
+	myRes := e.GetRolesForUserForAllDomains(name)
+	t.Log("Roles For ", name, ": ", res)
+
+	if !util.Array2DEquals(res, myRes) {
+		t.Error("Roles for ", name, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func TestGetImplicitRolesForDomainUser(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_hierarchy_with_domains_policy.csv")
 
@@ -110,6 +120,9 @@ func TestRoleAPIWithDomains(t *testing.T) {
 	testGetRoles(t, e, []string{}, "non_exist", "domain2")
 	testGetRolesInDomain(t, e, "non_exist", "domain2", []string{})
 
+	testGetRolesForUserForAllDomains(t, e, "alice", [][]string{{"admin", "domain1"}})
+	testGetRolesForUserForAllDomains(t, e, "bob", [][]string{{"admin", "domain2"}})
+
 	_, _ = e.DeleteRoleForUserInDomain("alice", "admin", "domain1")
 	_, _ = e.AddRoleForUserInDomain("bob", "admin", "domain1")
 
@@ -136,6 +149,9 @@ func TestRoleAPIWithDomains(t *testing.T) {
 
 	testGetRoles(t, e, []string{}, "non_exist", "domain2")
 	testGetRolesInDomain(t, e, "non_exist", "domain2", []string{})
+
+	testGetRolesForUserForAllDomains(t, e, "alice", [][]string{})
+	testGetRolesForUserForAllDomains(t, e, "bob", [][]string{{"admin", "domain2"}, {"admin", "domain1"}})
 
 	_, _ = e.AddRoleForUserInDomain("alice", "admin", "domain1")
 	_, _ = e.DeleteRolesForUserInDomain("bob", "domain1")
@@ -164,6 +180,8 @@ func TestRoleAPIWithDomains(t *testing.T) {
 	testGetRoles(t, e, []string{}, "non_exist", "domain2")
 	testGetRolesInDomain(t, e, "non_exist", "domain2", []string{})
 
+	testGetRolesForUserForAllDomains(t, e, "alice", [][]string{{"admin", "domain1"}})
+	testGetRolesForUserForAllDomains(t, e, "bob", [][]string{{"admin", "domain2"}})
 }
 
 func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name string, domain string, res [][]string) {
