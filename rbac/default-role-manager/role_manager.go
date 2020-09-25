@@ -193,6 +193,18 @@ func (rm *RoleManager) GetRoles(name string, domain ...string) ([]string, error)
 	return roles, nil
 }
 
+func (rm *RoleManager) GetAllDomainsForUser(name string) []string {
+	var res []string
+	rm.allDomains.Range(func(key, value interface{}) bool {
+		role := value.(*Roles).createRole(name, rm.matchingFunc)
+		if role.name == name || name == "" {
+			res = append(res, key.(string))
+		}
+		return true
+	})
+	return res
+}
+
 // GetUsers gets the users that inherits a subject.
 // domain is an unreferenced parameter here, may be used in other implementations.
 func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error) {

@@ -86,7 +86,9 @@ func (e *Enforcer) GetAllDomainsForUser(user string) []string {
 }
 
 func (e *Enforcer) GetImplicitPermissionsForUserForAllDomains(user string) ([][]string, error) {
-	domains := e.GetAllDomainsForUser(user)
+	//domains := e.GetAllDomainsForUser(user)
+	domains := e.rm.GetAllDomainsForUser(user)
+
 	var res [][]string
 	for _, domain := range domains {
 		e.GetPermissionsForUser(user, domain)

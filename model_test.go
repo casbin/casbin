@@ -341,6 +341,10 @@ func (rm *testCustomRoleManager) HasLink(name1 string, name2 string, domain ...s
 	}
 	return false, nil
 }
+
+func (rm *testCustomRoleManager) GetAllDomainsForUser(name string) []string {
+	return []string{}
+}
 func (rm *testCustomRoleManager) GetRoles(name string, domain ...string) ([]string, error) {
 	return []string{}, nil
 }
