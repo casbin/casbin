@@ -187,7 +187,7 @@ func testGetImplicitPermissionsForUserForAllDomains(t *testing.T, e *Enforcer, n
 }
 
 func testGetAllDomainsForUser(t *testing.T, e *Enforcer, name string, res []string) {
-	myRes, _ := e.GetAllDomainsForUser(name)
+	myRes := e.GetAllDomainsForUser(name)
 	t.Log("Domains for ", name, ": ", myRes)
 
 	if !util.ArrayEquals(res, myRes) {

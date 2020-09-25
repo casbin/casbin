@@ -61,7 +61,7 @@ func (e *Enforcer) DeleteRolesForUserInDomain(user string, domain string) (bool,
 	return e.RemoveGroupingPolicies(rules)
 }
 
-func (e *Enforcer) GetAllDomainsForUser(user string) ([]string, bool) {
+func (e *Enforcer) GetAllDomainsForUser(user string) []string {
 	sections := e.model["g"]
 	var domains []string
 	for _, assertion := range sections {
@@ -81,12 +81,12 @@ func (e *Enforcer) GetAllDomainsForUser(user string) ([]string, bool) {
 			}
 		}
 	}
-	return domains, true
+	return domains
 
 }
 
 func (e *Enforcer) GetImplicitPermissionsForUserForAllDomains(user string) ([][]string, error) {
-	domains, _ := e.GetAllDomainsForUser(user)
+	domains := e.GetAllDomainsForUser(user)
 	var res [][]string
 	for _, domain := range domains {
 		e.GetPermissionsForUser(user, domain)
