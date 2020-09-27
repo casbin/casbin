@@ -14,7 +14,10 @@
 
 package casbin
 
-import "github.com/Knetic/govaluate"
+import (
+	"bytes"
+	"github.com/Knetic/govaluate"
+)
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() []string {
@@ -154,6 +157,33 @@ func (e *Enforcer) AddNamedPolicies(ptype string, rules [][]string) (bool, error
 // RemovePolicy removes an authorization rule from the current policy.
 func (e *Enforcer) RemovePolicy(params ...interface{}) (bool, error) {
 	return e.RemoveNamedPolicy("p", params...)
+}
+
+// UpdatePolicy updates an authorization rule from the current policy.
+func (e *Enforcer) UpdatePolicy(p1 string, p2 string) (bool, error) {
+
+	oldPolicy := bytes.Split([]byte(p1), []byte(","))
+	for k, v := range oldPolicy {
+		oldPolicy[k] = bytes.TrimSpace(v)
+	}
+	newPolicy := bytes.Split([]byte(p2), []byte(","))
+	for k, v := range newPolicy {
+		newPolicy[k] = bytes.TrimSpace(v)
+	}
+
+	return e.UpdatePolicyByName("p", oldPolicy, newPolicy)
+}
+
+func (e *Enforcer) UpdatePolicyByName(ptype string, p1, p2 [][]byte) (bool, error) {
+	oldPolicy := make([]string, 0)
+	newPolicy := make([]string, 0)
+	for _, p := range p1 {
+		oldPolicy = append(oldPolicy, string(p[:]))
+	}
+	for _, p := range p2 {
+		newPolicy = append(newPolicy, string(p[:]))
+	}
+	return e.updatePolicy("p", ptype, oldPolicy, newPolicy)
 }
 
 // RemovePolicies removes authorization rules from the current policy.

@@ -192,6 +192,10 @@ func TestModifyPolicyAPI(t *testing.T) {
 	_, _ = e.RemoveFilteredPolicy(1, "data2")
 
 	testGetPolicy(t, e, [][]string{{"eve", "data3", "read"}})
+
+	_, _ = e.UpdatePolicy("eve, data3, read", "eve, data3, write")
+
+	testGetPolicy(t, e, [][]string{{"eve", "data3", "write"}})
 }
 
 func TestModifyGroupingPolicyAPI(t *testing.T) {

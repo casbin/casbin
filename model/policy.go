@@ -156,6 +156,21 @@ func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
 	return true
 }
 
+// UpdatePolicy updates a policy rule from the model.
+func (model Model) UpdatePolicy(sec, ptype string, oldRule, newRule []string) bool {
+	oldPolicy := strings.Join(oldRule, DefaultSep)
+	index, ok := model[sec][ptype].PolicyMap[oldPolicy]
+	if !ok {
+		return false
+	}
+
+	model[sec][ptype].Policy[index] = newRule
+	delete(model[sec][ptype].PolicyMap, oldPolicy)
+	model[sec][ptype].PolicyMap[strings.Join(newRule, DefaultSep)] = index
+
+	return true
+}
+
 // RemovePolicies removes policy rules from the model.
 func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
 	for _, rule := range rules {

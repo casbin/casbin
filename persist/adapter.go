@@ -56,6 +56,9 @@ type Adapter interface {
 	// RemovePolicy removes a policy rule from the storage.
 	// This is part of the Auto-Save feature.
 	RemovePolicy(sec string, ptype string, rule []string) error
+	// UpdatePolicy updates a policy rule from storage.
+	// This is part of the Auto-Save feature.
+	UpdatePolicy(sec string, ptype string, oldRule, newPolicy []string) error
 	// RemoveFilteredPolicy removes policy rules that match the filter from the storage.
 	// This is part of the Auto-Save feature.
 	RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error

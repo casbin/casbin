@@ -133,6 +133,43 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 	return ruleRemoved, nil
 }
 
+func (e *Enforcer) updatePolicy(sec, ptype string, oldRule, newRule []string) (bool, error) {
+	if e.shouldPersist() {
+		if err := e.adapter.UpdatePolicy(sec, ptype, oldRule, newRule); err != nil {
+			if err.Error() != notImplemented {
+				return false, err
+			}
+		}
+	}
+	ruleUpdated := e.model.UpdatePolicy(sec, ptype, oldRule, newRule)
+	if !ruleUpdated {
+		return ruleUpdated, nil
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{oldRule}) // remove the old rule
+		if err != nil {
+			return ruleUpdated, err
+		}
+		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{newRule}) // add the new rule
+		if err != nil {
+			return ruleUpdated, err
+		}
+	}
+
+	if e.watcher != nil && e.autoNotifyWatcher {
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForUpdatePolicy(oldRule, newRule)
+		} else {
+			err = e.watcher.Update()
+		}
+		return ruleUpdated, err
+	}
+
+	return ruleUpdated, nil
+}
+
 // removePolicies removes rules from the current policy.
 func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (bool, error) {
 	if !e.model.HasPolicies(sec, ptype, rules) {
