@@ -18,7 +18,7 @@ import (
 	"encoding/json"
 )
 
-func CasbinJsGetPermissionForUser(e *Enforcer, user string) ([]byte, error) {
+func CasbinJsGetPermissionForUser(e IEnforcer, user string) ([]byte, error) {
 	policy, err := e.GetImplicitPermissionsForUser(user)
 	if err != nil {
 		return nil, err

@@ -91,3 +91,14 @@ func TestCasbinJsGetPermissionForUser(t *testing.T) {
 		t.Errorf("Someone can have a non-existing action (rm -rf)")
 	}
 }
+
+func TestCasbinJsGetPermissionForUser2(t *testing.T) {
+	e, err := NewSyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	if err != nil {
+		panic(err)
+	}
+	_, err = CasbinJsGetPermissionForUser(e, "alice") // make sure CasbinJsGetPermissionForUser can be used with a SyncedEnforcer.
+	if err != nil {
+		t.Errorf("Test error: %s", err)
+	}
+}
