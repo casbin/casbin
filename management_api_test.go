@@ -193,7 +193,7 @@ func TestModifyPolicyAPI(t *testing.T) {
 
 	testGetPolicy(t, e, [][]string{{"eve", "data3", "read"}})
 
-	_, _ = e.UpdatePolicy("eve, data3, read", "eve, data3, write")
+	_, _ = e.UpdatePolicy([]string{"eve", "data3", "read"}, []string{"eve", "data3", "write"})
 
 	testGetPolicy(t, e, [][]string{{"eve", "data3", "write"}})
 }
