@@ -15,7 +15,6 @@
 package casbin
 
 import (
-	"bytes"
 	"github.com/Knetic/govaluate"
 )
 
@@ -160,30 +159,12 @@ func (e *Enforcer) RemovePolicy(params ...interface{}) (bool, error) {
 }
 
 // UpdatePolicy updates an authorization rule from the current policy.
-func (e *Enforcer) UpdatePolicy(p1 string, p2 string) (bool, error) {
-
-	oldPolicy := bytes.Split([]byte(p1), []byte(","))
-	for k, v := range oldPolicy {
-		oldPolicy[k] = bytes.TrimSpace(v)
-	}
-	newPolicy := bytes.Split([]byte(p2), []byte(","))
-	for k, v := range newPolicy {
-		newPolicy[k] = bytes.TrimSpace(v)
-	}
-
-	return e.UpdatePolicyByName("p", oldPolicy, newPolicy)
+func (e *Enforcer) UpdatePolicy(p1 []string, p2 []string) (bool, error) {
+	return e.UpdateNamedPolicy("p", p1, p2)
 }
 
-func (e *Enforcer) UpdatePolicyByName(ptype string, p1, p2 [][]byte) (bool, error) {
-	oldPolicy := make([]string, 0)
-	newPolicy := make([]string, 0)
-	for _, p := range p1 {
-		oldPolicy = append(oldPolicy, string(p[:]))
-	}
-	for _, p := range p2 {
-		newPolicy = append(newPolicy, string(p[:]))
-	}
-	return e.updatePolicy("p", ptype, oldPolicy, newPolicy)
+func (e *Enforcer) UpdateNamedPolicy(ptype string, p1, p2 []string) (bool, error) {
+	return e.updatePolicy("p", ptype, p1, p2)
 }
 
 // RemovePolicies removes authorization rules from the current policy.
