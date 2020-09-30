@@ -133,7 +133,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 	return ruleRemoved, nil
 }
 
-func (e *Enforcer) updatePolicy(sec, ptype string, oldRule, newRule []string) (bool, error) {
+func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
 	if e.shouldPersist() {
 		if err := e.adapter.UpdatePolicy(sec, ptype, oldRule, newRule); err != nil {
 			if err.Error() != notImplemented {

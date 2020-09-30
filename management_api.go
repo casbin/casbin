@@ -14,9 +14,7 @@
 
 package casbin
 
-import (
-	"github.com/Knetic/govaluate"
-)
+import "github.com/Knetic/govaluate"
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() []string {
@@ -159,11 +157,11 @@ func (e *Enforcer) RemovePolicy(params ...interface{}) (bool, error) {
 }
 
 // UpdatePolicy updates an authorization rule from the current policy.
-func (e *Enforcer) UpdatePolicy(p1 []string, p2 []string) (bool, error) {
-	return e.UpdateNamedPolicy("p", p1, p2)
+func (e *Enforcer) UpdatePolicy(rule1 []string, rule2 []string) (bool, error) {
+	return e.UpdateNamedPolicy("p", rule1, rule2)
 }
 
-func (e *Enforcer) UpdateNamedPolicy(ptype string, p1, p2 []string) (bool, error) {
+func (e *Enforcer) UpdateNamedPolicy(ptype string, p1 []string, p2 []string) (bool, error) {
 	return e.updatePolicy("p", ptype, p1, p2)
 }
 
