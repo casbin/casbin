@@ -43,9 +43,7 @@ func (model Model) BuildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, s
 
 // BuildRoleLinks initializes the roles in RBAC.
 func (model Model) BuildRoleLinks(rm rbac.RoleManager) error {
-	if log.GetLogger().IsEnabled() {
-		model.PrintPolicy()
-	}
+	model.PrintPolicy()
 	for _, ast := range model["g"] {
 		err := ast.buildRoleLinks(rm)
 		if err != nil {
@@ -58,6 +56,9 @@ func (model Model) BuildRoleLinks(rm rbac.RoleManager) error {
 
 // PrintPolicy prints the policy to log.
 func (model Model) PrintPolicy() {
+	if !log.GetLogger().IsEnabled() {
+		return
+	}
 	log.LogPrint("Policy:")
 	for key, ast := range model["p"] {
 		log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
