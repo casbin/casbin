@@ -84,5 +84,6 @@ func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
 	}
 
 	log.LogPrint("Role links for: " + ast.Key)
+
 	return ast.RM.PrintRoles()
 }

@@ -248,7 +248,6 @@ func (e *Enforcer) LoadPolicy() error {
 		return err
 	}
 
-	e.model.PrintPolicy()
 	if e.autoBuildRoleLinks {
 		err := e.BuildRoleLinks()
 		if err != nil {
