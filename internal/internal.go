@@ -31,7 +31,7 @@ type PolicyManager interface {
 }
 
 type policyManager struct {
-	model   *model.Model
+	model   model.Model
 	adapter persist.Adapter
 	rm      rbac.RoleManager
 }
@@ -41,7 +41,7 @@ const (
 )
 
 // NewPolicyManager is the constructor for PolicyManager
-func NewPolicyManager(model *model.Model, adapter persist.Adapter, rm rbac.RoleManager) PolicyManager {
+func NewPolicyManager(model model.Model, adapter persist.Adapter, rm rbac.RoleManager) PolicyManager {
 	return &policyManager{
 		model:   model,
 		adapter: adapter,
