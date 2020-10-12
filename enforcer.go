@@ -441,21 +441,20 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 			if hasEval {
 				ruleNames := util.GetEvalValue(expString)
-				var expWithRule = expString
+				replacements := make(map[string]string)
 				for _, ruleName := range ruleNames {
 					if j, ok := parameters.pTokens[ruleName]; ok {
 						rule := util.EscapeAssertion(pvals[j])
-						expWithRule = util.ReplaceEval(expWithRule, rule)
+						replacements[ruleName] = rule
 					} else {
 						return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
 					}
-
-					expression, err = govaluate.NewEvaluableExpressionWithFunctions(expWithRule, functions)
-					if err != nil {
-						return false, fmt.Errorf("p.sub_rule should satisfy the syntax of matcher: %s", err)
-					}
 				}
-
+				expWithRule := util.ReplaceEvalWithMap(expString, replacements)
+				expression, err = govaluate.NewEvaluableExpressionWithFunctions(expWithRule, functions)
+				if err != nil {
+					return false, fmt.Errorf("p.sub_rule should satisfy the syntax of matcher: %s", err)
+				}
 			}
 
 			result, err := expression.Eval(parameters)
