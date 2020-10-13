@@ -25,9 +25,6 @@ type WatcherEx interface {
 	// UPdateForRemovePolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.RemovePolicy()
 	UpdateForRemovePolicy(params ...string) error
-	// UPdateForUpdatePolicy calls the update callback of other instances to synchronize their policy.
-	// It is called after Enforcer.UpdatePolicy()
-	UpdateForUpdatePolicy(oldRule, newRule []string) error
 	// UpdateForRemoveFilteredPolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.RemoveFilteredNamedGroupingPolicy()
 	UpdateForRemoveFilteredPolicy(fieldIndex int, fieldValues ...string) error

@@ -135,7 +135,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 
 func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
 	if e.shouldPersist() {
-		if err := e.adapter.UpdatePolicy(sec, ptype, oldRule, newRule); err != nil {
+		if err := e.adapter.(persist.UpdatableAdapter).UpdatePolicy(sec, ptype, oldRule, newRule); err != nil {
 			if err.Error() != notImplemented {
 				return false, err
 			}
@@ -159,7 +159,7 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
-		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+		if watcher, ok := e.watcher.(persist.WatcherUpdatable); ok {
 			err = watcher.UpdateForUpdatePolicy(oldRule, newRule)
 		} else {
 			err = e.watcher.Update()
