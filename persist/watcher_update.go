@@ -14,7 +14,7 @@
 
 package persist
 
-// WatcherEx is the strengthen for Casbin watchers.
+// WatcherUpdatable is the strengthen for Casbin watchers.
 type WatcherUpdatable interface {
 	Watcher
 	// UPdateForUpdaticy calls the update callback of other instances to synchronize their policy.

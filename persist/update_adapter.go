@@ -14,7 +14,7 @@
 
 package persist
 
-// BatchAdapter is the interface for Casbin adapters with multiple add and remove policy functions.
+// UpdatableAdapter is the interface for Casbin adapters with add update policy function.
 type UpdatableAdapter interface {
 	Adapter
 	// UpdatePolicy updates a policy rule from storage.
