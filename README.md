@@ -178,7 +178,7 @@ Note: you can also initialize an enforcer with policy in DB instead of file, see
 3. Besides the static policy file, Casbin also provides API for permission management at run-time. For example, You can get all the roles assigned to a user as below:
 
     ```go
-    roles, _ := e.GetImplicitRolesForUser(sub)
+    roles := e.GetImplicitRolesForUser(sub)
     ```
 
 See [Policy management APIs](#policy-management) for more usage.
