@@ -32,7 +32,6 @@ type IEnforcer interface {
 	InitWithFile(modelPath string, policyPath string) error
 	InitWithAdapter(modelPath string, adapter persist.Adapter) error
 	InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error
-	initialize()
 	LoadModel() error
 	GetModel() model.Model
 	SetModel(m model.Model)
@@ -54,7 +53,6 @@ type IEnforcer interface {
 	EnableAutoSave(autoSave bool)
 	EnableAutoBuildRoleLinks(autoBuildRoleLinks bool)
 	BuildRoleLinks() error
-	enforce(matcher string, explains *[]string, rvals ...interface{}) (bool, error)
 	Enforce(rvals ...interface{}) (bool, error)
 	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
 	EnforceEx(rvals ...interface{}) (bool, []string, error)
