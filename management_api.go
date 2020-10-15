@@ -157,8 +157,8 @@ func (e *Enforcer) RemovePolicy(params ...interface{}) (bool, error) {
 }
 
 // UpdatePolicy updates an authorization rule from the current policy.
-func (e *Enforcer) UpdatePolicy(rule1 []string, rule2 []string) (bool, error) {
-	return e.UpdateNamedPolicy("p", rule1, rule2)
+func (e *Enforcer) UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, error) {
+	return e.UpdateNamedPolicy("p", oldPolicy, newPolicy)
 }
 
 func (e *Enforcer) UpdateNamedPolicy(ptype string, p1 []string, p2 []string) (bool, error) {
