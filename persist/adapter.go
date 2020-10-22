@@ -17,9 +17,12 @@ package persist
 import (
 	"encoding/csv"
 	"strings"
+	"sync"
 
 	"github.com/casbin/casbin/v2/model"
 )
+
+var loadMutex sync.Mutex
 
 // LoadPolicyLine loads a text line as a policy rule to model.
 func LoadPolicyLine(line string, m model.Model) {
@@ -39,6 +42,10 @@ func LoadPolicyLine(line string, m model.Model) {
 
 	key := tokens[0]
 	sec := key[:1]
+
+	loadMutex.Lock()
+	defer loadMutex.Unlock()
+
 	m[sec][key].Policy = append(m[sec][key].Policy, tokens[1:])
 	m[sec][key].PolicyMap[strings.Join(tokens[1:], model.DefaultSep)] = len(m[sec][key].Policy) - 1
 }
