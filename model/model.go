@@ -18,12 +18,13 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/Knetic/govaluate"
-	"github.com/casbin/casbin/v3/rbac"
-
 	"github.com/casbin/casbin/v3/config"
+	"github.com/casbin/casbin/v3/internal/model"
 	"github.com/casbin/casbin/v3/log"
+	"github.com/casbin/casbin/v3/rbac"
 	"github.com/casbin/casbin/v3/util"
 )
 
@@ -50,11 +51,11 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 }
 
 // AddDef adds an assertion to the model.
-func (model Model) AddDef(sec string, key string, value string) bool {
-	return model.addDef(sec, key, value)
+func (m Model) AddDef(sec string, key string, value string) bool {
+	return m.addDef(sec, key, value)
 }
 
-func (model Model) addDef(sec string, key string, value string) bool {
+func (m Model) addDef(sec string, key string, value string) bool {
 	if value == "" {
 		return false
 	}
@@ -62,7 +63,8 @@ func (model Model) addDef(sec string, key string, value string) bool {
 	ast := Assertion{}
 	ast.Key = key
 	ast.Value = value
-	ast.PolicyMap = make(map[string]int)
+	ast.Policy = model.NewPolicy()
+	ast.mutex = &sync.RWMutex{}
 
 	if sec == "r" || sec == "p" {
 		ast.Tokens = strings.Split(ast.Value, ",")
@@ -73,12 +75,12 @@ func (model Model) addDef(sec string, key string, value string) bool {
 		ast.Value = util.RemoveComments(util.EscapeAssertion(ast.Value))
 	}
 
-	_, ok := model[sec]
+	_, ok := m[sec]
 	if !ok {
-		model[sec] = make(AssertionMap)
+		m[sec] = make(AssertionMap)
 	}
 
-	model[sec][key] = &ast
+	m[sec][key] = &ast
 	return true
 }
 
@@ -132,32 +134,32 @@ func NewModelFromString(text string) (Model, error) {
 }
 
 // LoadModel loads the model from model CONF file.
-func (model Model) LoadModel(path string) error {
+func (m Model) LoadModel(path string) error {
 	cfg, err := config.NewConfig(path)
 	if err != nil {
 		return err
 	}
 
-	return model.loadModelFromConfig(cfg)
+	return m.loadModelFromConfig(cfg)
 }
 
 // LoadModelFromText loads the model from the text.
-func (model Model) LoadModelFromText(text string) error {
+func (m Model) LoadModelFromText(text string) error {
 	cfg, err := config.NewConfigFromText(text)
 	if err != nil {
 		return err
 	}
 
-	return model.loadModelFromConfig(cfg)
+	return m.loadModelFromConfig(cfg)
 }
 
-func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
+func (m Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	for s := range sectionNameMap {
-		loadSection(model, cfg, s)
+		loadSection(m, cfg, s)
 	}
 	ms := make([]string, 0)
 	for _, rs := range requiredSections {
-		if !model.hasSection(rs) {
+		if !m.hasSection(rs) {
 			ms = append(ms, sectionNameMap[rs])
 		}
 	}
@@ -167,15 +169,15 @@ func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	return nil
 }
 
-func (model Model) hasSection(sec string) bool {
-	section := model[sec]
+func (m Model) hasSection(sec string) bool {
+	section := m[sec]
 	return section != nil
 }
 
 // PrintModel prints the model to the log.
-func (model Model) PrintModel() {
+func (m Model) PrintModel() {
 	log.LogPrint("Model:")
-	for k, v := range model {
+	for k, v := range m {
 		for i, j := range v {
 			log.LogPrintf("%s.%s: %s", k, i, j.Value)
 		}
@@ -183,24 +185,24 @@ func (model Model) PrintModel() {
 }
 
 // GetMatcher gets the matcher.
-func (model Model) GetMatcher() string {
-	return model["m"]["m"].Value
+func (m Model) GetMatcher() string {
+	return m["m"]["m"].Value
 }
 
 // GetEffectExpression gets the effect expression.
-func (model Model) GetEffectExpression() string {
-	return model["e"]["e"].Value
+func (m Model) GetEffectExpression() string {
+	return m["e"]["e"].Value
 }
 
 // GetRoleManager gets the current role manager used in ptype.
-func (model Model) GetRoleManager(sec string, ptype string) rbac.RoleManager {
-	return model[sec][ptype].RM
+func (m Model) GetRoleManager(sec string, ptype string) rbac.RoleManager {
+	return m[sec][ptype].RM
 }
 
 // GetTokens returns a map with all the tokens
-func (model Model) GetTokens(sec string, ptype string) map[string]int {
-	tokens := make(map[string]int, len(model[sec][ptype].Tokens))
-	for i, token := range model[sec][ptype].Tokens {
+func (m Model) GetTokens(sec string, ptype string) map[string]int {
+	tokens := make(map[string]int, len(m[sec][ptype].Tokens))
+	for i, token := range m[sec][ptype].Tokens {
 		tokens[token] = i
 	}
 
@@ -208,20 +210,20 @@ func (model Model) GetTokens(sec string, ptype string) map[string]int {
 }
 
 // GetPtypes returns a slice for all ptype
-func (model Model) GetPtypes(sec string) []string {
+func (m Model) GetPtypes(sec string) []string {
 	var res []string
-	for k := range model[sec] {
+	for k := range m[sec] {
 		res = append(res, k)
 	}
 	return res
 }
 
 // GenerateFunctions return a map with all the functions
-func (model Model) GenerateFunctions(fm FunctionMap) map[string]govaluate.ExpressionFunction {
+func (m Model) GenerateFunctions(fm FunctionMap) map[string]govaluate.ExpressionFunction {
 	functions := fm.GetFunctions()
 
-	if _, ok := model["g"]; ok {
-		for key, ast := range model["g"] {
+	if _, ok := m["g"]; ok {
+		for key, ast := range m["g"] {
 			rm := ast.RM
 			functions[key] = util.GenerateGFunction(rm)
 		}

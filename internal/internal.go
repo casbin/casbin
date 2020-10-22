@@ -77,7 +77,7 @@ func (p *policyManager) AddPolicy(sec string, ptype string, rule []string, shoul
 
 // AddPolicies adds rules to model and adapter.
 func (p *policyManager) AddPolicies(sec string, ptype string, rules [][]string, shouldPersist bool) (bool, [][]string, error) {
-	rules = p.model.RemoveExistPolicy(sec, ptype, rules)
+	rules = p.model.FilterNotExistsPolicy(sec, ptype, rules)
 	if len(rules) == 0 {
 		return true, nil, nil
 	}
@@ -129,7 +129,7 @@ func (p *policyManager) RemovePolicy(sec string, ptype string, rule []string, sh
 
 // RemovePolicies removes rules from model and adapter.
 func (p *policyManager) RemovePolicies(sec string, ptype string, rules [][]string, shouldPersist bool) (bool, [][]string, error) {
-	rules = p.model.RemoveNotExistPolicy(sec, ptype, rules)
+	rules = p.model.FilterExistsPolicy(sec, ptype, rules)
 	if len(rules) == 0 {
 		return true, nil, nil
 	}
@@ -142,7 +142,8 @@ func (p *policyManager) RemovePolicies(sec string, ptype string, rules [][]strin
 		}
 	}
 
-	rulesRemoved := p.model.RemovePolicies(sec, ptype, rules)
+	effects := p.model.RemovePolicies(sec, ptype, rules)
+	rulesRemoved := len(effects) != 0
 	if !rulesRemoved {
 		return rulesRemoved, rules, nil
 	}
@@ -171,7 +172,8 @@ func (p *policyManager) RemoveFilteredPolicy(sec string, ptype string, shouldPer
 		}
 	}
 
-	ruleRemoved, effects := p.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	effects := p.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	ruleRemoved := len(effects) != 0
 	if !ruleRemoved {
 		return ruleRemoved, effects, nil
 	}

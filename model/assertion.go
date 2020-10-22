@@ -17,6 +17,9 @@ package model
 import (
 	"errors"
 	"strings"
+	"sync"
+
+	"github.com/casbin/casbin/v3/internal/model"
 
 	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/rbac"
@@ -25,15 +28,19 @@ import (
 // Assertion represents an expression in a section of the model.
 // For example: r = sub, obj, act
 type Assertion struct {
-	Key       string
-	Value     string
-	Tokens    []string
-	Policy    [][]string
-	PolicyMap map[string]int
-	RM        rbac.RoleManager
+	Key    string
+	Value  string
+	Tokens []string
+	Policy *model.Policy
+	RM     rbac.RoleManager
+
+	mutex *sync.RWMutex
 }
 
-func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
+func (ast *Assertion) BuildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
+	ast.mutex.Lock()
+	defer ast.mutex.Unlock()
+
 	ast.RM = rm
 	count := strings.Count(ast.Value, "_")
 	if count < 2 {
@@ -64,13 +71,16 @@ func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp
 	return nil
 }
 
-func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
+func (ast *Assertion) BuildRoleLinks(rm rbac.RoleManager) error {
+	ast.mutex.Lock()
+	defer ast.mutex.Unlock()
+
 	ast.RM = rm
 	count := strings.Count(ast.Value, "_")
 	if count < 2 {
 		return errors.New("the number of \"_\" in role definition should be at least 2")
 	}
-	for _, rule := range ast.Policy {
+	for _, rule := range ast.Policy.GetPolicy() {
 		if len(rule) < count {
 			return errors.New("grouping policy elements do not meet role definition")
 		}

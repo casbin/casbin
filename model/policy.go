@@ -15,8 +15,6 @@
 package model
 
 import (
-	"strings"
-
 	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/rbac"
 	"github.com/casbin/casbin/v3/util"
@@ -31,20 +29,18 @@ const (
 	PolicyRemove
 )
 
-const DefaultSep = ","
-
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
-func (model Model) BuildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
+func (m Model) BuildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
 	if sec == "g" {
-		return model[sec][ptype].buildIncrementalRoleLinks(rm, op, rules)
+		return m[sec][ptype].BuildIncrementalRoleLinks(rm, op, rules)
 	}
 	return nil
 }
 
 // BuildRoleLinks initializes the roles in RBAC.
-func (model Model) BuildRoleLinks(rm rbac.RoleManager) error {
-	for _, ast := range model["g"] {
-		err := ast.buildRoleLinks(rm)
+func (m Model) BuildRoleLinks(rm rbac.RoleManager) error {
+	for _, ast := range m["g"] {
+		err := ast.BuildRoleLinks(rm)
 		if err != nil {
 			return err
 		}
@@ -54,72 +50,47 @@ func (model Model) BuildRoleLinks(rm rbac.RoleManager) error {
 }
 
 // PrintPolicy prints the policy to log.
-func (model Model) PrintPolicy() {
+func (m Model) PrintPolicy() {
 	log.LogPrint("Policy:")
-	for key, ast := range model["p"] {
-		log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
+	for key, ast := range m["p"] {
+		log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy.GetPolicy())
 	}
 
-	for key, ast := range model["g"] {
-		log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
+	for key, ast := range m["g"] {
+		log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy.GetPolicy())
 	}
 }
 
 // ClearPolicy clears all current policy.
-func (model Model) ClearPolicy() {
-	for _, ast := range model["p"] {
-		ast.Policy = nil
-		ast.PolicyMap = map[string]int{}
+func (m Model) ClearPolicy() {
+	for _, ast := range m["p"] {
+		ast.Policy.ClearPolicy()
 	}
 
-	for _, ast := range model["g"] {
-		ast.Policy = nil
-		ast.PolicyMap = map[string]int{}
+	for _, ast := range m["g"] {
+		ast.Policy.ClearPolicy()
 	}
 }
 
 // GetPolicy gets all rules in a policy.
-func (model Model) GetPolicy(sec string, ptype string) [][]string {
-	var res [][]string
-	for _, v := range model[sec][ptype].Policy {
-		temp := make([]string, len(v))
-		copy(temp, v)
-		res = append(res, temp)
-	}
-	return res
+func (m Model) GetPolicy(sec string, ptype string) [][]string {
+	return m[sec][ptype].Policy.GetPolicy()
 }
 
 // GetFilteredPolicy gets rules based on field filters from a policy.
-func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) [][]string {
-	res := [][]string{}
-
-	for _, rule := range model[sec][ptype].Policy {
-		matched := true
-		for i, fieldValue := range fieldValues {
-			if fieldValue != "" && rule[fieldIndex+i] != fieldValue {
-				matched = false
-				break
-			}
-		}
-
-		if matched {
-			res = append(res, rule)
-		}
-	}
-
-	return res
+func (m Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) [][]string {
+	return m[sec][ptype].Policy.GetFilteredPolicy(fieldIndex, fieldValues...)
 }
 
 // HasPolicy determines whether a model has the specified policy rule.
-func (model Model) HasPolicy(sec string, ptype string, rule []string) bool {
-	_, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
-	return ok
+func (m Model) HasPolicy(sec string, ptype string, rule []string) bool {
+	return m[sec][ptype].Policy.HasPolicy(rule)
 }
 
 // HasPolicies determines whether a model has any of the specified policies. If one is found we return false.
-func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool {
+func (m Model) HasPolicies(sec string, ptype string, rules [][]string) bool {
 	for i := 0; i < len(rules); i++ {
-		if model.HasPolicy(sec, ptype, rules[i]) {
+		if m.HasPolicy(sec, ptype, rules[i]) {
 			return true
 		}
 	}
@@ -128,118 +99,41 @@ func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool 
 }
 
 // AddPolicy adds a policy rule to the model.
-func (model Model) AddPolicy(sec string, ptype string, rule []string) {
-	model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
-	model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
+func (m Model) AddPolicy(sec string, ptype string, rule []string) bool {
+	return m[sec][ptype].Policy.AddPolicy(rule)
 }
 
 // AddPolicies adds policy rules to the model.
-func (model Model) AddPolicies(sec string, ptype string, rules [][]string) {
-	for _, rule := range rules {
-		hashKey := strings.Join(rule, DefaultSep)
-		_, ok := model[sec][ptype].PolicyMap[hashKey]
-		if ok {
-			continue
-		}
-		model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
-		model[sec][ptype].PolicyMap[hashKey] = len(model[sec][ptype].Policy) - 1
-	}
+func (m Model) AddPolicies(sec string, ptype string, rules [][]string) [][]string {
+	return m[sec][ptype].Policy.AddPolicies(rules)
 }
 
 // RemovePolicy removes a policy rule from the model.
-func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
-	index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
-	if !ok {
-		return false
-	}
-
-	model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
-	delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
-	for i := index; i < len(model[sec][ptype].Policy); i++ {
-		model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
-	}
-
-	return true
+func (m Model) RemovePolicy(sec string, ptype string, rule []string) bool {
+	return m[sec][ptype].Policy.RemovePolicy(rule)
 }
 
 // RemovePolicies removes policy rules from the model.
-func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
-	for _, rule := range rules {
-		index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
-		if !ok {
-			continue
-		}
-
-		model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
-		delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
-		for i := index; i < len(model[sec][ptype].Policy); i++ {
-			model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
-		}
-	}
-	return true
+func (m Model) RemovePolicies(sec string, ptype string, rules [][]string) [][]string {
+	return m[sec][ptype].Policy.RemovePolicies(rules)
 }
 
 // RemoveFilteredPolicy removes policy rules based on field filters from the model.
-func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, [][]string) {
-	var tmp [][]string
-	var effects [][]string
-	res := false
-	firstIndex := -1
-
-	if len(fieldValues) == 0 {
-		return false, effects
-	}
-
-	for index, rule := range model[sec][ptype].Policy {
-		matched := true
-		for i, fieldValue := range fieldValues {
-			if fieldValue != "" && rule[fieldIndex+i] != fieldValue {
-				matched = false
-				break
-			}
-		}
-
-		if matched {
-			if firstIndex == -1 {
-				firstIndex = index
-			}
-			delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
-			effects = append(effects, rule)
-			res = true
-		} else {
-			tmp = append(tmp, rule)
-		}
-	}
-
-	if firstIndex != -1 {
-		model[sec][ptype].Policy = tmp
-		for i := firstIndex; i < len(model[sec][ptype].Policy); i++ {
-			model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
-		}
-	}
-
-	return res, effects
+func (m Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) [][]string {
+	return m[sec][ptype].Policy.RemoveFilteredPolicy(fieldIndex, fieldValues...)
 }
 
 // GetValuesForFieldInPolicy gets all values for a field for all rules in a policy, duplicated values are removed.
-func (model Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldIndex int) []string {
-	values := []string{}
-
-	for _, rule := range model[sec][ptype].Policy {
-		values = append(values, rule[fieldIndex])
-	}
-
-	util.ArrayRemoveDuplicates(&values)
-
-	return values
+func (m Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldIndex int) []string {
+	return m[sec][ptype].Policy.GetValuesForFieldInPolicy(fieldIndex)
 }
 
 // GetValuesForFieldInPolicyAllTypes gets all values for a field for all rules in a policy of all ptypes, duplicated values are removed.
-func (model Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int) []string {
-	values := []string{}
+func (m Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int) []string {
+	var values []string
 
-	for ptype := range model[sec] {
-		values = append(values, model.GetValuesForFieldInPolicy(sec, ptype, fieldIndex)...)
+	for ptype := range m[sec] {
+		values = append(values, m.GetValuesForFieldInPolicy(sec, ptype, fieldIndex)...)
 	}
 
 	util.ArrayRemoveDuplicates(&values)
@@ -247,26 +141,12 @@ func (model Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int)
 	return values
 }
 
-// RemoveExistPolicy remove the policy rules already in the model.
-func (model Model) RemoveExistPolicy(sec string, ptype string, rules [][]string) [][]string {
-	var res [][]string
-	for _, rule := range rules {
-		if _, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]; !ok {
-			res = append(res, rule)
-		}
-	}
-
-	return res
+// FilterNotExistsPolicy returns the policy that exist in the model by checking the given rules.
+func (m Model) FilterExistsPolicy(sec string, ptype string, rules [][]string) [][]string {
+	return m[sec][ptype].Policy.FilterExistsPolicy(rules)
 }
 
-// RemoveNotExistPolicy removes the policy rules not in the model
-func (model Model) RemoveNotExistPolicy(sec string, ptype string, rules [][]string) [][]string {
-	var res [][]string
-	for _, rule := range rules {
-		if _, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]; ok {
-			res = append(res, rule)
-		}
-	}
-
-	return res
+// FilterNotExistsPolicy returns the policy that not exist in the model by checking the given rules.
+func (m Model) FilterNotExistsPolicy(sec string, ptype string, rules [][]string) [][]string {
+	return m[sec][ptype].Policy.FilterNotExistsPolicy(rules)
 }
