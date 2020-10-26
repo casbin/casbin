@@ -14,6 +14,16 @@
 
 package log
 
+const (
+	LogTypeGrantedAccessRequest = iota
+	LogTypeRejectedAccessRequest
+	LogTypeLoadPolicy
+	LogTypePrintModel
+	LogTypePrintPolicy
+	LogTypePrintRole
+	LogTypeLinkRole
+)
+
 // Logger is the logging interface implementation.
 type Logger interface {
 	//EnableLog controls whether print the message.
@@ -23,8 +33,20 @@ type Logger interface {
 	IsEnabled() bool
 
 	//Print formats using the default formats for its operands and logs the message.
-	Print(...interface{})
+	//Print(...interface{})
 
 	//Printf formats according to a format specifier and logs the message.
-	Printf(string, ...interface{})
+	//Printf(string, ...interface{})
+
+	// LogModel log info related to model.
+	LogModel(event int, line []string, model [][]string)
+
+	// LogEnforce log info related to enforce.
+	LogEnforce(event int, line string, request *[]interface{}, policies *[]string, result *[]interface{})
+
+	// LogRole log info related to role.
+	LogRole(event int, line string, role []string)
+
+	// LogPolicy log info related to policy.
+	LogPolicy(event int, line string, pPolicyFormat []string, gPolicyFormat []string, pPolicy *[]interface{}, gPolicy *[]interface{})
 }

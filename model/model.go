@@ -167,10 +167,16 @@ func (model Model) hasSection(sec string) bool {
 
 // PrintModel prints the model to the log.
 func (model Model) PrintModel() {
-	log.LogPrint("Model:")
+	//log.LogPrint("Model:")
+	logInfo := []string{"Model"}
+	var modelInfo [][]string
 	for k, v := range model {
 		for i, j := range v {
-			log.LogPrintf("%s.%s: %s", k, i, j.Value)
+			modelInfo = append(modelInfo, []string{k, i, j.Value})
+			logInfo = append(logInfo, fmt.Sprintf("%s.%s: %s", k, i, j.Value))
+			//log.LogPrintf("%s.%s: %s", k, i, j.Value)
 		}
 	}
+
+	log.LogModel(log.LogTypePrintModel, logInfo, modelInfo)
 }
