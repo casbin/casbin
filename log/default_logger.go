@@ -36,14 +36,38 @@ func (l *DefaultLogger) IsEnabled() bool {
 	return atomic.LoadInt32(&(l.enable)) != 0
 }
 
-func (l *DefaultLogger) Print(v ...interface{}) {
-	if l.IsEnabled() {
-		log.Print(v...)
+func (l *DefaultLogger) LogModel(event int, line []string, model [][]string) {
+	for _, v := range line {
+		log.Print(v)
 	}
 }
 
+func (l *DefaultLogger) LogEnforce(event int, line string, request *[]interface{}, policies *[]string, result *[]interface{}) {
+	log.Print(line)
+}
+
+func (l *DefaultLogger) LogPolicy(event int, line string, pPolicyFormat []string, gPolicyFormat []string, pPolicy *[]interface{}, gPolicy *[]interface{}) {
+	log.Print(line)
+	if pPolicy != nil {
+		for k, v := range *pPolicy {
+			log.Print("p: ", pPolicyFormat[k], ": ", v)
+		}
+	}
+	if gPolicy != nil {
+		for k, v := range *gPolicy {
+			log.Print("g: ", gPolicyFormat[k], ": ", v)
+		}
+	}
+}
+
+func (l *DefaultLogger) LogRole(event int, line string, role []string) {
+	log.Print(line)
+}
+
+/*
 func (l *DefaultLogger) Printf(format string, v ...interface{}) {
 	if l.IsEnabled() {
 		log.Printf(format, v...)
 	}
 }
+*/

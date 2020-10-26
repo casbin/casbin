@@ -20,34 +20,49 @@ import (
 )
 
 type LoggerTester struct {
-	format      string
+	event       int
+	line        string
 	lastMessage []interface{}
 }
 
 func (t *LoggerTester) EnableLog(bool)  {}
 func (t *LoggerTester) IsEnabled() bool { return true }
 
-func (t *LoggerTester) Print(v ...interface{}) {
-	t.format = ""
-	t.lastMessage = v
+func (t *LoggerTester) LogModel(event int, line []string, model [][]string) {
+	t.event = event
+	t.line = ""
+	t.lastMessage = []interface{}{model}
 }
 
-func (t *LoggerTester) Printf(format string, v ...interface{}) {
-	t.format = format
-	t.lastMessage = v
+func (t *LoggerTester) LogEnforce(event int, line string, request *[]interface{}, policies *[]string, result *[]interface{}) {
+	t.event = event
+	t.line = ""
+	t.lastMessage = *request
+}
+
+func (t *LoggerTester) LogRole(event int, line string, role []string) {
+	t.event = event
+	t.line = ""
+	t.lastMessage = []interface{}{role}
+}
+
+func (t *LoggerTester) LogPolicy(event int, line string, pPolicyFormat []string, gPolicyFormat []string, pPolicy *[]interface{}, gPolicy *[]interface{}) {
+	t.event = event
+	t.line = ""
+	t.lastMessage = []interface{}{pPolicyFormat, gPolicyFormat, pPolicy, gPolicy}
 }
 
 func TestLog(t *testing.T) {
 	lt := &LoggerTester{}
 	SetLogger(lt)
 
-	LogPrint(1, "1", true)
-	if lt.format != "" || !reflect.DeepEqual(lt.lastMessage, []interface{}{1, "1", true}) {
+	LogEnforce(1, "2", &[]interface{}{"3"}, &[]string{"4"}, &[]interface{}{true})
+	if lt.event != 1 || lt.line != "" || !reflect.DeepEqual(lt.lastMessage, []interface{}{"3"}) {
 		t.Errorf("incorrect logger message: %+v", lt.lastMessage)
 	}
 
-	LogPrintf("%d", 2, "2", false)
-	if lt.format != "%d" || !reflect.DeepEqual(lt.lastMessage, []interface{}{2, "2", false}) {
+	LogModel(1, []string{"2"}, [][]string{{"3", "4"}})
+	if lt.event != 1 || lt.line != "" || !reflect.DeepEqual(lt.lastMessage, []interface{}{[][]string{{"3", "4"}}}) {
 		t.Errorf("incorrect logger message: %+v", lt.lastMessage)
 	}
 }

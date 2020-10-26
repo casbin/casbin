@@ -561,7 +561,12 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 		}
 
-		log.LogPrint(reqStr.String())
+		logType := log.LogTypeGrantedAccessRequest
+		if !result {
+			logType = log.LogTypeRejectedAccessRequest
+		}
+
+		log.LogEnforce(logType, reqStr.String(), &rvals, explains, &[]interface{}{result})
 	}
 
 	return result, nil

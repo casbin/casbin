@@ -65,7 +65,8 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 			atomic.StoreInt32(&(e.autoLoadRunning), int32(0))
 		}()
 		n := 1
-		log.LogPrintf("Start automatically load policy")
+		//log.LogPrintf("Start automatically load policy")
+		log.LogPolicy(log.LogTypeLoadPolicy, "Start automatically load policy", nil, nil, nil, nil)
 		for {
 			select {
 			case <-ticker.C:
@@ -75,7 +76,8 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 				// log.Print("Load policy for time: ", n)
 				n++
 			case <-e.stopAutoLoad:
-				log.LogPrintf("Stop automatically load policy")
+				//log.LogPrintf("Stop automatically load policy")
+				log.LogPolicy(log.LogTypeLoadPolicy, "Stop automatically load policy", nil, nil, nil, nil)
 				return
 			}
 		}
