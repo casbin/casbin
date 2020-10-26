@@ -59,14 +59,27 @@ func (model Model) PrintPolicy() {
 	if !log.GetLogger().IsEnabled() {
 		return
 	}
-	log.LogPrint("Policy:")
-	for key, ast := range model["p"] {
-		log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
+	//log.LogPrint("Policy:")
+	var (
+		pPolicy       []interface{} // or [][][]string
+		gPolicy       []interface{}
+		pPolicyFormat []string
+		gPolicyFormat []string
+	)
+
+	for _, ast := range model["p"] {
+		pPolicyFormat = append(pPolicyFormat, ast.Value)
+		pPolicy = append(pPolicy, ast.Policy)
+		//log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
 	}
 
-	for key, ast := range model["g"] {
-		log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
+	for _, ast := range model["g"] {
+		gPolicyFormat = append(gPolicyFormat, ast.Value)
+		gPolicy = append(gPolicy, ast.Policy)
+		//log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
 	}
+
+	log.LogPolicy(log.LogTypePrintPolicy, "Policy: ", pPolicyFormat, gPolicyFormat, &pPolicy, &gPolicy)
 }
 
 // ClearPolicy clears all current policy.

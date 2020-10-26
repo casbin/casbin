@@ -230,12 +230,14 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 func (rm *RoleManager) PrintRoles() error {
 	if log.GetLogger().IsEnabled() {
 		var sb strings.Builder
+		var roles []string
 		rm.allDomains.Range(func(_, value interface{}) bool {
 			value.(*Roles).Range(func(_, value interface{}) bool {
 				if text := value.(*Role).toString(); text != "" {
 					if sb.Len() == 0 {
 						sb.WriteString(text)
 					} else {
+						roles = append(roles, text)
 						sb.WriteString(", ")
 						sb.WriteString(text)
 					}
@@ -245,7 +247,8 @@ func (rm *RoleManager) PrintRoles() error {
 
 			return true
 		})
-		log.LogPrint(sb.String())
+		//log.LogPrint(sb.String())
+		log.LogRole(log.LogTypePrintRole, sb.String(), roles)
 	}
 	return nil
 }
