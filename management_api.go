@@ -301,8 +301,11 @@ func (e *Enforcer) UpdateGroupingPolicy(oldName string, newName string) (bool, e
 }
 
 func (e *Enforcer) UpdateNamedGroupingPolicy(ptype string, oldName string, newName string) (bool, error) {
-	var err error
 	roles, err := e.GetRolesForUser(oldName)
+	if err != nil {
+		return false, err
+	}
+	names, err := e.GetUsersForRole(oldName)
 	if err != nil {
 		return false, err
 	}
@@ -312,10 +315,6 @@ func (e *Enforcer) UpdateNamedGroupingPolicy(ptype string, oldName string, newNa
 		}
 	}
 
-	names, err := e.GetUsersForRole(oldName)
-	if err != nil {
-		return false, err
-	}
 	for _, name := range names {
 		if flag, err := e.updatePolicy("g", ptype, []string{name, oldName}, []string{name, newName}); err != nil || !flag {
 			return false, err
