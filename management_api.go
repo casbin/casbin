@@ -296,6 +296,34 @@ func (e *Enforcer) RemoveNamedGroupingPolicies(ptype string, rules [][]string) (
 	return e.removePolicies("g", ptype, rules)
 }
 
+func (e *Enforcer) UpdateGroupingPolicy(oldName string, newName string) (bool, error) {
+	return e.UpdateNamedGroupingPolicy("g", oldName, newName)
+}
+
+func (e *Enforcer) UpdateNamedGroupingPolicy(ptype string, oldName string, newName string) (bool, error) {
+	var err error
+	roles, err := e.GetRolesForUser(oldName)
+	if err != nil {
+		return false, err
+	}
+	for _, role := range roles {
+		if flag, err := e.updatePolicy("g", ptype, []string{oldName, role}, []string{newName, role}); err != nil || !flag {
+			return false, err
+		}
+	}
+
+	names, err := e.GetUsersForRole(oldName)
+	if err != nil {
+		return false, err
+	}
+	for _, name := range names {
+		if flag, err := e.updatePolicy("g", ptype, []string{name, oldName}, []string{name, newName}); err != nil || !flag {
+			return false, err
+		}
+	}
+	return true, nil
+}
+
 // RemoveFilteredNamedGroupingPolicy removes a role inheritance rule from the current named policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
 	return e.removeFilteredPolicy("g", ptype, fieldIndex, fieldValues...)
