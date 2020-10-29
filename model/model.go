@@ -56,6 +56,7 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 	ast.Key = key
 	ast.Value = value
 	ast.PolicyMap = make(map[string]int)
+	ast.setLogger(model.GetLogger())
 
 	if sec == "r" || sec == "p" {
 		ast.Tokens = strings.Split(ast.Value, ",")
@@ -94,9 +95,26 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 	}
 }
 
+// SetLogger sets the model's logger.
+func (model Model) SetLogger(logger log.Logger) {
+	for _, astMap := range model {
+		for _, ast := range astMap {
+			ast.logger = &logger
+		}
+	}
+	model["logger"] = AssertionMap{"logger": &Assertion{logger: &logger}}
+}
+
+// GetLogger returns the model's logger.
+func (model Model) GetLogger() log.Logger {
+	return *model["logger"]["logger"].logger
+}
+
 // NewModel creates an empty model.
 func NewModel() Model {
 	m := make(Model)
+	m.SetLogger(&log.DefaultLogger{})
+
 	return m
 }
 
@@ -167,16 +185,22 @@ func (model Model) hasSection(sec string) bool {
 
 // PrintModel prints the model to the log.
 func (model Model) PrintModel() {
-	//log.LogPrint("Model:")
+	if !model.GetLogger().IsEnabled() {
+		return
+	}
+
 	logInfo := []string{"Model"}
 	var modelInfo [][]string
 	for k, v := range model {
+		if k == "logger" {
+			continue
+		}
+
 		for i, j := range v {
 			modelInfo = append(modelInfo, []string{k, i, j.Value})
 			logInfo = append(logInfo, fmt.Sprintf("%s.%s: %s", k, i, j.Value))
-			//log.LogPrintf("%s.%s: %s", k, i, j.Value)
 		}
 	}
 
-	log.LogModel(log.LogTypePrintModel, logInfo, modelInfo)
+	model.GetLogger().LogModel(log.LogTypePrintModel, logInfo, modelInfo)
 }

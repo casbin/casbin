@@ -35,6 +35,8 @@ type RoleManager struct {
 	matchingFunc       MatchingFunc
 	hasDomainPattern   bool
 	domainMatchingFunc MatchingFunc
+
+	logger *log.Logger
 }
 
 // NewRoleManager is the constructor for creating an instance of the
@@ -46,6 +48,8 @@ func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
 	rm.maxHierarchyLevel = maxHierarchyLevel
 	rm.hasPattern = false
 	rm.hasDomainPattern = false
+
+	rm.SetLogger(&log.DefaultLogger{})
 
 	return &rm
 }
@@ -60,6 +64,11 @@ func (rm *RoleManager) AddMatchingFunc(name string, fn MatchingFunc) {
 func (rm *RoleManager) AddDomainMatchingFunc(name string, fn MatchingFunc) {
 	rm.hasDomainPattern = true
 	rm.domainMatchingFunc = fn
+}
+
+// SetLogger sets role manager's logger.
+func (rm *RoleManager) SetLogger(logger log.Logger) {
+	rm.logger = &logger
 }
 
 func (rm *RoleManager) generateTempRoles(domain string) *Roles {
@@ -228,28 +237,30 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 
 // PrintRoles prints all the roles to log.
 func (rm *RoleManager) PrintRoles() error {
-	if log.GetLogger().IsEnabled() {
-		var sb strings.Builder
-		var roles []string
-		rm.allDomains.Range(func(_, value interface{}) bool {
-			value.(*Roles).Range(func(_, value interface{}) bool {
-				if text := value.(*Role).toString(); text != "" {
-					if sb.Len() == 0 {
-						sb.WriteString(text)
-					} else {
-						roles = append(roles, text)
-						sb.WriteString(", ")
-						sb.WriteString(text)
-					}
-				}
-				return true
-			})
+	if !(*rm.logger).IsEnabled() {
+		return nil
+	}
 
+	var sb strings.Builder
+	var roles []string
+	rm.allDomains.Range(func(_, value interface{}) bool {
+		value.(*Roles).Range(func(_, value interface{}) bool {
+			if text := value.(*Role).toString(); text != "" {
+				if sb.Len() == 0 {
+					sb.WriteString(text)
+				} else {
+					roles = append(roles, text)
+					sb.WriteString(", ")
+					sb.WriteString(text)
+				}
+			}
 			return true
 		})
-		//log.LogPrint(sb.String())
-		log.LogRole(log.LogTypePrintRole, sb.String(), roles)
-	}
+
+		return true
+	})
+
+	(*rm.logger).LogRole(log.LogTypePrintRole, sb.String(), roles)
 	return nil
 }
 
