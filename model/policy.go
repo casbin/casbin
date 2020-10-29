@@ -56,10 +56,10 @@ func (model Model) BuildRoleLinks(rm rbac.RoleManager) error {
 
 // PrintPolicy prints the policy to log.
 func (model Model) PrintPolicy() {
-	if !log.GetLogger().IsEnabled() {
+	if !model.GetLogger().IsEnabled() {
 		return
 	}
-	//log.LogPrint("Policy:")
+
 	var (
 		pPolicy       []interface{} // or [][][]string
 		gPolicy       []interface{}
@@ -70,16 +70,14 @@ func (model Model) PrintPolicy() {
 	for _, ast := range model["p"] {
 		pPolicyFormat = append(pPolicyFormat, ast.Value)
 		pPolicy = append(pPolicy, ast.Policy)
-		//log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
 	}
 
 	for _, ast := range model["g"] {
 		gPolicyFormat = append(gPolicyFormat, ast.Value)
 		gPolicy = append(gPolicy, ast.Policy)
-		//log.LogPrint(key, ": ", ast.Value, ": ", ast.Policy)
 	}
 
-	log.LogPolicy(log.LogTypePrintPolicy, "Policy: ", pPolicyFormat, gPolicyFormat, &pPolicy, &gPolicy)
+	model.GetLogger().LogPolicy(log.LogTypePrintPolicy, "Policy: ", pPolicyFormat, gPolicyFormat, &pPolicy, &gPolicy)
 }
 
 // ClearPolicy clears all current policy.

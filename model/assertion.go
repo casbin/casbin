@@ -31,6 +31,8 @@ type Assertion struct {
 	Policy    [][]string
 	PolicyMap map[string]int
 	RM        rbac.RoleManager
+
+	logger *log.Logger
 }
 
 func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
@@ -83,8 +85,11 @@ func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
 		}
 	}
 
-	//log.LogPrint("Role links for: " + ast.Key)
-	log.LogRole(log.LogTypeLinkRole, "Role links for: " + ast.Key, []string{ast.Key})
+	(*ast.logger).LogRole(log.LogTypeLinkRole, "Role links for: "+ast.Key, []string{ast.Key})
 
 	return ast.RM.PrintRoles()
+}
+
+func (ast *Assertion) setLogger(logger log.Logger) {
+	ast.logger = &logger
 }

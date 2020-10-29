@@ -17,6 +17,7 @@ package casbin
 import (
 	"testing"
 
+	"github.com/casbin/casbin/v2/log"
 	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
 	"github.com/casbin/casbin/v2/rbac"
 	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
@@ -348,6 +349,7 @@ func (rm *testCustomRoleManager) GetUsers(name string, domain ...string) ([]stri
 	return []string{}, nil
 }
 func (rm *testCustomRoleManager) PrintRoles() error { return nil }
+func (rm *testCustomRoleManager) SetLogger(logger log.Logger) {}
 
 func TestRBACModelWithCustomRoleManager(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")

@@ -14,39 +14,44 @@
 
 package log
 
-import (
-	"log"
-	"sync/atomic"
-)
+import "log"
 
 // DefaultLogger is the implementation for a Logger using golang log.
 type DefaultLogger struct {
-	enable int32
+	enabled bool
 }
 
 func (l *DefaultLogger) EnableLog(enable bool) {
-	i := 0
-	if enable {
-		i = 1
-	}
-	atomic.StoreInt32(&(l.enable), int32(i))
+	l.enabled = enable
 }
 
 func (l *DefaultLogger) IsEnabled() bool {
-	return atomic.LoadInt32(&(l.enable)) != 0
+	return l.enabled
 }
 
 func (l *DefaultLogger) LogModel(event int, line []string, model [][]string) {
+	if !l.enabled {
+		return
+	}
+
 	for _, v := range line {
 		log.Print(v)
 	}
 }
 
 func (l *DefaultLogger) LogEnforce(event int, line string, request *[]interface{}, policies *[]string, result *[]interface{}) {
+	if !l.enabled {
+		return
+	}
+
 	log.Print(line)
 }
 
 func (l *DefaultLogger) LogPolicy(event int, line string, pPolicyFormat []string, gPolicyFormat []string, pPolicy *[]interface{}, gPolicy *[]interface{}) {
+	if !l.enabled {
+		return
+	}
+
 	log.Print(line)
 	if pPolicy != nil {
 		for k, v := range *pPolicy {
@@ -61,6 +66,10 @@ func (l *DefaultLogger) LogPolicy(event int, line string, pPolicyFormat []string
 }
 
 func (l *DefaultLogger) LogRole(event int, line string, role []string) {
+	if !l.enabled {
+		return
+	}
+
 	log.Print(line)
 }
 
