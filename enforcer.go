@@ -45,6 +45,8 @@ type Enforcer struct {
 	autoSave           bool
 	autoBuildRoleLinks bool
 	autoNotifyWatcher  bool
+
+	logger log.Logger
 }
 
 // NewEnforcer creates an enforcer via file or DB.
@@ -59,7 +61,7 @@ type Enforcer struct {
 // 	e := casbin.NewEnforcer("path/to/basic_model.conf", a)
 //
 func NewEnforcer(params ...interface{}) (*Enforcer, error) {
-	e := &Enforcer{}
+	e := &Enforcer{logger: &log.DefaultLogger{}}
 
 	parsedParamLen := 0
 	paramLen := len(params)
@@ -133,6 +135,8 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) er
 		return err
 	}
 
+	m.SetLogger(e.logger)
+
 	err = e.InitWithModelAndAdapter(m, adapter)
 	if err != nil {
 		return err
@@ -147,6 +151,7 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 	e.adapter = adapter
 
 	e.model = m
+	m.SetLogger(e.logger)
 	e.model.PrintModel()
 	e.fm = model.LoadFunctionMap()
 
@@ -164,6 +169,13 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 	return nil
 }
 
+// SetLogger changes the current enforcer's logger.
+func (e *Enforcer) SetLogger(logger log.Logger) {
+	e.logger = logger
+	e.model.SetLogger(e.logger)
+	e.rm.SetLogger(e.logger)
+}
+
 func (e *Enforcer) initialize() {
 	e.rm = defaultrolemanager.NewRoleManager(10)
 	e.eft = effect.NewDefaultEffector()
@@ -173,6 +185,8 @@ func (e *Enforcer) initialize() {
 	e.autoSave = true
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
+
+	e.rm.SetLogger(e.logger)
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -183,6 +197,7 @@ func (e *Enforcer) LoadModel() error {
 	if err != nil {
 		return err
 	}
+	e.model.SetLogger(e.logger)
 
 	e.model.PrintModel()
 	e.fm = model.LoadFunctionMap()
@@ -202,6 +217,7 @@ func (e *Enforcer) SetModel(m model.Model) {
 	e.model = m
 	e.fm = model.LoadFunctionMap()
 
+	e.model.SetLogger(e.logger)
 	e.initialize()
 }
 
@@ -329,7 +345,12 @@ func (e *Enforcer) EnableEnforce(enable bool) {
 
 // EnableLog changes whether Casbin will log messages to the Logger.
 func (e *Enforcer) EnableLog(enable bool) {
-	log.GetLogger().EnableLog(enable)
+	e.logger.EnableLog(enable)
+}
+
+// IsLogEnabled returns the current logger's enabled status.
+func (e *Enforcer) IsLogEnabled() bool {
+	return e.logger.IsEnabled()
 }
 
 // EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
@@ -537,7 +558,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	}
 
 	// Log request.
-	if log.GetLogger().IsEnabled() {
+	if e.logger.IsEnabled() {
 		var reqStr strings.Builder
 		reqStr.WriteString("Request: ")
 		for i, rval := range rvals {
@@ -566,7 +587,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			logType = log.LogTypeRejectedAccessRequest
 		}
 
-		log.LogEnforce(logType, reqStr.String(), &rvals, explains, &[]interface{}{result})
+		e.logger.LogEnforce(logType, reqStr.String(), &rvals, explains, &[]interface{}{result})
 	}
 
 	return result, nil
