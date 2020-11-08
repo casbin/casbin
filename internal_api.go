@@ -30,8 +30,9 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 		return true, e.dispatcher.AddPolicies(sec, ptype, [][]string{rule})
 	}
 
-	if result, err := e.internal.AddPolicy(sec, ptype, rule, e.shouldPersist()); err != nil || !result {
-		return result, err
+	effects, err := e.policyManager.AddPolicies(sec, ptype, [][]string{rule})
+	if err != nil || len(effects) == 0 {
+		return false, err
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
@@ -57,9 +58,9 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
 	}
 
-	result, effects, err := e.internal.AddPolicies(sec, ptype, rules, e.shouldPersist())
-	if err != nil || !result {
-		return result, err
+	effects, err := e.policyManager.AddPolicies(sec, ptype, rules)
+	if err != nil || len(effects) == 0 {
+		return false, err
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
@@ -82,9 +83,9 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		return true, e.dispatcher.RemovePolicies(sec, ptype, [][]string{rule})
 	}
 
-	ruleRemoved, err := e.internal.RemovePolicy(sec, ptype, rule, e.shouldPersist())
-	if err != nil || !ruleRemoved {
-		return ruleRemoved, err
+	effects, err := e.policyManager.RemovePolicies(sec, ptype, [][]string{rule})
+	if err != nil || len(effects) == 0 {
+		return false, err
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
@@ -94,7 +95,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		} else {
 			err = e.watcher.Update()
 		}
-		return ruleRemoved, err
+		return true, err
 
 	}
 
@@ -102,7 +103,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		log.LogPrintf("Policy Management, Type: RemovePolicy Assertion %s::%s\nrule: %s", sec, ptype, util.ArrayToString(rule))
 	}
 
-	return ruleRemoved, nil
+	return true, nil
 }
 
 // removePolicies removes rules from the current policy.
@@ -111,15 +112,15 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 		return true, e.dispatcher.RemovePolicies(sec, ptype, rules)
 	}
 
-	rulesRemoved, effects, err := e.internal.RemovePolicies(sec, ptype, rules, e.shouldPersist())
-	if err != nil || !rulesRemoved {
-		return rulesRemoved, err
+	effects, err := e.policyManager.RemovePolicies(sec, ptype, rules)
+	if err != nil || len(effects) == 0 {
+		return false, err
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
 		err := e.watcher.Update()
 		if err != nil {
-			return rulesRemoved, err
+			return true, err
 		}
 	}
 
@@ -127,7 +128,7 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 		log.LogPrintf("Policy Management, Type: RemovePolicies Assertion %s::%s\nrules: %s", sec, ptype, util.Array2DToString(effects))
 	}
 
-	return rulesRemoved, nil
+	return true, nil
 }
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.
@@ -136,9 +137,9 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 		return true, e.dispatcher.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
 	}
 
-	ruleRemoved, effects, err := e.internal.RemoveFilteredPolicy(sec, ptype, e.shouldPersist(), fieldIndex, fieldValues...)
-	if err != nil || !ruleRemoved {
-		return ruleRemoved, err
+	effects, err := e.policyManager.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	if err != nil || len(effects) == 0 {
+		return false, err
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
@@ -148,12 +149,12 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 		} else {
 			err = e.watcher.Update()
 		}
-		return ruleRemoved, err
+		return true, err
 	}
 
 	if log.GetLogger().IsEnabled() {
 		log.LogPrintf("Policy Management, Type: RemoveFilteredPolicy Assertion: %s::%s\nrules: %s", sec, ptype, util.Array2DToString(effects))
 	}
 
-	return ruleRemoved, nil
+	return true, nil
 }
