@@ -69,7 +69,14 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 		enableLog, ok := params[paramLen-1].(bool)
 		if ok {
 			e.EnableLog(enableLog)
+			parsedParamLen++
+		}
+	}
 
+	if paramLen-parsedParamLen >= 1 {
+		logger, ok := params[paramLen-parsedParamLen-1].(log.Logger)
+		if ok {
+			e.logger = logger
 			parsedParamLen++
 		}
 	}
