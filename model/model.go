@@ -189,7 +189,7 @@ func (model Model) PrintModel() {
 		return
 	}
 
-	logInfo := []string{"Model"}
+	logInfo := []string{"Model: "}
 	var modelInfo [][]string
 	for k, v := range model {
 		if k == "logger" {
