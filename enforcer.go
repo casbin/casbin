@@ -243,9 +243,8 @@ func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 }
 
 // SetDispatcher sets the current dispatcher.
-func (e *Enforcer) SetDispatcher(dispatcher persist.Dispatcher) error {
+func (e *Enforcer) SetDispatcher(dispatcher persist.Dispatcher) {
 	e.dispatcher = dispatcher
-	return dispatcher.SetEnforcer(e)
 }
 
 // GetRoleManager gets the current role manager.

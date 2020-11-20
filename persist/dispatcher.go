@@ -24,8 +24,6 @@ type Dispatcher interface {
 	RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error
 	// ClearPolicy clears all current policy in all instances
 	ClearPolicy() error
-
-	// SetEnforcer set up the instance that need to be maintained.
-	// The parameter should be SyncedEnforced
-	SetEnforcer(interface{}) error
+	// UpdatePolicy updates policy rule from all instance.
+	UpdatePolicy(sec string, ptype string, oldRule, newPolicy []string) error
 }
