@@ -30,12 +30,12 @@ func (e *Enforcer) shouldPersist() bool {
 
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
-	if e.model.HasPolicy(sec, ptype, rule) {
-		return false, nil
-	}
-
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.AddPolicies(sec, ptype, [][]string{rule})
+	}
+
+	if e.model.HasPolicy(sec, ptype, rule) {
+		return false, nil
 	}
 
 	if e.shouldPersist() {
@@ -70,12 +70,12 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 
 // addPolicies adds rules to the current policy.
 func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	if e.model.HasPolicies(sec, ptype, rules) {
-		return false, nil
-	}
-
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
+	}
+
+	if e.model.HasPolicies(sec, ptype, rules) {
+		return false, nil
 	}
 
 	if e.shouldPersist() {
@@ -146,6 +146,10 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 }
 
 func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.UpdatePolicy(sec, ptype, oldRule, newRule)
+	}
+
 	if e.shouldPersist() {
 		if err := e.adapter.(persist.UpdatableAdapter).UpdatePolicy(sec, ptype, oldRule, newRule); err != nil {
 			if err.Error() != notImplemented {
