@@ -26,34 +26,22 @@ func GetLogger() Logger {
 	return logger
 }
 
-/*
-// LogPrint prints the log.
-func LogPrint(v ...interface{}) {
-	logger.Print(v...)
-}
-
-// LogPrintf prints the log with the format.
-func LogPrintf(format string, v ...interface{}) {
-	logger.Printf(format, v...)
-}
-*/
-
 // LogModel logs the model information.
-func LogModel(event int, line []string, model [][]string) {
-	logger.LogModel(event, line, model)
+func LogModel(model [][]string) {
+	logger.LogModel(model)
 }
 
 // LogEnforce logs the enforcer information.
-func LogEnforce(event int, line string, request *[]interface{}, policies *[]string, result *[]interface{}) {
-	logger.LogEnforce(event, line, request, policies, result)
+func LogEnforce(matcher string, request []interface{}, result bool, explains [][]string) {
+	logger.LogEnforce(matcher, request, result, explains)
 }
 
-// LogRole logs the role information.
-func LogRole(event int, line string, role []string) {
-	logger.LogRole(event, line, role)
+// LogRole log info related to role.
+func LogRole(roles []string) {
+	logger.LogRole(roles)
 }
 
 // LogPolicy logs the policy information.
-func LogPolicy(event int, line string, pPolicyFormat []string, gPolicyFormat []string, pPolicy *[]interface{}, gPolicy *[]interface{}) {
-	logger.LogPolicy(event, line, pPolicyFormat, gPolicyFormat, pPolicy, gPolicy)
+func LogPolicy(policy map[string][][]string) {
+	logger.LogPolicy(policy)
 }

@@ -99,15 +99,15 @@ func loadSection(model Model, cfg config.ConfigInterface, sec string) {
 func (model Model) SetLogger(logger log.Logger) {
 	for _, astMap := range model {
 		for _, ast := range astMap {
-			ast.logger = &logger
+			ast.logger = logger
 		}
 	}
-	model["logger"] = AssertionMap{"logger": &Assertion{logger: &logger}}
+	model["logger"] = AssertionMap{"logger": &Assertion{logger: logger}}
 }
 
 // GetLogger returns the model's logger.
 func (model Model) GetLogger() log.Logger {
-	return *model["logger"]["logger"].logger
+	return model["logger"]["logger"].logger
 }
 
 // NewModel creates an empty model.
@@ -189,7 +189,6 @@ func (model Model) PrintModel() {
 		return
 	}
 
-	logInfo := []string{"Model: "}
 	var modelInfo [][]string
 	for k, v := range model {
 		if k == "logger" {
@@ -198,9 +197,8 @@ func (model Model) PrintModel() {
 
 		for i, j := range v {
 			modelInfo = append(modelInfo, []string{k, i, j.Value})
-			logInfo = append(logInfo, fmt.Sprintf("%s.%s: %s", k, i, j.Value))
 		}
 	}
 
-	model.GetLogger().LogModel(log.LogTypePrintModel, logInfo, modelInfo)
+	model.GetLogger().LogModel(modelInfo)
 }

@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/Knetic/govaluate"
-	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/persist"
 )
 
@@ -65,7 +64,6 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 			atomic.StoreInt32(&(e.autoLoadRunning), int32(0))
 		}()
 		n := 1
-		e.logger.LogPolicy(log.LogTypeLoadPolicy, "Start automatically load policy", nil, nil, nil, nil)
 		for {
 			select {
 			case <-ticker.C:
@@ -75,7 +73,6 @@ func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 				// log.Print("Load policy for time: ", n)
 				n++
 			case <-e.stopAutoLoad:
-				e.logger.LogPolicy(log.LogTypeLoadPolicy, "Stop automatically load policy", nil, nil, nil, nil)
 				return
 			}
 		}

@@ -17,8 +17,6 @@ package casbin
 import (
 	"errors"
 	"fmt"
-	"strings"
-
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effect"
 	"github.com/casbin/casbin/v2/log"
@@ -538,7 +536,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		parameters.pVals = make([]string, len(parameters.pTokens))
 
 		result, err := expression.Eval(parameters)
-		// log.LogPrint("Result: ", result)
 
 		if err != nil {
 			return false, err
@@ -551,51 +548,21 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 	}
 
-	// log.LogPrint("Rule Results: ", policyEffects)
-
 	result, explainIndex, err := e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults)
 	if err != nil {
 		return false, err
 	}
 
+	var logExplains [][]string
+
 	if explains != nil {
+		logExplains = append(logExplains, *explains)
 		if explainIndex != -1 && len(e.model["p"]["p"].Policy) > explainIndex {
 			*explains = e.model["p"]["p"].Policy[explainIndex]
 		}
 	}
 
-	// Log request.
-	if e.logger.IsEnabled() {
-		var reqStr strings.Builder
-		reqStr.WriteString("Request: ")
-		for i, rval := range rvals {
-			if i != len(rvals)-1 {
-				reqStr.WriteString(fmt.Sprintf("%v, ", rval))
-			} else {
-				reqStr.WriteString(fmt.Sprintf("%v", rval))
-			}
-		}
-		reqStr.WriteString(fmt.Sprintf(" ---> %t\n", result))
-
-		if explains != nil {
-			reqStr.WriteString("Hit Policy: ")
-			for i, pval := range *explains {
-				if i != len(*explains)-1 {
-					reqStr.WriteString(fmt.Sprintf("%v, ", pval))
-				} else {
-					reqStr.WriteString(fmt.Sprintf("%v \n", pval))
-				}
-			}
-
-		}
-
-		logType := log.LogTypeGrantedAccessRequest
-		if !result {
-			logType = log.LogTypeRejectedAccessRequest
-		}
-
-		e.logger.LogEnforce(logType, reqStr.String(), &rvals, explains, &[]interface{}{result})
-	}
+	e.logger.LogEnforce(expString, rvals, result, logExplains)
 
 	return result, nil
 }
