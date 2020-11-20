@@ -14,39 +14,25 @@
 
 package log
 
-const (
-	LogTypeGrantedAccessRequest = iota
-	LogTypeRejectedAccessRequest
-	LogTypeLoadPolicy
-	LogTypePrintModel
-	LogTypePrintPolicy
-	LogTypePrintRole
-	LogTypeLinkRole
-)
+//go:generate mockgen -destination=./mocks/mock_logger.go -package=mocks github.com/casbin/casbin/v2/log Logger
 
 // Logger is the logging interface implementation.
 type Logger interface {
-	//EnableLog controls whether print the message.
+	// EnableLog controls whether print the message.
 	EnableLog(bool)
 
-	//IsEnabled returns if logger is enabled.
+	// IsEnabled returns if logger is enabled.
 	IsEnabled() bool
 
-	//Print formats using the default formats for its operands and logs the message.
-	//Print(...interface{})
-
-	//Printf formats according to a format specifier and logs the message.
-	//Printf(string, ...interface{})
-
 	// LogModel log info related to model.
-	LogModel(event int, line []string, model [][]string)
+	LogModel(model [][]string)
 
 	// LogEnforce log info related to enforce.
-	LogEnforce(event int, line string, request *[]interface{}, policies *[]string, result *[]interface{})
+	LogEnforce(matcher string, request []interface{}, result bool, explains [][]string)
 
 	// LogRole log info related to role.
-	LogRole(event int, line string, role []string)
+	LogRole(roles []string)
 
 	// LogPolicy log info related to policy.
-	LogPolicy(event int, line string, pPolicyFormat []string, gPolicyFormat []string, pPolicy *[]interface{}, gPolicy *[]interface{})
+	LogPolicy(policy map[string][][]string)
 }

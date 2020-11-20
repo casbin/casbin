@@ -15,54 +15,42 @@
 package log
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/casbin/casbin/v2/log/mocks"
+
+	"github.com/golang/mock/gomock"
 )
 
-type LoggerTester struct {
-	event       int
-	line        string
-	lastMessage []interface{}
-}
-
-func (t *LoggerTester) EnableLog(bool)  {}
-func (t *LoggerTester) IsEnabled() bool { return true }
-
-func (t *LoggerTester) LogModel(event int, line []string, model [][]string) {
-	t.event = event
-	t.line = ""
-	t.lastMessage = []interface{}{model}
-}
-
-func (t *LoggerTester) LogEnforce(event int, line string, request *[]interface{}, policies *[]string, result *[]interface{}) {
-	t.event = event
-	t.line = ""
-	t.lastMessage = *request
-}
-
-func (t *LoggerTester) LogRole(event int, line string, role []string) {
-	t.event = event
-	t.line = ""
-	t.lastMessage = []interface{}{role}
-}
-
-func (t *LoggerTester) LogPolicy(event int, line string, pPolicyFormat []string, gPolicyFormat []string, pPolicy *[]interface{}, gPolicy *[]interface{}) {
-	t.event = event
-	t.line = ""
-	t.lastMessage = []interface{}{pPolicyFormat, gPolicyFormat, pPolicy, gPolicy}
-}
-
 func TestLog(t *testing.T) {
-	lt := &LoggerTester{}
-	SetLogger(lt)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-	LogEnforce(1, "2", &[]interface{}{"3"}, &[]string{"4"}, &[]interface{}{true})
-	if lt.event != 1 || lt.line != "" || !reflect.DeepEqual(lt.lastMessage, []interface{}{"3"}) {
-		t.Errorf("incorrect logger message: %+v", lt.lastMessage)
-	}
+	m := mocks.NewMockLogger(ctrl)
+	SetLogger(m)
 
-	LogModel(1, []string{"2"}, [][]string{{"3", "4"}})
-	if lt.event != 1 || lt.line != "" || !reflect.DeepEqual(lt.lastMessage, []interface{}{[][]string{{"3", "4"}}}) {
-		t.Errorf("incorrect logger message: %+v", lt.lastMessage)
-	}
+	m.EXPECT().EnableLog(true)
+	m.EXPECT().IsEnabled()
+
+	logger.EnableLog(true)
+	logger.IsEnabled()
+
+	policy := map[string][][]string{}
+	m.EXPECT().LogPolicy(policy)
+	LogPolicy(policy)
+
+	var model [][]string
+	m.EXPECT().LogModel(model)
+	LogModel(model)
+
+	matcher := "my_matcher"
+	request := []interface{}{"bob"}
+	result := true
+	var explains [][]string
+	m.EXPECT().LogEnforce(matcher, request, result, explains)
+	LogEnforce(matcher, request, result, explains)
+
+	var roles []string
+	m.EXPECT().LogRole(roles)
+	LogRole(roles)
 }

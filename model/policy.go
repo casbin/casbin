@@ -17,7 +17,6 @@ package model
 import (
 	"strings"
 
-	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
 	"github.com/casbin/casbin/v2/util"
 )
@@ -60,24 +59,29 @@ func (model Model) PrintPolicy() {
 		return
 	}
 
-	var (
-		pPolicy       []interface{} // or [][][]string
-		gPolicy       []interface{}
-		pPolicyFormat []string
-		gPolicyFormat []string
-	)
+	policy := make(map[string][][]string)
 
-	for _, ast := range model["p"] {
-		pPolicyFormat = append(pPolicyFormat, ast.Value)
-		pPolicy = append(pPolicy, ast.Policy)
+	for key, ast := range model["p"] {
+		value, found := policy[key]
+		if found {
+			value = append(value, ast.Policy...)
+			policy[key] = value
+		} else {
+			policy[key] = ast.Policy
+		}
 	}
 
-	for _, ast := range model["g"] {
-		gPolicyFormat = append(gPolicyFormat, ast.Value)
-		gPolicy = append(gPolicy, ast.Policy)
+	for key, ast := range model["g"] {
+		value, found := policy[key]
+		if found {
+			value = append(value, ast.Policy...)
+			policy[key] = value
+		} else {
+			policy[key] = ast.Policy
+		}
 	}
 
-	model.GetLogger().LogPolicy(log.LogTypePrintPolicy, "Policy: ", pPolicyFormat, gPolicyFormat, &pPolicy, &gPolicy)
+	model.GetLogger().LogPolicy(policy)
 }
 
 // ClearPolicy clears all current policy.
