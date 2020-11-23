@@ -14,16 +14,18 @@
 
 package persist
 
+//go:generate mockgen -destination=./mocks/mock_dispatcher.go -package=mocks github.com/casbin/casbin/v2/persist Dispatcher
+
 // Dispatcher is the interface for Casbin dispatcher
 type Dispatcher interface {
 	// AddPolicies adds policies rule to all instance.
-	AddPolicies(sec string, ptype string, rules [][]string) error
+	AddPolicies(sec string, ptype string, rules [][]string) (effects [][]string, err error)
 	// RemovePolicies removes policies rule from all instance.
-	RemovePolicies(sec string, ptype string, rules [][]string) error
+	RemovePolicies(sec string, ptype string, rules [][]string) (effects [][]string, err error)
 	// RemoveFilteredPolicy removes policy rules that match the filter from all instance.
-	RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error
+	RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (effects [][]string, err error)
 	// ClearPolicy clears all current policy in all instances
 	ClearPolicy() error
 	// UpdatePolicy updates policy rule from all instance.
-	UpdatePolicy(sec string, ptype string, oldRule, newPolicy []string) error
+	UpdatePolicy(sec string, ptype string, oldRule, newPolicy []string) (effected bool, err error)
 }

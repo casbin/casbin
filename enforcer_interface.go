@@ -127,3 +127,16 @@ type IEnforcer interface {
 	RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error)
 	AddFunction(name string, function govaluate.ExpressionFunction)
 }
+
+var _ IDistributedEnforcer = &DistributedEnforcer{}
+
+// IDistributedEnforcer defines dispatcher enforcer.
+type IDistributedEnforcer interface {
+	IEnforcer
+	/* Management API for DistributedEnforcer*/
+	AddPolicySelf(sec string, ptype string, rules [][]string) (effects [][]string, err error)
+	RemovePolicySelf(sec string, ptype string, rules [][]string) (effects [][]string, err error)
+	RemoveFilteredPolicySelf(sec string, ptype string, fieldIndex int, fieldValues ...string) (effects [][]string, err error)
+	ClearPolicySelf() error
+	UpdatePolicySelf(sec string, ptype string, oldRule, newPolicy []string) (effected bool, err error)
+}
