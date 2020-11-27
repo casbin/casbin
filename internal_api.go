@@ -31,8 +31,7 @@ func (e *Enforcer) shouldPersist() bool {
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
-		effects, err := e.dispatcher.AddPolicies(sec, ptype, [][]string{rule})
-		return len(effects) != 0, err
+		return true, e.dispatcher.AddPolicies(sec, ptype, [][]string{rule})
 	}
 
 	if e.model.HasPolicy(sec, ptype, rule) {
@@ -72,8 +71,7 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 // addPolicies adds rules to the current policy.
 func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
-		effects, err := e.dispatcher.AddPolicies(sec, ptype, rules)
-		return len(effects) != 0, err
+		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
 	}
 
 	if e.model.HasPolicies(sec, ptype, rules) {
@@ -110,8 +108,7 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
-		effects, err := e.dispatcher.RemovePolicies(sec, ptype, [][]string{rule})
-		return len(effects) != 0, err
+		return true, e.dispatcher.RemovePolicies(sec, ptype, [][]string{rule})
 	}
 
 	if e.shouldPersist() {
@@ -150,7 +147,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 
 func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
-		return e.dispatcher.UpdatePolicy(sec, ptype, oldRule, newRule)
+		return true, e.dispatcher.UpdatePolicy(sec, ptype, oldRule, newRule)
 	}
 
 	if e.shouldPersist() {
@@ -196,8 +193,7 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 	}
 
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
-		effects, err := e.dispatcher.RemovePolicies(sec, ptype, rules)
-		return len(effects) != 0, err
+		return true, e.dispatcher.RemovePolicies(sec, ptype, rules)
 	}
 
 	if e.shouldPersist() {
@@ -237,8 +233,7 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 	}
 
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
-		effects, err := e.dispatcher.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
-		return len(effects) != 0, err
+		return true, e.dispatcher.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
 	}
 
 	if e.shouldPersist() {
