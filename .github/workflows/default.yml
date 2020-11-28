@@ -46,12 +46,12 @@ jobs:
           go-version: 1.14
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v1
+        uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.28
+          version: v1.29
 
   semantic-release:
-    needs: [test]
+    needs: [test, lint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
