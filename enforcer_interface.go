@@ -134,9 +134,9 @@ var _ IDistributedEnforcer = &DistributedEnforcer{}
 type IDistributedEnforcer interface {
 	IEnforcer
 	/* Management API for DistributedEnforcer*/
-	AddPolicySelf(sec string, ptype string, rules [][]string) (effects [][]string, err error)
-	RemovePolicySelf(sec string, ptype string, rules [][]string) (effects [][]string, err error)
-	RemoveFilteredPolicySelf(sec string, ptype string, fieldIndex int, fieldValues ...string) (effects [][]string, err error)
-	ClearPolicySelf() error
-	UpdatePolicySelf(sec string, ptype string, oldRule, newPolicy []string) (effected bool, err error)
+	AddPolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error)
+	RemovePolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error)
+	RemoveFilteredPolicySelf(shouldPersist func() bool, sec string, ptype string, fieldIndex int, fieldValues ...string) (effects [][]string, err error)
+	ClearPolicySelf(shouldPersist func() bool) error
+	UpdatePolicySelf(shouldPersist func() bool, sec string, ptype string, oldRule, newPolicy []string) (effected bool, err error)
 }
