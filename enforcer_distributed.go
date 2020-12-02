@@ -26,7 +26,7 @@ func NewDistributedEnforcer(params ...interface{}) (*DistributedEnforcer, error)
 func (d *DistributedEnforcer) AddPolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error) {
 	var noExistsPolicy [][]string
 	for _, rule := range rules {
-		if !d.HasPolicy(sec, ptype, rule) {
+		if !d.model.HasPolicy(sec, ptype, rule) {
 			noExistsPolicy = append(noExistsPolicy, rule)
 		}
 	}
