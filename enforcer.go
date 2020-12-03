@@ -190,6 +190,7 @@ func (e *Enforcer) initialize() {
 	e.autoSave = true
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
+	e.autoNotifyDispatcher = true
 
 	e.rm.SetLogger(e.logger)
 }
