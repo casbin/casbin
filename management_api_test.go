@@ -265,6 +265,7 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 	rule := []string{"role1", "obj", "act"}
 	_, _ = e.AddPolicy(rule)
 	testHasPolicy(t, e, []string{"role1", "obj", "act"}, true)
+
 	rule[0] = "role2"
 	_, _ = e.AddPolicy(rule)
 	testHasPolicy(t, e, []string{"role1", "obj", "act"}, true)
