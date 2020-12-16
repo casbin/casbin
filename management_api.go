@@ -134,9 +134,14 @@ func (e *Enforcer) AddPolicies(rules [][]string) (bool, error) {
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddNamedPolicy(ptype string, params ...interface{}) (bool, error) {
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
-		return e.addPolicy("p", ptype, strSlice)
+		set := make([]interface{}, 0, len(strSlice))
+		for _, str := range strSlice {
+			set = append(set, str)
+		}
+		params = set
 	}
-	policy := make([]string, 0)
+
+	policy := make([]string, 0, len(params))
 	for _, param := range params {
 		policy = append(policy, param.(string))
 	}
