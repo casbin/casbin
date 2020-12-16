@@ -262,4 +262,12 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 	testGetRoles(t, e, []string{"admin"}, "eve")
 	testGetRoles(t, e, []string{"data4_admin"}, "admin")
 
+	rule := []string{"role1", "obj", "act"}
+	_, _ = e.AddPolicy(rule)
+	testHasPolicy(t, e, []string{"role1", "obj", "act"}, true)
+	rule[0] = "role2"
+	_, _ = e.AddPolicy(rule)
+	testHasPolicy(t, e, []string{"role1", "obj", "act"}, true)
+	testHasPolicy(t, e, []string{"role2", "obj", "act"}, true)
+
 }
