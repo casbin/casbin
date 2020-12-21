@@ -92,6 +92,13 @@ func (e *SyncedEnforcer) SetWatcher(watcher persist.Watcher) error {
 	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
 }
 
+// LoadModel reloads the model from the model CONF file.
+func (e *SyncedEnforcer) LoadModel() error {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.LoadModel()
+}
+
 // ClearPolicy clears all policy.
 func (e *SyncedEnforcer) ClearPolicy() {
 	e.m.Lock()
