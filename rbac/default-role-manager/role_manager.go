@@ -77,7 +77,7 @@ func (rm *RoleManager) generateTempRoles(domain string) *Roles {
 	patternDomain := []string{domain}
 	if rm.hasDomainPattern {
 		rm.allDomains.Range(func(key, value interface{}) bool {
-			if rm.domainMatchingFunc(domain, key.(string)) {
+			if domain != key.(string) && rm.domainMatchingFunc(domain, key.(string)) {
 				patternDomain = append(patternDomain, key.(string))
 			}
 			return true
