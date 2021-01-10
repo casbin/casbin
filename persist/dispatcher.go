@@ -25,5 +25,5 @@ type Dispatcher interface {
 	// ClearPolicy clears all current policy in all instances
 	ClearPolicy() error
 	// UpdatePolicy updates policy rule from all instance.
-	UpdatePolicy(sec string, ptype string, oldRule, newRule[]string) error
+	UpdatePolicy(sec string, ptype string, oldRule, newRule []string) error
 }
