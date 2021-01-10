@@ -26,10 +26,10 @@ var (
 	basicExample = filepath.Join("..", "examples", "basic_model.conf")
 	basicConfig  = &MockConfig{
 		data: map[string]string{
-			"request_definition::r":"sub, obj, act",
-			"policy_definition::p":"sub, obj, act",
-			"policy_effect::e":"some(where (p.eft == allow))",
-			"matchers::m":"r.sub == p.sub && r.obj == p.obj && r.act == p.act",
+			"request_definition::r": "sub, obj, act",
+			"policy_definition::p":  "sub, obj, act",
+			"policy_effect::e":      "some(where (p.eft == allow))",
+			"matchers::m":           "r.sub == p.sub && r.obj == p.obj && r.act == p.act",
 		},
 	}
 )

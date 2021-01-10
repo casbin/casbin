@@ -42,18 +42,22 @@ func validateVariadicArgs(expectedLen int, args ...interface{}) error {
 	return nil
 }
 
+var keyCache map[string]string
+
 // KeyMatch determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*"
 func KeyMatch(key1 string, key2 string) bool {
-	i := strings.Index(key2, "*")
-	if i == -1 {
-		return key1 == key2
+	keyCache = make(map[string]string)
+	key2 = strings.ReplaceAll(key2, "*", `\*`)
+	key2 = strings.Replace(key2, `\*`, "(.*)", 1)
+	key2 = "^" + key2 + "$"
+	re := regexp.MustCompile(key2)
+	value := re.FindAllStringSubmatch(key1, -1)
+	if len(value) == 0 {
+		return false
 	}
-
-	if len(key1) > i {
-		return key1[:i] == key2[:i]
-	}
-	return key1 == key2[:i]
+	keyCache["*"] = value[0][1]
+	return true
 }
 
 // KeyMatchFunc is the wrapper for KeyMatch.
@@ -68,15 +72,39 @@ func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 	return bool(KeyMatch(name1, name2)), nil
 }
 
+// KeyGet returns value resolved by KeyMatch
+// For example, "/foo/bar" matches "/foo/*"
+// "bar" is been returned
+func KeyGet() string {
+	return keyCache["*"]
+}
+
+// KeyGetFunc is the wrapper for KeyGet
+func KeyGetFunc(_ ...interface{}) (interface{}, error) {
+	return KeyGet(), nil
+}
+
+var keyCache2 map[string]string
+
 // KeyMatch2 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/:resource"
 func KeyMatch2(key1 string, key2 string) bool {
+	keyCache2 = make(map[string]string)
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 
 	re := regexp.MustCompile(`:[^/]+`)
-	key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
-
-	return RegexMatch(key1, "^"+key2+"$")
+	keys := re.FindAllString(key2, -1)
+	key2 = re.ReplaceAllString(key2, "$1([^/]+)$2")
+	key2 = "^" + key2 + "$"
+	re2 := regexp.MustCompile(key2)
+	values := re2.FindAllStringSubmatch(key1, -1)
+	if len(values) == 0 {
+		return false
+	}
+	for i, key := range keys {
+		keyCache2[key[1:]] = values[0][i+1]
+	}
+	return true
 }
 
 // KeyMatch2Func is the wrapper for KeyMatch2.
@@ -89,6 +117,24 @@ func KeyMatch2Func(args ...interface{}) (interface{}, error) {
 	name2 := args[1].(string)
 
 	return bool(KeyMatch2(name1, name2)), nil
+}
+
+// KeyGet2 returns value resolved by KeyMatch2
+// For example, "/resource1" matches "/:resource"
+// then "resource1" will be returned
+func KeyGet2(key string) string {
+	return keyCache2[key]
+}
+
+// KeyGet2Func is the wrapper for KeyGet2
+func KeyGet2Func(args ...interface{}) (interface{}, error) {
+	if err := validateVariadicArgs(1, args...); err != nil {
+		return false, fmt.Errorf("%s: %s", "keyGet2", err)
+	}
+
+	key := args[0].(string)
+
+	return KeyGet2(key), nil
 }
 
 // KeyMatch3 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
