@@ -133,6 +133,7 @@ var _ IDistributedEnforcer = &DistributedEnforcer{}
 // IDistributedEnforcer defines dispatcher enforcer.
 type IDistributedEnforcer interface {
 	IEnforcer
+	SetDispatcher(dispatcher persist.Dispatcher)
 	/* Management API for DistributedEnforcer*/
 	AddPolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error)
 	RemovePolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error)

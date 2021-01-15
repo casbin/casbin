@@ -243,10 +243,6 @@ func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
 }
 
-// SetDispatcher sets the current dispatcher.
-func (e *Enforcer) SetDispatcher(dispatcher persist.Dispatcher) {
-	e.dispatcher = dispatcher
-}
 
 // GetRoleManager gets the current role manager.
 func (e *Enforcer) GetRoleManager() rbac.RoleManager {
