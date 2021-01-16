@@ -148,18 +148,27 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) {
 
 // AddPolicies adds policy rules to the model.
 func (model Model) AddPolicies(sec string, ptype string, rules [][]string) {
+	_ = model.AddPoliciesWithAffected(sec, ptype, rules)
+}
+
+// AddPoliciesWithEffected adds policy rules to the model, and returns effected rules.
+func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]string) [][]string {
+	var effected [][]string
 	for _, rule := range rules {
 		hashKey := strings.Join(rule, DefaultSep)
 		_, ok := model[sec][ptype].PolicyMap[hashKey]
 		if ok {
 			continue
 		}
+		effected = append(effected, rule)
 		model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
 		model[sec][ptype].PolicyMap[hashKey] = len(model[sec][ptype].Policy) - 1
 	}
+	return effected
 }
 
 // RemovePolicy removes a policy rule from the model.
+// Deprecated: Using AddPoliciesWithAffected instead.
 func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
 	index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
 	if !ok {
@@ -192,19 +201,27 @@ func (model Model) UpdatePolicy(sec string, ptype string, oldRule []string, newR
 
 // RemovePolicies removes policy rules from the model.
 func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
+	effected := model.RemovePoliciesWithEffected(sec, ptype, rules)
+	return len(effected) != 0
+}
+
+// RemovePoliciesWithEffected removes policy rules from the model, and returns effected rules.
+func (model Model) RemovePoliciesWithEffected(sec string, ptype string, rules [][]string) [][]string {
+	var effected [][]string
 	for _, rule := range rules {
 		index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
 		if !ok {
 			continue
 		}
 
+		effected = append(effected, rule)
 		model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
 		delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
 		for i := index; i < len(model[sec][ptype].Policy); i++ {
 			model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
 		}
 	}
-	return true
+	return effected
 }
 
 // RemoveFilteredPolicy removes policy rules based on field filters from the model.
