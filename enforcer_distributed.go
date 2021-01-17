@@ -28,15 +28,15 @@ func (e *DistributedEnforcer) SetDispatcher(dispatcher persist.Dispatcher) {
 
 // AddPolicySelf provides a method for dispatcher to add authorization rules to the current policy.
 // The function returns the rules affected and error.
-func (d *DistributedEnforcer) AddPolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error) {
-	var noExistsPolicy [][]string
-	for _, rule := range rules {
-		if !d.model.HasPolicy(sec, ptype, rule) {
-			noExistsPolicy = append(noExistsPolicy, rule)
-		}
-	}
-
+func (d *DistributedEnforcer) AddPolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effected [][]string, err error) {
 	if shouldPersist() {
+		var noExistsPolicy [][]string
+		for _, rule := range rules {
+			if !d.model.HasPolicy(sec, ptype, rule) {
+				noExistsPolicy = append(noExistsPolicy, rule)
+			}
+		}
+
 		if err := d.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, noExistsPolicy); err != nil {
 			if err.Error() != notImplemented {
 				return nil, err
@@ -44,21 +44,21 @@ func (d *DistributedEnforcer) AddPolicySelf(shouldPersist func() bool, sec strin
 		}
 	}
 
-	d.model.AddPolicies(sec, ptype, noExistsPolicy)
+	effected = d.model.AddPoliciesWithAffected(sec, ptype, rules)
 
 	if sec == "g" {
-		err := d.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, noExistsPolicy)
+		err := d.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, effected)
 		if err != nil {
-			return noExistsPolicy, err
+			return effected, err
 		}
 	}
 
-	return rules, nil
+	return effected, nil
 }
 
 // RemovePolicySelf provides a method for dispatcher to remove policies from current policy.
 // The function returns the rules affected and error.
-func (d *DistributedEnforcer) RemovePolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error) {
+func (d *DistributedEnforcer) RemovePolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effected [][]string, err error) {
 	if shouldPersist() {
 		if err := d.adapter.(persist.BatchAdapter).RemovePolicies(sec, ptype, rules); err != nil {
 			if err.Error() != notImplemented {
@@ -67,21 +67,21 @@ func (d *DistributedEnforcer) RemovePolicySelf(shouldPersist func() bool, sec st
 		}
 	}
 
-	d.model.RemovePolicies(sec, ptype, rules)
+	effected = d.model.RemovePoliciesWithEffected(sec, ptype, rules)
 
 	if sec == "g" {
-		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, rules)
+		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effected)
 		if err != nil {
-			return rules, err
+			return effected, err
 		}
 	}
 
-	return rules, err
+	return effected, err
 }
 
 // RemoveFilteredPolicySelf provides a method for dispatcher to remove an authorization rule from the current policy, field filters can be specified.
 // The function returns the rules affected and error.
-func (d *DistributedEnforcer) RemoveFilteredPolicySelf(shouldPersist func() bool, sec string, ptype string, fieldIndex int, fieldValues ...string) (effects [][]string, err error) {
+func (d *DistributedEnforcer) RemoveFilteredPolicySelf(shouldPersist func() bool, sec string, ptype string, fieldIndex int, fieldValues ...string) (effected [][]string, err error) {
 	if shouldPersist() {
 		if err := d.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
 			if err.Error() != notImplemented {
@@ -90,16 +90,16 @@ func (d *DistributedEnforcer) RemoveFilteredPolicySelf(shouldPersist func() bool
 		}
 	}
 
-	_, effects = d.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	_, effected = d.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
 
 	if sec == "g" {
-		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effects)
+		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effected)
 		if err != nil {
-			return effects, err
+			return effected, err
 		}
 	}
 
-	return effects, nil
+	return effected, nil
 }
 
 // ClearPolicySelf provides a method for dispatcher to clear all rules from the current policy.
