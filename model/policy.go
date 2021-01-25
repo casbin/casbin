@@ -33,17 +33,18 @@ const (
 const DefaultSep = ","
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
-func (model Model) BuildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
+func (model Model) BuildIncrementalRoleLinks(rmMap map[string]rbac.RoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
 	if sec == "g" {
-		return model[sec][ptype].buildIncrementalRoleLinks(rm, op, rules)
+		return model[sec][ptype].buildIncrementalRoleLinks(rmMap[ptype], op, rules)
 	}
 	return nil
 }
 
 // BuildRoleLinks initializes the roles in RBAC.
-func (model Model) BuildRoleLinks(rm rbac.RoleManager) error {
+func (model Model) BuildRoleLinks(rmMap map[string]rbac.RoleManager) error {
 	model.PrintPolicy()
-	for _, ast := range model["g"] {
+	for ptype, ast := range model["g"] {
+		rm := rmMap[ptype]
 		err := ast.buildRoleLinks(rm)
 		if err != nil {
 			return err

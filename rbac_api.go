@@ -172,15 +172,17 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]str
 		name := q[0]
 		q = q[1:]
 
-		roles, err := e.rm.GetRoles(name, domain...)
-		if err != nil {
-			return nil, err
-		}
-		for _, r := range roles {
-			if _, ok := roleSet[r]; !ok {
-				res = append(res, r)
-				q = append(q, r)
-				roleSet[r] = true
+		for _, rm := range e.rmMap {
+			roles, err := rm.GetRoles(name, domain...)
+			if err != nil {
+				return nil, err
+			}
+			for _, r := range roles {
+				if _, ok := roleSet[r]; !ok {
+					res = append(res, r)
+					q = append(q, r)
+					roleSet[r] = true
+				}
 			}
 		}
 	}
