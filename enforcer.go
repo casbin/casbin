@@ -17,6 +17,7 @@ package casbin
 import (
 	"errors"
 	"fmt"
+
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effect"
 	"github.com/casbin/casbin/v2/log"
@@ -38,7 +39,7 @@ type Enforcer struct {
 	adapter    persist.Adapter
 	watcher    persist.Watcher
 	dispatcher persist.Dispatcher
-	rm         rbac.RoleManager
+	rmMap      map[string]rbac.RoleManager
 
 	enabled              bool
 	autoSave             bool
@@ -178,11 +179,13 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 func (e *Enforcer) SetLogger(logger log.Logger) {
 	e.logger = logger
 	e.model.SetLogger(e.logger)
-	e.rm.SetLogger(e.logger)
+	for k := range e.rmMap {
+		e.rmMap[k].SetLogger(e.logger)
+	}
 }
 
 func (e *Enforcer) initialize() {
-	e.rm = defaultrolemanager.NewRoleManager(10)
+	e.rmMap = map[string]rbac.RoleManager{}
 	e.eft = effect.NewDefaultEffector()
 	e.watcher = nil
 
@@ -191,8 +194,7 @@ func (e *Enforcer) initialize() {
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
 	e.autoNotifyDispatcher = true
-
-	e.rm.SetLogger(e.logger)
+	e.initRmMap()
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -243,15 +245,14 @@ func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
 }
 
-
 // GetRoleManager gets the current role manager.
 func (e *Enforcer) GetRoleManager() rbac.RoleManager {
-	return e.rm
+	return e.rmMap["g"]
 }
 
 // SetRoleManager sets the current role manager.
 func (e *Enforcer) SetRoleManager(rm rbac.RoleManager) {
-	e.rm = rm
+	e.rmMap["g"] = rm
 }
 
 // SetEffector sets the current effector.
@@ -270,6 +271,8 @@ func (e *Enforcer) LoadPolicy() error {
 	if err := e.adapter.LoadPolicy(e.model); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
 		return err
 	}
+
+	e.initRmMap()
 
 	if e.autoBuildRoleLinks {
 		err := e.BuildRoleLinks()
@@ -294,6 +297,7 @@ func (e *Enforcer) loadFilteredPolicy(filter interface{}) error {
 		return err
 	}
 
+	e.initRmMap()
 	e.model.PrintPolicy()
 	if e.autoBuildRoleLinks {
 		err := e.BuildRoleLinks()
@@ -345,6 +349,12 @@ func (e *Enforcer) SavePolicy() error {
 	return nil
 }
 
+func (e *Enforcer) initRmMap() {
+	for ptype := range e.model["g"] {
+		e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
+	}
+}
+
 // EnableEnforce changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
 func (e *Enforcer) EnableEnforce(enable bool) {
 	e.enabled = enable
@@ -382,17 +392,19 @@ func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *Enforcer) BuildRoleLinks() error {
-	err := e.rm.Clear()
-	if err != nil {
-		return err
+	for _, rm := range e.rmMap {
+		err := rm.Clear()
+		if err != nil {
+			return err
+		}
 	}
 
-	return e.model.BuildRoleLinks(e.rm)
+	return e.model.BuildRoleLinks(e.rmMap)
 }
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
 func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, rules [][]string) error {
-	return e.model.BuildIncrementalRoleLinks(e.rm, op, "g", ptype, rules)
+	return e.model.BuildIncrementalRoleLinks(e.rmMap, op, "g", ptype, rules)
 }
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
@@ -596,6 +608,24 @@ func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (b
 	explain := []string{}
 	result, err := e.enforce(matcher, &explain, rvals...)
 	return result, explain, err
+}
+
+// AddNamedMatchingFunc add MatchingFunc by ptype RoleManager
+func (e *Enforcer) AddNamedMatchingFunc(ptype, name string, fn defaultrolemanager.MatchingFunc) bool {
+	if rm, ok := e.rmMap[ptype]; ok {
+		rm.(*defaultrolemanager.RoleManager).AddMatchingFunc(name, fn)
+		return true
+	}
+	return false
+}
+
+// AddNamedDomainMatchingFunc add MatchingFunc by ptype to RoleManager
+func (e *Enforcer) AddNamedDomainMatchingFunc(ptype, name string, fn defaultrolemanager.MatchingFunc) bool {
+	if rm, ok := e.rmMap[ptype]; ok {
+		rm.(*defaultrolemanager.RoleManager).AddDomainMatchingFunc(name, fn)
+		return true
+	}
+	return false
 }
 
 // assumes bounds have already been checked
