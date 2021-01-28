@@ -20,4 +20,6 @@ type UpdatableAdapter interface {
 	// UpdatePolicy updates a policy rule from storage.
 	// This is part of the Auto-Save feature.
 	UpdatePolicy(sec string, ptype string, oldRule, newPolicy []string) error
+	// UpdatePolicies updates some policy rules to storage, like db, redis.
+	UpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) error
 }

@@ -196,6 +196,15 @@ func TestModifyPolicyAPI(t *testing.T) {
 	_, _ = e.UpdatePolicy([]string{"eve", "data3", "read"}, []string{"eve", "data3", "write"})
 
 	testGetPolicy(t, e, [][]string{{"eve", "data3", "write"}})
+
+	// This test shows a rollback effect.
+	// _, _ = e.UpdatePolicies([][]string{{"eve", "data3", "write"}, {"jack", "data4", "read"}}, [][]string{{"eve", "data3", "read"}, {"jack", "data4", "write"}})
+	// testGetPolicy(t, e, [][]string{{"eve", "data3", "read"}, {"jack", "data4", "write"}})
+
+	_, _ = e.AddPolicies(rules)
+	_, _ = e.UpdatePolicies([][]string{{"eve", "data3", "write"}, {"leyo", "data4", "read"}, {"katy", "data4", "write"}},
+		[][]string{{"eve", "data3", "read"}, {"leyo", "data4", "write"}, {"katy", "data1", "write"}})
+	testGetPolicy(t, e, [][]string{{"eve", "data3", "read"}, {"jack", "data4", "read"}, {"katy", "data1", "write"}, {"leyo", "data4", "write"}, {"ham", "data4", "write"}})
 }
 
 func TestModifyGroupingPolicyAPI(t *testing.T) {

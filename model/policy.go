@@ -200,6 +200,43 @@ func (model Model) UpdatePolicy(sec string, ptype string, oldRule []string, newR
 	return true
 }
 
+// UpdatePolicies updates a policy rule from the model.
+func (model Model) UpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) bool {
+	rollbackFlag := false
+	// index -> []{oldIndex, newIndex}
+	modifiedRuleIndex := make(map[int][]int)
+	// rollback
+	defer func() {
+		if rollbackFlag {
+			for index, oldNewIndex := range modifiedRuleIndex {
+				model[sec][ptype].Policy[index] = oldRules[oldNewIndex[0]]
+				oldPolicy := strings.Join(oldRules[oldNewIndex[0]], DefaultSep)
+				newPolicy := strings.Join(newRules[oldNewIndex[1]], DefaultSep)
+				delete(model[sec][ptype].PolicyMap, newPolicy)
+				model[sec][ptype].PolicyMap[oldPolicy] = index
+			}
+		}
+	}()
+
+	newIndex := 0
+	for oldIndex, oldRule := range oldRules {
+		oldPolicy := strings.Join(oldRule, DefaultSep)
+		index, ok := model[sec][ptype].PolicyMap[oldPolicy]
+		if !ok {
+			rollbackFlag = true
+			return false
+		}
+
+		model[sec][ptype].Policy[index] = newRules[newIndex]
+		delete(model[sec][ptype].PolicyMap, oldPolicy)
+		model[sec][ptype].PolicyMap[strings.Join(newRules[newIndex], DefaultSep)] = index
+		modifiedRuleIndex[index] = []int{oldIndex, newIndex}
+		newIndex++
+	}
+
+	return true
+}
+
 // RemovePolicies removes policy rules from the model.
 func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
 	effected := model.RemovePoliciesWithEffected(sec, ptype, rules)
