@@ -166,6 +166,15 @@ func (e *Enforcer) UpdateNamedPolicy(ptype string, p1 []string, p2 []string) (bo
 	return e.updatePolicy("p", ptype, p1, p2)
 }
 
+// UpdatePolicies updates authorization rules from the current policies.
+func (e *Enforcer) UpdatePolicies(oldPolices [][]string, newPolicies [][]string) (bool, error) {
+	return e.UpdateNamedPolicies("p", oldPolices, newPolicies)
+}
+
+func (e *Enforcer) UpdateNamedPolicies(ptype string, p1 [][]string, p2 [][]string) (bool, error) {
+	return e.updatePolicies("p", ptype, p1, p2)
+}
+
 // RemovePolicies removes authorization rules from the current policy.
 func (e *Enforcer) RemovePolicies(rules [][]string) (bool, error) {
 	return e.RemoveNamedPolicies("p", rules)
