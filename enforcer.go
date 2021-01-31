@@ -610,6 +610,32 @@ func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (b
 	return result, explain, err
 }
 
+// BatchEnforce enforce in batches
+func (e *Enforcer) BatchEnforce(requests [][]interface{}) ([]bool, error) {
+	var results []bool
+	for _, request := range requests {
+		result, err := e.enforce("", nil, request...)
+		if err != nil {
+			return results, err
+		}
+		results = append(results, result)
+	}
+	return results, nil
+}
+
+// BatchEnforceWithMatcher enforce with matcher in batches
+func (e *Enforcer) BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error) {
+	var results []bool
+	for _, request := range requests {
+		result, err := e.enforce(matcher, nil, request...)
+		if err != nil {
+			return results, err
+		}
+		results = append(results, result)
+	}
+	return results, nil
+}
+
 // AddNamedMatchingFunc add MatchingFunc by ptype RoleManager
 func (e *Enforcer) AddNamedMatchingFunc(ptype, name string, fn defaultrolemanager.MatchingFunc) bool {
 	if rm, ok := e.rmMap[ptype]; ok {
