@@ -231,7 +231,7 @@ func TestClear(t *testing.T) {
 	testRole(t, rm, "u4", "g3", false)
 }
 
-func TestDomainPartternRole(t *testing.T) {
+func TestDomainPatternRole(t *testing.T) {
 	rm := NewRoleManager(10)
 	rm.(*RoleManager).AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
 
@@ -274,3 +274,25 @@ func TestAllMatchingFunc(t *testing.T) {
 	testDomainRole(t, rm, "/book/1", "book_group", "domain1", true)
 	testDomainRole(t, rm, "/book/2", "book_group", "domain1", true)
 }
+
+func TestMatchingFuncOrder(t *testing.T) {
+	rm := NewRoleManager(10)
+	rm.(*RoleManager).AddMatchingFunc("regexMatch", util.RegexMatch)
+
+	_ = rm.AddLink("g\\d+", "root")
+	_ = rm.AddLink("u1", "g1")
+	testRole(t, rm, "u1", "root", true)
+
+	_ = rm.Clear()
+
+	_ = rm.AddLink("u1", "g1")
+	_ = rm.AddLink("g\\d+", "root")
+	testRole(t, rm, "u1", "root", true)
+
+	_ = rm.Clear()
+
+	_ = rm.AddLink("u1", "g\\d+")
+	testRole(t, rm, "u1", "g1", true)
+	testRole(t, rm, "u1", "g2", true)
+}
+

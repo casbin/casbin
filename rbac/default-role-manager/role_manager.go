@@ -21,6 +21,7 @@ import (
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
+	"github.com/casbin/casbin/v2/util"
 )
 
 const defaultDomain string = "casbin::default"
@@ -71,37 +72,6 @@ func (rm *RoleManager) SetLogger(logger log.Logger) {
 	rm.logger = logger
 }
 
-func (rm *RoleManager) generateTempRoles(domain string) *Roles {
-	rm.allDomains.LoadOrStore(domain, new(Roles))
-
-	patternDomain := []string{domain}
-	if rm.hasDomainPattern {
-		rm.allDomains.Range(func(key, value interface{}) bool {
-			if domain != key.(string) && rm.domainMatchingFunc(domain, key.(string)) {
-				patternDomain = append(patternDomain, key.(string))
-			}
-			return true
-		})
-	}
-
-	allRoles := new(Roles)
-	for _, domain := range patternDomain {
-		value, _ := rm.allDomains.LoadOrStore(domain, new(Roles))
-		value.(*Roles).Range(func(key, value interface{}) bool {
-			role2 := value.(*Role)
-			role1 := allRoles.createRole(role2.name, rm.matchingFunc)
-			for _, v := range role2.roles {
-				role3 := allRoles.createRole(v.name, rm.matchingFunc)
-				role1.addRole(role3)
-			}
-
-			return true
-		})
-	}
-
-	return allRoles
-}
-
 // Clear clears all stored data and resets the role manager to the initial state.
 func (rm *RoleManager) Clear() error {
 	rm.allDomains = &sync.Map{}
@@ -118,11 +88,36 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 		return errors.ERR_DOMAIN_PARAMETER
 	}
 
-	allRoles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
+	patternDomain := rm.getPatternDomain(domain[0])
 
-	role1, _ := allRoles.(*Roles).LoadOrStore(name1, newRole(name1))
-	role2, _ := allRoles.(*Roles).LoadOrStore(name2, newRole(name2))
-	role1.(*Role).addRole(role2.(*Role))
+	for _, domain := range patternDomain {
+		allRoles, _ := rm.allDomains.LoadOrStore(domain, new(Roles))
+
+		role1, _ := allRoles.(*Roles).LoadOrStore(name1, newRole(name1))
+		role2, _ := allRoles.(*Roles).LoadOrStore(name2, newRole(name2))
+		role1.(*Role).addRole(role2.(*Role))
+
+		if rm.hasPattern {
+			allRoles.(*Roles).Range(func(key, value interface{}) bool {
+				if rm.matchingFunc(key.(string), name1) && name1 != key {
+					valueRole, _ := allRoles.(*Roles).LoadOrStore(key.(string), newRole(key.(string)))
+					valueRole.(*Role).addRole(role1.(*Role))
+				}
+				if rm.matchingFunc(key.(string), name2) && name2 != key {
+					role2.(*Role).addRole(value.(*Role))
+				}
+				if rm.matchingFunc(name1, key.(string)) && name1 != key {
+					valueRole, _ := allRoles.(*Roles).LoadOrStore(key.(string), newRole(key.(string)))
+					valueRole.(*Role).addRole(role1.(*Role))
+				}
+				if rm.matchingFunc(name2, key.(string)) && name2 != key {
+					role2.(*Role).addRole(value.(*Role))
+				}
+				return true
+			})
+		}
+	}
+
 	return nil
 }
 
@@ -149,6 +144,19 @@ func (rm *RoleManager) DeleteLink(name1 string, name2 string, domain ...string) 
 	return nil
 }
 
+func (rm *RoleManager) getPatternDomain(domain string) []string {
+	patternDomain := []string{domain}
+	if rm.hasDomainPattern {
+		rm.allDomains.Range(func(key, value interface{}) bool {
+			if domain != key.(string) && rm.domainMatchingFunc(domain, key.(string)) {
+				patternDomain = append(patternDomain, key.(string))
+			}
+			return true
+		})
+	}
+	return patternDomain
+}
+
 // HasLink determines whether role: name1 inherits role: name2.
 func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bool, error) {
 	if len(domain) == 0 {
@@ -161,20 +169,39 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 		return true, nil
 	}
 
-	var allRoles *Roles
-	if rm.hasDomainPattern || rm.hasPattern {
-		allRoles = rm.generateTempRoles(domain[0])
-	} else {
-		roles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
+	patternDomain := rm.getPatternDomain(domain[0])
+
+	for _, domain := range patternDomain {
+		var allRoles *Roles
+
+		roles, _ := rm.allDomains.LoadOrStore(domain, new(Roles))
 		allRoles = roles.(*Roles)
-	}
+		if !allRoles.hasRole(name1, rm.matchingFunc) || !allRoles.hasRole(name2, rm.matchingFunc) {
+			continue
+		}
 
-	if !allRoles.hasRole(name1, rm.matchingFunc) || !allRoles.hasRole(name2, rm.matchingFunc) {
-		return false, nil
+		if rm.hasPattern {
+			flag := false
+			allRoles.Range(func(key, value interface{}) bool {
+				if rm.matchingFunc(name1, key.(string)) && value.(*Role).hasRoleWithMatchingFunc(name2, rm.maxHierarchyLevel, rm.matchingFunc) {
+					flag = true
+					return false
+				}
+				return true
+			})
+			if flag {
+				return true, nil
+			}
+			continue
+		}
+		role1 := allRoles.createRole(name1)
+		result := role1.hasRole(name2, rm.maxHierarchyLevel)
+		if result {
+			return true, nil
+		}
+		continue
 	}
-
-	role1 := allRoles.createRole(name1, rm.matchingFunc)
-	return role1.hasRole(name2, rm.maxHierarchyLevel), nil
+	return false, nil
 }
 
 // GetRoles gets the roles that a subject inherits.
@@ -185,21 +212,20 @@ func (rm *RoleManager) GetRoles(name string, domain ...string) ([]string, error)
 		return nil, errors.ERR_DOMAIN_PARAMETER
 	}
 
-	var allRoles *Roles
-	if rm.hasDomainPattern || rm.hasPattern {
-		allRoles = rm.generateTempRoles(domain[0])
-	} else {
-		roles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
+	patternDomain := rm.getPatternDomain(domain[0])
+
+	var gottenRoles []string
+	for _, domain := range patternDomain {
+		var allRoles *Roles
+		roles, _ := rm.allDomains.LoadOrStore(domain, new(Roles))
 		allRoles = roles.(*Roles)
+		if !allRoles.hasRole(name, rm.matchingFunc) {
+			continue
+		}
+		gottenRoles = append(gottenRoles, allRoles.createRole(name).getRoles()...)
 	}
-
-	if !allRoles.hasRole(name, rm.matchingFunc) {
-		return []string{}, nil
-	}
-
-	roles := allRoles.createRole(name, rm.matchingFunc).getRoles()
-
-	return roles, nil
+	gottenRoles = util.RemoveDuplicateElement(gottenRoles)
+	return gottenRoles, nil
 }
 
 // GetUsers gets the users that inherits a subject.
@@ -211,26 +237,25 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 		return nil, errors.ERR_DOMAIN_PARAMETER
 	}
 
+	patternDomain := rm.getPatternDomain(domain[0])
+
 	var allRoles *Roles
-	if rm.hasDomainPattern || rm.hasPattern {
-		allRoles = rm.generateTempRoles(domain[0])
-	} else {
-		roles, _ := rm.allDomains.LoadOrStore(domain[0], new(Roles))
+	var names []string
+	for _, domain := range patternDomain {
+		roles, _ := rm.allDomains.LoadOrStore(domain, new(Roles))
 		allRoles = roles.(*Roles)
-	}
-
-	if !allRoles.hasRole(name, rm.domainMatchingFunc) {
-		return nil, errors.ERR_NAME_NOT_FOUND
-	}
-
-	names := []string{}
-	allRoles.Range(func(_, value interface{}) bool {
-		role := value.(*Role)
-		if role.hasDirectRole(name) {
-			names = append(names, role.name)
+		if !allRoles.hasRole(name, rm.domainMatchingFunc) {
+			return nil, errors.ERR_NAME_NOT_FOUND
 		}
-		return true
-	})
+
+		allRoles.Range(func(_, value interface{}) bool {
+			role := value.(*Role)
+			if role.hasDirectRole(name) {
+				names = append(names, role.name)
+			}
+			return true
+		})
+	}
 
 	return names, nil
 }
@@ -278,20 +303,8 @@ func (roles *Roles) hasRole(name string, matchingFunc MatchingFunc) bool {
 	return ok
 }
 
-func (roles *Roles) createRole(name string, matchingFunc MatchingFunc) *Role {
+func (roles *Roles) createRole(name string) *Role {
 	role, _ := roles.LoadOrStore(name, newRole(name))
-
-	if matchingFunc != nil {
-		roles.Range(func(key, value interface{}) bool {
-			if matchingFunc(name, key.(string)) && name != key.(string) {
-				// Add new role to matching role
-				role1, _ := roles.LoadOrStore(key.(string), newRole(key.(string)))
-				role.(*Role).addRole(role1.(*Role))
-			}
-			return true
-		})
-	}
-
 	return role.(*Role)
 }
 
@@ -308,6 +321,7 @@ func newRole(name string) *Role {
 }
 
 func (r *Role) addRole(role *Role) {
+	// determine whether this role has been added
 	for _, rr := range r.roles {
 		if rr.name == role.name {
 			return
@@ -327,7 +341,7 @@ func (r *Role) deleteRole(role *Role) {
 }
 
 func (r *Role) hasRole(name string, hierarchyLevel int) bool {
-	if r.name == name {
+	if r.hasDirectRole(name) {
 		return true
 	}
 
@@ -343,9 +357,36 @@ func (r *Role) hasRole(name string, hierarchyLevel int) bool {
 	return false
 }
 
+func (r *Role) hasRoleWithMatchingFunc(name string, hierarchyLevel int, matchingFunc MatchingFunc) bool {
+	if r.hasDirectRoleWithMatchingFunc(name, matchingFunc) {
+		return true
+	}
+
+	if hierarchyLevel <= 0 {
+		return false
+	}
+
+	for _, role := range r.roles {
+		if role.hasRoleWithMatchingFunc(name, hierarchyLevel-1, matchingFunc) {
+			return true
+		}
+	}
+	return false
+}
+
 func (r *Role) hasDirectRole(name string) bool {
 	for _, role := range r.roles {
 		if role.name == name {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (r *Role) hasDirectRoleWithMatchingFunc(name string, matchingFunc MatchingFunc) bool {
+	for _, role := range r.roles {
+		if role.name == name || matchingFunc(name, role.name) {
 			return true
 		}
 	}
