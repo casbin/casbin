@@ -126,6 +126,9 @@ type IEnforcer interface {
 	RemoveNamedGroupingPolicies(ptype string, rules [][]string) (bool, error)
 	RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error)
 	AddFunction(name string, function govaluate.ExpressionFunction)
+
+	UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, error)
+	UpdatePolicies(oldPolicies [][]string, newPolicies [][]string) (bool, error)
 }
 
 var _ IDistributedEnforcer = &DistributedEnforcer{}
