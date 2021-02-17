@@ -138,9 +138,10 @@ type IDistributedEnforcer interface {
 	IEnforcer
 	SetDispatcher(dispatcher persist.Dispatcher)
 	/* Management API for DistributedEnforcer*/
-	AddPolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error)
-	RemovePolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error)
-	RemoveFilteredPolicySelf(shouldPersist func() bool, sec string, ptype string, fieldIndex int, fieldValues ...string) (effects [][]string, err error)
+	AddPoliciesSelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effected [][]string, err error)
+	RemovePoliciesSelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effected [][]string, err error)
+	RemoveFilteredPolicySelf(shouldPersist func() bool, sec string, ptype string, fieldIndex int, fieldValues ...string) (effected [][]string, err error)
 	ClearPolicySelf(shouldPersist func() bool) error
-	UpdatePolicySelf(shouldPersist func() bool, sec string, ptype string, oldRule, newPolicy []string) (effected bool, err error)
+	UpdatePolicySelf(shouldPersist func() bool, sec string, ptype string, oldRule, newRule []string) (effected bool, err error)
+	UpdatePoliciesSelf(shouldPersist func() bool, sec string, ptype string, oldRules, newRules [][]string) (effected bool, err error)
 }
