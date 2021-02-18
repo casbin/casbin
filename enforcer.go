@@ -262,6 +262,10 @@ func (e *Enforcer) SetEffector(eft effect.Effector) {
 
 // ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() {
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		_ = e.dispatcher.ClearPolicy()
+		return
+	}
 	e.model.ClearPolicy()
 }
 
