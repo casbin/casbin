@@ -192,6 +192,19 @@ func TestModifyPolicyAPI(t *testing.T) {
 	_, _ = e.RemoveFilteredPolicy(1, "data2")
 
 	testGetPolicy(t, e, [][]string{{"eve", "data3", "read"}})
+
+	_, _ = e.UpdatePolicy([]string{"eve", "data3", "read"}, []string{"eve", "data3", "write"})
+
+	testGetPolicy(t, e, [][]string{{"eve", "data3", "write"}})
+
+	// This test shows a rollback effect.
+	// _, _ = e.UpdatePolicies([][]string{{"eve", "data3", "write"}, {"jack", "data4", "read"}}, [][]string{{"eve", "data3", "read"}, {"jack", "data4", "write"}})
+	// testGetPolicy(t, e, [][]string{{"eve", "data3", "read"}, {"jack", "data4", "write"}})
+
+	_, _ = e.AddPolicies(rules)
+	_, _ = e.UpdatePolicies([][]string{{"eve", "data3", "write"}, {"leyo", "data4", "read"}, {"katy", "data4", "write"}},
+		[][]string{{"eve", "data3", "read"}, {"leyo", "data4", "write"}, {"katy", "data1", "write"}})
+	testGetPolicy(t, e, [][]string{{"eve", "data3", "read"}, {"jack", "data4", "read"}, {"katy", "data1", "write"}, {"leyo", "data4", "write"}, {"ham", "data4", "write"}})
 }
 
 func TestModifyGroupingPolicyAPI(t *testing.T) {
@@ -249,4 +262,13 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 	testGetUsers(t, e, []string{}, "data1_admin")
 	testGetUsers(t, e, []string{}, "data2_admin")
 	testGetUsers(t, e, []string{"eve"}, "data3_admin")
+	_, _ = e.AddGroupingPolicy("data3_admin", "data4_admin")
+	_, _ = e.UpdateGroupingPolicy([]string{"eve", "data3_admin"}, []string{"eve", "admin"})
+	_, _ = e.UpdateGroupingPolicy([]string{"data3_admin", "data4_admin"}, []string{"admin", "data4_admin"})
+	testGetUsers(t, e, []string{"admin"}, "data4_admin")
+	testGetUsers(t, e, []string{"eve"}, "admin")
+
+	testGetRoles(t, e, []string{"admin"}, "eve")
+	testGetRoles(t, e, []string{"data4_admin"}, "admin")
+
 }

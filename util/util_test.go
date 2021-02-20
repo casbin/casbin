@@ -157,3 +157,27 @@ func TestGetEvalValue(t *testing.T) {
 	testGetEvalValue(t, "eval(a) && eval(b) && a && b && c", []string{"a", "b"})
 	testGetEvalValue(t, "a && eval(a) && eval(b) && b && c", []string{"a", "b"})
 }
+
+func testReplaceEvalWithMap(t *testing.T, s string, sets map[string]string, res string) {
+	t.Helper()
+	myRes := ReplaceEvalWithMap(s, sets)
+
+	if myRes != res {
+		t.Errorf("%s: %s supposed to be %s", s, myRes, res)
+	}
+}
+
+func TestReplaceEvalWithMap(t *testing.T) {
+	testReplaceEvalWithMap(t, "eval(rule1)", map[string]string{"rule1": "a == b"}, "a == b")
+	testReplaceEvalWithMap(t, "eval(rule1) && c && d", map[string]string{"rule1": "a == b"}, "a == b && c && d")
+	testReplaceEvalWithMap(t, "eval(rule1)", nil, "eval(rule1)")
+	testReplaceEvalWithMap(t, "eval(rule1) && c && d", nil, "eval(rule1) && c && d")
+	testReplaceEvalWithMap(t, "eval(rule1) || eval(rule2)", map[string]string{"rule1": "a == b", "rule2": "a == c"}, "a == b || a == c")
+	testReplaceEvalWithMap(t, "eval(rule1) || eval(rule2) && c && d", map[string]string{"rule1": "a == b", "rule2": "a == c"}, "a == b || a == c && c && d")
+	testReplaceEvalWithMap(t, "eval(rule1) || eval(rule2)", map[string]string{"rule1": "a == b"}, "a == b || eval(rule2)")
+	testReplaceEvalWithMap(t, "eval(rule1) || eval(rule2) && c && d", map[string]string{"rule1": "a == b"}, "a == b || eval(rule2) && c && d")
+	testReplaceEvalWithMap(t, "eval(rule1) || eval(rule2)", map[string]string{"rule2": "a == b"}, "eval(rule1) || a == b")
+	testReplaceEvalWithMap(t, "eval(rule1) || eval(rule2) && c && d", map[string]string{"rule2": "a == b"}, "eval(rule1) || a == b && c && d")
+	testReplaceEvalWithMap(t, "eval(rule1) || eval(rule2)", nil, "eval(rule1) || eval(rule2)")
+	testReplaceEvalWithMap(t, "eval(rule1) || eval(rule2) && c && d", nil, "eval(rule1) || eval(rule2) && c && d")
+}

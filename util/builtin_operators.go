@@ -68,6 +68,34 @@ func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 	return bool(KeyMatch(name1, name2)), nil
 }
 
+// KeyGet returns the matched part
+// For example, "/foo/bar/foo" matches "/foo/*"
+// "bar/foo" will been returned
+func KeyGet(key1, key2 string) string {
+	i := strings.Index(key2, "*")
+	if i == -1 {
+		return ""
+	}
+	if len(key1) > i {
+		if key1[:i] == key2[:i] {
+			return key1[i:]
+		}
+	}
+	return ""
+}
+
+// KeyGetFunc is the wrapper for KeyGet
+func KeyGetFunc(args ...interface{}) (interface{}, error) {
+	if err := validateVariadicArgs(2, args...); err != nil {
+		return false, fmt.Errorf("%s: %s", "keyGet", err)
+	}
+
+	name1 := args[0].(string)
+	name2 := args[1].(string)
+
+	return KeyGet(name1, name2), nil
+}
+
 // KeyMatch2 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/:resource"
 func KeyMatch2(key1 string, key2 string) bool {
@@ -89,6 +117,42 @@ func KeyMatch2Func(args ...interface{}) (interface{}, error) {
 	name2 := args[1].(string)
 
 	return bool(KeyMatch2(name1, name2)), nil
+}
+
+// KeyGet2 returns value matched pattern
+// For example, "/resource1" matches "/:resource"
+// if the pathVar == "resource", then "resource1" will be returned
+func KeyGet2(key1, key2 string, pathVar string) string {
+	key2 = strings.Replace(key2, "/*", "/.*", -1)
+
+	re := regexp.MustCompile(`:[^/]+`)
+	keys := re.FindAllString(key2, -1)
+	key2 = re.ReplaceAllString(key2, "$1([^/]+)$2")
+	key2 = "^" + key2 + "$"
+	re2 := regexp.MustCompile(key2)
+	values := re2.FindAllStringSubmatch(key1, -1)
+	if len(values) == 0 {
+		return ""
+	}
+	for i, key := range keys {
+		if pathVar == key[1:] {
+			return values[0][i+1]
+		}
+	}
+	return ""
+}
+
+// KeyGet2Func is the wrapper for KeyGet2
+func KeyGet2Func(args ...interface{}) (interface{}, error) {
+	if err := validateVariadicArgs(3, args...); err != nil {
+		return false, fmt.Errorf("%s: %s", "keyGet2", err)
+	}
+
+	name1 := args[0].(string)
+	name2 := args[1].(string)
+	key := args[2].(string)
+
+	return KeyGet2(name1, name2, key), nil
 }
 
 // KeyMatch3 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.

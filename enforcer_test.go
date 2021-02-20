@@ -479,3 +479,23 @@ func TestEnforceExLog(t *testing.T) {
 	testEnforceEx(t, e, "bob", "data2", "read", []string{})
 	testEnforceEx(t, e, "bob", "data2", "write", []string{"bob", "data2", "write"})
 }
+
+func testBatchEnforce(t *testing.T, e *Enforcer, requests [][]interface{}, results []bool) {
+	t.Helper()
+	myRes, _ := e.BatchEnforce(requests)
+	if len(myRes) != len(results) {
+		t.Errorf("%v supposed to be %v", myRes, results)
+	}
+	for i, v := range myRes {
+		if v != results[i] {
+			t.Errorf("%v supposed to be %v", myRes, results)
+		}
+	}
+}
+
+func TestBatchEnforce(t *testing.T) {
+	e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	results := []bool{true, true, false}
+	testBatchEnforce(t, e, [][]interface{}{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"jack", "data3", "read"}}, results)
+}
+

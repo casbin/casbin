@@ -15,39 +15,42 @@
 package log
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/casbin/casbin/v2/log/mocks"
+
+	"github.com/golang/mock/gomock"
 )
 
-type LoggerTester struct {
-	format      string
-	lastMessage []interface{}
-}
-
-func (t *LoggerTester) EnableLog(bool)  {}
-func (t *LoggerTester) IsEnabled() bool { return true }
-
-func (t *LoggerTester) Print(v ...interface{}) {
-	t.format = ""
-	t.lastMessage = v
-}
-
-func (t *LoggerTester) Printf(format string, v ...interface{}) {
-	t.format = format
-	t.lastMessage = v
-}
-
 func TestLog(t *testing.T) {
-	lt := &LoggerTester{}
-	SetLogger(lt)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-	LogPrint(1, "1", true)
-	if lt.format != "" || !reflect.DeepEqual(lt.lastMessage, []interface{}{1, "1", true}) {
-		t.Errorf("incorrect logger message: %+v", lt.lastMessage)
-	}
+	m := mocks.NewMockLogger(ctrl)
+	SetLogger(m)
 
-	LogPrintf("%d", 2, "2", false)
-	if lt.format != "%d" || !reflect.DeepEqual(lt.lastMessage, []interface{}{2, "2", false}) {
-		t.Errorf("incorrect logger message: %+v", lt.lastMessage)
-	}
+	m.EXPECT().EnableLog(true)
+	m.EXPECT().IsEnabled()
+
+	logger.EnableLog(true)
+	logger.IsEnabled()
+
+	policy := map[string][][]string{}
+	m.EXPECT().LogPolicy(policy)
+	LogPolicy(policy)
+
+	var model [][]string
+	m.EXPECT().LogModel(model)
+	LogModel(model)
+
+	matcher := "my_matcher"
+	request := []interface{}{"bob"}
+	result := true
+	var explains [][]string
+	m.EXPECT().LogEnforce(matcher, request, result, explains)
+	LogEnforce(matcher, request, result, explains)
+
+	var roles []string
+	m.EXPECT().LogRole(roles)
+	LogRole(roles)
 }
