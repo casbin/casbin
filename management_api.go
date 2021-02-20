@@ -134,6 +134,7 @@ func (e *Enforcer) AddPolicies(rules [][]string) (bool, error) {
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddNamedPolicy(ptype string, params ...interface{}) (bool, error) {
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
+		strSlice = append(make([]string, 0, len(strSlice)), strSlice...)
 		return e.addPolicy("p", ptype, strSlice)
 	}
 	policy := make([]string, 0)
@@ -154,6 +155,24 @@ func (e *Enforcer) AddNamedPolicies(ptype string, rules [][]string) (bool, error
 // RemovePolicy removes an authorization rule from the current policy.
 func (e *Enforcer) RemovePolicy(params ...interface{}) (bool, error) {
 	return e.RemoveNamedPolicy("p", params...)
+}
+
+// UpdatePolicy updates an authorization rule from the current policy.
+func (e *Enforcer) UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, error) {
+	return e.UpdateNamedPolicy("p", oldPolicy, newPolicy)
+}
+
+func (e *Enforcer) UpdateNamedPolicy(ptype string, p1 []string, p2 []string) (bool, error) {
+	return e.updatePolicy("p", ptype, p1, p2)
+}
+
+// UpdatePolicies updates authorization rules from the current policies.
+func (e *Enforcer) UpdatePolicies(oldPolices [][]string, newPolicies [][]string) (bool, error) {
+	return e.UpdateNamedPolicies("p", oldPolices, newPolicies)
+}
+
+func (e *Enforcer) UpdateNamedPolicies(ptype string, p1 [][]string, p2 [][]string) (bool, error) {
+	return e.updatePolicies("p", ptype, p1, p2)
 }
 
 // RemovePolicies removes authorization rules from the current policy.
@@ -285,6 +304,14 @@ func (e *Enforcer) RemoveNamedGroupingPolicy(ptype string, params ...interface{}
 // RemoveNamedGroupingPolicies removes role inheritance rules from the current named policy.
 func (e *Enforcer) RemoveNamedGroupingPolicies(ptype string, rules [][]string) (bool, error) {
 	return e.removePolicies("g", ptype, rules)
+}
+
+func (e *Enforcer) UpdateGroupingPolicy(oldRule []string, newRule []string) (bool, error) {
+	return e.UpdateNamedGroupingPolicy("g", oldRule, newRule)
+}
+
+func (e *Enforcer) UpdateNamedGroupingPolicy(ptype string, oldRule []string, newRule []string) (bool, error) {
+	return e.updatePolicy("g", ptype, oldRule, newRule)
 }
 
 // RemoveFilteredNamedGroupingPolicy removes a role inheritance rule from the current named policy, field filters can be specified.

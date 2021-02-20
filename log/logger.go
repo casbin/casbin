@@ -14,17 +14,25 @@
 
 package log
 
+//go:generate mockgen -destination=./mocks/mock_logger.go -package=mocks github.com/casbin/casbin/v2/log Logger
+
 // Logger is the logging interface implementation.
 type Logger interface {
-	//EnableLog controls whether print the message.
+	// EnableLog controls whether print the message.
 	EnableLog(bool)
 
-	//IsEnabled returns if logger is enabled.
+	// IsEnabled returns if logger is enabled.
 	IsEnabled() bool
 
-	//Print formats using the default formats for its operands and logs the message.
-	Print(...interface{})
+	// LogModel log info related to model.
+	LogModel(model [][]string)
 
-	//Printf formats according to a format specifier and logs the message.
-	Printf(string, ...interface{})
+	// LogEnforce log info related to enforce.
+	LogEnforce(matcher string, request []interface{}, result bool, explains [][]string)
+
+	// LogRole log info related to role.
+	LogRole(roles []string)
+
+	// LogPolicy log info related to policy.
+	LogPolicy(policy map[string][][]string)
 }

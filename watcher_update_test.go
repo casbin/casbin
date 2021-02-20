@@ -15,18 +15,27 @@
 package casbin
 
 import (
-	"encoding/json"
+	"testing"
 )
 
-func CasbinJsGetPermissionForUser(e IEnforcer, user string) ([]byte, error) {
-	policy, err := e.GetImplicitPermissionsForUser(user)
+type SampleWatcherUpdatable struct {
+	SampleWatcher
+}
+
+func (w SampleWatcherUpdatable) UpdateForUpdatePolicy(params ...string) error {
+	return nil
+}
+
+func TestSetWatcherUpdatable(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	sampleWatcherEx := SampleWatcherUpdatable{}
+	err := e.SetWatcher(sampleWatcherEx)
 	if err != nil {
-		return nil, err
+		t.Fatal(err)
 	}
-	permission := make(map[string][]string)
-	for i := 0; i < len(policy); i++ {
-		permission[policy[i][2]] = append(permission[policy[i][2]], policy[i][1])
-	}
-	b, _ := json.Marshal(permission)
-	return b, nil
+
+	_ = e.SavePolicy()                                                                            // calls watcherEx.UpdateForSavePolicy()
+	_, _ = e.UpdatePolicy([]string{"admin", "data1", "read"}, []string{"admin", "data2", "read"}) // calls watcherEx.UpdateForUpdatePolicy()
+
 }

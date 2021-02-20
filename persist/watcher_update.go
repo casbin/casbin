@@ -12,21 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package casbin
+package persist
 
-import (
-	"encoding/json"
-)
-
-func CasbinJsGetPermissionForUser(e IEnforcer, user string) ([]byte, error) {
-	policy, err := e.GetImplicitPermissionsForUser(user)
-	if err != nil {
-		return nil, err
-	}
-	permission := make(map[string][]string)
-	for i := 0; i < len(policy); i++ {
-		permission[policy[i][2]] = append(permission[policy[i][2]], policy[i][1])
-	}
-	b, _ := json.Marshal(permission)
-	return b, nil
+// WatcherUpdatable is the strengthen for Casbin watchers.
+type WatcherUpdatable interface {
+	Watcher
+	// UPdateForUpdaticy calls the update callback of other instances to synchronize their policy.
+	// It is called after Enforcer.UpdatePolicy()
+	UpdateForUpdatePolicy(oldRule, newRule []string) error
+	// UPdateForUpdaticies calls the update callback of other instances to synchronize their policy.
+	// It is called after Enforcer.UpdatePolicies()
+	UpdateForUpdatePolicies(oldRules, newRules [][]string) error
 }

@@ -160,6 +160,22 @@ func ReplaceEval(s string, rule string) string {
 	return evalReg.ReplaceAllString(s, "("+rule+")")
 }
 
+// ReplaceEvalWithMap replace function eval with the value of its parameters via given sets.
+func ReplaceEvalWithMap(src string, sets map[string]string) string {
+	return evalReg.ReplaceAllStringFunc(src, func(s string) string {
+		subs := evalReg.FindStringSubmatch(s)
+		if subs == nil {
+			return s
+		}
+		key := subs[1]
+		value, found := sets[key]
+		if !found {
+			return s
+		}
+		return evalReg.ReplaceAllString(s, value)
+	})
+}
+
 // GetEvalValue returns the parameters of function eval
 func GetEvalValue(s string) []string {
 	subMatch := evalReg.FindAllStringSubmatch(s, -1)
@@ -168,4 +184,16 @@ func GetEvalValue(s string) []string {
 		rules = append(rules, rule[1])
 	}
 	return rules
+}
+
+func RemoveDuplicateElement(s []string) []string {
+    result := make([]string, 0, len(s))
+    temp := map[string]struct{}{}
+    for _, item := range s {
+        if _, ok := temp[item]; !ok {
+            temp[item] = struct{}{}
+            result = append(result, item)
+        }
+    }
+    return result
 }

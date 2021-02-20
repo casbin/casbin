@@ -14,6 +14,8 @@
 
 package rbac
 
+import "github.com/casbin/casbin/v2/log"
+
 // RoleManager provides interface to define the operations for managing roles.
 type RoleManager interface {
 	// Clear clears all stored data and resets the role manager to the initial state.
@@ -35,4 +37,6 @@ type RoleManager interface {
 	GetUsers(name string, domain ...string) ([]string, error)
 	// PrintRoles prints all the roles to log.
 	PrintRoles() error
+	// SetLogger sets role manager's logger.
+	SetLogger(logger log.Logger)
 }

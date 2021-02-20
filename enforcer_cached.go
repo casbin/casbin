@@ -17,13 +17,14 @@ package casbin
 import (
 	"strings"
 	"sync"
+	"sync/atomic"
 )
 
 // CachedEnforcer wraps Enforcer and provides decision cache
 type CachedEnforcer struct {
 	*Enforcer
 	m           map[string]bool
-	enableCache bool
+	enableCache int32
 	locker      *sync.RWMutex
 }
 
@@ -36,7 +37,7 @@ func NewCachedEnforcer(params ...interface{}) (*CachedEnforcer, error) {
 		return nil, err
 	}
 
-	e.enableCache = true
+	e.enableCache = 1
 	e.m = make(map[string]bool)
 	e.locker = new(sync.RWMutex)
 	return e, nil
@@ -44,13 +45,17 @@ func NewCachedEnforcer(params ...interface{}) (*CachedEnforcer, error) {
 
 // EnableCache determines whether to enable cache on Enforce(). When enableCache is enabled, cached result (true | false) will be returned for previous decisions.
 func (e *CachedEnforcer) EnableCache(enableCache bool) {
-	e.enableCache = enableCache
+	var enabled int32
+	if enableCache {
+		enabled = 1
+	}
+	atomic.StoreInt32(&e.enableCache, enabled)
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
 // if rvals is not string , ingore the cache
 func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
-	if !e.enableCache {
+	if atomic.LoadInt32(&e.enableCache) == 0 {
 		return e.Enforcer.Enforce(rvals...)
 	}
 
@@ -91,5 +96,7 @@ func (e *CachedEnforcer) setCachedResult(key string, res bool) {
 
 // InvalidateCache deletes all the existing cached decisions.
 func (e *CachedEnforcer) InvalidateCache() {
+	e.locker.Lock()
+	defer e.locker.Unlock()
 	e.m = make(map[string]bool)
 }
