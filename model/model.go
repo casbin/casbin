@@ -16,6 +16,7 @@ package model
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -201,4 +202,28 @@ func (model Model) PrintModel() {
 	}
 
 	model.GetLogger().LogModel(modelInfo)
+}
+
+func (model Model) SortPoliciesByPriority() error {
+	for ptype, assertion := range model["p"] {
+		if assertion.Tokens[0] != fmt.Sprintf("%s_priority", ptype) {
+			continue
+		}
+		policies := assertion.Policy
+		sort.SliceStable(policies, func(i, j int) bool {
+			p1, err := strconv.ParseUint(policies[i][0], 10, 32)
+			if err != nil {
+				return true
+			}
+			p2, err := strconv.ParseUint(policies[j][0], 10, 32)
+			if err != nil {
+				return true
+			}
+			return p1 < p2
+		})
+		for i, policy := range assertion.Policy {
+			assertion.PolicyMap[strings.Join(policy, ",")] = i
+		}
+	}
+	return nil
 }

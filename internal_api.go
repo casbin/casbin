@@ -186,11 +186,11 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 	return ruleUpdated, nil
 }
 
-func (e *Enforcer) updatePolicies(sec string, ptype string , oldRules [][]string, newRules [][]string) (bool, error) {
+func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.UpdatePolicies(sec, ptype, oldRules, newRules)
 	}
-	
+
 	if e.shouldPersist() {
 		if err := e.adapter.(persist.UpdatableAdapter).UpdatePolicies(sec, ptype, oldRules, newRules); err != nil {
 			if err.Error() != notImplemented {
