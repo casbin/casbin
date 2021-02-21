@@ -499,3 +499,36 @@ func TestBatchEnforce(t *testing.T) {
 	testBatchEnforce(t, e, [][]interface{}{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"jack", "data3", "read"}}, results)
 }
 
+func TestPriorityExplicit(t *testing.T) {
+	e, _ := NewEnforcer("examples/priority_model_explicit.conf", "examples/priority_policy_explicit.csv")
+	testBatchEnforce(t, e, [][]interface{}{
+		{"alice", "data1", "write"},
+		{"alice", "data1", "read"},
+		{"bob", "data2", "read"},
+		{"bob", "data2", "write"},
+		{"data1_deny_group", "data1", "read"},
+		{"data1_deny_group", "data1", "write"},
+		{"data2_allow_group", "data2", "read"},
+		{"data2_allow_group", "data2", "write"},
+	}, []bool{
+		true, true, false, true, false, false, true, true,
+	})
+
+	_, err := e.AddPolicy("1", "bob", "data2", "write", "deny")
+	if err != nil {
+		t.Fatalf("Add Policy: %v", err)
+	}
+
+	testBatchEnforce(t, e, [][]interface{}{
+		{"alice", "data1", "write"},
+		{"alice", "data1", "read"},
+		{"bob", "data2", "read"},
+		{"bob", "data2", "write"},
+		{"data1_deny_group", "data1", "read"},
+		{"data1_deny_group", "data1", "write"},
+		{"data2_allow_group", "data2", "read"},
+		{"data2_allow_group", "data2", "write"},
+	}, []bool{
+		true, true, false, false, false, false, true, true,
+	})
+}
