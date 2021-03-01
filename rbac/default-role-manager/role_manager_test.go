@@ -295,4 +295,3 @@ func TestMatchingFuncOrder(t *testing.T) {
 	testRole(t, rm, "u1", "g1", true)
 	testRole(t, rm, "u1", "g2", true)
 }
-

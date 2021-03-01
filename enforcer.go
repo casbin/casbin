@@ -276,6 +276,10 @@ func (e *Enforcer) LoadPolicy() error {
 		return err
 	}
 
+	if err := e.model.SortPoliciesByPriority(); err != nil {
+		return err
+	}
+
 	e.initRmMap()
 
 	if e.autoBuildRoleLinks {
@@ -298,6 +302,10 @@ func (e *Enforcer) loadFilteredPolicy(filter interface{}) error {
 		return errors.New("filtered policies are not supported by this adapter")
 	}
 	if err := filteredAdapter.LoadFilteredPolicy(e.model, filter); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
+		return err
+	}
+
+	if err := e.model.SortPoliciesByPriority(); err != nil {
 		return err
 	}
 
