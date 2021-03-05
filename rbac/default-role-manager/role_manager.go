@@ -84,41 +84,61 @@ func (rm *RoleManager) Clear() error {
 func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) error {
 	if len(domain) == 0 {
 		domain = []string{defaultDomain}
-	} else if len(domain) > 1 {
-		return errors.ERR_DOMAIN_PARAMETER
+	} else if len(domain) > 2 {
+		return errors.ERR_MAX_DOMAIN_PARAMETER
 	}
 
-	patternDomain := rm.getPatternDomain(domain[0])
+	if len(domain) == 1 {
+		patternDomain := rm.getPatternDomain(domain[0])
 
-	for _, domain := range patternDomain {
-		allRoles, _ := rm.allDomains.LoadOrStore(domain, new(Roles))
+		for _, domain := range patternDomain {
+			allRoles, _ := rm.allDomains.LoadOrStore(domain, new(Roles))
 
-		role1, _ := allRoles.(*Roles).LoadOrStore(name1, newRole(name1))
-		role2, _ := allRoles.(*Roles).LoadOrStore(name2, newRole(name2))
-		role1.(*Role).addRole(role2.(*Role))
+			role1, _ := allRoles.(*Roles).LoadOrStore(name1, newRole(name1))
+			role2, _ := allRoles.(*Roles).LoadOrStore(name2, newRole(name2))
+			role1.(*Role).addRole(role2.(*Role))
 
-		if rm.hasPattern {
-			allRoles.(*Roles).Range(func(key, value interface{}) bool {
-				if rm.matchingFunc(key.(string), name1) && name1 != key {
-					valueRole, _ := allRoles.(*Roles).LoadOrStore(key.(string), newRole(key.(string)))
-					valueRole.(*Role).addRole(role1.(*Role))
-				}
-				if rm.matchingFunc(key.(string), name2) && name2 != key {
-					role2.(*Role).addRole(value.(*Role))
-				}
-				if rm.matchingFunc(name1, key.(string)) && name1 != key {
-					valueRole, _ := allRoles.(*Roles).LoadOrStore(key.(string), newRole(key.(string)))
-					valueRole.(*Role).addRole(role1.(*Role))
-				}
-				if rm.matchingFunc(name2, key.(string)) && name2 != key {
-					role2.(*Role).addRole(value.(*Role))
-				}
-				return true
-			})
+			rm.buildLinkByPattern(name1, role1.(*Role), allRoles.(*Roles))
+			rm.buildLinkByPattern(name2, role2.(*Role), allRoles.(*Roles))
+		}
+	} else if len(domain) == 2 {
+		patternDomain1 := rm.getPatternDomain(domain[0])
+		patternDomain2 := rm.getPatternDomain(domain[1])
+
+		for _, domain1 := range patternDomain1 {
+			for _, domain2 := range patternDomain2 {
+				allRoles1, _ := rm.allDomains.LoadOrStore(domain1, new(Roles))
+				allRoles2, _ := rm.allDomains.LoadOrStore(domain2, new(Roles))
+
+				role1, _ := allRoles1.(*Roles).LoadOrStore(name1, newRole(name1))
+				role1.(*Role).crossDomain = true
+				role2, _ := allRoles2.(*Roles).LoadOrStore(name2, newRole(name2))
+
+				role1.(*Role).addRole(role2.(*Role))
+
+				rm.buildLinkByPattern(name1, role1.(*Role), allRoles1.(*Roles))
+				rm.buildLinkByPattern(name2, role2.(*Role), allRoles1.(*Roles))
+			}
 		}
 	}
 
 	return nil
+}
+
+func (rm *RoleManager) buildLinkByPattern(name string, role *Role, roles *Roles) {
+	if rm.hasPattern {
+		roles.Range(func(key, value interface{}) bool {
+			if rm.matchingFunc(key.(string), name) && name != key {
+				valueRole, _ := roles.LoadOrStore(key.(string), newRole(key.(string)))
+				valueRole.(*Role).addRole(role)
+			}
+			if rm.matchingFunc(name, key.(string)) && name != key {
+				valueRole, _ := roles.LoadOrStore(key.(string), newRole(key.(string)))
+				role.addRole(valueRole.(*Role))
+			}
+			return true
+		})
+	}
 }
 
 // DeleteLink deletes the inheritance link between role: name1 and role: name2.
@@ -176,7 +196,7 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 
 		roles, _ := rm.allDomains.LoadOrStore(domain, new(Roles))
 		allRoles = roles.(*Roles)
-		if !allRoles.hasRole(name1, rm.matchingFunc) || !allRoles.hasRole(name2, rm.matchingFunc) {
+		if role, _ := allRoles.LoadOrStore(name1, newRole(name1)); (!allRoles.hasRole(name1, rm.matchingFunc) || !allRoles.hasRole(name2, rm.matchingFunc)) && !role.(*Role).crossDomain {
 			continue
 		}
 
@@ -310,8 +330,9 @@ func (roles *Roles) createRole(name string) *Role {
 
 // Role represents the data structure for a role in RBAC.
 type Role struct {
-	name  string
-	roles []*Role
+	name        string
+	roles       []*Role
+	crossDomain bool
 }
 
 func newRole(name string) *Role {

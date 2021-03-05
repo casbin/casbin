@@ -1,0 +1,10 @@
+p, super_admin, /pen/1, GET
+p, super_admin, /pen2/1, GET
+p, book_admin, book_group, GET
+p, pen_admin, pen_group, GET
+
+g, super_admin, book_admin, domain1
+g, super_admin, pen_admin, domain2
+g, alice, book_admin, domain2
+g, bob, super_admin, domain1
+g, bob, super_admin, domain1, domain2

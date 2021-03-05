@@ -76,8 +76,9 @@ func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
 		if len(rule) < count {
 			return errors.New("grouping policy elements do not meet role definition")
 		}
-		if len(rule) > count {
-			rule = rule[:count]
+		// for cross domain support
+		if len(rule) > count+1 {
+			rule = rule[:count+1]
 		}
 		err := ast.RM.AddLink(rule[0], rule[1], rule[2:]...)
 		if err != nil {

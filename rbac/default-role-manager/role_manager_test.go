@@ -295,3 +295,25 @@ func TestMatchingFuncOrder(t *testing.T) {
 	testRole(t, rm, "u1", "g1", true)
 	testRole(t, rm, "u1", "g2", true)
 }
+
+func TestCrossDomainRole(t *testing.T) {
+	rm := NewRoleManager(10)
+
+	_ = rm.AddLink("super_admin", "book_admin", "domain1")
+	_ = rm.AddLink("super_admin", "pen_admin", "domain2")
+	_ = rm.AddLink("alice", "book_admin", "domain2")
+	_ = rm.AddLink("bob", "super_admin", "domain1", "domain2")
+
+	// inheritance tree likes this:
+	// domain1:book_admin              domain2:pen_admin          domain2:book_admin
+	//        /                               \                          \
+	// domain1:super_admin             domain2:super_admin        domain2:alice
+	//                                        \
+	//                                 domain1:bob
+
+	testDomainRole(t, rm, "bob", "book_admin", "domain1", false)
+	testDomainRole(t, rm, "bob", "pen_admin", "domain1", true)
+	testDomainRole(t, rm, "bob", "super_admin", "domain1", true)
+	testDomainRole(t, rm, "bob", "super_admin", "domain2", false)
+	testDomainRole(t, rm, "alice", "book_admin", "domain2", true)
+}
