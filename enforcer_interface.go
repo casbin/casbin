@@ -54,6 +54,7 @@ type IEnforcer interface {
 	EnableAutoBuildRoleLinks(autoBuildRoleLinks bool)
 	BuildRoleLinks() error
 	Enforce(rvals ...interface{}) (bool, error)
+	BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error)
 	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
 	EnforceEx(rvals ...interface{}) (bool, []string, error)
 	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error)
