@@ -57,6 +57,8 @@ type IEnforcer interface {
 	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
 	EnforceEx(rvals ...interface{}) (bool, []string, error)
 	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error)
+	BatchEnforce(requests [][]interface{}) ([]bool, error)
+	BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error)
 
 	/* RBAC API */
 	GetRolesForUser(name string, domain ...string) ([]string, error)

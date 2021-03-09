@@ -148,6 +148,20 @@ func (e *SyncedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 	return e.Enforcer.Enforce(rvals...)
 }
 
+// BatchEnforce enforce in batches
+func (e *SyncedEnforcer) BatchEnforce(requests [][]interface{}) ([]bool, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.BatchEnforce(requests)
+}
+
+// BatchEnforceWithMatcher enforce with matcher in batches
+func (e *SyncedEnforcer) BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.BatchEnforceWithMatcher(matcher, requests)
+}
+
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *SyncedEnforcer) GetAllSubjects() []string {
 	e.m.RLock()
