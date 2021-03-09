@@ -187,6 +187,14 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 }
 
 func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
+
+	if len(oldRules) == 1 {
+		patternRule := oldRules[0]
+		if patternRule[len(patternRule)-1] == "*" {
+			return e.updatePoliciesEnhance(sec, ptype, patternRule, newRules)
+		}
+	}
+
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.UpdatePolicies(sec, ptype, oldRules, newRules)
 	}
@@ -226,6 +234,24 @@ func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string,
 	}
 
 	return ruleUpdated, nil
+}
+
+func (e *Enforcer) updatePoliciesEnhance(sec string, ptype string, oldRule []string, newRules [][]string) (bool, error) {
+	autoSave := e.autoSave
+	e.EnableAutoSave(true)
+
+	oldRule = oldRule[:len(oldRule)-1]
+	policies := e.model.GetFilteredPolicy(sec, ptype, 0, oldRule...)
+	if ok, err := e.removePolicies(sec, ptype, policies); err != nil {
+		return ok, err
+	}
+
+	if ok, err := e.addPolicies(sec, ptype, newRules); err != nil {
+		return ok, err
+	}
+
+	e.EnableAutoSave(autoSave)
+	return true, nil
 }
 
 // removePolicies removes rules from the current policy.
