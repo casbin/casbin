@@ -304,7 +304,6 @@ func (roles *Roles) hasRole(domain, name string, matchingFunc MatchingFunc) bool
 	if matchingFunc != nil {
 		roles.Range(func(key, value interface{}) bool {
 			domainPattern, namePattern := getNameAndDomain(key.(string))
-			fmt.Println(domainPattern, namePattern)
 			if domainPattern == domain && matchingFunc(name, namePattern) {
 				ok = true
 			}
