@@ -107,18 +107,18 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 					if domainPattern != domain {
 						return true
 					}
-					if rm.matchingFunc(namePattern, name1) && name1 != namePattern {
+					if rm.matchingFunc(namePattern, name1) && name1 != namePattern && name2 != namePattern {
 						valueRole, _ := rm.roles.LoadOrStore(key.(string), newRole(key.(string)))
 						valueRole.(*Role).addRole(role1)
 					}
-					if rm.matchingFunc(namePattern, name2) && name2 != namePattern {
+					if rm.matchingFunc(namePattern, name2) && name2 != namePattern && name1 != namePattern {
 						role2.addRole(value.(*Role))
 					}
-					if rm.matchingFunc(name1, namePattern) && name1 != namePattern {
+					if rm.matchingFunc(name1, namePattern) && name1 != namePattern && name2 != namePattern {
 						valueRole, _ := rm.roles.LoadOrStore(key.(string), newRole(key.(string)))
 						valueRole.(*Role).addRole(role1)
 					}
-					if rm.matchingFunc(name2, namePattern) && name2 != namePattern {
+					if rm.matchingFunc(name2, namePattern) && name2 != namePattern && name1 != namePattern {
 						role2.addRole(value.(*Role))
 					}
 					return true
@@ -195,7 +195,14 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 				flag := false
 				rm.roles.Range(func(key, value interface{}) bool {
 					nameWithDomain := key.(string)
-					_, name := getNameAndDomain(nameWithDomain)
+					keyDomain, name := getNameAndDomain(nameWithDomain)
+					if rm.hasDomainPattern {
+						if !rm.domainMatchingFunc(domain, keyDomain) {
+							return true
+						}
+					} else if domain != keyDomain {
+						return true
+					}
 					if rm.matchingFunc(name1, name) && value.(*Role).hasRoleWithMatchingFunc(domain, name2, rm.maxHierarchyLevel, rm.matchingFunc) {
 						flag = true
 						return false
@@ -401,7 +408,7 @@ func (r *Role) hasDirectRoleWithMatchingFunc(domain, name string, matchingFunc M
 	roleWithDomain := getNameWithDomain(domain, name)
 	for _, role := range r.roles {
 		roleDomain, roleName := getNameAndDomain(role.nameWithDomain)
-		if role.nameWithDomain == roleWithDomain || (matchingFunc(name, roleName) && roleDomain == domain) {
+		if role.nameWithDomain == roleWithDomain || (matchingFunc(name, roleName) && roleDomain == domain && name != roleName) {
 			return true
 		}
 	}
