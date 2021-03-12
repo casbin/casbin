@@ -21,7 +21,6 @@ import (
 
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/log"
-	"github.com/casbin/casbin/v2/rbac"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -45,7 +44,7 @@ type RoleManager struct {
 
 // NewRoleManager is the constructor for creating an instance of the
 // default RoleManager implementation.
-func NewRoleManager(maxHierarchyLevel int) rbac.RoleManager {
+func NewRoleManager(maxHierarchyLevel int) *RoleManager {
 	rm := RoleManager{}
 	rm.roles = &Roles{sync.Map{}}
 	rm.domains = make(map[string]struct{})
