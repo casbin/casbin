@@ -1,6 +1,7 @@
 package casbin
 
 import (
+	"errors"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 )
@@ -65,6 +66,10 @@ func (d *DistributedEnforcer) RemovePoliciesSelf(shouldPersist func() bool, sec 
 				return nil, err
 			}
 		}
+	}
+
+	if !d.model.HasPolicies(sec,ptype,rules) {
+		return nil, errors.New("some rules don't exist")
 	}
 
 	effected = d.model.RemovePoliciesWithEffected(sec, ptype, rules)
