@@ -234,6 +234,8 @@ func (e *Enforcer) GetImplicitUsersForPermission(permission ...string) ([]string
 	subjects := append(pSubjects, gSubjects...)
 	util.ArrayRemoveDuplicates(&subjects)
 
+	subjects = util.SetSubtract(subjects, gInherit)
+
 	res := []string{}
 	for _, user := range subjects {
 		req := util.JoinSliceAny(user, permission...)
@@ -246,8 +248,6 @@ func (e *Enforcer) GetImplicitUsersForPermission(permission ...string) ([]string
 			res = append(res, user)
 		}
 	}
-
-	res = util.SetSubtract(res, gInherit)
 
 	return res, nil
 }
