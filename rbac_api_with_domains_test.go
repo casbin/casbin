@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/casbin/casbin/v2/util"
@@ -188,4 +189,24 @@ func TestPermissionAPIInDomain(t *testing.T) {
 	testGetPermissionsInDomain(t, e, "bob", "domain2", [][]string{})
 	testGetPermissionsInDomain(t, e, "admin", "domain2", [][]string{{"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}})
 	testGetPermissionsInDomain(t, e, "non_exist", "domain2", [][]string{})
+}
+
+func testGetDomainsForUser(t *testing.T, e *Enforcer, res []string, user string) {
+	t.Helper()
+	myRes, _ := e.GetDomainsForUser(user)
+
+	sort.Strings(myRes)
+	sort.Strings(res)
+
+	if !util.ArrayEquals(res, myRes) {
+		t.Error("domains for user: ", user, ": ", myRes, ",  supposed to be ", res)
+	}
+}
+
+func TestGetDomainsForUser(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy2.csv")
+
+	testGetDomainsForUser(t, e, []string{"domain1", "domain2"}, "alice")
+	testGetDomainsForUser(t, e, []string{"domain2", "domain3"}, "bob")
+	testGetDomainsForUser(t, e, []string{"domain3"}, "user")
 }

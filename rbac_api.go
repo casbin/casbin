@@ -251,3 +251,16 @@ func (e *Enforcer) GetImplicitUsersForPermission(permission ...string) ([]string
 
 	return res, nil
 }
+
+// GetDomainsForUser gets all domains
+func (e *Enforcer) GetDomainsForUser(user string) ([]string, error) {
+	var domains []string
+	for _, rm := range e.rmMap {
+		domain, err := rm.GetDomains(user)
+		if err != nil {
+			return nil, err
+		}
+		domains = append(domains, domain...)
+	}
+	return domains, nil
+}
