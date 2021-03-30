@@ -300,6 +300,28 @@ func (rm *RoleManager) PrintRoles() error {
 	return nil
 }
 
+// GetDomains gets domains that a user has
+func (rm *RoleManager) GetDomains(name string) ([]string, error) {
+	var domains []string
+	for domain := range rm.domains {
+		if rm.hasAnyRole(name, domain)  {
+			domains = append(domains, domain)
+		}
+	}
+	domains = util.RemoveDuplicateElement(domains)
+	return domains, nil
+}
+
+func (rm *RoleManager) hasAnyRole(name string, domain string) bool {
+	patternDomain := rm.getPatternDomain(domain)
+	for _, domain := range patternDomain {
+		if rm.roles.hasRole(domain, name, rm.matchingFunc) {
+			return true
+		}
+	}
+	return false
+}
+
 // Roles represents all roles in a domain
 type Roles struct {
 	sync.Map
