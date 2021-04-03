@@ -280,7 +280,9 @@ func (e *Enforcer) LoadPolicy() error {
 		return err
 	}
 
-	e.initRmMap()
+	if err := e.clearRmMap(); err != nil {
+		return err
+	}
 
 	if e.autoBuildRoleLinks {
 		err := e.BuildRoleLinks()
@@ -365,6 +367,15 @@ func (e *Enforcer) initRmMap() {
 	for ptype := range e.model["g"] {
 		e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
 	}
+}
+
+func (e *Enforcer) clearRmMap() error {
+	for ptype := range e.model["g"] {
+		if err := e.rmMap[ptype].Clear(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // EnableEnforce changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
