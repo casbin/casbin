@@ -14,6 +14,8 @@
 
 package effect
 
+import "errors"
+
 // Effect is the result for a policy rule.
 type Effect int
 
@@ -26,6 +28,36 @@ const (
 
 // Effector is the interface for Casbin effectors.
 type Effector interface {
-	// MergeEffects merges all matching results collected by the enforcer into a single decision.
-	MergeEffects(expr string, effects []Effect, results []float64) (bool, int, error)
+	// IntermediateEffect returns a intermediate effect based on the matched effects of the enforcer
+	IntermediateEffect(effects [3]int) Effect
+
+	//FinalEffect returns the final effect based on the matched effects of the enforcer """
+	FinalEffect(effects [3]int) Effect
+}
+
+// NewDefaultEffector is the constructor for DefaultEffector.
+func NewEffector(expr string) (Effector, error) {
+	if expr == "some(where (p_eft == allow))" {
+		return AllowOverrideEffector{}, nil
+	} else if expr == "!some(where (p_eft == deny))" {
+		return DenyOverrideEffector{}, nil
+	} else if expr == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" {
+		return AllowAndDenyEffector{}, nil
+	} else if expr == "some(where (p_eft == allow)) || !some(where (p_eft == deny))" {
+		return AllowOrDenyEffector{}, nil
+	} else if expr == "priority(p_eft) || deny" {
+		return PriorityEffector{}, nil
+	} else {
+		return nil, errors.New("unsupported effect")
+	}
+}
+
+func EffectToBool(effect Effect) (bool, error) {
+	if effect == Allow {
+		return true, nil
+	}
+	if effect == Deny {
+		return false, nil
+	}
+	return false, errors.New("effect can't be converted to boolean")
 }

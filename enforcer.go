@@ -186,7 +186,7 @@ func (e *Enforcer) SetLogger(logger log.Logger) {
 
 func (e *Enforcer) initialize() {
 	e.rmMap = map[string]rbac.RoleManager{}
-	e.eft = effect.NewDefaultEffector()
+	e.eft, _ = effect.NewEffector(e.model["e"]["e"].Value)
 	e.watcher = nil
 
 	e.enabled = true
@@ -442,6 +442,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		return true, nil
 	}
 
+	explainIndex := -1
+
 	functions := e.fm.GetFunctions()
 	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
@@ -482,12 +484,9 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		pTokens: pTokens,
 	}
 
-	var policyEffects []effect.Effect
-	var matcherResults []float64
+	var policyEffects [3]int
 
 	if policyLen := len(e.model["p"]["p"].Policy); policyLen != 0 {
-		policyEffects = make([]effect.Effect, policyLen)
-		matcherResults = make([]float64, policyLen)
 		if len(e.model["r"]["r"].Tokens) != len(rvals) {
 			return false, fmt.Errorf(
 				"invalid request size: expected %d, got %d, rvals: %v",
@@ -496,7 +495,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				rvals)
 		}
 		for i, pvals := range e.model["p"]["p"].Policy {
-			// log.LogPrint("Policy Rule: ", pvals)
 			if len(e.model["p"]["p"].Tokens) != len(pvals) {
 				return false, fmt.Errorf(
 					"invalid policy size: expected %d, got %d, pvals: %v",
@@ -526,7 +524,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			}
 
 			result, err := expression.Eval(parameters)
-			// log.LogPrint("Result: ", result)
 
 			if err != nil {
 				return false, err
@@ -535,15 +532,13 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			switch result := result.(type) {
 			case bool:
 				if !result {
-					policyEffects[i] = effect.Indeterminate
+					policyEffects[effect.Indeterminate]++
 					continue
 				}
 			case float64:
 				if result == 0 {
-					policyEffects[i] = effect.Indeterminate
+					policyEffects[effect.Indeterminate]++
 					continue
-				} else {
-					matcherResults[i] = result
 				}
 			default:
 				return false, errors.New("matcher result should be bool, int or float")
@@ -552,17 +547,18 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			if j, ok := parameters.pTokens["p_eft"]; ok {
 				eft := parameters.pVals[j]
 				if eft == "allow" {
-					policyEffects[i] = effect.Allow
+					policyEffects[effect.Allow]++
 				} else if eft == "deny" {
-					policyEffects[i] = effect.Deny
+					policyEffects[effect.Deny]++
 				} else {
-					policyEffects[i] = effect.Indeterminate
+					policyEffects[effect.Indeterminate]++
 				}
 			} else {
-				policyEffects[i] = effect.Allow
+				policyEffects[effect.Allow]++
 			}
 
-			if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
+			if e.eft.IntermediateEffect(policyEffects) != effect.Indeterminate {
+				explainIndex = i
 				break
 			}
 
@@ -571,9 +567,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		if hasEval && len(e.model["p"]["p"].Policy) == 0 {
 			return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
 		}
-
-		policyEffects = make([]effect.Effect, 1)
-		matcherResults = make([]float64, 1)
 
 		parameters.pVals = make([]string, len(parameters.pTokens))
 
@@ -584,13 +577,13 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 
 		if result.(bool) {
-			policyEffects[0] = effect.Allow
+			policyEffects[effect.Allow]++
 		} else {
-			policyEffects[0] = effect.Indeterminate
+			policyEffects[effect.Indeterminate]++
 		}
 	}
-
-	result, explainIndex, err := e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults)
+	finalEffect := e.eft.FinalEffect(policyEffects)
+	result, err := effect.EffectToBool(finalEffect)
 	if err != nil {
 		return false, err
 	}

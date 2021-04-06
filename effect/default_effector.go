@@ -14,78 +14,98 @@
 
 package effect
 
-import "errors"
-
-// DefaultEffector is default effector for Casbin.
-type DefaultEffector struct {
+type AllowOverrideEffector struct {
 }
 
-// NewDefaultEffector is the constructor for DefaultEffector.
-func NewDefaultEffector() *DefaultEffector {
-	e := DefaultEffector{}
-	return &e
-}
-
-// MergeEffects merges all matching results collected by the enforcer into a single decision.
-func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, results []float64) (bool, int, error) {
-	result := false
-	explainIndex := -1
-	if expr == "some(where (p_eft == allow))" {
-		result = false
-		for i, eft := range effects {
-			if eft == Allow {
-				result = true
-				explainIndex = i
-				break
-			}
-		}
-	} else if expr == "!some(where (p_eft == deny))" {
-		result = true
-		for i, eft := range effects {
-			if eft == Deny {
-				result = false
-				explainIndex = i
-				break
-			}
-		}
-	} else if expr == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" {
-		result = false
-		for i, eft := range effects {
-			if eft == Allow {
-				result = true
-			} else if eft == Deny {
-				result = false
-				explainIndex = i
-				break
-			}
-		}
-	} else if expr == "some(where (p_eft == allow)) || !some(where (p_eft == deny))" {
-		result = true
-		for i, eft := range effects {
-			if eft == Allow {
-				result = true
-				explainIndex = i
-				break
-			} else if eft == Deny {
-				result = false
-			}
-		}
-	} else if expr == "priority(p_eft) || deny" {
-		result = false
-		for i, eft := range effects {
-			if eft != Indeterminate {
-				if eft == Allow {
-					result = true
-				} else {
-					result = false
-				}
-				explainIndex = i
-				break
-			}
-		}
-	} else {
-		return false, -1, errors.New("unsupported effect")
+//IntermediateEffect returns a intermediate effect based on the matched effects of the enforcer """
+func (e AllowOverrideEffector) IntermediateEffect(effects [3]int) Effect {
+	if effects[Allow] != 0 {
+		return Allow
 	}
+	return Indeterminate
+}
 
-	return result, explainIndex, nil
+//FinalEffect returns the final effect based on the matched effects of the enforcer """
+func (e AllowOverrideEffector) FinalEffect(effects [3]int) Effect {
+	if effects[Allow] != 0 {
+		return Allow
+	}
+	return Deny
+}
+
+type DenyOverrideEffector struct {
+}
+
+//IntermediateEffect returns a intermediate effect based on the matched effects of the enforcer """
+func (e DenyOverrideEffector) IntermediateEffect(effects [3]int) Effect {
+	if effects[Deny] != 0 {
+		return Deny
+	}
+	return Indeterminate
+}
+
+//FinalEffect returns the final effect based on the matched effects of the enforcer """
+func (e DenyOverrideEffector) FinalEffect(effects [3]int) Effect {
+	if effects[Deny] != 0 {
+		return Deny
+	}
+	return Allow
+}
+
+type AllowAndDenyEffector struct {
+}
+
+//IntermediateEffect returns a intermediate effect based on the matched effects of the enforcer """
+func (e AllowAndDenyEffector) IntermediateEffect(effects [3]int) Effect {
+	if effects[Deny] != 0 {
+		return Deny
+	}
+	return Indeterminate
+}
+
+//FinalEffect returns the final effect based on the matched effects of the enforcer """
+func (e AllowAndDenyEffector) FinalEffect(effects [3]int) Effect {
+	if effects[Deny] != 0 || effects[Allow] == 0 {
+		return Deny
+	}
+	return Allow
+}
+
+type AllowOrDenyEffector struct {
+}
+
+//IntermediateEffect returns a intermediate effect based on the matched effects of the enforcer """
+func (e AllowOrDenyEffector) IntermediateEffect(effects [3]int) Effect {
+	return Indeterminate
+}
+
+//FinalEffect returns the final effect based on the matched effects of the enforcer """
+func (e AllowOrDenyEffector) FinalEffect(effects [3]int) Effect {
+	if effects[Allow] != 0 || effects[Deny] == 0 {
+		return Allow
+	}
+	return Deny
+}
+
+type PriorityEffector struct {
+}
+
+//IntermediateEffect returns a intermediate effect based on the matched effects of the enforcer """
+func (e PriorityEffector) IntermediateEffect(effects [3]int) Effect {
+	if effects[Allow] != 0 {
+		return Allow
+	} else if effects[Deny] != 0 {
+		return Deny
+	}
+	return Indeterminate
+}
+
+//FinalEffect returns the final effect based on the matched effects of the enforcer """
+func (e PriorityEffector) FinalEffect(effects [3]int) Effect {
+	if effects[Allow] != 0 {
+		return Allow
+	} else if effects[Deny] != 0 {
+		return Deny
+	}
+	return Deny
 }
