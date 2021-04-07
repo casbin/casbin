@@ -320,6 +320,7 @@ func (e *Enforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex in
 }
 
 // AddFunction adds a customized function.
+// The added function may only return a float64, string, bool, or an array of these three types.
 func (e *Enforcer) AddFunction(name string, function govaluate.ExpressionFunction) {
 	e.fm.AddFunction(name, function)
 }
