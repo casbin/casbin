@@ -304,7 +304,7 @@ func (rm *RoleManager) PrintRoles() error {
 func (rm *RoleManager) GetDomains(name string) ([]string, error) {
 	var domains []string
 	for domain := range rm.domains {
-		if rm.hasAnyRole(name, domain)  {
+		if rm.hasAnyRole(name, domain) {
 			domains = append(domains, domain)
 		}
 	}
