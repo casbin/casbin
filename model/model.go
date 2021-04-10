@@ -227,3 +227,27 @@ func (model Model) SortPoliciesByPriority() error {
 	}
 	return nil
 }
+
+func (model Model) ToText() string {
+	s := strings.Builder{}
+	writeString := func(sec string) {
+		for ptype := range model[sec] {
+			s.WriteString(fmt.Sprintf("%s = %s\n", ptype, strings.Replace(model[sec][ptype].Value, "_", ".", -1)))
+		}
+	}
+	s.WriteString("[request_definition]\n")
+	writeString("r")
+	s.WriteString("[policy_definition]\n")
+	writeString("p")
+	if _, ok := model["g"]; ok {
+		s.WriteString("[role_definition]\n")
+		for ptype := range model["g"] {
+			s.WriteString(fmt.Sprintf("%s = %s\n", ptype, model["g"][ptype].Value))
+		}
+	}
+	s.WriteString("[policy_effect]\n")
+	writeString("e")
+	s.WriteString("[matchers]\n")
+	writeString("m")
+	return s.String()
+}
