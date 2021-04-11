@@ -18,7 +18,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Knetic/govaluate"
+	"github.com/antonmedv/expr"
 	"github.com/casbin/casbin/v2/effect"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/model"
@@ -442,11 +442,11 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		return true, nil
 	}
 
-	functions := e.fm.GetFunctions()
+	envir := e.fm.GetFunctions()
 	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
 			rm := ast.RM
-			functions[key] = util.GenerateGFunction(rm)
+			envir[key] = util.GenerateGFunction(rm)
 		}
 	}
 	var expString string
@@ -456,30 +456,10 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		expString = util.RemoveComments(util.EscapeAssertion(matcher))
 	}
 
-	var expression *govaluate.EvaluableExpression
 	hasEval := util.HasEval(expString)
 
-	if !hasEval {
-		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
-		if err != nil {
-			return false, err
-		}
-	}
-
-	rTokens := make(map[string]int, len(e.model["r"]["r"].Tokens))
 	for i, token := range e.model["r"]["r"].Tokens {
-		rTokens[token] = i
-	}
-	pTokens := make(map[string]int, len(e.model["p"]["p"].Tokens))
-	for i, token := range e.model["p"]["p"].Tokens {
-		pTokens[token] = i
-	}
-
-	parameters := enforceParameters{
-		rTokens: rTokens,
-		rVals:   rvals,
-
-		pTokens: pTokens,
+		envir[token] = rvals[i]
 	}
 
 	var policyEffects []effect.Effect
@@ -505,28 +485,29 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 					pvals)
 			}
 
-			parameters.pVals = pvals
+			for i, token := range e.model["p"]["p"].Tokens {
+				envir[token] = pvals[i]
+			}
+
+			expAfterReplace := expString
 
 			if hasEval {
 				ruleNames := util.GetEvalValue(expString)
 				replacements := make(map[string]string)
 				for _, ruleName := range ruleNames {
-					if j, ok := parameters.pTokens[ruleName]; ok {
-						rule := util.EscapeAssertion(pvals[j])
+					if j, ok := envir[ruleName]; ok {
+						//fmt.Println("ruleName:", ruleName, "\t", j)
+						rule := util.EscapeAssertion(j.(string))
 						replacements[ruleName] = rule
 					} else {
 						return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
 					}
 				}
 				expWithRule := util.ReplaceEvalWithMap(expString, replacements)
-				expression, err = govaluate.NewEvaluableExpressionWithFunctions(expWithRule, functions)
-				if err != nil {
-					return false, fmt.Errorf("p.sub_rule should satisfy the syntax of matcher: %s", err)
-				}
+				expAfterReplace = expWithRule
 			}
 
-			result, err := expression.Eval(parameters)
-			// log.LogPrint("Result: ", result)
+			result, err := expr.Eval(expAfterReplace, envir)
 
 			if err != nil {
 				return false, err
@@ -549,8 +530,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				return false, errors.New("matcher result should be bool, int or float")
 			}
 
-			if j, ok := parameters.pTokens["p_eft"]; ok {
-				eft := parameters.pVals[j]
+			if j, ok := envir["p_eft"]; ok {
+				eft := j
 				if eft == "allow" {
 					policyEffects[i] = effect.Allow
 				} else if eft == "deny" {
@@ -575,9 +556,9 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		policyEffects = make([]effect.Effect, 1)
 		matcherResults = make([]float64, 1)
 
-		parameters.pVals = make([]string, len(parameters.pTokens))
+		// parameters.pVals = make([]string, len(parameters.pTokens))
 
-		result, err := expression.Eval(parameters)
+		result, err := expr.Eval(expString, envir)
 
 		if err != nil {
 			return false, err
@@ -684,6 +665,12 @@ type enforceParameters struct {
 
 	pTokens map[string]int
 	pVals   []string
+}
+
+type Env struct {
+	pParams   map[string]string
+	rParams   map[string]interface{}
+	functions map[string]interface{}
 }
 
 // implements govaluate.Parameters
