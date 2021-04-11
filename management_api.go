@@ -14,6 +14,8 @@
 
 package casbin
 
+import "github.com/Knetic/govaluate"
+
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() []string {
 	return e.model.GetValuesForFieldInPolicyAllTypes("p", 0)
@@ -318,6 +320,6 @@ func (e *Enforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex in
 }
 
 // AddFunction adds a customized function.
-func (e *Enforcer) AddFunction(name string, function func(args ...interface{}) (interface{}, error)) {
+func (e *Enforcer) AddFunction(name string, function govaluate.ExpressionFunction) {
 	e.fm.AddFunction(name, function)
 }

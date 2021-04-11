@@ -17,6 +17,7 @@ package model
 import (
 	"sync"
 
+	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -28,7 +29,7 @@ type FunctionMap struct {
 // [string]govaluate.ExpressionFunction
 
 // AddFunction adds an expression function.
-func (fm *FunctionMap) AddFunction(name string, function func(args ...interface{}) (interface{}, error)) {
+func (fm *FunctionMap) AddFunction(name string, function govaluate.ExpressionFunction) {
 	fm.fns.LoadOrStore(name, function)
 }
 
@@ -51,11 +52,11 @@ func LoadFunctionMap() FunctionMap {
 }
 
 // GetFunctions return a map with all the functions
-func (fm *FunctionMap) GetFunctions() map[string]interface{} {
-	ret := make(map[string]interface{})
+func (fm *FunctionMap) GetFunctions() map[string]govaluate.ExpressionFunction {
+	ret := make(map[string]govaluate.ExpressionFunction)
 
 	fm.fns.Range(func(k interface{}, v interface{}) bool {
-		ret[k.(string)] = v.(func(args ...interface{}) (interface{}, error))
+		ret[k.(string)] = v.(govaluate.ExpressionFunction)
 		return true
 	})
 
