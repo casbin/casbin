@@ -15,7 +15,6 @@
 package casbin
 
 import (
-	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effect"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
@@ -127,7 +126,7 @@ type IEnforcer interface {
 	RemoveNamedGroupingPolicy(ptype string, params ...interface{}) (bool, error)
 	RemoveNamedGroupingPolicies(ptype string, rules [][]string) (bool, error)
 	RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error)
-	AddFunction(name string, function govaluate.ExpressionFunction)
+	AddFunction(name string, function func(args ...interface{}) (interface{}, error))
 
 	UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, error)
 	UpdatePolicies(oldPolicies [][]string, newPolicies [][]string) (bool, error)

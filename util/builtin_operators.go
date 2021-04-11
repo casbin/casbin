@@ -22,7 +22,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/rbac"
 )
 
@@ -303,7 +302,7 @@ func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 }
 
 // GenerateGFunction is the factory method of the g(_, _) function.
-func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
+func GenerateGFunction(rm rbac.RoleManager) func(args ...interface{}) (interface{}, error) {
 	memorized := map[string]bool{}
 
 	return func(args ...interface{}) (interface{}, error) {
