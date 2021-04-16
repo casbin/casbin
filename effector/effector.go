@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package effect
+package effector
 
 // Effect is the result for a policy rule.
 type Effect int
@@ -27,5 +27,5 @@ const (
 // Effector is the interface for Casbin effectors.
 type Effector interface {
 	// MergeEffects merges all matching results collected by the enforcer into a single decision.
-	MergeEffects(expr string, effects []Effect, results []float64) (bool, int, error)
+	MergeEffects(expr string, effects []Effect, matches []float64, policyIndex int, policyLength int) (Effect, int, error)
 }
