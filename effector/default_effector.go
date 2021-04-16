@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package effect
+package effector
 
 import "errors"
 
@@ -27,53 +27,80 @@ func NewDefaultEffector() *DefaultEffector {
 }
 
 // MergeEffects merges all matching results collected by the enforcer into a single decision.
-func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, results []float64) (bool, int, error) {
-	result := false
+func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []float64, policyIndex int, policyLength int) (Effect, int, error) {
+	result := Indeterminate
 	explainIndex := -1
+
+	// short-circuit some effects in the middle
+	if expr != "priority(p_eft) || deny" {
+		if policyIndex < policyLength-1 {
+			// choose not to short-circuit
+			return result, explainIndex, nil
+		}
+	}
+
+	// merge all effects at last
 	if expr == "some(where (p_eft == allow))" {
-		result = false
+		result = Indeterminate
 		for i, eft := range effects {
+			if matches[i] == 0 {
+				continue
+			}
+
 			if eft == Allow {
-				result = true
+				result = Allow
 				explainIndex = i
 				break
 			}
 		}
 	} else if expr == "!some(where (p_eft == deny))" {
-		result = true
+		// if no deny rules are matched, then allow
+		result = Allow
 		for i, eft := range effects {
+			if matches[i] == 0 {
+				continue
+			}
+
 			if eft == Deny {
-				result = false
+				result = Deny
 				explainIndex = i
 				break
 			}
 		}
 	} else if expr == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" {
-		result = false
+		result = Indeterminate
 		for i, eft := range effects {
+			if matches[i] == 0 {
+				continue
+			}
+
 			if eft == Allow {
-				result = true
+				result = Allow
 			} else if eft == Deny {
-				result = false
+				result = Deny
 				explainIndex = i
 				break
 			}
 		}
 	} else if expr == "priority(p_eft) || deny" {
-		result = false
+		result = Indeterminate
 		for i, eft := range effects {
+			if matches[i] == 0 {
+				continue
+			}
+
 			if eft != Indeterminate {
 				if eft == Allow {
-					result = true
+					result = Allow
 				} else {
-					result = false
+					result = Deny
 				}
 				explainIndex = i
 				break
 			}
 		}
 	} else {
-		return false, -1, errors.New("unsupported effect")
+		return Deny, -1, errors.New("unsupported effect")
 	}
 
 	return result, explainIndex, nil
