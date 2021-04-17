@@ -171,3 +171,37 @@ func (d *DistributedEnforcer) UpdatePoliciesSelf(shouldPersist func() bool, sec 
 
 	return ruleUpdated, nil
 }
+
+// UpdateFilteredPoliciesSelf provides a method for dispatcher to update a set of authorization rules from the current policy.
+func (d *DistributedEnforcer) UpdateFilteredPoliciesSelf(shouldPersist func() bool, sec string, ptype string, newRules [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+	var (
+		oldRules [][]string
+		err      error
+	)
+	if shouldPersist != nil && shouldPersist() {
+		oldRules, err = d.adapter.(persist.UpdatableAdapter).UpdateFilteredPolicies(sec, ptype, newRules, fieldIndex, fieldValues...)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	ruleChanged := !d.model.RemovePolicies(sec, ptype, oldRules)
+	d.model.AddPolicies(sec, ptype, newRules)
+	ruleChanged = ruleChanged && len(newRules) != 0
+	if !ruleChanged {
+		return ruleChanged, nil
+	}
+
+	if sec == "g" {
+		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, oldRules) // remove the old rule
+		if err != nil {
+			return ruleChanged, err
+		}
+		err = d.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, newRules) // add the new rule
+		if err != nil {
+			return ruleChanged, err
+		}
+	}
+
+	return true, nil
+}

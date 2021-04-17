@@ -357,6 +357,18 @@ func (e *SyncedEnforcer) UpdateNamedPolicies(ptype string, p1 [][]string, p2 [][
 	return e.Enforcer.UpdateNamedPolicies(ptype, p1, p2)
 }
 
+func (e *SyncedEnforcer) UpdateFilteredPolicies(newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.UpdateFilteredPolicies(newPolicies, fieldIndex, fieldValues...)
+}
+
+func (e *SyncedEnforcer) UpdateFilteredNamedPolicies(ptype string, newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.UpdateFilteredNamedPolicies(ptype, newPolicies, fieldIndex, fieldValues...)
+}
+
 // RemovePolicies removes authorization rules from the current policy.
 func (e *SyncedEnforcer) RemovePolicies(rules [][]string) (bool, error) {
 	e.m.Lock()

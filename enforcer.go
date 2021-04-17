@@ -365,7 +365,11 @@ func (e *Enforcer) SavePolicy() error {
 
 func (e *Enforcer) initRmMap() {
 	for ptype := range e.model["g"] {
-		e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
+		if rm, ok := e.rmMap[ptype]; ok {
+			_ = rm.Clear()
+		} else {
+			e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
+		}
 	}
 }
 
