@@ -75,9 +75,14 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 			}
 
 			if eft == Allow {
+				// set hit rule to first matched allow rule, maybe overridden by the deny part
+				if result == Indeterminate {
+					explainIndex = i
+				}
 				result = Allow
 			} else if eft == Deny {
 				result = Deny
+				// set hit rule to the (first) matched deny rule
 				explainIndex = i
 				break
 			}
