@@ -58,6 +58,7 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 	ast.Value = value
 	ast.PolicyMap = make(map[string]int)
 	ast.setLogger(model.GetLogger())
+	ast.initPriorityIndex()
 
 	if sec == "r" || sec == "p" {
 		ast.Tokens = strings.Split(ast.Value, ",")
@@ -206,16 +207,22 @@ func (model Model) PrintModel() {
 
 func (model Model) SortPoliciesByPriority() error {
 	for ptype, assertion := range model["p"] {
-		if assertion.Tokens[0] != fmt.Sprintf("%s_priority", ptype) {
+		for index, token := range assertion.Tokens {
+			if token == fmt.Sprintf("%s_priority", ptype) {
+				assertion.priorityIndex = index
+				break
+			}
+		}
+		if assertion.priorityIndex == -1 {
 			continue
 		}
 		policies := assertion.Policy
 		sort.SliceStable(policies, func(i, j int) bool {
-			p1, err := strconv.ParseUint(policies[i][0], 10, 32)
+			p1, err := strconv.Atoi(policies[i][assertion.priorityIndex])
 			if err != nil {
 				return true
 			}
-			p2, err := strconv.ParseUint(policies[j][0], 10, 32)
+			p2, err := strconv.Atoi(policies[j][assertion.priorityIndex])
 			if err != nil {
 				return true
 			}
