@@ -147,24 +147,35 @@ func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool 
 func (model Model) AddPolicy(sec string, ptype string, rule []string) {
 	assertion := model[sec][ptype]
 	assertion.Policy = append(assertion.Policy, rule)
-	if idxInsert, err := strconv.ParseUint(rule[0], 10, 32); sec == "p" && assertion.Tokens[0] == fmt.Sprintf("%s_priority", ptype) && err == nil {
-		i := len(assertion.Policy) - 1
-		for ; i > 0; i-- {
-			idx, err := strconv.ParseUint(assertion.Policy[i-1][0], 10, 32)
-			if err != nil {
-				break
-			}
-			if idx > idxInsert {
-				assertion.Policy[i] = assertion.Policy[i-1]
-			} else {
-				break
-			}
+
+	// find priority index
+	priorityIndex := -1
+	for index, token := range assertion.Tokens {
+		if token == fmt.Sprintf("%s_priority", ptype) {
+			priorityIndex = index
+			break
 		}
-		assertion.Policy[i] = rule
-		assertion.PolicyMap[strings.Join(rule, DefaultSep)] = i
-	} else {
-		assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
 	}
+
+	if priorityIndex >= 0 {
+		if idxInsert, err := strconv.ParseUint(rule[priorityIndex], 10, 32); sec == "p" && err == nil {
+			i := len(assertion.Policy) - 1
+			for ; i > 0; i-- {
+				idx, err := strconv.ParseUint(assertion.Policy[i-1][priorityIndex], 10, 32)
+				if err != nil {
+					break
+				}
+				if idx > idxInsert {
+					assertion.Policy[i] = assertion.Policy[i-1]
+				} else {
+					break
+				}
+			}
+			assertion.Policy[i] = rule
+			assertion.PolicyMap[strings.Join(rule, DefaultSep)] = i
+		}
+	}
+	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
 }
 
 // AddPolicies adds policy rules to the model.
