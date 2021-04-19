@@ -32,7 +32,8 @@ type Assertion struct {
 	PolicyMap map[string]int
 	RM        rbac.RoleManager
 
-	logger log.Logger
+	logger        log.Logger
+	priorityIndex int
 }
 
 func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
@@ -90,4 +91,8 @@ func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
 
 func (ast *Assertion) setLogger(logger log.Logger) {
 	ast.logger = logger
+}
+
+func (ast *Assertion) initPriorityIndex() {
+	ast.priorityIndex = -1
 }

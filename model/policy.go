@@ -15,7 +15,6 @@
 package model
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -148,20 +147,11 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) {
 	assertion := model[sec][ptype]
 	assertion.Policy = append(assertion.Policy, rule)
 
-	// find priority index
-	priorityIndex := -1
-	for index, token := range assertion.Tokens {
-		if token == fmt.Sprintf("%s_priority", ptype) {
-			priorityIndex = index
-			break
-		}
-	}
-
-	if priorityIndex >= 0 {
-		if idxInsert, err := strconv.ParseUint(rule[priorityIndex], 10, 32); sec == "p" && err == nil {
+	if sec == "p" && assertion.priorityIndex >= 0 {
+		if idxInsert, err := strconv.Atoi(rule[assertion.priorityIndex]); err == nil {
 			i := len(assertion.Policy) - 1
 			for ; i > 0; i-- {
-				idx, err := strconv.ParseUint(assertion.Policy[i-1][priorityIndex], 10, 32)
+				idx, err := strconv.Atoi(assertion.Policy[i-1][assertion.priorityIndex])
 				if err != nil {
 					break
 				}
@@ -183,7 +173,7 @@ func (model Model) AddPolicies(sec string, ptype string, rules [][]string) {
 	_ = model.AddPoliciesWithAffected(sec, ptype, rules)
 }
 
-// AddPoliciesWithEffected adds policy rules to the model, and returns effected rules.
+// AddPoliciesWithAffected adds policy rules to the model, and returns effected rules.
 func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]string) [][]string {
 	var effected [][]string
 	for _, rule := range rules {
