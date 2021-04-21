@@ -43,8 +43,11 @@ var sectionNameMap = map[string]string{
 var requiredSections = []string{"r", "p", "e", "m"}
 
 func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) bool {
-	value := cfg.String(sectionNameMap[sec] + "::" + key)
-	return model.AddDef(sec, key, value)
+	if _, ok := sectionNameMap[sec]; ok {
+		value := cfg.String(sectionNameMap[sec] + "::" + key)
+		return model.AddDef(sec, key, value)
+	}
+	return false
 }
 
 // AddDef adds an assertion to the model.
@@ -181,7 +184,10 @@ func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 }
 
 func (model Model) hasSection(sec string) bool {
-	section := model[sec]
+	section, ok := model[sec]
+	if !ok {
+		return false
+	}
 	return section != nil
 }
 
@@ -238,8 +244,10 @@ func (model Model) SortPoliciesByPriority() error {
 func (model Model) ToText() string {
 	s := strings.Builder{}
 	writeString := func(sec string) {
-		for ptype := range model[sec] {
-			s.WriteString(fmt.Sprintf("%s = %s\n", ptype, strings.Replace(model[sec][ptype].Value, "_", ".", -1)))
+		if _, ok := model[sec]; ok {
+			for ptype := range model[sec] {
+				s.WriteString(fmt.Sprintf("%s = %s\n", ptype, strings.Replace(model[sec][ptype].Value, "_", ".", -1)))
+			}
 		}
 	}
 	s.WriteString("[request_definition]\n")
