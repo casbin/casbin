@@ -25,9 +25,9 @@ func CasbinJsGetPermissionForUser(e IEnforcer, user string) ([]byte, error) {
 	m["m"] = model.ToText()
 	policies := make([][]string, 0)
 	for ptype := range model["p"] {
-		policies = model.GetPolicy("p", ptype)
-		for i := range policies {
-			policies[i] = append([]string{ptype}, policies[i]...)
+		policy := model.GetPolicy("p", ptype)
+		for i := range policy {
+			policies = append(policies, append([]string{ptype}, policy[i]...))
 		}
 	}
 	m["p"] = policies
