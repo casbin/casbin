@@ -24,14 +24,14 @@ type SampleWatcherEx struct {
 	SampleWatcher
 }
 
-func (w SampleWatcherEx) UpdateForAddPolicy(params ...string) error {
+func (w SampleWatcherEx) UpdateForAddPolicy(ptype string, params ...string) error {
 	return nil
 }
-func (w SampleWatcherEx) UpdateForRemovePolicy(params ...string) error {
+func (w SampleWatcherEx) UpdateForRemovePolicy(ptype string, params ...string) error {
 	return nil
 }
 
-func (w SampleWatcherEx) UpdateForRemoveFilteredPolicy(fieldIndex int, fieldValues ...string) error {
+func (w SampleWatcherEx) UpdateForRemoveFilteredPolicy(ptype string, fieldIndex int, fieldValues ...string) error {
 	return nil
 }
 
@@ -52,4 +52,8 @@ func TestSetWatcherEx(t *testing.T) {
 	_, _ = e.AddPolicy("admin", "data1", "read")    // calls watcherEx.UpdateForAddPolicy()
 	_, _ = e.RemovePolicy("admin", "data1", "read") // calls watcherEx.UpdateForRemovePolicy()
 	_, _ = e.RemoveFilteredPolicy(1, "data1")       // calls watcherEx.UpdateForRemoveFilteredPolicy()
+	_, _ = e.AddGroupingPolicy("g:admin", "data1")
+	_, _ = e.RemoveGroupingPolicy("g:admin", "data1")
+	_, _ = e.AddGroupingPolicy("g:admin", "data1")
+	_, _ = e.RemoveFilteredGroupingPolicy(1, "data1")
 }

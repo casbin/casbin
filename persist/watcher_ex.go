@@ -21,13 +21,13 @@ type WatcherEx interface {
 	Watcher
 	// UpdateForAddPolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.AddPolicy()
-	UpdateForAddPolicy(params ...string) error
+	UpdateForAddPolicy(ptype string, params ...string) error
 	// UPdateForRemovePolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.RemovePolicy()
-	UpdateForRemovePolicy(params ...string) error
+	UpdateForRemovePolicy(ptype string, params ...string) error
 	// UpdateForRemoveFilteredPolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.RemoveFilteredNamedGroupingPolicy()
-	UpdateForRemoveFilteredPolicy(fieldIndex int, fieldValues ...string) error
+	UpdateForRemoveFilteredPolicy(ptype string, fieldIndex int, fieldValues ...string) error
 	// UpdateForSavePolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.RemoveFilteredNamedGroupingPolicy()
 	UpdateForSavePolicy(model model.Model) error

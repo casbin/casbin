@@ -58,7 +58,7 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForAddPolicy(rule...)
+			err = watcher.UpdateForAddPolicy(ptype, rule...)
 		} else {
 			err = e.watcher.Update()
 		}
@@ -134,7 +134,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForRemovePolicy(rule...)
+			err = watcher.UpdateForRemovePolicy(ptype, rule...)
 		} else {
 			err = e.watcher.Update()
 		}
@@ -297,11 +297,10 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 			return ruleRemoved, err
 		}
 	}
-
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForRemoveFilteredPolicy(fieldIndex, fieldValues...)
+			err = watcher.UpdateForRemoveFilteredPolicy(ptype, fieldIndex, fieldValues...)
 		} else {
 			err = e.watcher.Update()
 		}
