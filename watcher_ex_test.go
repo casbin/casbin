@@ -24,14 +24,14 @@ type SampleWatcherEx struct {
 	SampleWatcher
 }
 
-func (w SampleWatcherEx) UpdateForAddPolicy(ptype string, params ...string) error {
+func (w SampleWatcherEx) UpdateForAddPolicy(sec, ptype string, params ...string) error {
 	return nil
 }
-func (w SampleWatcherEx) UpdateForRemovePolicy(ptype string, params ...string) error {
+func (w SampleWatcherEx) UpdateForRemovePolicy(sec, ptype string, params ...string) error {
 	return nil
 }
 
-func (w SampleWatcherEx) UpdateForRemoveFilteredPolicy(ptype string, fieldIndex int, fieldValues ...string) error {
+func (w SampleWatcherEx) UpdateForRemoveFilteredPolicy(sec, ptype string, fieldIndex int, fieldValues ...string) error {
 	return nil
 }
 
