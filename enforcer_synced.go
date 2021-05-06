@@ -152,21 +152,21 @@ func (e *SyncedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 func (e *SyncedEnforcer) EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.EnforceWithMatcher(matcher, rvals)
+	return e.Enforcer.EnforceWithMatcher(matcher, rvals...)
 }
 
 // EnforceEx explain enforcement by informing matched rules
 func (e *SyncedEnforcer) EnforceEx(rvals ...interface{}) (bool, []string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.EnforceEx(rvals)
+	return e.Enforcer.EnforceEx(rvals...)
 }
 
 // EnforceExWithMatcher use a custom matcher and explain enforcement by informing matched rules
 func (e *SyncedEnforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
-	return e.Enforcer.EnforceExWithMatcher(matcher, rvals)
+	return e.Enforcer.EnforceExWithMatcher(matcher, rvals...)
 }
 
 // BatchEnforce enforce in batches
