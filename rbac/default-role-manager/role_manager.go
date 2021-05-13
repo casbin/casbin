@@ -103,8 +103,14 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 			if rm.hasPattern {
 				rm.roles.Range(func(key, value interface{}) bool {
 					domainPattern, namePattern := getNameAndDomain(key.(string))
-					if domainPattern != domain {
-						return true
+					if rm.hasDomainPattern {
+						if !rm.domainMatchingFunc(domainPattern, domain) {
+							return true
+						}
+					} else {
+						if domainPattern != domain {
+							return true
+						}
 					}
 					if rm.matchingFunc(namePattern, name1) && name1 != namePattern && name2 != namePattern {
 						valueRole, _ := rm.roles.LoadOrStore(key.(string), newRole(key.(string)))
@@ -202,7 +208,7 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 					} else if domain != keyDomain {
 						return true
 					}
-					if rm.matchingFunc(name1, name) && value.(*Role).hasRoleWithMatchingFunc(domain, name2, rm.maxHierarchyLevel, rm.matchingFunc) {
+					if rm.matchingFunc(name1, name) && value.(*Role).hasRoleWithMatchingFunc(name2, rm.maxHierarchyLevel, rm.matchingFunc) {
 						flag = true
 						return false
 					}
@@ -398,8 +404,8 @@ func (r *Role) hasRole(nameWithDomain string, hierarchyLevel int) bool {
 	return false
 }
 
-func (r *Role) hasRoleWithMatchingFunc(domain, name string, hierarchyLevel int, matchingFunc MatchingFunc) bool {
-	if r.hasDirectRoleWithMatchingFunc(domain, name, matchingFunc) {
+func (r *Role) hasRoleWithMatchingFunc(name string, hierarchyLevel int, matchingFunc MatchingFunc) bool {
+	if r.hasDirectRoleWithMatchingFunc(name, matchingFunc) {
 		return true
 	}
 
@@ -408,7 +414,7 @@ func (r *Role) hasRoleWithMatchingFunc(domain, name string, hierarchyLevel int, 
 	}
 
 	for _, role := range r.roles {
-		if role.hasRoleWithMatchingFunc(domain, name, hierarchyLevel-1, matchingFunc) {
+		if role.hasRoleWithMatchingFunc(name, hierarchyLevel-1, matchingFunc) {
 			return true
 		}
 	}
@@ -425,11 +431,10 @@ func (r *Role) hasDirectRole(nameWithDomain string) bool {
 	return false
 }
 
-func (r *Role) hasDirectRoleWithMatchingFunc(domain, name string, matchingFunc MatchingFunc) bool {
-	roleWithDomain := getNameWithDomain(domain, name)
+func (r *Role) hasDirectRoleWithMatchingFunc(name string, matchingFunc MatchingFunc) bool {
 	for _, role := range r.roles {
-		roleDomain, roleName := getNameAndDomain(role.nameWithDomain)
-		if role.nameWithDomain == roleWithDomain || (matchingFunc(name, roleName) && roleDomain == domain && name != roleName) {
+		_, roleName := getNameAndDomain(role.nameWithDomain)
+		if roleName == name || (matchingFunc(name, roleName) && name != roleName) {
 			return true
 		}
 	}
