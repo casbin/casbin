@@ -147,6 +147,27 @@ func (e *SyncedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 	return e.Enforcer.Enforce(rvals...)
 }
 
+// EnforceWithMatcher use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
+func (e *SyncedEnforcer) EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.EnforceWithMatcher(matcher, rvals...)
+}
+
+// EnforceEx explain enforcement by informing matched rules
+func (e *SyncedEnforcer) EnforceEx(rvals ...interface{}) (bool, []string, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.EnforceEx(rvals...)
+}
+
+// EnforceExWithMatcher use a custom matcher and explain enforcement by informing matched rules
+func (e *SyncedEnforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.EnforceExWithMatcher(matcher, rvals...)
+}
+
 // BatchEnforce enforce in batches
 func (e *SyncedEnforcer) BatchEnforce(requests [][]interface{}) ([]bool, error) {
 	e.m.RLock()
@@ -354,6 +375,18 @@ func (e *SyncedEnforcer) UpdateNamedPolicies(ptype string, p1 [][]string, p2 [][
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.UpdateNamedPolicies(ptype, p1, p2)
+}
+
+func (e *SyncedEnforcer) UpdateFilteredPolicies(newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.UpdateFilteredPolicies(newPolicies, fieldIndex, fieldValues...)
+}
+
+func (e *SyncedEnforcer) UpdateFilteredNamedPolicies(ptype string, newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.UpdateFilteredNamedPolicies(ptype, newPolicies, fieldIndex, fieldValues...)
 }
 
 // RemovePolicies removes authorization rules from the current policy.

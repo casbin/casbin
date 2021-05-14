@@ -15,7 +15,7 @@
 package casbin
 
 import (
-	"github.com/casbin/casbin/v2/effect"
+	"github.com/casbin/casbin/v2/effector"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 	"github.com/casbin/casbin/v2/rbac"
@@ -39,7 +39,7 @@ type IEnforcer interface {
 	SetWatcher(watcher persist.Watcher) error
 	GetRoleManager() rbac.RoleManager
 	SetRoleManager(rm rbac.RoleManager)
-	SetEffector(eft effect.Effector)
+	SetEffector(eft effector.Effector)
 	ClearPolicy()
 	LoadPolicy() error
 	LoadFilteredPolicy(filter interface{}) error
@@ -130,6 +130,7 @@ type IEnforcer interface {
 
 	UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, error)
 	UpdatePolicies(oldPolicies [][]string, newPolicies [][]string) (bool, error)
+	UpdateFilteredPolicies(newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error)
 }
 
 var _ IDistributedEnforcer = &DistributedEnforcer{}
@@ -145,4 +146,5 @@ type IDistributedEnforcer interface {
 	ClearPolicySelf(shouldPersist func() bool) error
 	UpdatePolicySelf(shouldPersist func() bool, sec string, ptype string, oldRule, newRule []string) (effected bool, err error)
 	UpdatePoliciesSelf(shouldPersist func() bool, sec string, ptype string, oldRules, newRules [][]string) (effected bool, err error)
+	UpdateFilteredPoliciesSelf(shouldPersist func() bool, sec string, ptype string, newRules [][]string, fieldIndex int, fieldValues ...string) (bool, error)
 }

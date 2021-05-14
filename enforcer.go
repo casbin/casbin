@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"github.com/antonmedv/expr"
-	"github.com/casbin/casbin/v2/effect"
+	"github.com/casbin/casbin/v2/effector"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
@@ -34,7 +34,7 @@ type Enforcer struct {
 	modelPath string
 	model     model.Model
 	fm        model.FunctionMap
-	eft       effect.Effector
+	eft       effector.Effector
 
 	adapter    persist.Adapter
 	watcher    persist.Watcher
@@ -186,7 +186,7 @@ func (e *Enforcer) SetLogger(logger log.Logger) {
 
 func (e *Enforcer) initialize() {
 	e.rmMap = map[string]rbac.RoleManager{}
-	e.eft = effect.NewDefaultEffector()
+	e.eft = effector.NewDefaultEffector()
 	e.watcher = nil
 
 	e.enabled = true
@@ -256,7 +256,7 @@ func (e *Enforcer) SetRoleManager(rm rbac.RoleManager) {
 }
 
 // SetEffector sets the current effector.
-func (e *Enforcer) SetEffector(eft effect.Effector) {
+func (e *Enforcer) SetEffector(eft effector.Effector) {
 	e.eft = eft
 }
 
@@ -365,7 +365,11 @@ func (e *Enforcer) SavePolicy() error {
 
 func (e *Enforcer) initRmMap() {
 	for ptype := range e.model["g"] {
-		e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
+		if rm, ok := e.rmMap[ptype]; ok {
+			_ = rm.Clear()
+		} else {
+			e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
+		}
 	}
 }
 
@@ -462,20 +466,24 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		envir[token] = rvals[i]
 	}
 
-	var policyEffects []effect.Effect
+	if len(e.model["r"]["r"].Tokens) != len(rvals) {
+		return false, fmt.Errorf(
+			"invalid request size: expected %d, got %d, rvals: %v",
+			len(e.model["r"]["r"].Tokens),
+			len(rvals),
+			rvals)
+	}
+
+	var policyEffects []effector.Effect
 	var matcherResults []float64
 
+	var effect effector.Effect
+	var explainIndex int
 	if policyLen := len(e.model["p"]["p"].Policy); policyLen != 0 {
-		policyEffects = make([]effect.Effect, policyLen)
+		policyEffects = make([]effector.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
-		if len(e.model["r"]["r"].Tokens) != len(rvals) {
-			return false, fmt.Errorf(
-				"invalid request size: expected %d, got %d, rvals: %v",
-				len(e.model["r"]["r"].Tokens),
-				len(rvals),
-				rvals)
-		}
-		for i, pvals := range e.model["p"]["p"].Policy {
+
+		for policyIndex, pvals := range e.model["p"]["p"].Policy {
 			// log.LogPrint("Policy Rule: ", pvals)
 			if len(e.model["p"]["p"].Tokens) != len(pvals) {
 				return false, fmt.Errorf(
@@ -513,18 +521,16 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				return false, err
 			}
 
+			// set to no-match at first
+			matcherResults[policyIndex] = 0
 			switch result := result.(type) {
 			case bool:
-				if !result {
-					policyEffects[i] = effect.Indeterminate
-					continue
+				if result {
+					matcherResults[policyIndex] = 1
 				}
 			case float64:
-				if result == 0 {
-					policyEffects[i] = effect.Indeterminate
-					continue
-				} else {
-					matcherResults[i] = result
+				if result != 0 {
+					matcherResults[policyIndex] = 1
 				}
 			default:
 				return false, errors.New("matcher result should be bool, int or float")
@@ -533,28 +539,36 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			if j, ok := envir["p_eft"]; ok {
 				eft := j
 				if eft == "allow" {
-					policyEffects[i] = effect.Allow
+					policyEffects[policyIndex] = effector.Allow
 				} else if eft == "deny" {
-					policyEffects[i] = effect.Deny
+					policyEffects[policyIndex] = effector.Deny
 				} else {
-					policyEffects[i] = effect.Indeterminate
+					policyEffects[policyIndex] = effector.Indeterminate
 				}
 			} else {
-				policyEffects[i] = effect.Allow
+				policyEffects[policyIndex] = effector.Allow
 			}
 
-			if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
+			//if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
+			//	break
+			//}
+
+			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects[:policyIndex+1], matcherResults[:policyIndex+1], policyIndex, policyLen)
+			if err != nil {
+				return false, err
+			}
+			if effect != effector.Indeterminate {
 				break
 			}
-
 		}
 	} else {
 		if hasEval && len(e.model["p"]["p"].Policy) == 0 {
 			return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
 		}
 
-		policyEffects = make([]effect.Effect, 1)
+		policyEffects = make([]effector.Effect, 1)
 		matcherResults = make([]float64, 1)
+		matcherResults[0] = 1
 
 		// parameters.pVals = make([]string, len(parameters.pTokens))
 
@@ -565,15 +579,15 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 
 		if result.(bool) {
-			policyEffects[0] = effect.Allow
+			policyEffects[0] = effector.Allow
 		} else {
-			policyEffects[0] = effect.Indeterminate
+			policyEffects[0] = effector.Indeterminate
 		}
-	}
 
-	result, explainIndex, err := e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults)
-	if err != nil {
-		return false, err
+		effect, explainIndex, err = e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults, 0, 1)
+		if err != nil {
+			return false, err
+		}
 	}
 
 	var logExplains [][]string
@@ -585,6 +599,11 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 	}
 
+	// effect -> result
+	result := false
+	if effect == effector.Allow {
+		result = true
+	}
 	e.logger.LogEnforce(expString, rvals, result, logExplains)
 
 	return result, nil

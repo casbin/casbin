@@ -15,6 +15,8 @@
 package casbin
 
 import (
+	"fmt"
+
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
 )
@@ -142,9 +144,20 @@ func (e *Enforcer) DeletePermissionsForUser(user string) (bool, error) {
 
 // GetPermissionsForUser gets permissions for a user or role.
 func (e *Enforcer) GetPermissionsForUser(user string, domain ...string) [][]string {
-	args := []string{user}
-	args = append(args, domain...)
-	return e.GetFilteredPolicy(0, args...)
+	permission := make([][]string, 0)
+	for ptype, assertion := range e.model["p"] {
+		args := make([]string, len(assertion.Tokens))
+		args[0] = user
+		for i, token := range assertion.Tokens {
+			if token == fmt.Sprintf("%s_dom", ptype) {
+				args[i] = domain[0]
+				break
+			}
+		}
+		perm := e.GetFilteredPolicy(0, args...)
+		permission = append(permission, perm...)
+	}
+	return permission
 }
 
 // HasPermissionForUser determines whether a user has a permission.
