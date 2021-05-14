@@ -63,52 +63,70 @@ func (e *Enforcer) DeleteRolesForUserInDomain(user string, domain string) (bool,
 func (e *Enforcer) GetAllUsersByDomain(domain string) []string {
 	m := make(map[string]struct{})
 	g := e.model["g"]["g"]
-	if len(g.Tokens) != 3 {
-		return []string{}
-	}
+	p := e.model["p"]["p"]
 	users := make([]string, 0)
-	for _, policy := range g.Policy {
-		if _, ok := m[policy[2]]; policy[2] == domain && ok {
-			users = append(users, policy[0])
+	index := e.getDomainIndex("p")
+
+	getUser := func(index int, policies [][]string, domain string, m map[string]struct{}) []string {
+		if len(policies) == 0 || len(policies[0]) <= index {
+			return []string{}
 		}
+		res := make([]string, 0)
+		for _, policy := range policies {
+			if _, ok := m[policy[0]]; policy[index] == domain && !ok {
+				res = append(res, policy[0])
+				m[policy[0]] = struct{}{}
+			}
+		}
+		return res
 	}
+
+	users = append(users, getUser(2, g.Policy, domain, m)...)
+	users = append(users, getUser(index, p.Policy, domain, m)...)
 	return users
 }
 
 // DeleteAllUsersByDomain would delete all users associated with the domain.
 func (e *Enforcer) DeleteAllUsersByDomain(domain string) (bool, error) {
 	g := e.model["g"]["g"]
-	if len(g.Tokens) != 3 {
-		return false, nil
-	}
-	policies := make([][]string, 0)
-	for _, policy := range g.Policy {
-		if policy[3] == domain {
-			policies = append(policies, policy)
+	p := e.model["p"]["p"]
+	index := e.getDomainIndex("p")
+
+	getUser := func(index int, policies [][]string, domain string) [][]string {
+		if len(policies) == 0 || len(policies[0]) <= index {
+			return [][]string{}
 		}
+		res := make([][]string, 0)
+		for _, policy := range policies {
+			if policy[index] == domain {
+				res = append(res, policy)
+			}
+		}
+		return res
 	}
-	return e.RemoveGroupingPolicies(policies)
+
+	users := getUser(2, g.Policy, domain)
+	if _, err := e.RemoveGroupingPolicies(users); err != nil {
+		return false, err
+	}
+	users = getUser(index, p.Policy, domain)
+	if _, err := e.RemovePolicies(users); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // DeleteDomains would delete all associated users and roles.
 // It would delete all domains if parameter is not provided.
-func (e *Enforcer) DeleteDomains(domains ...string) (bool, error) {
-	g := e.model["g"]["g"]
-	if len(g.Tokens) != 3 {
-		return false, nil
-	}
+func (e *Enforcer) DeleteDomains(index int, domains ...string) (bool, error) {
 	if len(domains) == 0 {
-		return e.RemoveGroupingPolicies(g.Policy)
+		e.ClearPolicy()
+		return true, nil
 	}
-	m := make(map[string]struct{})
 	for _, domain := range domains {
-		m[domain] = struct{}{}
-	}
-	policies := make([][]string, 0)
-	for _, policy := range g.Policy {
-		if _, ok := m[policy[2]]; ok {
-			policies = append(policies, policy)
+		if _, err := e.DeleteAllUsersByDomain(domain); err != nil {
+			return false, err
 		}
 	}
-	return e.RemoveGroupingPolicies(policies)
+	return true, nil
 }
