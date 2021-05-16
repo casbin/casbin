@@ -210,3 +210,43 @@ func TestGetDomainsForUser(t *testing.T) {
 	testGetDomainsForUser(t, e, []string{"domain2", "domain3"}, "bob")
 	testGetDomainsForUser(t, e, []string{"domain3"}, "user")
 }
+
+func testGetAllUsersByDomain(t *testing.T, e *Enforcer, domain string, expected []string) {
+	if !util.ArrayEquals(e.GetAllUsersByDomain(domain), expected) {
+		t.Errorf("users in %s: %v, supposed to be %v\n", domain, e.GetAllUsersByDomain(domain), expected)
+	}
+}
+
+func TestGetAllUsersByDomain(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+
+	testGetAllUsersByDomain(t, e, "domain1", []string{"alice", "admin"})
+	testGetAllUsersByDomain(t, e, "domain2", []string{"bob", "admin"})
+}
+
+func testDeleteAllUsersByDomain(t *testing.T, domain string, expectedPolicy, expectedGroupingPolicy [][]string) {
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+
+	_, _ = e.DeleteAllUsersByDomain(domain)
+	if !util.Array2DEquals(e.GetPolicy(), expectedPolicy) {
+		t.Errorf("policy in %s: %v, supposed to be %v\n", domain, e.GetPolicy(), expectedPolicy)
+	}
+	if !util.Array2DEquals(e.GetGroupingPolicy(), expectedGroupingPolicy) {
+		t.Errorf("grouping policy in %s: %v, supposed to be %v\n", domain, e.GetGroupingPolicy(), expectedGroupingPolicy)
+	}
+}
+
+func TestDeleteAllUsersByDomain(t *testing.T) {
+	testDeleteAllUsersByDomain(t, "domain1", [][]string{
+		{"admin", "domain2", "data2", "read"},
+		{"admin", "domain2", "data2", "write"},
+	}, [][]string{
+		{"bob", "admin", "domain2"},
+	})
+	testDeleteAllUsersByDomain(t, "domain2", [][]string{
+		{"admin", "domain1", "data1", "read"},
+		{"admin", "domain1", "data1", "write"},
+	}, [][]string{
+		{"alice", "admin", "domain1"},
+	})
+}
