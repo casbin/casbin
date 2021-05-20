@@ -355,3 +355,73 @@ func TestImplicitUserAPI(t *testing.T) {
 	_, _ = e.AddGroupingPolicy("alice", "admin")
 	testGetImplicitUsers(t, e, []string{"alice", "bob"}, "data1", "read")
 }
+
+func testGetImplicitResourcesForUser(t *testing.T, e *Enforcer, res [][]string, user string, domain ...string) {
+	t.Helper()
+	myRes, _ := e.GetImplicitResourcesForUser(user, domain...)
+	t.Log("Implicit resources for user: ", user, ": ", myRes)
+
+	lessFunc := func(arr [][]string) func(int, int) bool {
+		return func(i, j int) bool {
+			policy1, policy2 := arr[i], arr[j]
+			for k := range policy1 {
+				if policy1[k] == policy2[k] {
+					continue
+				}
+				return policy1[k] < policy2[k]
+			}
+			return true
+		}
+	}
+
+	sort.Slice(res, lessFunc(res))
+	sort.Slice(myRes, lessFunc(myRes))
+
+	if !util.Array2DEquals(res, myRes) {
+		t.Error("Implicit resources for user: ", user, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
+func TestGetImplicitResourcesForUser(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
+	testGetImplicitResourcesForUser(t, e, [][]string{
+		{"alice", "/pen/1", "GET"},
+		{"alice", "/pen2/1", "GET"},
+		{"alice", "/book/:id", "GET"},
+		{"alice", "/book2/{id}", "GET"},
+		{"alice", "/book/*", "GET"},
+		{"alice", "book_group", "GET"},
+	}, "alice")
+	testGetImplicitResourcesForUser(t, e, [][]string{
+		{"bob", "pen_group", "GET"},
+		{"bob", "/pen/:id", "GET"},
+		{"bob", "/pen2/{id}", "GET"},
+	}, "bob")
+	testGetImplicitResourcesForUser(t, e, [][]string{
+		{"cathy", "pen_group", "GET"},
+		{"cathy", "/pen/:id", "GET"},
+		{"cathy", "/pen2/{id}", "GET"},
+	}, "cathy")
+}
+
+func TestImplicitUsersForRole(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
+
+	testGetImplicitUsersForRole(t, e, "book_admin", []string{"alice"})
+	testGetImplicitUsersForRole(t, e, "pen_admin", []string{"cathy", "bob"})
+
+	testGetImplicitUsersForRole(t, e, "book_group", []string{"/book/*", "/book/:id", "/book2/{id}"})
+	testGetImplicitUsersForRole(t, e, "pen_group", []string{"/pen/:id", "/pen2/{id}"})
+}
+
+func testGetImplicitUsersForRole(t *testing.T, e *Enforcer, name string, res []string) {
+	t.Helper()
+	myRes, _ := e.GetImplicitUsersForRole(name)
+	t.Log("Implicit users for ", name, ": ", myRes)
+	sort.Strings(res)
+	sort.Strings(myRes)
+
+	if !util.ArrayEquals(res, myRes) {
+		t.Error("Implicit users for ", name, ": ", myRes, ", supposed to be ", res)
+	}
+}
