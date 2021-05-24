@@ -268,7 +268,7 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 		var names []string
 		for _, domain := range patternDomain {
 			nameWithDomain := getNameWithDomain(domain, name)
-			if !rm.roles.hasRole(domain, name, rm.domainMatchingFunc) {
+			if !rm.roles.hasRole(domain, name, rm.matchingFunc) {
 				return nil, errors.ERR_NAME_NOT_FOUND
 			}
 
