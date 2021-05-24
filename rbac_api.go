@@ -15,8 +15,6 @@
 package casbin
 
 import (
-	"fmt"
-
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
 )
@@ -148,10 +146,11 @@ func (e *Enforcer) GetPermissionsForUser(user string, domain ...string) [][]stri
 	for ptype, assertion := range e.model["p"] {
 		args := make([]string, len(assertion.Tokens))
 		args[0] = user
-		for i, token := range assertion.Tokens {
-			if token == fmt.Sprintf("%s_dom", ptype) {
-				args[i] = domain[0]
-				break
+
+		if len(domain) > 0 {
+			index := e.getDomainIndex(ptype)
+			if index < len(assertion.Tokens) {
+				args[index] = domain[0]
 			}
 		}
 		perm := e.GetFilteredPolicy(0, args...)
