@@ -1,4 +1,4 @@
-// Copyright 2020 The casbin Authors. All Rights Reserved.
+// Copyright 2021 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,17 +14,17 @@
 
 package casbin
 
-import (
-	"testing"
-)
+import "encoding/json"
 
-func TestCasbinJsGetPermissionForUser(t *testing.T) {
-	e, err := NewSyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+func CasbinJsGetPermissionForUserOld(e IEnforcer, user string) ([]byte, error) {
+	policy, err := e.GetImplicitPermissionsForUser(user)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	_, err = CasbinJsGetPermissionForUser(e, "alice") // make sure CasbinJsGetPermissionForUser can be used with a SyncedEnforcer.
-	if err != nil {
-		t.Errorf("Test error: %s", err)
+	permission := make(map[string][]string)
+	for i := 0; i < len(policy); i++ {
+		permission[policy[i][2]] = append(permission[policy[i][2]], policy[i][1])
 	}
+	b, _ := json.Marshal(permission)
+	return b, nil
 }
