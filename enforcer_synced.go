@@ -53,10 +53,10 @@ func (e *SyncedEnforcer) IsAutoLoadingRunning() bool {
 // StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy
 func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 	// Don't start another goroutine if there is already one running
-	if e.IsAutoLoadingRunning() {
+	if !atomic.CompareAndSwapInt32(&e.autoLoadRunning, 0, 1) {
 		return
 	}
-	atomic.StoreInt32(&(e.autoLoadRunning), int32(1))
+
 	ticker := time.NewTicker(d)
 	go func() {
 		defer func() {
