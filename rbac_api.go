@@ -17,6 +17,7 @@ package casbin
 import (
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
+	"regexp"
 )
 
 // GetRolesForUser gets the roles that a user has.
@@ -172,7 +173,7 @@ func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool 
 //
 // GetRolesForUser("alice") can only get: ["role:admin"].
 // But GetImplicitRolesForUser("alice") will get: ["role:admin", "role:user"].
-func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]string, error) {
+func (e *Enforcer) GetImplicitRolesForUser(name string, domainAndPtype ...string) ([]string, error) {
 	res := []string{}
 	roleSet := make(map[string]bool)
 	roleSet[name] = true
@@ -180,20 +181,23 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]str
 	q := make([]string, 0)
 	q = append(q, name)
 
+	domain, ptypes := handleDomainAndPtype(e,domainAndPtype...)
+
 	for len(q) > 0 {
 		name := q[0]
 		q = q[1:]
 
-		for _, rm := range e.rmMap {
-			roles, err := rm.GetRoles(name, domain...)
-			if err != nil {
-				return nil, err
-			}
-			for _, r := range roles {
-				if _, ok := roleSet[r]; !ok {
-					res = append(res, r)
-					q = append(q, r)
-					roleSet[r] = true
+		for _,ptype := range ptypes {
+			rm := e.rmMap[ptype]
+				roles, err := rm.GetRoles(name, domain...)
+				if err != nil {
+					return nil, err
+				}
+				for _, r := range roles {
+					if _, ok := roleSet[r]; !ok {
+						res = append(res, r)
+						q = append(q, r)
+						roleSet[r] = true
 				}
 			}
 		}
@@ -203,10 +207,12 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]str
 }
 
 // GetImplicitUsersForRole gets implicit users for a role.
-func (e *Enforcer) GetImplicitUsersForRole(name string, domain ...string) ([]string, error) {
+func (e *Enforcer) GetImplicitUsersForRole(name string, domainAndPtype ...string) ([]string, error) {
 	res := []string{}
 	roleSet := make(map[string]bool)
 	roleSet[name] = true
+
+	domain,ptypes := handleDomainAndPtype(e,domainAndPtype...)
 
 	q := make([]string, 0)
 	q = append(q, name)
@@ -215,7 +221,8 @@ func (e *Enforcer) GetImplicitUsersForRole(name string, domain ...string) ([]str
 		name := q[0]
 		q = q[1:]
 
-		for _, rm := range e.rmMap {
+		for _,ptype := range ptypes {
+			rm := e.rmMap[ptype]
 			roles, err := rm.GetUsers(name, domain...)
 			if err != nil && err.Error() != "error: name does not exist" {
 				return nil, err
@@ -345,4 +352,31 @@ func (e *Enforcer) GetImplicitResourcesForUser(user string, domain ...string) ([
 		res = append(res, resLocal...)
 	}
 	return res, nil
+}
+
+func handleDomainAndPtype(e *Enforcer,domainAndPtype ...string)([]string,[]string) {
+	domain,ptype := make([]string,0),make([]string,0)
+	length := len(domainAndPtype)
+	if length == 0 {
+		if len(ptype) == 0 {
+			for k := range e.rmMap {
+				ptype  = append(ptype,k)
+			}
+		}
+		return domain,ptype
+	}
+	ptypePattern := regexp.MustCompile(`g\d+`)
+	for _,item := range domainAndPtype {
+		if item[0] == 'g' && ptypePattern.MatchString(item){
+			ptype = append(ptype, item)
+		}else{
+			domain = append(domain,item)
+		}
+	}
+	if len(ptype) == 0 {
+		for k := range e.rmMap {
+			ptype  = append(ptype,k)
+		}
+	}
+	return domain, ptype
 }
