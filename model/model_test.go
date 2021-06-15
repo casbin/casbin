@@ -148,3 +148,38 @@ func TestModel_CopyTo(t *testing.T) {
 		t.Fatal(`the a["p"]["p"] and b["p"]["p"] should not be equal`)
 	}
 }
+
+func TestModelToTest(t *testing.T) {
+	testModelToText(t, "r.sub == p.sub && r.obj == p.obj && r_func(r.act, p.act) && testr_func(r.act, p.act)", "r_sub == p_sub && r_obj == p_obj && r_func(r_act, p_act) && testr_func(r_act, p_act)")
+	testModelToText(t, "r.sub == p.sub && r.obj == p.obj && p_func(r.act, p.act) && testp_func(r.act, p.act)", "r_sub == p_sub && r_obj == p_obj && p_func(r_act, p_act) && testp_func(r_act, p_act)")
+}
+
+func testModelToText(t *testing.T, mData, mExpected string) {
+	m := NewModel()
+	data := map[string]string{
+		"r": "sub, obj, act",
+		"p": "sub, obj, act",
+		"e": "some(where (p.eft == allow))",
+		"m": mData,
+	}
+	expected := map[string]string{
+		"r": "sub, obj, act",
+		"p": "sub, obj, act",
+		"e": "some(where (p_eft == allow))",
+		"m": mExpected,
+	}
+	addData := func(ptype string) {
+		m.AddDef(ptype, ptype, data[ptype])
+	}
+	for ptype := range data {
+		addData(ptype)
+	}
+	newM := NewModel()
+	print(m.ToText())
+	_ = newM.LoadModelFromText(m.ToText())
+	for ptype := range data {
+		if newM[ptype][ptype].Value != expected[ptype] {
+			t.Errorf("\"%s\" assertion value changed, current value: %s, it should be: %s", ptype, newM[ptype][ptype].Value, expected[ptype])
+		}
+	}
+}
