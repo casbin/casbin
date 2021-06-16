@@ -17,6 +17,7 @@ package casbin
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effector"
@@ -29,6 +30,8 @@ import (
 	"github.com/casbin/casbin/v2/util"
 )
 
+type RoleManagerMap map[string]rbac.RoleManager
+
 // Enforcer is the main interface for authorization enforcement and policy management.
 type Enforcer struct {
 	modelPath string
@@ -39,7 +42,7 @@ type Enforcer struct {
 	adapter    persist.Adapter
 	watcher    persist.Watcher
 	dispatcher persist.Dispatcher
-	rmMap      map[string]rbac.RoleManager
+	rmMap      RoleManagerMap
 
 	enabled              bool
 	autoSave             bool
@@ -132,7 +135,21 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 
 // InitWithFile initializes an enforcer with a model file and a policy file.
 func (e *Enforcer) InitWithFile(modelPath string, policyPath string) error {
-	a := fileadapter.NewAdapter(policyPath)
+	var a persist.Adapter
+
+	// When the policy path is empty, the user only passes the model path.
+	// If the policy path is not empty, we have to make sure the file exists.
+	if policyPath != "" {
+		exists, err := util.PathExists(policyPath)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			return os.ErrNotExist
+		}
+		a = fileadapter.NewAdapter(policyPath)
+	}
+
 	return e.InitWithAdapter(modelPath, a)
 }
 
@@ -185,7 +202,6 @@ func (e *Enforcer) SetLogger(logger log.Logger) {
 }
 
 func (e *Enforcer) initialize() {
-	e.rmMap = map[string]rbac.RoleManager{}
 	e.eft = effector.NewDefaultEffector()
 	e.watcher = nil
 
@@ -194,7 +210,9 @@ func (e *Enforcer) initialize() {
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
 	e.autoNotifyDispatcher = true
-	e.initRmMap()
+
+	e.rmMap = RoleManagerMap{}
+	e.initRmMap(e.model, e.rmMap)
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -271,38 +289,34 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
-	oldModel := e.model
-	e.model = model.NewModel()
-	e.model.SetLogger(oldModel.GetLogger())
+	newModel := model.NewModel()
+	e.model.CopyTo(&newModel)
+	newModel.ClearPolicy()
 
 	var err error
+	rmMap := RoleManagerMap{}
 	defer func() {
-		if err != nil {
-			e.model = oldModel
+		if err == nil {
+			e.model = newModel
+			e.rmMap = rmMap
 		}
 	}()
 
-	if err = e.model.LoadModelFromText(oldModel.ToText()); err != nil {
-		return err
-	}
-	if err = e.adapter.LoadPolicy(e.model); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
+	if err = e.adapter.LoadPolicy(newModel); err != nil {
 		return err
 	}
 
-	if err = e.model.SortPoliciesByPriority(); err != nil {
-		return err
-	}
-
-	if err = e.clearRmMap(); err != nil {
+	if err = newModel.SortPoliciesByPriority(); err != nil {
 		return err
 	}
 
 	if e.autoBuildRoleLinks {
-		err = e.BuildRoleLinks()
+		err = e.buildRoleLinks(newModel, rmMap)
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -324,7 +338,6 @@ func (e *Enforcer) loadFilteredPolicy(filter interface{}) error {
 		return err
 	}
 
-	e.initRmMap()
 	e.model.PrintPolicy()
 	if e.autoBuildRoleLinks {
 		err := e.BuildRoleLinks()
@@ -376,23 +389,10 @@ func (e *Enforcer) SavePolicy() error {
 	return nil
 }
 
-func (e *Enforcer) initRmMap() {
-	for ptype := range e.model["g"] {
-		if rm, ok := e.rmMap[ptype]; ok {
-			_ = rm.Clear()
-		} else {
-			e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
-		}
+func (e *Enforcer) initRmMap(model model.Model, rmMap RoleManagerMap) {
+	for ptype := range model["g"] {
+		rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
 	}
-}
-
-func (e *Enforcer) clearRmMap() error {
-	for ptype := range e.model["g"] {
-		if err := e.rmMap[ptype].Clear(); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 // EnableEnforce changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
@@ -432,14 +432,12 @@ func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *Enforcer) BuildRoleLinks() error {
-	for _, rm := range e.rmMap {
-		err := rm.Clear()
-		if err != nil {
-			return err
-		}
-	}
+	return e.buildRoleLinks(e.model, e.rmMap)
+}
 
-	return e.model.BuildRoleLinks(e.rmMap)
+func (e *Enforcer) buildRoleLinks(model model.Model, rmMap RoleManagerMap) error {
+	e.initRmMap(model, rmMap)
+	return model.BuildRoleLinks(rmMap)
 }
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.

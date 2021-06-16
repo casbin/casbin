@@ -205,6 +205,18 @@ func (model Model) PrintModel() {
 	model.GetLogger().LogModel(modelInfo)
 }
 
+func (model Model) CopyTo(dest *Model) {
+	for modelKey, modelValue := range model {
+		astMap := make(AssertionMap)
+		(*dest)[modelKey] = astMap
+		for key, value := range modelValue {
+			ast := new(Assertion)
+			value.copyTo(ast)
+			astMap[key] = ast
+		}
+	}
+}
+
 func (model Model) SortPoliciesByPriority() error {
 	for ptype, assertion := range model["p"] {
 		for index, token := range assertion.Tokens {
