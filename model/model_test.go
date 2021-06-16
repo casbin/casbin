@@ -15,11 +15,14 @@
 package model
 
 import (
-	"github.com/casbin/casbin/v2/config"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/casbin/casbin/v2/config"
 )
 
 var (
@@ -120,5 +123,28 @@ func TestModel_AddDef(t *testing.T) {
 	ok = m.AddDef(s, s, "")
 	if ok {
 		t.Errorf("empty assertion value should not be added")
+	}
+}
+
+func TestModel_CopyTo(t *testing.T) {
+	a := NewModel()
+	a["p"] = make(AssertionMap)
+	a["p"]["p"] = new(Assertion)
+	a["p"]["p"].Policy = [][]string{{"1"}, {"2"}}
+
+	b := NewModel()
+	a.CopyTo(&b)
+
+	if fmt.Sprintf("%p", a["p"]) == fmt.Sprintf("%p", b["p"]) {
+		t.Fatal(`the memory address of a["p"] and b["p"] should not be equal`)
+	}
+
+	if fmt.Sprintf("%p", a["p"]["p"]) == fmt.Sprintf("%p", b["p"]["p"]) {
+		t.Fatal(`the memory address of a["p"]["p"] and b["p"]["p"] should not be equal`)
+	}
+
+	a["p"]["p"].Policy = nil
+	if reflect.DeepEqual(a["p"]["p"], b["p"]["p"]) {
+		t.Fatal(`the a["p"]["p"] and b["p"]["p"] should not be equal`)
 	}
 }

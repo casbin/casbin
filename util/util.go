@@ -15,6 +15,7 @@
 package util
 
 import (
+	"os"
 	"regexp"
 	"sort"
 	"strings"
@@ -196,4 +197,16 @@ func RemoveDuplicateElement(s []string) []string {
 		}
 	}
 	return result
+}
+
+func PathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsExist(err) {
+		return true, nil
+	} else {
+		return false, err
+	}
 }
