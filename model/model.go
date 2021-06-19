@@ -248,10 +248,21 @@ func (model Model) SortPoliciesByPriority() error {
 }
 
 func (model Model) ToText() string {
+	tokenPatterns := make(map[string]string)
+
+	for _, ptype := range []string{"r", "p"} {
+		for _, token := range model[ptype][ptype].Tokens {
+			tokenPatterns[token] = strings.Replace(token, "_", ".", -1)
+		}
+	}
 	s := strings.Builder{}
 	writeString := func(sec string) {
 		for ptype := range model[sec] {
-			s.WriteString(fmt.Sprintf("%s = %s\n", ptype, strings.Replace(model[sec][ptype].Value, "_", ".", -1)))
+			value := model[sec][ptype].Value
+			for tokenPattern, newToken := range tokenPatterns {
+				value = strings.Replace(value, tokenPattern, newToken, -1)
+			}
+			s.WriteString(fmt.Sprintf("%s = %s\n", sec, value))
 		}
 	}
 	s.WriteString("[request_definition]\n")
