@@ -294,13 +294,17 @@ func (e *Enforcer) LoadPolicy() error {
 	newModel.ClearPolicy()
 
 	var err error
-	rmMap := RoleManagerMap{}
 	defer func() {
 		if err == nil {
 			e.model = newModel
-			e.rmMap = rmMap
+		} else {
+			_ = e.buildRoleLinks(e.model, e.rmMap)
 		}
 	}()
+
+	if err = e.rmMap.Clear(); err != nil {
+		return err
+	}
 
 	if err = e.adapter.LoadPolicy(newModel); err != nil {
 		return err
@@ -311,7 +315,7 @@ func (e *Enforcer) LoadPolicy() error {
 	}
 
 	if e.autoBuildRoleLinks {
-		err = e.buildRoleLinks(newModel, rmMap)
+		err = e.buildRoleLinks(newModel, e.rmMap)
 		if err != nil {
 			return err
 		}
@@ -738,4 +742,13 @@ func (p enforceParameters) Get(name string) (interface{}, error) {
 	default:
 		return nil, errors.New("No parameter '" + name + "' found.")
 	}
+}
+
+func (m *RoleManagerMap) Clear() error {
+	for _, rm := range *m {
+		if err := rm.Clear(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
