@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/casbin/casbin/v2/log"
@@ -547,6 +548,13 @@ func newTestSubject(name string, age int) testSub {
 
 func TestABACPolicy(t *testing.T) {
 	e, _ := NewEnforcer("examples/abac_rule_model.conf", "examples/abac_rule_policy.csv")
+	m := e.GetModel()
+	for sec, ast := range m {
+		fmt.Println(sec)
+		for ptype, p := range ast {
+			fmt.Println(ptype, p)
+		}
+	}
 	sub1 := newTestSubject("alice", 16)
 	sub2 := newTestSubject("alice", 20)
 	sub3 := newTestSubject("alice", 65)

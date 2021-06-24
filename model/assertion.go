@@ -36,10 +36,6 @@ type Assertion struct {
 	priorityIndex int
 }
 
-func (ast *Assertion) copyTo(dest *Assertion) {
-	*dest = *ast
-}
-
 func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
 	ast.RM = rm
 	count := strings.Count(ast.Value, "_")
