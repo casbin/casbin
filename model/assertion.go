@@ -96,3 +96,27 @@ func (ast *Assertion) setLogger(logger log.Logger) {
 func (ast *Assertion) initPriorityIndex() {
 	ast.priorityIndex = -1
 }
+
+func (ast *Assertion) copy() *Assertion {
+	tokens := append([]string(nil), ast.Tokens...)
+	policy := make([][]string, len(ast.Policy))
+
+	for i, p := range ast.Policy {
+		policy[i] = append(policy[i], p...)
+	}
+	policyMap := make(map[string]int)
+	for k, v := range ast.PolicyMap {
+		policyMap[k] = v
+	}
+
+	newAst := &Assertion{
+		Key:           ast.Key,
+		Value:         ast.Value,
+		PolicyMap:     policyMap,
+		Tokens:        tokens,
+		Policy:        policy,
+		priorityIndex: ast.priorityIndex,
+	}
+
+	return newAst
+}

@@ -271,3 +271,18 @@ func (model Model) ToText() string {
 	writeString("m")
 	return s.String()
 }
+
+func (model Model) Copy() Model {
+	newModel := NewModel()
+
+	for sec, m := range model {
+		newAstMap := make(AssertionMap)
+		for ptype, ast := range m {
+			newAstMap[ptype] = ast.copy()
+		}
+		newModel[sec] = newAstMap
+	}
+
+	newModel.SetLogger(model.GetLogger())
+	return newModel
+}
