@@ -34,8 +34,13 @@ type FilteredAdapter struct {
 // Filter defines the filtering rules for a FilteredAdapter's policy. Empty values
 // are ignored, but all others must match the filter.
 type Filter struct {
-	P []string
-	G []string
+	P  []string
+	G  []string
+	G1 []string
+	G2 []string
+	G3 []string
+	G4 []string
+	G5 []string
 }
 
 // NewFilteredAdapter is the constructor for FilteredAdapter.
@@ -119,6 +124,16 @@ func filterLine(line string, filter *Filter) bool {
 		filterSlice = filter.P
 	case "g":
 		filterSlice = filter.G
+	case "g1":
+		filterSlice = filter.G1
+	case "g2":
+		filterSlice = filter.G2
+	case "g3":
+		filterSlice = filter.G3
+	case "g4":
+		filterSlice = filter.G4
+	case "g5":
+		filterSlice = filter.G5
 	}
 	return filterWords(p, filterSlice)
 }

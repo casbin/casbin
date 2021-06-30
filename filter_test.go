@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
+	"github.com/casbin/casbin/v2/util"
 )
 
 func TestInitFilteredAdapter(t *testing.T) {
@@ -63,6 +64,46 @@ func TestLoadFilteredPolicy(t *testing.T) {
 	if err := e.GetAdapter().SavePolicy(e.GetModel()); err == nil {
 		t.Errorf("adapter did not prevent saving filtered policy")
 	}
+}
+
+func TestLoadMoreTypeFilteredPolicy(t *testing.T) {
+	e, _ := NewEnforcer()
+
+	adapter := fileadapter.NewFilteredAdapter("examples/rbac_with_pattern_policy.csv")
+	_ = e.InitWithAdapter("examples/rbac_with_pattern_model.conf", adapter)
+	if err := e.LoadPolicy(); err != nil {
+		t.Errorf("unexpected error in LoadPolicy: %v", err)
+	}
+	e.AddNamedMatchingFunc("g2", "matching func", util.KeyMatch2)
+	_ = e.BuildRoleLinks()
+
+	testEnforce(t, e, "alice", "/book/1", "GET", true)
+
+	// validate initial conditions
+	testHasPolicy(t, e, []string{"book_admin", "book_group", "GET"}, true)
+	testHasPolicy(t, e, []string{"pen_admin", "pen_group", "GET"}, true)
+
+	if err := e.LoadFilteredPolicy(&fileadapter.Filter{
+		P:  []string{"book_admin"},
+		G:  []string{"alice"},
+		G2: []string{"", "book_group"},
+	}); err != nil {
+		t.Errorf("unexpected error in LoadFilteredPolicy: %v", err)
+	}
+	if !e.IsFiltered() {
+		t.Errorf("adapter did not set the filtered flag correctly")
+	}
+
+	testHasPolicy(t, e, []string{"alice", "/pen/1", "GET"}, false)
+	testHasPolicy(t, e, []string{"alice", "/pen2/1", "GET"}, false)
+	testHasPolicy(t, e, []string{"pen_admin", "pen_group", "GET"}, false)
+	testHasGroupingPolicy(t, e, []string{"alice", "book_admin"}, true)
+	testHasGroupingPolicy(t, e, []string{"bob", "pen_admin"}, false)
+	testHasGroupingPolicy(t, e, []string{"cathy", "pen_admin"}, false)
+	testHasGroupingPolicy(t, e, []string{"cathy", "/book/1/2/3/4/5"}, false)
+
+	testEnforce(t, e, "alice", "/book/1", "GET", true)
+	testEnforce(t, e, "alice", "/pen/1", "GET", false)
 }
 
 func TestAppendFilteredPolicy(t *testing.T) {
