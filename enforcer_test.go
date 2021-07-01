@@ -532,3 +532,24 @@ func TestPriorityExplicit(t *testing.T) {
 		true, true, false, false, false, false, true, true,
 	})
 }
+
+func TestFailedToLoadPolicy(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
+	e.AddNamedMatchingFunc("g2", "matchingFunc", util.KeyMatch2)
+	testEnforce(t, e, "alice", "/book/1", "GET", true)
+	testEnforce(t, e, "bob", "/pen/3", "GET", true)
+	e.SetAdapter(fileadapter.NewAdapter("not found"))
+	_ = e.LoadPolicy()
+	testEnforce(t, e, "alice", "/book/1", "GET", true)
+	testEnforce(t, e, "bob", "/pen/3", "GET", true)
+}
+
+func TestReloadPolicyWithFunc(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
+	e.AddNamedMatchingFunc("g2", "matchingFunc", util.KeyMatch2)
+	testEnforce(t, e, "alice", "/book/1", "GET", true)
+	testEnforce(t, e, "bob", "/pen/3", "GET", true)
+	_ = e.LoadPolicy()
+	testEnforce(t, e, "alice", "/book/1", "GET", true)
+	testEnforce(t, e, "bob", "/pen/3", "GET", true)
+}
