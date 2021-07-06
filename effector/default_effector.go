@@ -32,7 +32,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 	explainIndex := -1
 
 	// short-circuit some effects in the middle
-	if expr != "priority(p_eft) || deny" {
+	if expr != "priority(p_eft) || deny" && expr != "subjectPriority(p_eft) || deny" {
 		if policyIndex < policyLength-1 {
 			// choose not to short-circuit
 			return result, explainIndex, nil
@@ -87,7 +87,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 				break
 			}
 		}
-	} else if expr == "priority(p_eft) || deny" {
+	} else if expr == "priority(p_eft) || deny" || expr == "subjectPriority(p_eft) || deny" {
 		result = Indeterminate
 		for i, eft := range effects {
 			if matches[i] == 0 {

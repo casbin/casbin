@@ -499,6 +499,26 @@ func TestBatchEnforce(t *testing.T) {
 	testBatchEnforce(t, e, [][]interface{}{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"jack", "data3", "read"}}, results)
 }
 
+func TestSubjectPriority(t *testing.T) {
+	e, _ := NewEnforcer("examples/subject_priority_model.conf", "examples/subject_priority_policy.csv")
+	testBatchEnforce(t, e, [][]interface{}{
+		{"jane", "data1", "read"},
+		{"alice", "data1", "read"},
+	}, []bool{
+		true, true,
+	})
+}
+
+func TestSubjectPriorityWithDomain(t *testing.T) {
+	e, _ := NewEnforcer("examples/subject_priority_model_with_domain.conf", "examples/subject_priority_policy_with_domain.csv")
+	testBatchEnforce(t, e, [][]interface{}{
+		{"alice", "data1", "domain1", "write"},
+		{"bob", "data2", "domain2", "write"},
+	}, []bool{
+		true, true,
+	})
+}
+
 func TestPriorityExplicit(t *testing.T) {
 	e, _ := NewEnforcer("examples/priority_model_explicit.conf", "examples/priority_policy_explicit.csv")
 	testBatchEnforce(t, e, [][]interface{}{

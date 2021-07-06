@@ -15,6 +15,8 @@
 package model
 
 import (
+	"container/list"
+	"errors"
 	"fmt"
 	"regexp"
 	"sort"
@@ -31,6 +33,9 @@ type Model map[string]AssertionMap
 
 // AssertionMap is the collection of assertions, can be "r", "p", "g", "e", "m".
 type AssertionMap map[string]*Assertion
+
+const defaultDomain string = ""
+const defaultSeparator = "::"
 
 var sectionNameMap = map[string]string{
 	"r": "request_definition",
@@ -204,6 +209,97 @@ func (model Model) PrintModel() {
 	}
 
 	model.GetLogger().LogModel(modelInfo)
+}
+
+func (model Model) SortPoliciesBySubjectHierarchy() error {
+	if model["e"]["e"].Value != "subjectPriority(p_eft) || deny" {
+		return nil
+	}
+	subIndex := 0
+	domainIndex := -1
+	for ptype, assertion := range model["p"] {
+		for index, token := range assertion.Tokens {
+			if token == fmt.Sprintf("%s_dom", ptype) {
+				domainIndex = index
+				break
+			}
+		}
+		policies := assertion.Policy
+		subjectHierarchyMap, err := getSubjectHierarchyMap(model["g"]["g"].Policy)
+		if err != nil {
+			return err
+		}
+		sort.SliceStable(policies, func(i, j int) bool {
+			domain1, domain2 := defaultDomain, defaultDomain
+			if domainIndex != -1 {
+				domain1 = policies[i][domainIndex]
+				domain2 = policies[j][domainIndex]
+			}
+			name1, name2 := getNameWithDomain(domain1, policies[i][subIndex]), getNameWithDomain(domain2, policies[j][subIndex])
+			p1 := subjectHierarchyMap[name1]
+			p2 := subjectHierarchyMap[name2]
+			return p1 > p2
+		})
+		for i, policy := range assertion.Policy {
+			assertion.PolicyMap[strings.Join(policy, ",")] = i
+		}
+	}
+	return nil
+}
+
+func getSubjectHierarchyMap(policies [][]string) (map[string]int, error) {
+	subjectHierarchyMap := make(map[string]int)
+	// Tree structure of role
+	policyMap := make(map[string][]string)
+	for _, policy := range policies {
+		if len(policy) < 2 {
+			return nil, errors.New("policy g expect 2 more params")
+		}
+		domain := defaultDomain
+		if len(policy) != 2 {
+			domain = policy[2]
+		}
+		child := getNameWithDomain(domain, policy[0])
+		parent := getNameWithDomain(domain, policy[1])
+		policyMap[parent] = append(policyMap[parent], child)
+		if _, ok := subjectHierarchyMap[child]; !ok {
+			subjectHierarchyMap[child] = 0
+		}
+		if _, ok := subjectHierarchyMap[parent]; !ok {
+			subjectHierarchyMap[parent] = 0
+		}
+		subjectHierarchyMap[child] = 1
+	}
+	// Use queues for levelOrder
+	queue := list.New()
+	for k, v := range subjectHierarchyMap {
+		root := k
+		if v != 0 {
+			continue
+		}
+		lv := 0
+		queue.PushBack(root)
+		for queue.Len() != 0 {
+			sz := queue.Len()
+			for i := 0; i < sz; i++ {
+				node := queue.Front()
+				queue.Remove(node)
+				nodeValue := node.Value.(string)
+				subjectHierarchyMap[nodeValue] = lv
+				if _, ok := policyMap[nodeValue]; ok {
+					for _, child := range policyMap[nodeValue] {
+						queue.PushBack(child)
+					}
+				}
+			}
+			lv++
+		}
+	}
+	return subjectHierarchyMap, nil
+}
+
+func getNameWithDomain(domain string, name string) string {
+	return domain + defaultSeparator + name
 }
 
 func (model Model) SortPoliciesByPriority() error {
