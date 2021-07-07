@@ -26,6 +26,10 @@ import (
 	"github.com/casbin/casbin/v2/rbac"
 )
 
+var (
+	keyMatch4Re *regexp.Regexp = regexp.MustCompile(`{([^/]+)}`)
+)
+
 // validate the variadic parameter size and type as string
 func validateVariadicArgs(expectedLen int, args ...interface{}) error {
 	if len(args) != expectedLen {
@@ -188,7 +192,7 @@ func KeyMatch4(key1 string, key2 string) bool {
 
 	tokens := []string{}
 
-	re := regexp.MustCompile(`\{([^/]+)\}`)
+	re := keyMatch4Re
 	key2 = re.ReplaceAllStringFunc(key2, func(s string) string {
 		tokens = append(tokens, s[1:len(s)-1])
 		return "([^/]+)"

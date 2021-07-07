@@ -2,6 +2,7 @@ package casbin
 
 import (
 	"fmt"
+	"github.com/casbin/casbin/v2/util"
 	"testing"
 )
 
@@ -115,5 +116,68 @@ func BenchmarkRoleManagerLarge(b *testing.B) {
 		for j := 0; j < 10000; j++ {
 			_, _ = rm.HasLink("user501", fmt.Sprintf("group%d", j))
 		}
+	}
+}
+
+func BenchmarkBuildRoleLinksWithPatternLarge(b *testing.B) {
+	e, _ := NewEnforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv")
+	e.AddNamedMatchingFunc("g", "", util.KeyMatch4)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = e.BuildRoleLinks()
+	}
+}
+
+func BenchmarkBuildRoleLinksWithDomainPatternLarge(b *testing.B) {
+	e, _ := NewEnforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv")
+	e.AddNamedDomainMatchingFunc("g", "", util.KeyMatch4)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = e.BuildRoleLinks()
+	}
+}
+
+func BenchmarkBuildRoleLinksWithPatternAndDomainPatternLarge(b *testing.B) {
+	e, _ := NewEnforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv")
+	e.AddNamedMatchingFunc("g", "", util.KeyMatch4)
+	e.AddNamedDomainMatchingFunc("g", "", util.KeyMatch4)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = e.BuildRoleLinks()
+	}
+}
+
+func BenchmarkHasLinkWithPatternLarge(b *testing.B) {
+	e, _ := NewEnforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv")
+	e.AddNamedMatchingFunc("g", "", util.KeyMatch4)
+	_ = e.BuildRoleLinks()
+	rm := e.rmMap["g"];
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = rm.HasLink("staffUser1001", "staff001", "/orgs/1/sites/site001")
+	}
+}
+
+func BenchmarkHasLinkWithDomainPatternLarge(b *testing.B) {
+	e, _ := NewEnforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv")
+	e.AddNamedDomainMatchingFunc("g", "", util.KeyMatch4)
+	_ = e.BuildRoleLinks()
+	rm := e.rmMap["g"];
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = rm.HasLink("staffUser1001", "staff001", "/orgs/1/sites/site001")
+	}
+
+}
+
+func BenchmarkHasLinkWithPatternAndDomainPatternLarge(b *testing.B) {
+	e, _ := NewEnforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv")
+	e.AddNamedMatchingFunc("g", "", util.KeyMatch4)
+	e.AddNamedDomainMatchingFunc("g", "", util.KeyMatch4)
+	_ = e.BuildRoleLinks()
+	rm := e.rmMap["g"];
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = rm.HasLink("staffUser1001", "staff001", "/orgs/1/sites/site001")
 	}
 }
