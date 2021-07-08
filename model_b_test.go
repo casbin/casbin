@@ -16,6 +16,7 @@ package casbin
 
 import (
 	"fmt"
+	"github.com/casbin/casbin/v2/util"
 	"testing"
 )
 
@@ -192,5 +193,15 @@ func BenchmarkPriorityModel(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _ = e.Enforce("alice", "data1", "read")
+	}
+}
+
+func BenchmarkRBACModelWithDomainPatternLarge(b *testing.B) {
+	e, _ := NewEnforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv")
+	e.AddNamedDomainMatchingFunc("g", "", util.KeyMatch4)
+	_ = e.BuildRoleLinks()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = e.Enforce("staffUser1001", "/orgs/1/sites/site001", "App001.Module001.Action1001")
 	}
 }

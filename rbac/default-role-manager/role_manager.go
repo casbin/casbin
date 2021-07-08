@@ -31,8 +31,9 @@ type MatchingFunc func(arg1, arg2 string) bool
 
 // RoleManager provides a default implementation for the RoleManager interface
 type RoleManager struct {
-	roles              *Roles
-	domains            map[string]struct{}
+	roles   *Roles
+	domains map[string]struct{}
+
 	maxHierarchyLevel  int
 	hasPattern         bool
 	matchingFunc       MatchingFunc
@@ -40,6 +41,9 @@ type RoleManager struct {
 	domainMatchingFunc MatchingFunc
 
 	logger log.Logger
+
+	matchingFuncCache       map[string]bool
+	domainMatchingFuncCache map[string]bool
 }
 
 // NewRoleManager is the constructor for creating an instance of the
@@ -61,12 +65,14 @@ func NewRoleManager(maxHierarchyLevel int) *RoleManager {
 func (rm *RoleManager) AddMatchingFunc(name string, fn MatchingFunc) {
 	rm.hasPattern = true
 	rm.matchingFunc = fn
+	rm.matchingFuncCache = make(map[string]bool)
 }
 
 // AddDomainMatchingFunc support use domain pattern in g
 func (rm *RoleManager) AddDomainMatchingFunc(name string, fn MatchingFunc) {
 	rm.hasDomainPattern = true
 	rm.domainMatchingFunc = fn
+	rm.domainMatchingFuncCache = make(map[string]bool)
 }
 
 // SetLogger sets role manager's logger.
@@ -78,6 +84,8 @@ func (rm *RoleManager) SetLogger(logger log.Logger) {
 func (rm *RoleManager) Clear() error {
 	rm.roles = &Roles{sync.Map{}}
 	rm.domains = make(map[string]struct{})
+	rm.matchingFuncCache = make(map[string]bool)
+	rm.domainMatchingFuncCache = make(map[string]bool)
 	return nil
 }
 
@@ -103,27 +111,23 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domain ...string) err
 			if rm.hasPattern {
 				rm.roles.Range(func(key, value interface{}) bool {
 					domainPattern, namePattern := getNameAndDomain(key.(string))
+					if name1 == namePattern || name2 == namePattern {
+						return true
+					}
 					if rm.hasDomainPattern {
-						if !rm.domainMatchingFunc(domainPattern, domain) {
+						if !rm.domainMatch(domain, domainPattern) {
 							return true
 						}
 					} else {
-						if domainPattern != domain {
+						if domain != domainPattern {
 							return true
 						}
 					}
-					if rm.matchingFunc(namePattern, name1) && name1 != namePattern && name2 != namePattern {
+					if rm.match(namePattern, name1) {
 						valueRole, _ := rm.roles.LoadOrStore(key.(string), newRole(key.(string)))
 						valueRole.(*Role).addRole(role1)
 					}
-					if rm.matchingFunc(namePattern, name2) && name2 != namePattern && name1 != namePattern {
-						role2.addRole(value.(*Role))
-					}
-					if rm.matchingFunc(name1, namePattern) && name1 != namePattern && name2 != namePattern {
-						valueRole, _ := rm.roles.LoadOrStore(key.(string), newRole(key.(string)))
-						valueRole.(*Role).addRole(role1)
-					}
-					if rm.matchingFunc(name2, namePattern) && name2 != namePattern && name1 != namePattern {
+					if rm.match(name2, namePattern) {
 						role2.addRole(value.(*Role))
 					}
 					return true
@@ -167,7 +171,7 @@ func (rm *RoleManager) getPatternDomain(domain string) []string {
 	matchedDomains := []string{domain}
 	if rm.hasDomainPattern {
 		for domainPattern := range rm.domains {
-			if domain != domainPattern && rm.domainMatchingFunc(domain, domainPattern) {
+			if domain != domainPattern && rm.domainMatch(domain, domainPattern) {
 				matchedDomains = append(matchedDomains, domainPattern)
 			}
 		}
@@ -189,7 +193,7 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 		matchedDomain := rm.getPatternDomain(domain[0])
 
 		for _, domain := range matchedDomain {
-			if !rm.roles.hasRole(domain, name1, rm.matchingFunc) || !rm.roles.hasRole(domain, name2, rm.matchingFunc) {
+			if !rm.hasRole(domain, name1) || !rm.hasRole(domain, name2) {
 				continue
 			}
 
@@ -202,13 +206,13 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domain ...string) (bo
 					nameWithDomain := key.(string)
 					keyDomain, name := getNameAndDomain(nameWithDomain)
 					if rm.hasDomainPattern {
-						if !rm.domainMatchingFunc(domain, keyDomain) {
+						if !rm.domainMatch(domain, keyDomain) {
 							return true
 						}
 					} else if domain != keyDomain {
 						return true
 					}
-					if rm.matchingFunc(name1, name) && value.(*Role).hasRoleWithMatchingFunc(name2, rm.maxHierarchyLevel, rm.matchingFunc) {
+					if rm.match(name1, name) && value.(*Role).hasRoleWithMatchingFunc(name2, rm.maxHierarchyLevel, rm.match) {
 						flag = true
 						return false
 					}
@@ -243,7 +247,7 @@ func (rm *RoleManager) GetRoles(name string, domain ...string) ([]string, error)
 		var gottenRoles []string
 		for _, domain := range patternDomain {
 			nameWithDomain := getNameWithDomain(domain, name)
-			if !rm.roles.hasRole(domain, name, rm.matchingFunc) {
+			if !rm.hasRole(domain, name) {
 				continue
 			}
 			gottenRoles = append(gottenRoles, rm.roles.createRole(nameWithDomain).getRoles()...)
@@ -268,7 +272,7 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 		var names []string
 		for _, domain := range patternDomain {
 			nameWithDomain := getNameWithDomain(domain, name)
-			if !rm.roles.hasRole(domain, name, rm.matchingFunc) {
+			if !rm.hasRole(domain, name) {
 				return nil, errors.ERR_NAME_NOT_FOUND
 			}
 
@@ -321,12 +325,44 @@ func (rm *RoleManager) GetDomains(name string) ([]string, error) {
 func (rm *RoleManager) hasAnyRole(name string, domain string) bool {
 	patternDomain := rm.getPatternDomain(domain)
 	for _, domain := range patternDomain {
-		if rm.roles.hasRole(domain, name, rm.matchingFunc) {
+		if rm.hasRole(domain, name) {
 			return true
 		}
 	}
 	return false
 }
+
+func (rm *RoleManager) hasRole(domain, name string) bool {
+	if rm.hasPattern {
+		return rm.roles.hasRole(domain, name, rm.match)
+	} else {
+		return rm.roles.hasRole(domain, name, nil)
+	}
+}
+
+func (rm *RoleManager) match(name1, name2 string) bool {
+	cacheKey := strings.Join([]string{name1, name2}, "$$")
+	if v, has := rm.matchingFuncCache[cacheKey]; has {
+		return v
+	} else {
+		matched := rm.matchingFunc(name1, name2)
+		rm.matchingFuncCache[cacheKey] = matched
+		return matched
+	}
+}
+
+func (rm *RoleManager) domainMatch(domain1, domain2 string) bool {
+	cacheKey := strings.Join([]string{domain1, domain2}, "$$")
+	if v, has := rm.domainMatchingFuncCache[cacheKey]; has {
+		return v
+	} else {
+		matched := rm.domainMatchingFunc(domain1, domain2)
+		rm.domainMatchingFuncCache[cacheKey] = matched
+		return matched
+	}
+}
+
+
 
 // Roles represents all roles in a domain
 type Roles struct {
