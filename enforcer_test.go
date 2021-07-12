@@ -499,6 +499,19 @@ func TestBatchEnforce(t *testing.T) {
 	testBatchEnforce(t, e, [][]interface{}{{"alice", "data1", "read"}, {"bob", "data2", "write"}, {"jack", "data3", "read"}}, results)
 }
 
+func TestMultiplePolicyDefinitions(t *testing.T) {
+	e, _ := NewEnforcer("examples/multiple_policy_definitions_model.conf", "examples/multiple_policy_definitions_policy.csv")
+	typeContext := NewTypeContext("2")
+	typeContext.eType = "e"
+	testBatchEnforce(t, e, [][]interface{}{
+		{"alice", "data2", "read"},
+		{typeContext, struct{ Age int }{Age: 30}, "/data1", "read"},
+		{typeContext, struct{ Age int }{Age: 10}, "/data1", "read"},
+	}, []bool{
+		true, true, false,
+	})
+}
+
 func TestPriorityExplicit(t *testing.T) {
 	e, _ := NewEnforcer("examples/priority_model_explicit.conf", "examples/priority_policy_explicit.csv")
 	testBatchEnforce(t, e, [][]interface{}{

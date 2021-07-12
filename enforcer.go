@@ -50,6 +50,14 @@ type Enforcer struct {
 	logger log.Logger
 }
 
+// TypeContext is used as the first element of the parameter "rvals" in method "enforce"
+type TypeContext struct {
+	rType string
+	pType string
+	eType string
+	mType string
+}
+
 // NewEnforcer creates an enforcer via file or DB.
 //
 // File:
@@ -436,6 +444,16 @@ func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, ru
 	return e.model.BuildIncrementalRoleLinks(e.rmMap, op, "g", ptype, rules)
 }
 
+// NewTypeContext Create a default structure based on the suffix
+func NewTypeContext(suffix string) TypeContext {
+	return TypeContext{
+		rType: "r" + suffix,
+		pType: "p" + suffix,
+		eType: "e" + suffix,
+		mType: "m" + suffix,
+	}
+}
+
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) {
 	defer func() {
@@ -455,9 +473,30 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			functions[key] = util.GenerateGFunction(rm)
 		}
 	}
+
+	var (
+		rType = "r"
+		pType = "p"
+		eType = "e"
+		mType = "m"
+	)
+	if len(rvals) != 0 {
+		switch rvals[0].(type) {
+		case TypeContext:
+			typeContext := rvals[0].(TypeContext)
+			rType = typeContext.rType
+			pType = typeContext.pType
+			eType = typeContext.eType
+			mType = typeContext.mType
+			rvals = rvals[1:]
+		default:
+			break
+		}
+	}
+
 	var expString string
 	if matcher == "" {
-		expString = e.model["m"]["m"].Value
+		expString = e.model["m"][mType].Value
 	} else {
 		expString = util.RemoveComments(util.EscapeAssertion(matcher))
 	}
@@ -472,12 +511,12 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 	}
 
-	rTokens := make(map[string]int, len(e.model["r"]["r"].Tokens))
-	for i, token := range e.model["r"]["r"].Tokens {
+	rTokens := make(map[string]int, len(e.model["r"][rType].Tokens))
+	for i, token := range e.model["r"][rType].Tokens {
 		rTokens[token] = i
 	}
-	pTokens := make(map[string]int, len(e.model["p"]["p"].Tokens))
-	for i, token := range e.model["p"]["p"].Tokens {
+	pTokens := make(map[string]int, len(e.model["p"][pType].Tokens))
+	for i, token := range e.model["p"][pType].Tokens {
 		pTokens[token] = i
 	}
 
@@ -488,10 +527,10 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		pTokens: pTokens,
 	}
 
-	if len(e.model["r"]["r"].Tokens) != len(rvals) {
+	if len(e.model["r"][rType].Tokens) != len(rvals) {
 		return false, fmt.Errorf(
 			"invalid request size: expected %d, got %d, rvals: %v",
-			len(e.model["r"]["r"].Tokens),
+			len(e.model["r"][rType].Tokens),
 			len(rvals),
 			rvals)
 	}
@@ -501,16 +540,17 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	var effect effector.Effect
 	var explainIndex int
-	if policyLen := len(e.model["p"]["p"].Policy); policyLen != 0 {
+
+	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 {
 		policyEffects = make([]effector.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
 
-		for policyIndex, pvals := range e.model["p"]["p"].Policy {
+		for policyIndex, pvals := range e.model["p"][pType].Policy {
 			// log.LogPrint("Policy Rule: ", pvals)
-			if len(e.model["p"]["p"].Tokens) != len(pvals) {
+			if len(e.model["p"][pType].Tokens) != len(pvals) {
 				return false, fmt.Errorf(
 					"invalid policy size: expected %d, got %d, pvals: %v",
-					len(e.model["p"]["p"].Tokens),
+					len(e.model["p"][pType].Tokens),
 					len(pvals),
 					pvals)
 			}
@@ -574,7 +614,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			//	break
 			//}
 
-			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects[:policyIndex+1], matcherResults[:policyIndex+1], policyIndex, policyLen)
+			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects[:policyIndex+1], matcherResults[:policyIndex+1], policyIndex, policyLen)
 			if err != nil {
 				return false, err
 			}
@@ -583,7 +623,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			}
 		}
 	} else {
-		if hasEval && len(e.model["p"]["p"].Policy) == 0 {
+
+		if hasEval && len(e.model["p"][pType].Policy) == 0 {
 			return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
 		}
 
@@ -605,7 +646,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			policyEffects[0] = effector.Indeterminate
 		}
 
-		effect, explainIndex, err = e.eft.MergeEffects(e.model["e"]["e"].Value, policyEffects, matcherResults, 0, 1)
+		effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, 0, 1)
 		if err != nil {
 			return false, err
 		}
@@ -615,8 +656,9 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	if explains != nil {
 		logExplains = append(logExplains, *explains)
-		if explainIndex != -1 && len(e.model["p"]["p"].Policy) > explainIndex {
-			*explains = e.model["p"]["p"].Policy[explainIndex]
+
+		if explainIndex != -1 && len(e.model["p"][pType].Policy) > explainIndex {
+			*explains = e.model["p"][pType].Policy[explainIndex]
 		}
 	}
 
