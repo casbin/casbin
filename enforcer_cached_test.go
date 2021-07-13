@@ -32,21 +32,29 @@ func TestCache(t *testing.T) {
 	testEnforceCache(t, e, "alice", "data2", "read", false)
 	testEnforceCache(t, e, "alice", "data2", "write", false)
 
-	// The cache is enabled, so even if we remove a policy rule, the decision
-	// for ("alice", "data1", "read") will still be true, as it uses the cached result.
+	// The cache is enabled, calling RemovePolicy, LoadPolicy or RemovePolicies will
+	// also operate cached items.
 	_, _ = e.RemovePolicy("alice", "data1", "read")
-
-	testEnforceCache(t, e, "alice", "data1", "read", true)
-	testEnforceCache(t, e, "alice", "data1", "write", false)
-	testEnforceCache(t, e, "alice", "data2", "read", false)
-	testEnforceCache(t, e, "alice", "data2", "write", false)
-
-	// Now we invalidate the cache, then all first-coming Enforce() has to be evaluated in real-time.
-	// The decision for ("alice", "data1", "read") will be false now.
-	e.InvalidateCache()
 
 	testEnforceCache(t, e, "alice", "data1", "read", false)
 	testEnforceCache(t, e, "alice", "data1", "write", false)
 	testEnforceCache(t, e, "alice", "data2", "read", false)
 	testEnforceCache(t, e, "alice", "data2", "write", false)
+
+	e, _ = NewCachedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	testEnforceCache(t, e, "alice", "data1", "read", true)
+	testEnforceCache(t, e, "bob", "data2", "write", true)
+	testEnforceCache(t, e, "alice", "data2", "read", true)
+	testEnforceCache(t, e, "alice", "data2", "write", true)
+
+	_, _ = e.RemovePolicies([][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+	})
+
+	testEnforceCache(t, e, "alice", "data1", "read", false)
+	testEnforceCache(t, e, "bob", "data2", "write", false)
+	testEnforceCache(t, e, "alice", "data2", "read", true)
+	testEnforceCache(t, e, "alice", "data2", "write", true)
 }

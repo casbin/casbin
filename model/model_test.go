@@ -15,11 +15,12 @@
 package model
 
 import (
-	"github.com/casbin/casbin/v2/config"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/casbin/casbin/v2/config"
 )
 
 var (
