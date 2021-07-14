@@ -17,10 +17,10 @@ package persist
 // WatcherUpdatable is the strengthen for Casbin watchers.
 type WatcherUpdatable interface {
 	Watcher
-	// UPdateForUpdaticy calls the update callback of other instances to synchronize their policy.
+	// UpdateForUpdatePolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.UpdatePolicy()
 	UpdateForUpdatePolicy(oldRule, newRule []string) error
-	// UPdateForUpdaticies calls the update callback of other instances to synchronize their policy.
+	// UpdateForUpdatePolicies calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.UpdatePolicies()
 	UpdateForUpdatePolicies(oldRules, newRules [][]string) error
 }
