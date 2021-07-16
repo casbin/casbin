@@ -98,10 +98,13 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return true, err
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForAddPolicies(sec, ptype, rules...)
+		} else {
+			err = e.watcher.Update()
 		}
+		return true, err
 	}
 
 	return true, nil
@@ -261,10 +264,13 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return rulesRemoved, err
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForRemovePolicies(sec, ptype, rules...)
+		} else {
+			err = e.watcher.Update()
 		}
+		return true, err
 	}
 
 	return rulesRemoved, nil
