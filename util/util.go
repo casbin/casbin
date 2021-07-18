@@ -28,7 +28,7 @@ func EscapeAssertion(s string) string {
 	if strings.HasPrefix(s, "r") || strings.HasPrefix(s, "p") {
 		s = strings.Replace(s, ".", "_", 1)
 	}
-	var regex = regexp.MustCompile(`(\|| |=|\)|\(|&|<|>|,|\+|-|!|\*|\/)(r|p)\.`)
+	var regex = regexp.MustCompile(`(\|| |=|\)|\(|&|<|>|,|\+|-|!|\*|\/)((r|p)[0-9]*)\.`)
 	s = regex.ReplaceAllStringFunc(s, func(m string) string {
 		return strings.Replace(m, ".", "_", 1)
 	})
