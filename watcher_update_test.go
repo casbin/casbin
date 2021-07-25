@@ -22,7 +22,11 @@ type SampleWatcherUpdatable struct {
 	SampleWatcher
 }
 
-func (w SampleWatcherUpdatable) UpdateForUpdatePolicy(params ...string) error {
+func (w SampleWatcherUpdatable) UpdateForUpdatePolicy(sec, ptype string, oldRule, newRule []string) error {
+	return nil
+}
+
+func (w SampleWatcherUpdatable) UpdateForUpdatePolicies(sec, ptype string, oldRules, newRules [][]string) error {
 	return nil
 }
 
@@ -35,7 +39,9 @@ func TestSetWatcherUpdatable(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_ = e.SavePolicy()                                                                            // calls watcherEx.UpdateForSavePolicy()
-	_, _ = e.UpdatePolicy([]string{"admin", "data1", "read"}, []string{"admin", "data2", "read"}) // calls watcherEx.UpdateForUpdatePolicy()
+	_ = e.SavePolicy()                                                                                                                                                // calls watcherEx.UpdateForSavePolicy()
+	_, _ = e.UpdatePolicy([]string{"admin", "data1", "read"}, []string{"admin", "data2", "read"})                                                                     // calls watcherEx.UpdateForUpdatePolicy()
+	_, _ = e.UpdatePolicies([][]string{{"alice", "data1", "read"}, {"alice", "data2", "read"}}, [][]string{{"alice", "data1", "write"}, {"alice", "data2", "write"}}) // calls watcherEx.UpdateForUpdatePolicies()
+	_, _ = e.UpdateFilteredPolicies([][]string{{"alice", "data1", "write"}, {"alice", "data2", "write"}}, 1, "data1")                                                 // calls watcherEx.UpdateForUpdateFilteredPolicies()
 
 }

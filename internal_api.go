@@ -181,7 +181,7 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherUpdatable); ok {
-			err = watcher.UpdateForUpdatePolicy(oldRule, newRule)
+			err = watcher.UpdateForUpdatePolicy(sec, ptype, oldRule, newRule)
 		} else {
 			err = e.watcher.Update()
 		}
@@ -223,7 +223,7 @@ func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string,
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherUpdatable); ok {
-			err = watcher.UpdateForUpdatePolicies(oldRules, newRules)
+			err = watcher.UpdateForUpdatePolicies(sec, ptype, oldRules, newRules)
 		} else {
 			err = e.watcher.Update()
 		}
@@ -357,7 +357,7 @@ func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherUpdatable); ok {
-			err = watcher.UpdateForUpdatePolicies(oldRules, newRules)
+			err = watcher.UpdateForUpdatePolicies(sec, ptype, oldRules, newRules)
 		} else {
 			err = e.watcher.Update()
 		}

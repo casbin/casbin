@@ -19,8 +19,8 @@ type WatcherUpdatable interface {
 	Watcher
 	// UpdateForUpdatePolicy calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.UpdatePolicy()
-	UpdateForUpdatePolicy(oldRule, newRule []string) error
+	UpdateForUpdatePolicy(sec, ptype string, oldRule, newRule []string) error
 	// UpdateForUpdatePolicies calls the update callback of other instances to synchronize their policy.
 	// It is called after Enforcer.UpdatePolicies()
-	UpdateForUpdatePolicies(oldRules, newRules [][]string) error
+	UpdateForUpdatePolicies(sec, ptype string, oldRules, newRules [][]string) error
 }
