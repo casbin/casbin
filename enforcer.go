@@ -36,6 +36,7 @@ type Enforcer struct {
 	fm        model.FunctionMap
 	eft       effector.Effector
 
+	operator   *PolicyOperator
 	adapter    persist.Adapter
 	watcher    persist.Watcher
 	dispatcher persist.Dispatcher
@@ -63,6 +64,7 @@ type Enforcer struct {
 //
 func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 	e := &Enforcer{logger: &log.DefaultLogger{}}
+	e.operator = &PolicyOperator{e: e}
 
 	parsedParamLen := 0
 	paramLen := len(params)
@@ -188,6 +190,7 @@ func (e *Enforcer) initialize() {
 	e.rmMap = map[string]rbac.RoleManager{}
 	e.eft = effector.NewDefaultEffector()
 	e.watcher = nil
+	e.operator = &PolicyOperator{e: e}
 
 	e.enabled = true
 	e.autoSave = true
@@ -243,6 +246,11 @@ func (e *Enforcer) SetAdapter(adapter persist.Adapter) {
 func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 	e.watcher = watcher
 	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
+}
+
+// GetOperator gets the enforcer policy operator
+func (e *Enforcer) GetOperator() *PolicyOperator {
+	return e.operator
 }
 
 // GetRoleManager gets the current role manager.
