@@ -302,7 +302,7 @@ func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherUpdatable); ok {
-			err = watcher.UpdateForUpdateFilteredPolicies(sec, ptype, oldRules, newRules)
+			err = watcher.UpdateForUpdatePolicies(sec, ptype, oldRules, newRules)
 		} else {
 			err = e.watcher.Update()
 		}
