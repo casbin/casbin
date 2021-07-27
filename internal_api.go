@@ -294,7 +294,7 @@ func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][
 		return true, e.dispatcher.UpdateFilteredPolicies(sec, ptype, oldRules, newRules)
 	}
 
-	ruleChanged, err := e.operator.UpdateFilteredPolicies(sec, ptype, oldRules, newRules)
+	ruleChanged, err := e.operator.UpdatePolicies(sec, ptype, oldRules, newRules)
 	if err != nil {
 		return ruleChanged, err
 	}
@@ -444,27 +444,4 @@ func (p *PolicyOperator) RemoveFilteredPolicy(sec string, ptype string, fieldInd
 		}
 	}
 	return ruleRemoved, nil
-}
-
-// UpdateFilteredPolicies updates rules based on field filters from the current policy.
-func (p *PolicyOperator) UpdateFilteredPolicies(sec string, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
-	ruleChanged := p.e.model.RemovePolicies(sec, ptype, oldRules)
-	p.e.model.AddPolicies(sec, ptype, newRules)
-	ruleChanged = ruleChanged && len(newRules) != 0
-	if !ruleChanged {
-		return ruleChanged, nil
-	}
-
-	if sec == "g" {
-		err := p.e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, oldRules) // remove the old rules
-		if err != nil {
-			return ruleChanged, err
-		}
-		err = p.e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, newRules) // add the new rules
-		if err != nil {
-			return ruleChanged, err
-		}
-	}
-
-	return ruleChanged, nil
 }
