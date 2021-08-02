@@ -146,6 +146,7 @@ func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool 
 func (model Model) AddPolicy(sec string, ptype string, rule []string) {
 	assertion := model[sec][ptype]
 	assertion.Policy = append(assertion.Policy, rule)
+	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
 
 	if sec == "p" && assertion.priorityIndex >= 0 {
 		if idxInsert, err := strconv.Atoi(rule[assertion.priorityIndex]); err == nil {
@@ -157,6 +158,7 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) {
 				}
 				if idx > idxInsert {
 					assertion.Policy[i] = assertion.Policy[i-1]
+					assertion.PolicyMap[strings.Join(assertion.Policy[i], DefaultSep)]=i
 				} else {
 					break
 				}
@@ -165,7 +167,7 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) {
 			assertion.PolicyMap[strings.Join(rule, DefaultSep)] = i
 		}
 	}
-	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
+
 }
 
 // AddPolicies adds policy rules to the model.
