@@ -1,0 +1,5 @@
+p, data2_admin, data2, read
+p2, r2.sub.Age > 18 && r2.sub.Age < 60, /data1, read, allow
+p2, r2.sub.Age > 60 && r2.sub.Age < 100, /data1, read, deny
+
+g, alice, data2_admin
