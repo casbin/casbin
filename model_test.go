@@ -589,6 +589,7 @@ func TestDomainMatchModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domain_pattern_model.conf", "examples/rbac_with_domain_pattern_policy.csv")
 	e.AddNamedDomainMatchingFunc("g", "keyMatch2", util.KeyMatch2)
 
+	testDomainEnforce(t, e, "alice", "domain3", "data1", "read", true)
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
 	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
 	testDomainEnforce(t, e, "alice", "domain1", "data2", "read", false)

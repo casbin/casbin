@@ -2,6 +2,8 @@ p, admin, domain1, data1, read
 p, admin, domain1, data1, write
 p, admin, domain2, data2, read
 p, admin, domain2, data2, write
+p, super, domain3, data1, read
 
 g, alice, admin, *
+g, admin, super, domain3
 g, bob, admin, domain2

@@ -739,7 +739,8 @@ func (e *Enforcer) AddNamedMatchingFunc(ptype, name string, fn defaultrolemanage
 func (e *Enforcer) AddNamedDomainMatchingFunc(ptype, name string, fn defaultrolemanager.MatchingFunc) bool {
 	if rm, ok := e.rmMap[ptype]; ok {
 		rm.(*defaultrolemanager.RoleManager).AddDomainMatchingFunc(name, fn)
-		return true
+		err := e.model.BuildRoleLinks(e.rmMap)
+		return err==nil
 	}
 	return false
 }
