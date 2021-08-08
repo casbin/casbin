@@ -329,6 +329,9 @@ func (rm *testCustomRoleManager) Clear() error { return nil }
 func (rm *testCustomRoleManager) AddLink(name1 string, name2 string, domain ...string) error {
 	return nil
 }
+func (rm *testCustomRoleManager) BuildRelationship(name1 string,name2 string, domain ...string) error {
+	return nil
+}
 func (rm *testCustomRoleManager) DeleteLink(name1 string, name2 string, domain ...string) error {
 	return nil
 }
