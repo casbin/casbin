@@ -302,7 +302,7 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 			effects = append(effects, rule)
 		} else {
 			tmp = append(tmp, rule)
-			model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)] = len(tmp)-1
+			model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)] = len(tmp) - 1
 		}
 	}
 
