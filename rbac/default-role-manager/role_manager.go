@@ -286,7 +286,7 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 		var names []string
 		for _, domain := range patternDomain {
 			if !rm.hasRole(domain, name) {
-				return nil, errors.ERR_NAME_NOT_FOUND
+				continue
 			}
 
 			domainValue, _ := rm.allDomains.LoadOrStore(domain, &Roles{})
