@@ -281,8 +281,8 @@ func TestMatchingFuncOrder(t *testing.T) {
 
 	_ = rm.AddLink("g\\d+", "root")
 	_ = rm.AddLink("u1", "g1")
-	_ = rm.BuildRelationship("g\\d+","root")
-	_ = rm.BuildRelationship("u1","g1")
+	_ = rm.BuildRelationship("g\\d+", "root")
+	_ = rm.BuildRelationship("u1", "g1")
 	testRole(t, rm, "u1", "root", true)
 
 	_ = rm.Clear()

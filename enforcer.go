@@ -280,39 +280,44 @@ func (e *Enforcer) ClearPolicy() {
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
 	needToRebuild := false
-	oldModel := e.model
-	e.model = oldModel.Copy()
-	e.ClearPolicy()
+	newModel := e.model.Copy()
+	newModel.ClearPolicy()
 
 	var err error
 	defer func() {
 		if err != nil {
-			e.model = oldModel
 			if e.autoBuildRoleLinks && needToRebuild {
 				_ = e.BuildRoleLinks()
 			}
 		}
 	}()
 
-	if err = e.adapter.LoadPolicy(e.model); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
+	if err = e.adapter.LoadPolicy(newModel); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
 		return err
 	}
 
-	if err = e.model.SortPoliciesBySubjectHierarchy(); err != nil {
+	if err = newModel.SortPoliciesBySubjectHierarchy(); err != nil {
 		return err
 	}
 
-	if err = e.model.SortPoliciesByPriority(); err != nil {
+	if err = newModel.SortPoliciesByPriority(); err != nil {
 		return err
 	}
 
 	if e.autoBuildRoleLinks {
 		needToRebuild = true
-		err = e.BuildRoleLinks()
+		for _, rm := range e.rmMap {
+			err := rm.Clear()
+			if err != nil {
+				return err
+			}
+		}
+		err = newModel.BuildRoleLinks(e.rmMap)
 		if err != nil {
 			return err
 		}
 	}
+	e.model = newModel
 	return nil
 }
 
