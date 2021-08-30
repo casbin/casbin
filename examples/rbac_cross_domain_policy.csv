@@ -1,0 +1,7 @@
+g, alice, admin, dom1, dom2
+g, admin, super, dom2, dom3
+
+# g, alice, admin , dom         --means--  dom::alice -> dom:: admin
+# g, alice, admin , dom1, dom2  --means--  dom1::alice -> dom2:: admin
+
+p, super, dom3

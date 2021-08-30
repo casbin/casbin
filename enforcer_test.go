@@ -521,6 +521,17 @@ func TestSubjectPriority(t *testing.T) {
 	})
 }
 
+//
+
+func TestRbacCrossDomain(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_cross_domain_model.conf", "examples/rbac_cross_domain_policy.csv")
+	testBatchEnforce(t, e, [][]interface{}{
+		{"alice","dom1"},
+	}, []bool{
+		true,
+	})
+}
+
 func TestSubjectPriorityWithDomain(t *testing.T) {
 	e, _ := NewEnforcer("examples/subject_priority_model_with_domain.conf", "examples/subject_priority_policy_with_domain.csv")
 	testBatchEnforce(t, e, [][]interface{}{

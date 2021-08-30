@@ -41,6 +41,16 @@ func testDomainRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 strin
 	}
 }
 
+func testCrossDomainRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, domain1 string,domain2 string, res bool) {
+	t.Helper()
+	myRes, _ := rm.HasLink(name1, name2, domain1,domain2)
+	t.Logf("%s :: %s, %s :: %s: %t", domain1, name1, domain2,name2, myRes)
+
+	if myRes != res {
+		t.Errorf("%s :: %s < %s :: %s: %t, supposed to be %t", domain1, name1, domain2,name2, !res, res)
+	}
+}
+
 func testPrintRoles(t *testing.T, rm rbac.RoleManager, name string, res []string) {
 	t.Helper()
 	myRes, _ := rm.GetRoles(name)
@@ -127,6 +137,30 @@ func TestRole(t *testing.T) {
 	testPrintRoles(t, rm, "g1", []string{})
 	testPrintRoles(t, rm, "g2", []string{})
 	testPrintRoles(t, rm, "g3", []string{})
+}
+
+func TestCrossDomainRole(t *testing.T) {
+	rm := NewRoleManager(10)
+	_ = rm.AddLink("alice", "admin", "dom1","dom2")
+	_ = rm.AddLink("admin", "super", "dom2","dom3")
+
+	// Current role inheritance tree:
+	//       dom3:super
+	//            /
+	//      dom2:admin
+	//         /
+	//    dom1::alice
+
+	testCrossDomainRole(t, rm, "alice", "super", "dom1","dom3",true)
+
+	_ = rm.DeleteLink("admin", "super", "dom2","dom3")
+
+	// Current role inheritance tree:
+	//      dom2:admin
+	//         /
+	//    dom1::alice
+
+	testCrossDomainRole(t, rm, "alice", "super", "dom1","dom3",false)
 }
 
 func TestDomainRole(t *testing.T) {

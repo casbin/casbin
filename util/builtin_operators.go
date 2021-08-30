@@ -329,8 +329,11 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 		} else if len(args) == 2 {
 			v, _ = rm.HasLink(name1, name2)
 		} else {
-			domain := args[2].(string)
-			v, _ = rm.HasLink(name1, name2, domain)
+			var domains []string
+			for _,arg := range args[2:] {
+				domains = append(domains, arg.(string))
+			}
+			v, _ = rm.HasLink(name1, name2, domains...)
 		}
 
 		memorized[key] = v

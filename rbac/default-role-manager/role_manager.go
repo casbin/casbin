@@ -24,6 +24,7 @@ import (
 )
 
 const defaultDomain string = ""
+const defaultDelimiter string = "::"
 
 type MatchingFunc func(arg1, arg2 string) bool
 
@@ -100,6 +101,15 @@ func (rm *RoleManager) AddLink(name1 string, name2 string, domains ...string) er
 		role1.addRole(role2)
 
 		return nil
+	case 2:
+		domainValue, _ := rm.allDomains.LoadOrStore(domains[0], &Roles{})
+		domain := domainValue.(*Roles)
+
+		role1 := domain.createRole(name1)
+		role2 := domain.createRole(rm.getNameWithDomain(domains[1],name2))
+		role1.addRole(role2)
+
+		return nil
 	default:
 		return errors.ERR_DOMAIN_PARAMETER
 	}
@@ -155,6 +165,9 @@ func (rm *RoleManager) BuildRelationship(name1, name2 string, domains ...string)
 			}
 		}
 		return nil
+	case 2:
+
+		return nil
 	default:
 		return errors.ERR_DOMAIN_PARAMETER
 	}
@@ -181,9 +194,33 @@ func (rm *RoleManager) DeleteLink(name1 string, name2 string, domains ...string)
 		role2 := domain.createRole(name2)
 		role1.deleteRole(role2)
 		return nil
+	case 2:
+
+		domainValue, _ := rm.allDomains.LoadOrStore(domains[0], &Roles{})
+		domain := domainValue.(*Roles)
+		_, ok1 := domain.Load(name1)
+		name2WithDomain := rm.getNameWithDomain(domains[1],name2)
+		_, ok2 := domain.Load(name2WithDomain)
+		if !ok1 || !ok2 {
+			return errors.ERR_NAMES12_NOT_FOUND
+		}
+
+		role1 := domain.createRole(name1)
+		role2 := domain.createRole(name2WithDomain)
+		role1.deleteRole(role2)
+		return nil
 	default:
 		return errors.ERR_DOMAIN_PARAMETER
 	}
+}
+
+func (rm *RoleManager) getNameWithDomain(domain string, name string) string {
+	return domain+defaultDelimiter+name
+}
+
+func (rm *RoleManager) splitNameWithDoamin(nameWithDoamin string) (domain string, name string) {
+	arr := strings.Split(nameWithDoamin,defaultDelimiter)
+	return arr[0], arr[1]
 }
 
 func (rm *RoleManager) getPatternDomain(domain string) []string {
@@ -244,6 +281,10 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domains ...string) (b
 			}
 		}
 		return false, nil
+	case 2:
+		res := rm.hasRoleWithCrossDomain(rm.getNameWithDomain(domains[0],name1),rm.getNameWithDomain(domains[1],name2),rm.maxHierarchyLevel)
+
+		return res, nil
 	default:
 		return false, errors.ERR_DOMAIN_PARAMETER
 	}
@@ -452,6 +493,35 @@ func (r *Role) hasRole(name string, hierarchyLevel int) bool {
 
 	for _, role := range r.roles {
 		if role.hasRole(name, hierarchyLevel-1) {
+			return true
+		}
+	}
+	return false
+}
+
+func (rm *RoleManager) hasRoleWithCrossDomain(subNameWithDoamin string, roleNameWithDomain string, hierarchyLevel int) bool {
+	subDomain, subName := rm.splitNameWithDoamin(subNameWithDoamin)
+	domainValue, ok := rm.allDomains.Load(subDomain)
+	if !ok {
+		return false
+	}
+	domain := domainValue.(*Roles)
+	subRoleValue, ok := domain.Load(subName)
+	if !ok {
+		return false
+	}
+	subRole := subRoleValue.(*Role)
+
+	if subRole.hasDirectRole(roleNameWithDomain) {
+		return true
+	}
+
+	if hierarchyLevel <= 0 {
+		return false
+	}
+
+	for _, role := range subRole.roles {
+		if rm.hasRoleWithCrossDomain(role.name,roleNameWithDomain,hierarchyLevel-1) {
 			return true
 		}
 	}
