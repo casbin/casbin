@@ -28,7 +28,14 @@ func (e *Enforcer) GetRolesForUserInDomain(name string, domain string) []string 
 
 // GetPermissionsForUserInDomain gets permissions for a user or role inside a domain.
 func (e *Enforcer) GetPermissionsForUserInDomain(user string, domain string) [][]string {
-	return e.GetFilteredPolicy(0, user, domain)
+	var res [][]string
+	users, _ := e.GetRolesForUser(user, domain)
+	users = append(users, user)
+	for _, singleUser := range users {
+		policy := e.GetFilteredPolicy(0, singleUser, domain)
+		res = append(res, policy...)
+	}
+	return res
 }
 
 // AddRoleForUserInDomain adds a role for a user inside a domain.

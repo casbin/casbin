@@ -180,13 +180,13 @@ func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name string, domain s
 func TestPermissionAPIInDomain(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
-	testGetPermissionsInDomain(t, e, "alice", "domain1", [][]string{})
+	testGetPermissionsInDomain(t, e, "alice", "domain1", [][]string{{"admin", "domain1", "data1", "read"},{"admin", "domain1", "data1", "write"}})
 	testGetPermissionsInDomain(t, e, "bob", "domain1", [][]string{})
 	testGetPermissionsInDomain(t, e, "admin", "domain1", [][]string{{"admin", "domain1", "data1", "read"}, {"admin", "domain1", "data1", "write"}})
 	testGetPermissionsInDomain(t, e, "non_exist", "domain1", [][]string{})
 
 	testGetPermissionsInDomain(t, e, "alice", "domain2", [][]string{})
-	testGetPermissionsInDomain(t, e, "bob", "domain2", [][]string{})
+	testGetPermissionsInDomain(t, e, "bob", "domain2", [][]string{{"admin", "domain2", "data2", "read"},{"admin", "domain2", "data2", "write"}})
 	testGetPermissionsInDomain(t, e, "admin", "domain2", [][]string{{"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}})
 	testGetPermissionsInDomain(t, e, "non_exist", "domain2", [][]string{})
 }
