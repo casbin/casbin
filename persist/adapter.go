@@ -37,10 +37,15 @@ func LoadPolicyLine(line string, m model.Model) {
 		return
 	}
 
-	key := tokens[0]
+	LoadPolicyArray(tokens, m)
+}
+
+// LoadPolicyArray loads a policy rule to model.
+func LoadPolicyArray(rule []string, m model.Model) {
+	key := rule[0]
 	sec := key[:1]
-	m[sec][key].Policy = append(m[sec][key].Policy, tokens[1:])
-	m[sec][key].PolicyMap[strings.Join(tokens[1:], model.DefaultSep)] = len(m[sec][key].Policy) - 1
+	m[sec][key].Policy = append(m[sec][key].Policy, rule[1:])
+	m[sec][key].PolicyMap[strings.Join(rule[1:], model.DefaultSep)] = len(m[sec][key].Policy) - 1
 }
 
 // Adapter is the interface for Casbin adapters.
