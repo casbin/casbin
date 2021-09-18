@@ -664,10 +664,13 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	var logExplains [][]string
 
 	if explains != nil {
-		logExplains = append(logExplains, *explains)
-
+		if len(*explains) > 0 {
+			logExplains = append(logExplains, *explains)
+		}
+		
 		if explainIndex != -1 && len(e.model["p"][pType].Policy) > explainIndex {
 			*explains = e.model["p"][pType].Policy[explainIndex]
+			logExplains = append(logExplains, *explains)
 		}
 	}
 
