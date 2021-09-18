@@ -39,8 +39,8 @@ type RoleManager struct {
 
 	logger log.Logger
 
-	matchingFuncCache       map[string]bool
-	domainMatchingFuncCache map[string]bool
+	matchingFuncCache       *sync.Map
+	domainMatchingFuncCache *sync.Map
 }
 
 // NewRoleManager is the constructor for creating an instance of the
@@ -61,14 +61,14 @@ func NewRoleManager(maxHierarchyLevel int) *RoleManager {
 func (rm *RoleManager) AddMatchingFunc(name string, fn MatchingFunc) {
 	rm.hasPattern = true
 	rm.matchingFunc = fn
-	rm.matchingFuncCache = make(map[string]bool)
+	rm.matchingFuncCache = &sync.Map{}
 }
 
 // AddDomainMatchingFunc support use domain pattern in g
 func (rm *RoleManager) AddDomainMatchingFunc(name string, fn MatchingFunc) {
 	rm.hasDomainPattern = true
 	rm.domainMatchingFunc = fn
-	rm.domainMatchingFuncCache = make(map[string]bool)
+	rm.domainMatchingFuncCache = &sync.Map{}
 }
 
 // SetLogger sets role manager's logger.
@@ -79,8 +79,8 @@ func (rm *RoleManager) SetLogger(logger log.Logger) {
 // Clear clears all stored data and resets the role manager to the initial state.
 func (rm *RoleManager) Clear() error {
 	rm.allDomains = &sync.Map{}
-	rm.matchingFuncCache = make(map[string]bool)
-	rm.domainMatchingFuncCache = make(map[string]bool)
+	rm.matchingFuncCache = &sync.Map{}
+	rm.domainMatchingFuncCache = &sync.Map{}
 	return nil
 }
 
@@ -322,7 +322,7 @@ func (rm *RoleManager) PrintRoles() error {
 		})
 		return true
 	})
-
+	
 	rm.logger.LogRole(roles)
 	return nil
 }
@@ -362,22 +362,22 @@ func (rm *RoleManager) hasRole(domain, name string) bool {
 
 func (rm *RoleManager) match(name1, name2 string) bool {
 	cacheKey := strings.Join([]string{name1, name2}, "$$")
-	if v, has := rm.matchingFuncCache[cacheKey]; has {
-		return v
+	if v, has := rm.matchingFuncCache.Load(cacheKey); has {
+		return v.(bool)
 	} else {
 		matched := rm.matchingFunc(name1, name2)
-		rm.matchingFuncCache[cacheKey] = matched
+		rm.matchingFuncCache.Store(cacheKey, matched)
 		return matched
 	}
 }
 
 func (rm *RoleManager) domainMatch(domain1, domain2 string) bool {
 	cacheKey := strings.Join([]string{domain1, domain2}, "$$")
-	if v, has := rm.domainMatchingFuncCache[cacheKey]; has {
-		return v
+	if v, has := rm.domainMatchingFuncCache.Load(cacheKey); has {
+		return v.(bool)
 	} else {
 		matched := rm.domainMatchingFunc(domain1, domain2)
-		rm.domainMatchingFuncCache[cacheKey] = matched
+		rm.domainMatchingFuncCache.Store(cacheKey, matched)
 		return matched
 	}
 }
