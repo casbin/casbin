@@ -75,8 +75,8 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 		ast.Value = util.RemoveComments(util.EscapeAssertion(ast.Value))
 	}
 
-	if sec == "m" && strings.Contains(ast.Value,"in") {
-		ast.Value = strings.Replace(strings.Replace(ast.Value,"[","(",-1),"]",")",-1)
+	if sec == "m" && strings.Contains(ast.Value, "in") {
+		ast.Value = strings.Replace(strings.Replace(ast.Value, "[", "(", -1), "]", ")", -1)
 	}
 
 	_, ok := model[sec]
