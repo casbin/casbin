@@ -534,7 +534,7 @@ func TestSubjectPriorityWithDomain(t *testing.T) {
 func TestMultiplePolicyDefinitions(t *testing.T) {
 	e, _ := NewEnforcer("examples/multiple_policy_definitions_model.conf", "examples/multiple_policy_definitions_policy.csv")
 	enforceContext := NewEnforceContext("2")
-	enforceContext.eType = "e"
+	enforceContext.EType = "e"
 	testBatchEnforce(t, e, [][]interface{}{
 		{"alice", "data2", "read"},
 		{enforceContext, struct{ Age int }{Age: 70}, "/data1", "read"},
