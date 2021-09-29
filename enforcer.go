@@ -52,10 +52,10 @@ type Enforcer struct {
 
 // EnforceContext is used as the first element of the parameter "rvals" in method "enforce"
 type EnforceContext struct {
-	rType string
-	pType string
-	eType string
-	mType string
+	RType string
+	PType string
+	EType string
+	MType string
 }
 
 // NewEnforcer creates an enforcer via file or DB.
@@ -456,10 +456,10 @@ func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, ru
 // NewEnforceContext Create a default structure based on the suffix
 func NewEnforceContext(suffix string) EnforceContext {
 	return EnforceContext{
-		rType: "r" + suffix,
-		pType: "p" + suffix,
-		eType: "e" + suffix,
-		mType: "m" + suffix,
+		RType: "r" + suffix,
+		PType: "p" + suffix,
+		EType: "e" + suffix,
+		MType: "m" + suffix,
 	}
 }
 
@@ -493,10 +493,10 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		switch rvals[0].(type) {
 		case EnforceContext:
 			enforceContext := rvals[0].(EnforceContext)
-			rType = enforceContext.rType
-			pType = enforceContext.pType
-			eType = enforceContext.eType
-			mType = enforceContext.mType
+			rType = enforceContext.RType
+			pType = enforceContext.PType
+			eType = enforceContext.EType
+			mType = enforceContext.MType
 			rvals = rvals[1:]
 		default:
 			break
@@ -667,7 +667,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		if len(*explains) > 0 {
 			logExplains = append(logExplains, *explains)
 		}
-		
+
 		if explainIndex != -1 && len(e.model["p"][pType].Policy) > explainIndex {
 			*explains = e.model["p"][pType].Policy[explainIndex]
 			logExplains = append(logExplains, *explains)
