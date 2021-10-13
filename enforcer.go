@@ -623,7 +623,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			//	break
 			//}
 
-			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects[:policyIndex+1], matcherResults[:policyIndex+1], policyIndex, policyLen)
+			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects[:policyIndex+1], matcherResults[:policyIndex+1], policyIndex, e.model["p"][pType].Policy)
 			if err != nil {
 				return false, err
 			}
@@ -655,7 +655,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			policyEffects[0] = effector.Indeterminate
 		}
 
-		effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, 0, 1)
+		effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, 0, nil)
 		if err != nil {
 			return false, err
 		}
