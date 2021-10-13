@@ -322,7 +322,7 @@ func (rm *RoleManager) PrintRoles() error {
 		})
 		return true
 	})
-	
+
 	rm.logger.LogRole(roles)
 	return nil
 }

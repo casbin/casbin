@@ -27,5 +27,5 @@ const (
 // Effector is the interface for Casbin effectors.
 type Effector interface {
 	// MergeEffects merges all matching results collected by the enforcer into a single decision.
-	MergeEffects(expr string, effects []Effect, matches []float64, policyIndex int, policyLength int) (Effect, int, error)
+	MergeEffects(expr string, effects []Effect, matches []float64) (Effect, int, error)
 }

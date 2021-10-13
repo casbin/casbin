@@ -549,6 +549,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	var effect effector.Effect
 	var explainIndex int
+	expr := e.model["e"][eType].Value
 
 	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 {
 		policyEffects = make([]effector.Effect, policyLen)
@@ -619,17 +620,17 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				policyEffects[policyIndex] = effector.Allow
 			}
 
-			//if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
-			//	break
-			//}
-
-			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects[:policyIndex+1], matcherResults[:policyIndex+1], policyIndex, policyLen)
-			if err != nil {
-				return false, err
+			if matcherResults[policyIndex] == 0 {
+				continue
 			}
-			if effect != effector.Indeterminate {
+
+			if expr == effector.Priority || expr == effector.SubjectPriority {
 				break
 			}
+		}
+		effect, explainIndex, err = e.eft.MergeEffects(expr, policyEffects, matcherResults)
+		if err != nil {
+			return false, err
 		}
 	} else {
 
@@ -655,7 +656,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			policyEffects[0] = effector.Indeterminate
 		}
 
-		effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, 0, 1)
+		effect, explainIndex, err = e.eft.MergeEffects(expr, policyEffects, matcherResults)
 		if err != nil {
 			return false, err
 		}
@@ -667,7 +668,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		if len(*explains) > 0 {
 			logExplains = append(logExplains, *explains)
 		}
-		
+
 		if explainIndex != -1 && len(e.model["p"][pType].Policy) > explainIndex {
 			*explains = e.model["p"][pType].Policy[explainIndex]
 			logExplains = append(logExplains, *explains)
