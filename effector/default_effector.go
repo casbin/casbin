@@ -27,13 +27,13 @@ func NewDefaultEffector() *DefaultEffector {
 }
 
 // MergeEffects merges all matching results collected by the enforcer into a single decision.
-func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []float64, policyIndex int, policyLength int) (Effect, int, error) {
+func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []float64, policyIndex int, policies [][]string) (Effect, int, error) {
 	result := Indeterminate
 	explainIndex := -1
 
 	// short-circuit some effects in the middle
 	if expr != "priority(p_eft) || deny" && expr != "subjectPriority(p_eft) || deny" {
-		if policyIndex < policyLength-1 {
+		if policyLength := len(policies); policyLength > 0 && policyIndex < policyLength-1 {
 			// choose not to short-circuit
 			return result, explainIndex, nil
 		}
