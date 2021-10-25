@@ -239,6 +239,13 @@ func TestPermissionAPI(t *testing.T) {
 	testEnforceWithoutUsers(t, e, "bob", "read", true)
 	testEnforceWithoutUsers(t, e, "bob", "write", true)
 
+	_, _ = e.AddPermissionsForUser("jack",
+		[]string{"read"},
+		[]string{"write"})
+
+	testEnforceWithoutUsers(t, e, "jack", "read", true)
+	testEnforceWithoutUsers(t, e, "bob", "write", true)
+
 	_, _ = e.DeletePermissionForUser("bob", "read")
 
 	testEnforceWithoutUsers(t, e, "alice", "read", false)

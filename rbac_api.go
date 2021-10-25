@@ -128,6 +128,16 @@ func (e *Enforcer) AddPermissionForUser(user string, permission ...string) (bool
 	return e.AddPolicy(util.JoinSlice(user, permission...))
 }
 
+// AddPermissionsForUser adds multiple permissions for a user or role.
+// Returns false if the user or role already has one of the permissions (aka not affected).
+func (e *Enforcer) AddPermissionsForUser(user string, permissions ...[]string) (bool, error) {
+	var rules [][]string
+	for _, permission := range permissions {
+		rules = append(rules, util.JoinSlice(user, permission...))
+	}
+	return e.AddPolicies(rules)
+}
+
 // DeletePermissionForUser deletes a permission for a user or role.
 // Returns false if the user or role does not have the permission (aka not affected).
 func (e *Enforcer) DeletePermissionForUser(user string, permission ...string) (bool, error) {
