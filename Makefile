@@ -4,7 +4,7 @@ export PATH := $(shell yarn global bin):$(PATH)
 default: lint test
 
 test:
-	go test -race -v .
+	go test -race -v ./...
 
 benchmark:
 	go test -bench=.
