@@ -235,6 +235,29 @@ func KeyMatch4Func(args ...interface{}) (interface{}, error) {
 	return bool(KeyMatch4(name1, name2)), nil
 }
 
+// KeyMatch determines whether key1 matches the pattern of key2 and ignores the parameters in key2.
+// For example, "/foo/bar?status=1&type=2" matches "/foo/bar"
+func KeyMatch5(key1 string, key2 string) bool {
+	i := strings.Index(key1, "?")
+	if i == -1 {
+		return key1 == key2
+	}
+
+	return key1[:i] == key2
+}
+
+// KeyMatch5Func is the wrapper for KeyMatch5.
+func KeyMatch5Func(args ...interface{}) (interface{}, error) {
+	if err := validateVariadicArgs(2, args...); err != nil {
+		return false, fmt.Errorf("%s: %s", "keyMatch5", err)
+	}
+
+	name1 := args[0].(string)
+	name2 := args[1].(string)
+
+	return bool(KeyMatch5(name1, name2)), nil
+}
+
 // RegexMatch determines whether key1 matches the pattern of key2 in regular expression.
 func RegexMatch(key1 string, key2 string) bool {
 	res, err := regexp.MatchString(key2, key1)

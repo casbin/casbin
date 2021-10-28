@@ -333,6 +333,20 @@ func testKeyMatch4Func(t *testing.T, res bool, err string, args ...interface{}) 
 	}
 }
 
+func testKeyMatch5Func(t *testing.T, res bool, err string, args ...interface{}) {
+	t.Helper()
+	myRes, myErr := KeyMatch5Func(args...)
+	myErrStr := ""
+
+	if myErr != nil {
+		myErrStr = myErr.Error()
+	}
+
+	if myRes != res || err != myErrStr {
+		t.Errorf("%v returns %v %v, supposed to be %v %v", args, myRes, myErr, res, err)
+	}
+}
+
 func testIPMatchFunc(t *testing.T, res bool, err string, args ...interface{}) {
 	t.Helper()
 	myRes, myErr := IPMatchFunc(args...)
@@ -414,6 +428,20 @@ func TestKeyMatch4Func(t *testing.T) {
 
 	testKeyMatch4Func(t, true, "", "/parent/123/child/123", "/parent/{id}/child/{another_id}")
 	testKeyMatch4Func(t, true, "", "/parent/123/child/456", "/parent/{id}/child/{another_id}")
+
+}
+
+func TestKeyMatch5Func(t *testing.T) {
+	testKeyMatch5Func(t, false, "keyMatch5: Expected 2 arguments, but got 1", "/foo")
+	testKeyMatch5Func(t, false, "keyMatch5: Expected 2 arguments, but got 3", "/foo/create/123", "/foo/*", "/foo/update/123")
+	testKeyMatch5Func(t, false, "keyMatch5: Argument must be a string", "/parent/123", true)
+
+	testKeyMatch5Func(t, true, "", "/parent/child?status=1&type=2", "/parent/child")
+	testKeyMatch5Func(t, false, "", "/parent?status=1&type=2", "/parent/child")
+
+	testKeyMatch5Func(t, true, "", "/parent/child/?status=1&type=2", "/parent/child/")
+	testKeyMatch5Func(t, false, "", "/parent/child/?status=1&type=2", "/parent/child")
+	testKeyMatch5Func(t, false, "", "/parent/child?status=1&type=2", "/parent/child/")
 
 }
 
