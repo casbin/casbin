@@ -549,6 +549,17 @@ func newTestSubject(name string, age int) testSub {
 	return s
 }
 
+func TestABACNotUsingPolicy(t *testing.T) {
+	e, _ := NewEnforcer("examples/abac_not_using_policy_model.conf", "examples/abac_rule_effect_policy.csv")
+	data1 := newTestResource("data1", "alice")
+	data2 := newTestResource("data2", "bob")
+
+	testEnforce(t, e, "alice", data1, "read", true)
+	testEnforce(t, e, "alice", data1, "write", true)
+	testEnforce(t, e, "alice", data2, "read", false)
+	testEnforce(t, e, "alice", data2, "write", false)
+}
+
 func TestABACPolicy(t *testing.T) {
 	e, _ := NewEnforcer("examples/abac_rule_model.conf", "examples/abac_rule_policy.csv")
 	m := e.GetModel()

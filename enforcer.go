@@ -17,6 +17,7 @@ package casbin
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effector"
@@ -550,7 +551,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	var effect effector.Effect
 	var explainIndex int
 
-	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 {
+	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType + "_"){
 		policyEffects = make([]effector.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
 
