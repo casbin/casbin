@@ -340,3 +340,10 @@ func (model Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int)
 
 	return values
 }
+
+// SyncPolicyIndex syncs model[spec][ptype].PolicyIndex with model[spec][ptype].Policy
+func (model Model) SyncPolicyIndex(spec string, ptype string) {
+	for i, policy := range model[spec][ptype].Policy {
+		model[spec][ptype].PolicyMap[strings.Join(policy, DefaultSep)] = i
+	}
+}
