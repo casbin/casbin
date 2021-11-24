@@ -1,0 +1,4 @@
+p, alice, /data1, read, deny
+p, alice, /data1, write, allow
+p, bob, /data2, write, deny
+p, bob, /data2, read, allow
