@@ -31,6 +31,10 @@ type CachedEnforcer struct {
 	locker      *sync.RWMutex
 }
 
+type CacheableParam interface {
+	GetCacheKey() string
+}
+
 // NewCachedEnforcer creates a cached enforcer via file or DB.
 func NewCachedEnforcer(params ...interface{}) (*CachedEnforcer, error) {
 	e := &CachedEnforcer{}
@@ -145,12 +149,15 @@ func (e *CachedEnforcer) setCachedResult(key string, res bool, extra ...interfac
 func (e *CachedEnforcer) getKey(params ...interface{}) (string, bool) {
 	key := strings.Builder{}
 	for _, param := range params {
-		if val, ok := param.(string); ok {
-			key.WriteString(val)
-			key.WriteString("$$")
-		} else {
+		switch param.(type) {
+		case string:
+			key.WriteString(param.(string))
+		case CacheableParam:
+			key.WriteString(param.(CacheableParam).GetCacheKey())
+		default:
 			return "", false
 		}
+		key.WriteString("$$")
 	}
 	return key.String(), true
 }
