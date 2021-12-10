@@ -45,8 +45,8 @@ func NewCachedEnforcer(params ...interface{}) (*CachedEnforcer, error) {
 	}
 
 	e.enableCache = 1
-	cache := cache.DefaultCache(make(map[string]bool))
-	e.cache = &cache
+	c := cache.DefaultCache(make(map[string]bool))
+	e.cache = &c
 	e.locker = new(sync.RWMutex)
 	return e, nil
 }
