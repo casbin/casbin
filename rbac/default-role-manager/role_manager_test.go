@@ -299,3 +299,14 @@ func TestMatchingFuncOrder(t *testing.T) {
 	testRole(t, rm, "u1", "g1", true)
 	testRole(t, rm, "u1", "g2", true)
 }
+
+func TestDomainMatchingFuncWithDifferentDomain(t *testing.T) {
+	rm := NewRoleManager(10)
+	rm.AddDomainMatchingFunc("keyMatch", util.KeyMatch)
+
+	_ = rm.AddLink("alice", "editor", "*")
+	_ = rm.AddLink("editor", "admin", "domain1")
+
+	testDomainRole(t, rm, "alice", "admin", "domain1", true)
+	testDomainRole(t, rm, "alice", "admin", "domain2", false)
+}
