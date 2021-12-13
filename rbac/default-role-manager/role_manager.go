@@ -214,35 +214,52 @@ func (rm *RoleManager) HasLink(name1 string, name2 string, domains ...string) (b
 
 		matchedDomain := rm.getPatternDomain(domains[0])
 
-		for _, domainName := range matchedDomain {
+		roleQueue := []string{name1}
+		inherited := make(map[string]bool)
 
-			domainValue, _ := rm.allDomains.LoadOrStore(domainName, &Roles{})
-			domain := domainValue.(*Roles)
+		for len(roleQueue) != 0 {
+			role := roleQueue[0]
+			roleQueue = roleQueue[1:]
+			if _, ok := inherited[role]; ok {
+				continue
+			}
+			inherited[role] = true
 
-			if rm.hasPattern {
-				flag := false
-				domain.Range(func(key, value interface{}) bool {
-					if rm.match(name1, key.(string)) && value.(*Role).hasRoleWithMatchingFunc(name2, rm.maxHierarchyLevel, rm.match) {
-						flag = true
-						return false
+			for _, domainName := range matchedDomain {
+
+				domainValue, _ := rm.allDomains.LoadOrStore(domainName, &Roles{})
+				domain := domainValue.(*Roles)
+
+				if rm.hasPattern {
+					flag := false
+					domain.Range(func(key, value interface{}) bool {
+						if rm.match(role, key.(string)) && value.(*Role).hasRoleWithMatchingFunc(name2, rm.maxHierarchyLevel, rm.match) {
+							flag = true
+							return false
+						}
+						return true
+					})
+					if flag {
+						return true, nil
 					}
-					return true
-				})
-				if flag {
-					return true, nil
-				}
-			} else {
-				role1Value, ok := domain.Load(name1)
-				if !ok {
-					continue
-				}
-				role1 := role1Value.(*Role)
-				result := role1.hasRole(name2, rm.maxHierarchyLevel)
-				if result {
-					return true, nil
+				} else {
+					role1Value, ok := domain.Load(role)
+					if !ok {
+						continue
+					}
+					role1 := role1Value.(*Role)
+					result := role1.hasRole(name2, rm.maxHierarchyLevel)
+					if result {
+						return true, nil
+					} else {
+						for _, r := range role1.roles {
+							roleQueue = append(roleQueue, r.name)
+						}
+					}
 				}
 			}
 		}
+
 		return false, nil
 	default:
 		return false, errors.ERR_DOMAIN_PARAMETER
