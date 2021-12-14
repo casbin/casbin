@@ -14,20 +14,22 @@
 
 package cache
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 var ErrNoSuchKey = errors.New("there's no such key existing in cache")
 
 type Cache interface {
 	// Set puts key and value into cache.
-	// First parameter for extra should be uint denoting expected survival time.
-	// If survival time equals 0 or less, the key will always be survival.
-	Set(key string, value bool, extra ...interface{}) error
+	// For expireTime <= 0 cache must be saved forever.
+	Set(key string, value []byte, expireTime time.Duration) error
 
 	// Get returns result for key,
 	// If there's no such key existing in cache,
 	// ErrNoSuchKey will be returned.
-	Get(key string) (bool, error)
+	Get(key string) ([]byte, error)
 
 	// Delete will remove the specific key in cache.
 	// If there's no such key existing in cache,

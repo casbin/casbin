@@ -18,14 +18,16 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/casbin/casbin/v2/persist/cache"
+	"github.com/casbin/casbin/v2/util"
 )
 
 // CachedEnforcer wraps Enforcer and provides decision cache
 type CachedEnforcer struct {
 	*Enforcer
-	expireTime  uint
+	expireTime  time.Duration
 	cache       cache.Cache
 	enableCache int32
 	locker      *sync.RWMutex
@@ -45,8 +47,10 @@ func NewCachedEnforcer(params ...interface{}) (*CachedEnforcer, error) {
 	}
 
 	e.enableCache = 1
-	cache := cache.DefaultCache(make(map[string]bool))
-	e.cache = &cache
+
+	c := cache.DefaultCache(make(map[string][]byte))
+	e.cache = &c
+
 	e.locker = new(sync.RWMutex)
 	return e, nil
 }
@@ -72,7 +76,7 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 		return e.Enforcer.Enforce(rvals...)
 	}
 
-	if res, err := e.getCachedResult(key); err == nil {
+	if res, err := e.getEnforcerCachedResult(key); err == nil {
 		return res, nil
 	} else if err != cache.ErrNoSuchKey {
 		return res, err
@@ -83,7 +87,7 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 		return false, err
 	}
 
-	err = e.setCachedResult(key, res, e.expireTime)
+	err = e.setEnforceCachedResult(key, res, e.expireTime)
 	return res, err
 }
 
@@ -126,13 +130,18 @@ func (e *CachedEnforcer) RemovePolicies(rules [][]string) (bool, error) {
 	return e.Enforcer.RemovePolicies(rules)
 }
 
-func (e *CachedEnforcer) getCachedResult(key string) (res bool, err error) {
+func (e *CachedEnforcer) getEnforcerCachedResult(key string) (res bool, err error) {
 	e.locker.RLock()
 	defer e.locker.RUnlock()
-	return e.cache.Get(key)
+	cacheResult, err := e.cache.Get(key)
+
+	if err != nil {
+		return false, err
+	}
+	return util.BytesToBool(cacheResult), err
 }
 
-func (e *CachedEnforcer) SetExpireTime(expireTime uint) {
+func (e *CachedEnforcer) SetExpireTime(expireTime time.Duration) {
 	e.expireTime = expireTime
 }
 
@@ -140,10 +149,11 @@ func (e *CachedEnforcer) SetCache(c cache.Cache) {
 	e.cache = c
 }
 
-func (e *CachedEnforcer) setCachedResult(key string, res bool, extra ...interface{}) error {
+func (e *CachedEnforcer) setEnforceCachedResult(key string, res bool, expireTime time.Duration) error {
 	e.locker.Lock()
 	defer e.locker.Unlock()
-	return e.cache.Set(key, res, extra...)
+
+	return e.cache.Set(key, util.BoolToBytes(res), expireTime)
 }
 
 func (e *CachedEnforcer) getKey(params ...interface{}) (string, bool) {
