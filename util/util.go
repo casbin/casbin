@@ -15,6 +15,8 @@
 package util
 
 import (
+	"bytes"
+	"encoding/binary"
 	"regexp"
 	"sort"
 	"strings"
@@ -196,4 +198,74 @@ func RemoveDuplicateElement(s []string) []string {
 		}
 	}
 	return result
+}
+
+func BoolToBytes(value bool) []byte {
+	if value {
+		return []byte{1}
+	}
+
+	return []byte{0}
+}
+
+func BytesToBool(value []byte) bool {
+	if value[0] == 1 {
+		return true
+	}
+
+	return false
+}
+
+func Uint16ToBytes(value uint16) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.LittleEndian, value)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+func BytesToUint16(value []byte) (uint16, error) {
+	buf := new(bytes.Buffer)
+	buf.Write(value)
+
+	var result uint16
+	err := binary.Read(buf, binary.LittleEndian, &result)
+	if err != nil {
+		return 0, err
+	}
+
+	return result, nil
+}
+
+func Uint32ToBytes(value uint32) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.LittleEndian, value)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+func BytesToUint32(value []byte) (uint32, error) {
+	buf := new(bytes.Buffer)
+	buf.Write(value)
+
+	var result uint32
+	err := binary.Read(buf, binary.LittleEndian, &result)
+	if err != nil {
+		return 0, err
+	}
+
+	return result, nil
+}
+
+func StringToBytes(value string) []byte {
+	return []byte(value)
+}
+
+func BytesToString(value []byte) string {
+	return string(value)
 }

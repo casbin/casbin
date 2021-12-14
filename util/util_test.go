@@ -181,3 +181,93 @@ func TestReplaceEvalWithMap(t *testing.T) {
 	testReplaceEvalWithMap(t, "eval(rule1) || eval(rule2)", nil, "eval(rule1) || eval(rule2)")
 	testReplaceEvalWithMap(t, "eval(rule1) || eval(rule2) && c && d", nil, "eval(rule1) || eval(rule2) && c && d")
 }
+
+func TestBoolToBytes(t *testing.T) {
+	bytesValue := BoolToBytes(true)
+
+	if bytesValue[0] != 1 {
+		t.Errorf("Incorrect bytes representation after convertation")
+	}
+
+	bytesValue = BoolToBytes(false)
+
+	if bytesValue[0] != 0 {
+		t.Errorf("Incorrect bytes representation after convertation")
+	}
+}
+
+func TestBytesToBool(t *testing.T) {
+	boolValue := BytesToBool([]byte{1})
+
+	if boolValue != true {
+		t.Errorf("Bool value must be true")
+	}
+
+	boolValue = BytesToBool([]byte{0})
+
+	if boolValue != false {
+		t.Errorf("Bool value must be false")
+	}
+}
+
+func TestBytesToBoolAndViceVersa(t *testing.T) {
+	bytesValue := BoolToBytes(true)
+	boolValue := BytesToBool(bytesValue)
+	if boolValue != true {
+		t.Errorf("Bool value must be true")
+	}
+
+	bytesValue = BoolToBytes(false)
+	boolValue = BytesToBool(bytesValue)
+	if boolValue != false {
+		t.Errorf("Bool value must be false")
+	}
+}
+
+func TestUint16ToBytesAndViceVersa(t *testing.T) {
+	value := uint16(65123)
+	bytesValue, err := Uint16ToBytes(value)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	uint16Value, err := BytesToUint16(bytesValue)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if uint16Value != value {
+		t.Errorf("Values not equal after convertation. Initial value: %d, Converted value: %d", value, uint16Value)
+	}
+}
+
+func TestUint32ToBytesAndViceVersa(t *testing.T) {
+	value := uint32(4123456789)
+	bytesValue, err := Uint32ToBytes(value)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	uint32Value, err := BytesToUint32(bytesValue)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if uint32Value != value {
+		t.Errorf("Values not equal after convertation. Initial value: %d, Converted value: %d", value, uint32Value)
+	}
+}
+
+func TestStringToBytesAndViceVersa(t *testing.T) {
+	value := "Some long string for tests. Some long string for tests. Some long string for tests."
+	bytesValue := StringToBytes(value)
+	stringValue := BytesToString(bytesValue)
+
+	if stringValue != value {
+		t.Errorf("Strings are not equal: Initial string %s, Converted value: %s", value, stringValue)
+	}
+}

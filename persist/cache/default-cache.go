@@ -14,16 +14,18 @@
 
 package cache
 
-type DefaultCache map[string]bool
+import "time"
 
-func (c *DefaultCache) Set(key string, value bool, extra ...interface{}) error {
+type DefaultCache map[string][]byte
+
+func (c *DefaultCache) Set(key string, value []byte, expireTime time.Duration) error {
 	(*c)[key] = value
 	return nil
 }
 
-func (c *DefaultCache) Get(key string) (bool, error) {
+func (c *DefaultCache) Get(key string) ([]byte, error) {
 	if res, ok := (*c)[key]; !ok {
-		return false, ErrNoSuchKey
+		return nil, ErrNoSuchKey
 	} else {
 		return res, nil
 	}
