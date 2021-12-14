@@ -209,11 +209,7 @@ func BoolToBytes(value bool) []byte {
 }
 
 func BytesToBool(value []byte) bool {
-	if value[0] == 1 {
-		return true
-	}
-
-	return false
+	return value[0] == 1
 }
 
 func Uint16ToBytes(value uint16) ([]byte, error) {
