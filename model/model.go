@@ -345,6 +345,9 @@ func (model Model) ToText() string {
 			tokenPatterns[token] = rPattern.ReplaceAllString(pPattern.ReplaceAllString(token, "p."), "r.")
 		}
 	}
+	if strings.Contains(model["e"]["e"].Value, "p_eft") {
+		tokenPatterns["p_eft"] = "p.eft"
+	}
 	s := strings.Builder{}
 	writeString := func(sec string) {
 		for ptype := range model[sec] {

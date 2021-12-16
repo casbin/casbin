@@ -15,16 +15,48 @@
 package casbin
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"regexp"
+	"strings"
 	"testing"
 )
 
 func TestCasbinJsGetPermissionForUser(t *testing.T) {
-	e, err := NewSyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	e, err := NewSyncedEnforcer("examples/rbac_model.conf", "examples/rbac_with_hierarchy_policy.csv")
 	if err != nil {
 		panic(err)
 	}
-	_, err = CasbinJsGetPermissionForUser(e, "alice") // make sure CasbinJsGetPermissionForUser can be used with a SyncedEnforcer.
+	receivedString, err := CasbinJsGetPermissionForUser(e, "alice") // make sure CasbinJsGetPermissionForUser can be used with a SyncedEnforcer.
 	if err != nil {
 		t.Errorf("Test error: %s", err)
+	}
+	received := map[string]interface{}{}
+	err = json.Unmarshal([]byte(receivedString), &received)
+	if err != nil {
+		t.Errorf("Test error: %s", err)
+	}
+	expectedModel, err := ioutil.ReadFile("examples/rbac_model.conf")
+	if err != nil {
+		t.Errorf("Test error: %s", err)
+	}
+	expectedModelStr := regexp.MustCompile("\n+").ReplaceAllString(string(expectedModel), "\n")
+	if strings.TrimSpace(received["m"].(string)) != expectedModelStr {
+		t.Errorf("%s supposed to be %s", strings.TrimSpace(received["m"].(string)), expectedModelStr)
+	}
+
+	expectedPolicies, err := ioutil.ReadFile("examples/rbac_with_hierarchy_policy.csv")
+	if err != nil {
+		t.Errorf("Test error: %s", err)
+	}
+	expectedPoliciesItem := regexp.MustCompile(",|\n").Split(string(expectedPolicies), -1)
+	i := 0
+	for _, sArr := range received["p"].([]interface{}) {
+		for _, s := range sArr.([]interface{}) {
+			if strings.TrimSpace(s.(string)) != strings.TrimSpace(expectedPoliciesItem[i]) {
+				t.Errorf("%s supposed to be %s", strings.TrimSpace(s.(string)), strings.TrimSpace(expectedPoliciesItem[i]))
+			}
+			i++
+		}
 	}
 }

@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 )
 
-func CasbinJsGetPermissionForUser(e IEnforcer, user string) ([]byte, error) {
+func CasbinJsGetPermissionForUser(e IEnforcer, user string) (string, error) {
 	model := e.GetModel()
 	m := map[string]interface{}{}
 	m["m"] = model.ToText()
@@ -35,5 +35,5 @@ func CasbinJsGetPermissionForUser(e IEnforcer, user string) ([]byte, error) {
 	encoder := json.NewEncoder(result)
 	encoder.SetEscapeHTML(false)
 	err := encoder.Encode(m)
-	return result.Bytes(), err
+	return result.String(), err
 }
