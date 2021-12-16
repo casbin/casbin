@@ -31,17 +31,43 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 	result := Indeterminate
 	explainIndex := -1
 
-	// short-circuit some effects in the middle
-	if expr != "priority(p_eft) || deny" && expr != "subjectPriority(p_eft) || deny" {
+	switch expr {
+	case "some(where (p_eft == allow))":
+		if matches[policyIndex] == 0 {
+			break
+		}
+		// only check the current policyIndex
+		if effects[policyIndex] == Allow {
+			result = Allow
+			explainIndex = policyIndex
+			break
+		}
+	case "!some(where (p_eft == deny))":
+		// only check the current policyIndex
+		if matches[policyIndex] != 0 && effects[policyIndex] == Deny {
+			result = Deny
+			explainIndex = policyIndex
+			break
+		}
+		// if no deny rules are matched  at last, then allow
+		if policyIndex == policyLength-1 {
+			result = Allow
+		}
+	case "some(where (p_eft == allow)) && !some(where (p_eft == deny))":
+		// short-circuit if matched deny rule
+		if matches[policyIndex] != 0 && effects[policyIndex] == Deny {
+			result = Deny
+			// set hit rule to the (first) matched deny rule
+			explainIndex = policyIndex
+			break
+		}
+
+		// short-circuit some effects in the middle
 		if policyIndex < policyLength-1 {
 			// choose not to short-circuit
 			return result, explainIndex, nil
 		}
-	}
-
-	// merge all effects at last
-	if expr == "some(where (p_eft == allow))" {
-		result = Indeterminate
+		// merge all effects at last
 		for i, eft := range effects {
 			if matches[i] == 0 {
 				continue
@@ -49,53 +75,18 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 
 			if eft == Allow {
 				result = Allow
-				explainIndex = i
 				break
 			}
 		}
-	} else if expr == "!some(where (p_eft == deny))" {
-		// if no deny rules are matched, then allow
-		result = Allow
-		for i, eft := range effects {
+	case "priority(p_eft) || deny", "subjectPriority(p_eft) || deny":
+		// reverse merge, short-circuit may be earlier
+		for i := len(effects) - 1; i >= 0; i-- {
 			if matches[i] == 0 {
 				continue
 			}
 
-			if eft == Deny {
-				result = Deny
-				explainIndex = i
-				break
-			}
-		}
-	} else if expr == "some(where (p_eft == allow)) && !some(where (p_eft == deny))" {
-		result = Indeterminate
-		for i, eft := range effects {
-			if matches[i] == 0 {
-				continue
-			}
-
-			if eft == Allow {
-				// set hit rule to first matched allow rule, maybe overridden by the deny part
-				if result == Indeterminate {
-					explainIndex = i
-				}
-				result = Allow
-			} else if eft == Deny {
-				result = Deny
-				// set hit rule to the (first) matched deny rule
-				explainIndex = i
-				break
-			}
-		}
-	} else if expr == "priority(p_eft) || deny" || expr == "subjectPriority(p_eft) || deny" {
-		result = Indeterminate
-		for i, eft := range effects {
-			if matches[i] == 0 {
-				continue
-			}
-
-			if eft != Indeterminate {
-				if eft == Allow {
+			if effects[i] != Indeterminate {
+				if effects[i] == Allow {
 					result = Allow
 				} else {
 					result = Deny
@@ -104,7 +95,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 				break
 			}
 		}
-	} else {
+	default:
 		return Deny, -1, errors.New("unsupported effect")
 	}
 
