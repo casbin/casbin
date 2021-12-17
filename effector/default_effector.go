@@ -75,6 +75,8 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 
 			if eft == Allow {
 				result = Allow
+				// set hit rule to first matched allow rule
+				explainIndex = i
 				break
 			}
 		}
