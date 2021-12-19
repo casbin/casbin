@@ -598,3 +598,10 @@ func TestReloadPolicyWithFunc(t *testing.T) {
 	testEnforce(t, e, "alice", "/book/1", "GET", true)
 	testEnforce(t, e, "bob", "/pen/3", "GET", true)
 }
+
+func TestEvalPriority(t *testing.T) {
+	e, _ := NewEnforcer("examples/eval_operator_model.conf", "examples/eval_operator_policy.csv")
+	testEnforce(t, e, "admin", "users", "write", true)
+	testEnforce(t, e, "admin", "none", "write", false)
+	testEnforce(t, e, "user", "users", "write", false)
+}

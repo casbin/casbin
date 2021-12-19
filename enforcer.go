@@ -573,7 +573,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				for _, ruleName := range ruleNames {
 					if j, ok := parameters.pTokens[ruleName]; ok {
 						rule := util.EscapeAssertion(pvals[j])
-						replacements[ruleName] = rule
+						// Increase the evaluate priority of the rule
+						replacements[ruleName] = "(" + rule + ")"
 					} else {
 						return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
 					}
