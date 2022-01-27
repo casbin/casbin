@@ -271,4 +271,12 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 	testGetRoles(t, e, []string{"admin"}, "eve")
 	testGetRoles(t, e, []string{"data4_admin"}, "admin")
 
+	_, _ = e.UpdateGroupingPolicies([][]string{{"eve", "admin"}}, [][]string{{"eve", "admin_groups"}})
+	_, _ = e.UpdateGroupingPolicies([][]string{{"admin", "data4_admin"}}, [][]string{{"admin", "data5_admin"}})
+	testGetUsers(t, e, []string{"admin"}, "data5_admin")
+	testGetUsers(t, e, []string{"eve"}, "admin_groups")
+
+	testGetRoles(t, e, []string{"data5_admin"}, "admin")
+	testGetRoles(t, e, []string{"admin_groups"}, "eve")
+
 }
