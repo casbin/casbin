@@ -318,8 +318,17 @@ func (e *Enforcer) UpdateGroupingPolicy(oldRule []string, newRule []string) (boo
 	return e.UpdateNamedGroupingPolicy("g", oldRule, newRule)
 }
 
+// UpdateGroupingPolicies updates authorization rules from the current policies.
+func (e *Enforcer) UpdateGroupingPolicies(oldRules [][]string, newRules [][]string) (bool, error) {
+	return e.UpdateNamedGroupingPolicies("g", oldRules, newRules)
+}
+
 func (e *Enforcer) UpdateNamedGroupingPolicy(ptype string, oldRule []string, newRule []string) (bool, error) {
 	return e.updatePolicy("g", ptype, oldRule, newRule)
+}
+
+func (e *Enforcer) UpdateNamedGroupingPolicies(ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
+	return e.updatePolicies("g", ptype, oldRules, newRules)
 }
 
 // RemoveFilteredNamedGroupingPolicy removes a role inheritance rule from the current named policy, field filters can be specified.

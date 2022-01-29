@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/Knetic/govaluate"
+
 	"github.com/casbin/casbin/v2/persist"
 )
 
@@ -516,10 +517,22 @@ func (e *SyncedEnforcer) UpdateGroupingPolicy(oldRule []string, newRule []string
 	return e.Enforcer.UpdateGroupingPolicy(oldRule, newRule)
 }
 
+func (e *SyncedEnforcer) UpdateGroupingPolicies(oldRules [][]string, newRules [][]string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.UpdateGroupingPolicies(oldRules, newRules)
+}
+
 func (e *SyncedEnforcer) UpdateNamedGroupingPolicy(ptype string, oldRule []string, newRule []string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.UpdateNamedGroupingPolicy(ptype, oldRule, newRule)
+}
+
+func (e *SyncedEnforcer) UpdateNamedGroupingPolicies(ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.UpdateNamedGroupingPolicies(ptype, oldRules, newRules)
 }
 
 // RemoveFilteredNamedGroupingPolicy removes a role inheritance rule from the current named policy, field filters can be specified.
