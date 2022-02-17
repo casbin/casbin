@@ -16,8 +16,9 @@ package casbin
 
 import (
 	"fmt"
-	"github.com/casbin/casbin/v2/util"
 	"testing"
+
+	"github.com/casbin/casbin/v2/util"
 )
 
 func rawEnforce(sub string, obj string, act string) bool {
@@ -51,6 +52,75 @@ func BenchmarkRBACModel(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _ = e.Enforce("alice", "data2", "read")
+	}
+}
+
+func BenchmarkRBACModelSizes(b *testing.B) {
+	cases := []struct {
+		name      string
+		roles     int
+		resources int
+		users     int
+	}{
+		{name: "small", roles: 100, resources: 10, users: 1000},
+		{name: "medium", roles: 1000, resources: 100, users: 10000},
+		{name: "large", roles: 10000, resources: 1000, users: 100000},
+	}
+	for _, c := range cases {
+		c := c
+
+		e, err := NewEnforcer("examples/rbac_model.conf", false)
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		pPolicies := make([][]string, c.roles)
+		for i := range pPolicies {
+			pPolicies[i] = []string{
+				fmt.Sprintf("group-has-a-very-long-name-%d", i),
+				fmt.Sprintf("data-has-a-very-long-name-%d", i%c.resources),
+				"read",
+			}
+		}
+		if _, err := e.AddPolicies(pPolicies); err != nil {
+			b.Fatal(err)
+		}
+
+		gPolicies := make([][]string, c.users)
+		for i := range gPolicies {
+			gPolicies[i] = []string{
+				fmt.Sprintf("user-has-a-very-long-name-%d", i),
+				fmt.Sprintf("group-has-a-very-long-name-%d", i%c.roles),
+			}
+		}
+		if _, err := e.AddGroupingPolicies(gPolicies); err != nil {
+			b.Fatal(err)
+		}
+
+		// Set up enforcements, alternating between things a user can access
+		// and things they cannot. Use 17 tests so that we get a variety of users
+		// and roles rather than always landing on a multiple of 2/10/whatever.
+		enforcements := make([][]interface{}, 17)
+		for i := range enforcements {
+			userNum := (c.users / len(enforcements)) * i
+			roleNum := userNum % c.roles
+			resourceNum := roleNum % c.resources
+			if i%2 == 0 {
+				resourceNum += 1
+				resourceNum %= c.resources
+			}
+			enforcements[i] = []interface{}{
+				fmt.Sprintf("user-has-a-very-long-name-%d", userNum),
+				fmt.Sprintf("data-has-a-very-long-name-%d", resourceNum),
+				"read",
+			}
+		}
+
+		b.Run(c.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_, _ = e.Enforce(enforcements[i%len(enforcements)]...)
+			}
+		})
 	}
 }
 
