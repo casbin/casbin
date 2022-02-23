@@ -329,24 +329,35 @@ func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 	return GlobMatch(name1, name2)
 }
 
-// GenerateGFunction is the factory method of the g(_, _) function.
+// GenerateGFunction is the factory method of the g(_, _[, _]) function.
 func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 	memorized := map[string]bool{}
-
 	return func(args ...interface{}) (interface{}, error) {
-		name1 := args[0].(string)
-		name2 := args[1].(string)
+		// Like all our other govaluate functions, all args are strings.
 
-		key := ""
-		for index := 0; index < len(args); index++ {
-			key += ";" + fmt.Sprintf("%v", args[index])
+		// Allocate and generate a cache key from the arguments...
+		total := len(args)
+		for _, a := range args {
+			aStr := a.(string)
+			total += len(aStr)
 		}
+		builder := strings.Builder{}
+		builder.Grow(total)
+		for _, arg := range args {
+			builder.WriteByte(0)
+			builder.WriteString(arg.(string))
+		}
+		key := builder.String()
 
+		// ...and see if we've already calculated this.
 		v, found := memorized[key]
 		if found {
 			return v, nil
 		}
 
+		// If not, do the calculation.
+		// There are guaranteed to be exactly 2 or 3 arguments.
+		name1, name2 := args[0].(string), args[1].(string)
 		if rm == nil {
 			v = name1 == name2
 		} else if len(args) == 2 {
