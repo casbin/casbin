@@ -41,8 +41,9 @@ func TestCasbinJsGetPermissionForUser(t *testing.T) {
 		t.Errorf("Test error: %s", err)
 	}
 	expectedModelStr := regexp.MustCompile("\n+").ReplaceAllString(string(expectedModel), "\n")
-	if strings.TrimSpace(received["m"].(string)) != expectedModelStr {
-		t.Errorf("%s supposed to be %s", strings.TrimSpace(received["m"].(string)), expectedModelStr)
+	actualModelStr := received["m"].(string)
+	if actualModelStr != expectedModelStr {
+		t.Errorf("modelStr = %q; want %q", actualModelStr, expectedModelStr)
 	}
 
 	expectedPolicies, err := ioutil.ReadFile("examples/rbac_with_hierarchy_policy.csv")
