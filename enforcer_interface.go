@@ -133,6 +133,9 @@ type IEnforcer interface {
 	UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, error)
 	UpdatePolicies(oldPolicies [][]string, newPolicies [][]string) (bool, error)
 	UpdateFilteredPolicies(newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error)
+
+	UpdateGroupingPolicy(oldRule []string, newRule []string) (bool, error)
+	UpdateGroupingPolicies(oldRules [][]string, newRules [][]string) (bool, error)
 }
 
 var _ IDistributedEnforcer = &DistributedEnforcer{}
