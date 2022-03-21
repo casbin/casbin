@@ -357,6 +357,16 @@ func (rm *RoleManager) GetDomains(name string) ([]string, error) {
 	return domains, nil
 }
 
+// GetAllDomains gets all domains
+func (rm *RoleManager) GetAllDomains() ([]string, error) {
+	var domains []string
+	rm.allDomains.Range(func(key, value interface{}) bool {
+		domains = append(domains, key.(string))
+		return true
+	})
+	return domains, nil
+}
+
 func (rm *RoleManager) hasAnyRole(name string, domain string) bool {
 	patternDomain := rm.getPatternDomain(domain)
 	for _, domain := range patternDomain {

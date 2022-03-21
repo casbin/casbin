@@ -250,3 +250,20 @@ func TestDeleteAllUsersByDomain(t *testing.T) {
 		{"alice", "admin", "domain1"},
 	})
 }
+
+// testGetAllDomains tests GetAllDomains()
+func testGetAllDomains(t *testing.T, e *Enforcer, res []string) {
+	t.Helper()
+	myRes, _ := e.GetAllDomains()
+	sort.Strings(myRes)
+	sort.Strings(res)
+	if !util.ArrayEquals(res, myRes) {
+		t.Error("domains: ", myRes, ", supposed to be ", res)
+	}
+}
+
+func TestGetAllDomains(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+
+	testGetAllDomains(t, e, []string{"domain1", "domain2"})
+}
