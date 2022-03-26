@@ -354,6 +354,9 @@ func (rm *testCustomRoleManager) GetUsers(name string, domain ...string) ([]stri
 func (rm *testCustomRoleManager) GetDomains(name string) ([]string, error) {
 	return []string{}, nil
 }
+func (rm *testCustomRoleManager) GetAllDomains() ([]string, error) {
+	return []string{}, nil
+}
 func (rm *testCustomRoleManager) PrintRoles() error           { return nil }
 func (rm *testCustomRoleManager) SetLogger(logger log.Logger) {}
 

@@ -137,3 +137,8 @@ func (e *Enforcer) DeleteDomains(domains ...string) (bool, error) {
 	}
 	return true, nil
 }
+
+// GetAllDomains would get all domains.
+func (e *Enforcer) GetAllDomains() ([]string, error) {
+	return e.model["g"]["g"].RM.GetAllDomains()
+}

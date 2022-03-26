@@ -38,6 +38,8 @@ type RoleManager interface {
 	GetUsers(name string, domain ...string) ([]string, error)
 	// GetDomains gets domains that a user has
 	GetDomains(name string) ([]string, error)
+	// GetAllDomains gets all domains
+	GetAllDomains() ([]string, error)
 	// PrintRoles prints all the roles to log.
 	PrintRoles() error
 	// SetLogger sets role manager's logger.
