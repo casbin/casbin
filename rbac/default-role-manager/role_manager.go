@@ -20,6 +20,7 @@ import (
 
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/log"
+	"github.com/casbin/casbin/v2/rbac"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -339,7 +340,7 @@ func (rm *RoleManager) PrintRoles() error {
 		})
 		return true
 	})
-	
+
 	rm.logger.LogRole(roles)
 	return nil
 }
@@ -409,6 +410,29 @@ func (rm *RoleManager) domainMatch(domain1, domain2 string) bool {
 	}
 }
 
+func (rm *RoleManager) Copy() rbac.RoleManager {
+	newRm := NewRoleManager(rm.maxHierarchyLevel)
+
+	newDomains := &sync.Map{}
+	rm.allDomains.Range(func(key, value interface{}) bool {
+		newRoles := value.(*Roles).copy()
+
+		newDomains.LoadOrStore(key, newRoles)
+
+		return true
+	})
+	newRm.allDomains = newDomains
+
+	newRm.hasPattern = rm.hasPattern
+	newRm.matchingFunc = rm.matchingFunc
+	newRm.hasDomainPattern = rm.hasDomainPattern
+	newRm.domainMatchingFunc = rm.domainMatchingFunc
+
+	newRm.logger = rm.logger
+
+	return newRm
+}
+
 // Roles represents all roles in a domain
 type Roles struct {
 	sync.Map
@@ -434,6 +458,18 @@ func (roles *Roles) hasRole(domain, name string, matchingFunc MatchingFunc) bool
 func (roles *Roles) createRole(name string) *Role {
 	role, _ := roles.LoadOrStore(name, newRole(name))
 	return role.(*Role)
+}
+
+func (r *Roles) copy() *Roles {
+	newRoles := &Roles{}
+	r.Range(func(key, value interface{}) bool {
+		newRole := value.(*Role).copy()
+		newRoles.LoadOrStore(key, newRole)
+
+		return true
+	})
+
+	return newRoles
 }
 
 // Role represents the data structure for a role in RBAC.
@@ -556,4 +592,14 @@ func (r *Role) getRoles() []string {
 		names = append(names, role.name)
 	}
 	return names
+}
+
+func (r *Role) copy() *Role {
+	nRole := newRole(r.name)
+
+	for _, role := range r.roles {
+		nRole.addRole(newRole(role.name))
+	}
+
+	return nRole
 }

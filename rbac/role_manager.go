@@ -44,4 +44,6 @@ type RoleManager interface {
 	PrintRoles() error
 	// SetLogger sets role manager's logger.
 	SetLogger(logger log.Logger)
+	// Copy duplicate role manager
+	Copy() RoleManager
 }

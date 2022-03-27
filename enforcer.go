@@ -307,17 +307,21 @@ func (e *Enforcer) LoadPolicy() error {
 
 	if e.autoBuildRoleLinks {
 		needToRebuild = true
-		for _, rm := range e.rmMap {
-			err := rm.Clear()
+		newRmMap := make(map[string]rbac.RoleManager)
+		for ptype, rm := range e.rmMap {
+			newRmMap[ptype] = rm.Copy()
+			err := newRmMap[ptype].Clear()
 			if err != nil {
 				return err
 			}
 		}
-		err = newModel.BuildRoleLinks(e.rmMap)
+		err = newModel.BuildRoleLinks(newRmMap)
 		if err != nil {
 			return err
 		}
+		e.rmMap = newRmMap
 	}
+
 	e.model = newModel
 	return nil
 }
@@ -439,14 +443,22 @@ func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *Enforcer) BuildRoleLinks() error {
-	for _, rm := range e.rmMap {
-		err := rm.Clear()
+	newRmMap := make(map[string]rbac.RoleManager)
+	for ptype, rm := range e.rmMap {
+		newRmMap[ptype] = rm.Copy()
+		err := newRmMap[ptype].Clear()
 		if err != nil {
 			return err
 		}
 	}
 
-	return e.model.BuildRoleLinks(e.rmMap)
+	err := e.model.BuildRoleLinks(newRmMap)
+	if err != nil {
+		return err
+	}
+
+	e.rmMap = newRmMap
+	return nil
 }
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
@@ -551,7 +563,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	var effect effector.Effect
 	var explainIndex int
 
-	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType + "_"){
+	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") {
 		policyEffects = make([]effector.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
 
