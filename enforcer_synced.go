@@ -89,6 +89,8 @@ func (e *SyncedEnforcer) StopAutoLoadPolicy() {
 
 // SetWatcher sets the current watcher.
 func (e *SyncedEnforcer) SetWatcher(watcher persist.Watcher) error {
+	e.m.Lock()
+	defer e.m.Unlock()
 	e.watcher = watcher
 	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
 }
@@ -137,8 +139,8 @@ func (e *SyncedEnforcer) SavePolicy() error {
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *SyncedEnforcer) BuildRoleLinks() error {
-	e.m.RLock()
-	defer e.m.RUnlock()
+	e.m.Lock()
+	defer e.m.Unlock()
 	return e.Enforcer.BuildRoleLinks()
 }
 
