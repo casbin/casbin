@@ -359,7 +359,6 @@ func (rm *testCustomRoleManager) GetAllDomains() ([]string, error) {
 }
 func (rm *testCustomRoleManager) PrintRoles() error           { return nil }
 func (rm *testCustomRoleManager) SetLogger(logger log.Logger) {}
-func (rm *testCustomRoleManager) Copy() rbac.RoleManager      { return &testCustomRoleManager{} }
 
 func TestRBACModelWithCustomRoleManager(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
