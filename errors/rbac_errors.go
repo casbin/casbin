@@ -20,7 +20,7 @@ import "errors"
 var (
 	ERR_NAME_NOT_FOUND            = errors.New("error: name does not exist")
 	ERR_DOMAIN_PARAMETER          = errors.New("error: domain should be 1 parameter")
-	ERR_NAMES12_NOT_FOUND         = errors.New("error: name1 or name2 does not exist")
+	ERR_LINK_NOT_FOUND            = errors.New("error: link between name1 and name2 does not exist")
 	ERR_USE_DOMAIN_PARAMETER      = errors.New("error: useDomain should be 1 parameter")
 	INVALID_FIELDVAULES_PARAMETER = errors.New("fieldValues requires at least one parameter")
 )
