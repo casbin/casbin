@@ -266,7 +266,7 @@ func testGetImplicitRoles(t *testing.T, e *Enforcer, name string, res []string) 
 	myRes, _ := e.GetImplicitRolesForUser(name)
 	t.Log("Implicit roles for ", name, ": ", myRes)
 
-	if !util.ArrayEquals(res, myRes) {
+	if !util.SetEquals(res, myRes) {
 		t.Error("Implicit roles for ", name, ": ", myRes, ", supposed to be ", res)
 	}
 }
@@ -276,7 +276,7 @@ func testGetImplicitRolesInDomain(t *testing.T, e *Enforcer, name string, domain
 	myRes, _ := e.GetImplicitRolesForUser(name, domain)
 	t.Log("Implicit roles in domain ", domain, " for ", name, ": ", myRes)
 
-	if !util.ArrayEquals(res, myRes) {
+	if !util.SetEquals(res, myRes) {
 		t.Error("Implicit roles in domain ", domain, " for ", name, ": ", myRes, ", supposed to be ", res)
 	}
 }
@@ -305,7 +305,7 @@ func testGetImplicitPermissions(t *testing.T, e *Enforcer, name string, res [][]
 	myRes, _ := e.GetImplicitPermissionsForUser(name)
 	t.Log("Implicit permissions for ", name, ": ", myRes)
 
-	if !util.Array2DEquals(res, myRes) {
+	if !util.Set2DEquals(res, myRes) {
 		t.Error("Implicit permissions for ", name, ": ", myRes, ", supposed to be ", res)
 	}
 }
@@ -315,7 +315,7 @@ func testGetImplicitPermissionsWithDomain(t *testing.T, e *Enforcer, name string
 	myRes, _ := e.GetImplicitPermissionsForUser(name, domain)
 	t.Log("Implicit permissions for", name, "under", domain, ":", myRes)
 
-	if !util.Array2DEquals(res, myRes) {
+	if !util.Set2DEquals(res, myRes) {
 		t.Error("Implicit permissions for", name, "under", domain, ":", myRes, ", supposed to be ", res)
 	}
 }
@@ -428,7 +428,7 @@ func testGetImplicitUsersForRole(t *testing.T, e *Enforcer, name string, res []s
 	sort.Strings(res)
 	sort.Strings(myRes)
 
-	if !util.ArrayEquals(res, myRes) {
+	if !util.SetEquals(res, myRes) {
 		t.Error("Implicit users for ", name, ": ", myRes, ", supposed to be ", res)
 	}
 }

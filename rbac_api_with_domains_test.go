@@ -198,7 +198,7 @@ func testGetDomainsForUser(t *testing.T, e *Enforcer, res []string, user string)
 	sort.Strings(myRes)
 	sort.Strings(res)
 
-	if !util.ArrayEquals(res, myRes) {
+	if !util.SetEquals(res, myRes) {
 		t.Error("domains for user: ", user, ": ", myRes, ",  supposed to be ", res)
 	}
 }
@@ -212,7 +212,7 @@ func TestGetDomainsForUser(t *testing.T) {
 }
 
 func testGetAllUsersByDomain(t *testing.T, e *Enforcer, domain string, expected []string) {
-	if !util.ArrayEquals(e.GetAllUsersByDomain(domain), expected) {
+	if !util.SetEquals(e.GetAllUsersByDomain(domain), expected) {
 		t.Errorf("users in %s: %v, supposed to be %v\n", domain, e.GetAllUsersByDomain(domain), expected)
 	}
 }

@@ -64,15 +64,6 @@ func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp
 		}
 	}
 
-	if op == PolicyAdd {
-		for _, rule := range rules {
-			err := rm.BuildRelationship(rule[0], rule[1], rule[2:]...)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
 	return nil
 }
 
@@ -90,13 +81,6 @@ func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
 			rule = rule[:count]
 		}
 		err := ast.RM.AddLink(rule[0], rule[1], rule[2:]...)
-		if err != nil {
-			return err
-		}
-	}
-
-	for _, rule := range ast.Policy {
-		err := ast.RM.BuildRelationship(rule[0], rule[1], rule[2:]...)
 		if err != nil {
 			return err
 		}

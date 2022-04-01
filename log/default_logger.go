@@ -93,5 +93,5 @@ func (l *DefaultLogger) LogRole(roles []string) {
 		return
 	}
 
-	log.Println("Roles: ", roles)
+	log.Println("Roles: ", strings.Join(roles, "\n"))
 }

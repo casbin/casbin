@@ -184,17 +184,18 @@ func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool 
 // But GetImplicitRolesForUser("alice") will get: ["role:admin", "role:user"].
 func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]string, error) {
 	res := []string{}
-	roleSet := make(map[string]bool)
-	roleSet[name] = true
 
-	q := make([]string, 0)
-	q = append(q, name)
+	for _, rm := range e.rmMap {
 
-	for len(q) > 0 {
-		name := q[0]
-		q = q[1:]
+		roleSet := make(map[string]bool)
+		roleSet[name] = true
+		q := make([]string, 0)
+		q = append(q, name)
 
-		for _, rm := range e.rmMap {
+		for len(q) > 0 {
+			name := q[0]
+			q = q[1:]
+
 			roles, err := rm.GetRoles(name, domain...)
 			if err != nil {
 				return nil, err
@@ -215,17 +216,18 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]str
 // GetImplicitUsersForRole gets implicit users for a role.
 func (e *Enforcer) GetImplicitUsersForRole(name string, domain ...string) ([]string, error) {
 	res := []string{}
-	roleSet := make(map[string]bool)
-	roleSet[name] = true
 
-	q := make([]string, 0)
-	q = append(q, name)
+	for _, rm := range e.rmMap {
 
-	for len(q) > 0 {
-		name := q[0]
-		q = q[1:]
+		roleSet := make(map[string]bool)
+		roleSet[name] = true
+		q := make([]string, 0)
+		q = append(q, name)
 
-		for _, rm := range e.rmMap {
+		for len(q) > 0 {
+			name := q[0]
+			q = q[1:]
+
 			roles, err := rm.GetUsers(name, domain...)
 			if err != nil && err.Error() != "error: name does not exist" {
 				return nil, err

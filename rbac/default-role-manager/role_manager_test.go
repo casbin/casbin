@@ -15,6 +15,7 @@
 package defaultrolemanager
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/casbin/casbin/v2/rbac"
@@ -46,7 +47,17 @@ func testPrintRoles(t *testing.T, rm rbac.RoleManager, name string, res []string
 	myRes, _ := rm.GetRoles(name)
 	t.Logf("%s: %s", name, myRes)
 
-	if !util.ArrayEquals(myRes, res) {
+	if !util.SetEquals(myRes, res) {
+		t.Errorf("%s: %s, supposed to be %s", name, myRes, res)
+	}
+}
+
+func testPrintUsers(t *testing.T, rm rbac.RoleManager, name string, res []string) {
+	t.Helper()
+	myRes, _ := rm.GetUsers(name)
+	t.Logf("%s: %s", name, myRes)
+
+	if !util.SetEquals(myRes, res) {
 		t.Errorf("%s: %s, supposed to be %s", name, myRes, res)
 	}
 }
@@ -55,7 +66,7 @@ func testPrintRolesWithDomain(t *testing.T, rm rbac.RoleManager, name string, do
 	t.Helper()
 	myRes, _ := rm.GetRoles(name, domain)
 
-	if !util.ArrayEquals(myRes, res) {
+	if !util.SetEquals(myRes, res) {
 		t.Errorf("%s: %s, supposed to be %s", name, myRes, res)
 	}
 }
@@ -281,16 +292,12 @@ func TestMatchingFuncOrder(t *testing.T) {
 
 	_ = rm.AddLink("g\\d+", "root")
 	_ = rm.AddLink("u1", "g1")
-	_ = rm.BuildRelationship("g\\d+", "root")
-	_ = rm.BuildRelationship("u1", "g1")
 	testRole(t, rm, "u1", "root", true)
 
 	_ = rm.Clear()
 
 	_ = rm.AddLink("u1", "g1")
 	_ = rm.AddLink("g\\d+", "root")
-	_ = rm.BuildRelationship("u1", "g1")
-	_ = rm.BuildRelationship("g\\d+", "root")
 	testRole(t, rm, "u1", "root", true)
 
 	_ = rm.Clear()
@@ -309,4 +316,27 @@ func TestDomainMatchingFuncWithDifferentDomain(t *testing.T) {
 
 	testDomainRole(t, rm, "alice", "admin", "domain1", true)
 	testDomainRole(t, rm, "alice", "admin", "domain2", false)
+}
+
+func TestTemporaryRoles(t *testing.T) {
+	rm := NewRoleManager(10)
+	rm.AddMatchingFunc("regexMatch", util.RegexMatch)
+
+	_ = rm.AddLink("u\\d+", "user")
+
+	for i := 0; i < 10; i++ {
+		testRole(t, rm, fmt.Sprintf("u%d", i), "user", true)
+	}
+
+	testPrintUsers(t, rm, "user", []string{"u\\d+"})
+	testPrintRoles(t, rm, "u1", []string{"user"})
+
+	_ = rm.AddLink("u1", "manager")
+
+	for i := 10; i < 20; i++ {
+		testRole(t, rm, fmt.Sprintf("u%d", i), "user", true)
+	}
+
+	testPrintUsers(t, rm, "user", []string{"u\\d+", "u1"})
+	testPrintRoles(t, rm, "u1", []string{"user", "manager"})
 }
