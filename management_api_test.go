@@ -280,3 +280,33 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 	testGetRoles(t, e, []string{"admin_groups"}, "eve")
 
 }
+
+func TestUpdatePoliciesEnhanced(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+	})
+
+	_, _ = e.UpdatePolicies([][]string{{"bob", "*"}}, [][]string{{"alice", "data1", "write"}})
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+		{"alice", "data1", "write"},
+	})
+
+	_, _ = e.UpdatePolicies([][]string{{"*"}}, [][]string{{"alice", "data1", "write"}})
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "write"},
+	})
+
+	_, _ = e.UpdatePolicies([][]string{{"*"}}, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+	})
+}
