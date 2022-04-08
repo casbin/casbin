@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"context"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -88,15 +89,23 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 }
 
 func (e *CachedEnforcer) LoadPolicy() error {
+	return e.LoadPolicyWithContext(context.Background())
+}
+
+func (e *CachedEnforcer) LoadPolicyWithContext(ctx context.Context) error {
 	if atomic.LoadInt32(&e.enableCache) != 0 {
 		if err := e.cache.Clear(); err != nil {
 			return err
 		}
 	}
-	return e.Enforcer.LoadPolicy()
+	return e.Enforcer.LoadPolicyWithContext(ctx)
 }
 
 func (e *CachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
+	return e.RemovePolicyWithContext(context.Background(), params...)
+}
+
+func (e *CachedEnforcer) RemovePolicyWithContext(ctx context.Context, params ...interface{}) (bool, error) {
 	if atomic.LoadInt32(&e.enableCache) != 0 {
 		key, ok := e.getKey(params...)
 		if ok {
@@ -109,6 +118,10 @@ func (e *CachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
 }
 
 func (e *CachedEnforcer) RemovePolicies(rules [][]string) (bool, error) {
+	return e.RemovePoliciesWithContext(context.Background(), rules)
+}
+
+func (e *CachedEnforcer) RemovePoliciesWithContext(ctx context.Context, rules [][]string) (bool, error) {
 	if len(rules) != 0 {
 		if atomic.LoadInt32(&e.enableCache) != 0 {
 			irule := make([]interface{}, len(rules[0]))

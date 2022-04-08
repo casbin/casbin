@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"context"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -110,10 +111,15 @@ func (e *SyncedEnforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *SyncedEnforcer) LoadPolicy() error {
+	return e.LoadPolicyWithContext(context.Background())
+}
+
+// LoadPolicyWithContext see LoadPolicy
+func (e *SyncedEnforcer) LoadPolicyWithContext(ctx context.Context) error {
 	e.m.RLock()
 	cleanedNewModel := e.model.Copy()
 	e.m.RUnlock()
-	newModel, err := e.prepareNewModel(cleanedNewModel)
+	newModel, err := e.prepareNewModel(ctx, cleanedNewModel)
 	if err != nil {
 		return err
 	}

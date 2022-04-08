@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"context"
 	"fmt"
 
 	Err "github.com/casbin/casbin/v2/errors"
@@ -31,7 +32,7 @@ func (e *Enforcer) shouldPersist() bool {
 }
 
 // addPolicy adds a rule to the current policy.
-func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
+func (e *Enforcer) addPolicy(ctx context.Context, sec string, ptype string, rule []string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.AddPolicies(sec, ptype, [][]string{rule})
 	}
@@ -41,7 +42,14 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 	}
 
 	if e.shouldPersist() {
-		if err := e.adapter.AddPolicy(sec, ptype, rule); err != nil {
+		var err error
+		switch adapter := e.adapter.(type) {
+		case persist.ContextAdapter:
+			err = adapter.AddPolicyWithContext(ctx, sec, ptype, rule)
+		default:
+			err = adapter.AddPolicy(sec, ptype, rule)
+		}
+		if err != nil {
 			if err.Error() != notImplemented {
 				return false, err
 			}
@@ -71,7 +79,7 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 }
 
 // addPolicies adds rules to the current policy.
-func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool, error) {
+func (e *Enforcer) addPolicies(ctx context.Context, sec string, ptype string, rules [][]string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
 	}
@@ -111,13 +119,20 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 }
 
 // removePolicy removes a rule from the current policy.
-func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
+func (e *Enforcer) removePolicy(ctx context.Context, sec string, ptype string, rule []string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.RemovePolicies(sec, ptype, [][]string{rule})
 	}
 
 	if e.shouldPersist() {
-		if err := e.adapter.RemovePolicy(sec, ptype, rule); err != nil {
+		var err error
+		switch adapter := e.adapter.(type) {
+		case persist.ContextAdapter:
+			err = adapter.RemovePolicyWithContext(ctx, sec, ptype, rule)
+		default:
+			err = adapter.RemovePolicy(sec, ptype, rule)
+		}
+		if err != nil {
 			if err.Error() != notImplemented {
 				return false, err
 			}
@@ -150,7 +165,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 	return ruleRemoved, nil
 }
 
-func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
+func (e *Enforcer) updatePolicy(ctx context.Context, sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.UpdatePolicy(sec, ptype, oldRule, newRule)
 	}
@@ -191,7 +206,7 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 	return ruleUpdated, nil
 }
 
-func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
+func (e *Enforcer) updatePolicies(ctx context.Context, sec string, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.UpdatePolicies(sec, ptype, oldRules, newRules)
 	}
@@ -234,7 +249,7 @@ func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string,
 }
 
 // removePolicies removes rules from the current policy.
-func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (bool, error) {
+func (e *Enforcer) removePolicies(ctx context.Context, sec string, ptype string, rules [][]string) (bool, error) {
 	if !e.model.HasPolicies(sec, ptype, rules) {
 		return false, nil
 	}
@@ -277,7 +292,7 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 }
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.
-func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
+func (e *Enforcer) removeFilteredPolicy(ctx context.Context, sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
 	if len(fieldValues) == 0 {
 		return false, Err.INVALID_FIELDVAULES_PARAMETER
 	}
@@ -287,7 +302,14 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 	}
 
 	if e.shouldPersist() {
-		if err := e.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
+		var err error
+		switch adapter := e.adapter.(type) {
+		case persist.ContextAdapter:
+			err = adapter.RemoveFilteredPolicyWithContext(ctx, sec, ptype, fieldIndex, fieldValues...)
+		default:
+			err = adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+		}
+		if err != nil {
 			if err.Error() != notImplemented {
 				return false, err
 			}
@@ -318,7 +340,7 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 	return ruleRemoved, nil
 }
 
-func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+func (e *Enforcer) updateFilteredPolicies(ctx context.Context, sec string, ptype string, newRules [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
 	var (
 		oldRules [][]string
 		err      error

@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -197,7 +198,14 @@ func (e *Enforcer) HasNamedPolicy(ptype string, params ...interface{}) bool {
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddPolicy(params ...interface{}) (bool, error) {
-	return e.AddNamedPolicy("p", params...)
+	return e.AddPolicyWithContext(context.Background(), params...)
+}
+
+// AddPolicyWithContext adds an authorization rule to the current policy.
+// If the rule already exists, the function returns false and the rule will not be added.
+// Otherwise the function returns true by adding the new rule.
+func (e *Enforcer) AddPolicyWithContext(ctx context.Context, params ...interface{}) (bool, error) {
+	return e.AddNamedPolicyWithContext(ctx, "p", params...)
 }
 
 // AddPolicies adds authorization rules to the current policy.
@@ -207,32 +215,54 @@ func (e *Enforcer) AddPolicies(rules [][]string) (bool, error) {
 	return e.AddNamedPolicies("p", rules)
 }
 
+// AddPoliciesWithContext see AddPolicies
+func (e *Enforcer) AddPoliciesWithContext(ctx context.Context, rules [][]string) (bool, error) {
+	return e.AddNamedPoliciesWithContext(ctx, "p", rules)
+}
+
 // AddNamedPolicy adds an authorization rule to the current named policy.
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddNamedPolicy(ptype string, params ...interface{}) (bool, error) {
+	return e.AddNamedPolicyWithContext(context.Background(), ptype, params...)
+}
+
+// AddNamedPolicyWithContext adds an authorization rule to the current named policy.
+// If the rule already exists, the function returns false and the rule will not be added.
+// Otherwise the function returns true by adding the new rule.
+func (e *Enforcer) AddNamedPolicyWithContext(ctx context.Context, ptype string, params ...interface{}) (bool, error) {
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
 		strSlice = append(make([]string, 0, len(strSlice)), strSlice...)
-		return e.addPolicy("p", ptype, strSlice)
+		return e.addPolicy(ctx, "p", ptype, strSlice)
 	}
 	policy := make([]string, 0)
 	for _, param := range params {
 		policy = append(policy, param.(string))
 	}
 
-	return e.addPolicy("p", ptype, policy)
+	return e.addPolicy(ctx, "p", ptype, policy)
 }
 
 // AddNamedPolicies adds authorization rules to the current named policy.
 // If the rule already exists, the function returns false for the corresponding rule and the rule will not be added.
 // Otherwise the function returns true for the corresponding by adding the new rule.
 func (e *Enforcer) AddNamedPolicies(ptype string, rules [][]string) (bool, error) {
-	return e.addPolicies("p", ptype, rules)
+	return e.AddNamedPoliciesWithContext(context.Background(), ptype, rules)
+}
+
+// AddNamedPoliciesWithContext see AddNamedPolicies
+func (e *Enforcer) AddNamedPoliciesWithContext(ctx context.Context, ptype string, rules [][]string) (bool, error) {
+	return e.addPolicies(ctx, "p", ptype, rules)
 }
 
 // RemovePolicy removes an authorization rule from the current policy.
 func (e *Enforcer) RemovePolicy(params ...interface{}) (bool, error) {
-	return e.RemoveNamedPolicy("p", params...)
+	return e.RemovePolicyWithContext(context.Background(), params...)
+}
+
+// RemovePolicyWithContext removes an authorization rule from the current policy.
+func (e *Enforcer) RemovePolicyWithContext(ctx context.Context, params ...interface{}) (bool, error) {
+	return e.RemoveNamedPolicyWithContext(ctx, "p", params...)
 }
 
 // UpdatePolicy updates an authorization rule from the current policy.
@@ -240,8 +270,17 @@ func (e *Enforcer) UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, e
 	return e.UpdateNamedPolicy("p", oldPolicy, newPolicy)
 }
 
+// UpdatePolicy updates an authorization rule from the current policy.
+func (e *Enforcer) UpdatePolicyWithContext(ctx context.Context, oldPolicy []string, newPolicy []string) (bool, error) {
+	return e.UpdateNamedPolicyWithContext(ctx, "p", oldPolicy, newPolicy)
+}
+
 func (e *Enforcer) UpdateNamedPolicy(ptype string, p1 []string, p2 []string) (bool, error) {
-	return e.updatePolicy("p", ptype, p1, p2)
+	return e.UpdateNamedPolicyWithContext(context.Background(), ptype, p1, p2)
+}
+
+func (e *Enforcer) UpdateNamedPolicyWithContext(ctx context.Context, ptype string, p1 []string, p2 []string) (bool, error) {
+	return e.updatePolicy(ctx, "p", ptype, p1, p2)
 }
 
 // UpdatePolicies updates authorization rules from the current policies.
@@ -249,16 +288,33 @@ func (e *Enforcer) UpdatePolicies(oldPolices [][]string, newPolicies [][]string)
 	return e.UpdateNamedPolicies("p", oldPolices, newPolicies)
 }
 
+// UpdatePoliciesWithContext see UpdatePolicies
+func (e *Enforcer) UpdatePoliciesWithContext(ctx context.Context, oldPolices [][]string, newPolicies [][]string) (bool, error) {
+	return e.UpdateNamedPoliciesWithContext(ctx, "p", oldPolices, newPolicies)
+}
+
 func (e *Enforcer) UpdateNamedPolicies(ptype string, p1 [][]string, p2 [][]string) (bool, error) {
-	return e.updatePolicies("p", ptype, p1, p2)
+	return e.UpdateNamedPoliciesWithContext(context.Background(), ptype, p1, p2)
+}
+
+func (e *Enforcer) UpdateNamedPoliciesWithContext(ctx context.Context, ptype string, p1 [][]string, p2 [][]string) (bool, error) {
+	return e.updatePolicies(ctx, "p", ptype, p1, p2)
 }
 
 func (e *Enforcer) UpdateFilteredPolicies(newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
 	return e.UpdateFilteredNamedPolicies("p", newPolicies, fieldIndex, fieldValues...)
 }
 
+func (e *Enforcer) UpdateFilteredPoliciesWithContext(ctx context.Context, newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+	return e.UpdateFilteredNamedPoliciesWithContext(ctx, "p", newPolicies, fieldIndex, fieldValues...)
+}
+
 func (e *Enforcer) UpdateFilteredNamedPolicies(ptype string, newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
-	return e.updateFilteredPolicies("p", ptype, newPolicies, fieldIndex, fieldValues...)
+	return e.UpdateFilteredNamedPoliciesWithContext(context.Background(), ptype, newPolicies, fieldIndex, fieldValues...)
+}
+
+func (e *Enforcer) UpdateFilteredNamedPoliciesWithContext(ctx context.Context, ptype string, newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+	return e.updateFilteredPolicies(ctx, "p", ptype, newPolicies, fieldIndex, fieldValues...)
 }
 
 // RemovePolicies removes authorization rules from the current policy.
@@ -266,32 +322,57 @@ func (e *Enforcer) RemovePolicies(rules [][]string) (bool, error) {
 	return e.RemoveNamedPolicies("p", rules)
 }
 
+// RemovePoliciesWithContext see RemovePolicies
+func (e *Enforcer) RemovePoliciesWithContext(ctx context.Context, rules [][]string) (bool, error) {
+	return e.RemoveNamedPoliciesWithContext(ctx, "p", rules)
+}
+
 // RemoveFilteredPolicy removes an authorization rule from the current policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) (bool, error) {
-	return e.RemoveFilteredNamedPolicy("p", fieldIndex, fieldValues...)
+	return e.RemoveFilteredPolicyWithContext(context.Background(), fieldIndex, fieldValues...)
+}
+
+// RemoveFilteredPolicyWithContext removes an authorization rule from the current policy, field filters can be specified.
+func (e *Enforcer) RemoveFilteredPolicyWithContext(ctx context.Context, fieldIndex int, fieldValues ...string) (bool, error) {
+	return e.RemoveFilteredNamedPolicyWithContext(ctx, "p", fieldIndex, fieldValues...)
 }
 
 // RemoveNamedPolicy removes an authorization rule from the current named policy.
 func (e *Enforcer) RemoveNamedPolicy(ptype string, params ...interface{}) (bool, error) {
+	return e.RemoveNamedPolicyWithContext(context.Background(), ptype, params...)
+}
+
+// RemoveNamedPolicyWithContext removes an authorization rule from the current named policy.
+func (e *Enforcer) RemoveNamedPolicyWithContext(ctx context.Context, ptype string, params ...interface{}) (bool, error) {
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
-		return e.removePolicy("p", ptype, strSlice)
+		return e.removePolicy(ctx, "p", ptype, strSlice)
 	}
 	policy := make([]string, 0)
 	for _, param := range params {
 		policy = append(policy, param.(string))
 	}
 
-	return e.removePolicy("p", ptype, policy)
+	return e.removePolicy(ctx, "p", ptype, policy)
 }
 
 // RemoveNamedPolicies removes authorization rules from the current named policy.
 func (e *Enforcer) RemoveNamedPolicies(ptype string, rules [][]string) (bool, error) {
-	return e.removePolicies("p", ptype, rules)
+	return e.RemoveNamedPoliciesWithContext(context.Background(), ptype, rules)
+}
+
+// RemoveNamedPoliciesWithContext see RemoveNamedPolicies
+func (e *Enforcer) RemoveNamedPoliciesWithContext(ctx context.Context, ptype string, rules [][]string) (bool, error) {
+	return e.removePolicies(ctx, "p", ptype, rules)
 }
 
 // RemoveFilteredNamedPolicy removes an authorization rule from the current named policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredNamedPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
-	return e.removeFilteredPolicy("p", ptype, fieldIndex, fieldValues...)
+	return e.RemoveFilteredNamedPolicyWithContext(context.Background(), ptype, fieldIndex, fieldValues...)
+}
+
+// RemoveNamedGroupingPolicyWithContext removes a role inheritance rule from the current named policy.
+func (e *Enforcer) RemoveFilteredNamedPolicyWithContext(ctx context.Context, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
+	return e.removeFilteredPolicy(ctx, "p", ptype, fieldIndex, fieldValues...)
 }
 
 // HasGroupingPolicy determines whether a role inheritance rule exists.
@@ -317,7 +398,19 @@ func (e *Enforcer) HasNamedGroupingPolicy(ptype string, params ...interface{}) b
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddGroupingPolicy(params ...interface{}) (bool, error) {
-	return e.AddNamedGroupingPolicy("g", params...)
+	return e.AddGroupingPolicyWithContext(context.Background(), params...)
+}
+
+// AddGroupingPolicyWithContext adds a role inheritance rule to the current policy.
+// If the rule already exists, the function returns false and the rule will not be added.
+// Otherwise the function returns true by adding the new rule.
+func (e *Enforcer) AddGroupingPolicyWithContext(ctx context.Context, params ...interface{}) (bool, error) {
+	return e.AddNamedGroupingPolicyWithContext(ctx, "g", params...)
+}
+
+// AddGroupingPoliciesWithContext see AddGroupingPolicies
+func (e *Enforcer) AddGroupingPoliciesWithContext(ctx context.Context, rules [][]string) (bool, error) {
+	return e.AddNamedGroupingPoliciesWithContext(ctx, "g", rules)
 }
 
 // AddGroupingPolicies adds role inheritance rules to the current policy.
@@ -331,17 +424,22 @@ func (e *Enforcer) AddGroupingPolicies(rules [][]string) (bool, error) {
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddNamedGroupingPolicy(ptype string, params ...interface{}) (bool, error) {
+	return e.AddNamedGroupingPolicyWithContext(context.Background(), ptype, params...)
+}
+
+// AddNamedGroupingPolicyWithContext see AddNamedGroupingPolicy
+func (e *Enforcer) AddNamedGroupingPolicyWithContext(ctx context.Context, ptype string, params ...interface{}) (bool, error) {
 	var ruleAdded bool
 	var err error
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
-		ruleAdded, err = e.addPolicy("g", ptype, strSlice)
+		ruleAdded, err = e.addPolicy(ctx, "g", ptype, strSlice)
 	} else {
 		policy := make([]string, 0)
 		for _, param := range params {
 			policy = append(policy, param.(string))
 		}
 
-		ruleAdded, err = e.addPolicy("g", ptype, policy)
+		ruleAdded, err = e.addPolicy(ctx, "g", ptype, policy)
 	}
 
 	return ruleAdded, err
@@ -351,12 +449,22 @@ func (e *Enforcer) AddNamedGroupingPolicy(ptype string, params ...interface{}) (
 // If the rule already exists, the function returns false for the corresponding policy rule and the rule will not be added.
 // Otherwise the function returns true for the corresponding policy rule by adding the new rule.
 func (e *Enforcer) AddNamedGroupingPolicies(ptype string, rules [][]string) (bool, error) {
-	return e.addPolicies("g", ptype, rules)
+	return e.AddNamedGroupingPoliciesWithContext(context.Background(), ptype, rules)
+}
+
+// AddNamedGroupingPoliciesWithContext see AddNamedGroupingPolicies
+func (e *Enforcer) AddNamedGroupingPoliciesWithContext(ctx context.Context, ptype string, rules [][]string) (bool, error) {
+	return e.addPolicies(ctx, "g", ptype, rules)
 }
 
 // RemoveGroupingPolicy removes a role inheritance rule from the current policy.
 func (e *Enforcer) RemoveGroupingPolicy(params ...interface{}) (bool, error) {
-	return e.RemoveNamedGroupingPolicy("g", params...)
+	return e.RemoveGroupingPolicyWithContext(context.Background(), params...)
+}
+
+// RemoveGroupingPolicyWithContext see RemoveGroupingPolicy
+func (e *Enforcer) RemoveGroupingPolicyWithContext(ctx context.Context, params ...interface{}) (bool, error) {
+	return e.RemoveNamedGroupingPolicyWithContext(ctx, "g", params...)
 }
 
 // RemoveGroupingPolicies removes role inheritance rules from the current policy.
@@ -364,24 +472,39 @@ func (e *Enforcer) RemoveGroupingPolicies(rules [][]string) (bool, error) {
 	return e.RemoveNamedGroupingPolicies("g", rules)
 }
 
+// RemoveGroupingPoliciesWithContext see RemoveGroupingPolicies
+func (e *Enforcer) RemoveGroupingPoliciesWithContext(ctx context.Context, rules [][]string) (bool, error) {
+	return e.RemoveNamedGroupingPolicies("g", rules)
+}
+
 // RemoveFilteredGroupingPolicy removes a role inheritance rule from the current policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) (bool, error) {
-	return e.RemoveFilteredNamedGroupingPolicy("g", fieldIndex, fieldValues...)
+	return e.RemoveFilteredGroupingPolicyWithContext(context.Background(), fieldIndex, fieldValues...)
+}
+
+// RemoveFilteredGroupingPolicyWithContext see RemoveFilteredGroupingPolicyWithContext
+func (e *Enforcer) RemoveFilteredGroupingPolicyWithContext(ctx context.Context, fieldIndex int, fieldValues ...string) (bool, error) {
+	return e.RemoveFilteredNamedGroupingPolicyWithContext(ctx, "g", fieldIndex, fieldValues...)
 }
 
 // RemoveNamedGroupingPolicy removes a role inheritance rule from the current named policy.
 func (e *Enforcer) RemoveNamedGroupingPolicy(ptype string, params ...interface{}) (bool, error) {
+	return e.RemoveNamedGroupingPolicyWithContext(context.Background(), ptype, params...)
+}
+
+// RemoveNamedGroupingPolicyWithContext see RemoveNamedGroupingPolicy
+func (e *Enforcer) RemoveNamedGroupingPolicyWithContext(ctx context.Context, ptype string, params ...interface{}) (bool, error) {
 	var ruleRemoved bool
 	var err error
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
-		ruleRemoved, err = e.removePolicy("g", ptype, strSlice)
+		ruleRemoved, err = e.removePolicy(ctx, "g", ptype, strSlice)
 	} else {
 		policy := make([]string, 0)
 		for _, param := range params {
 			policy = append(policy, param.(string))
 		}
 
-		ruleRemoved, err = e.removePolicy("g", ptype, policy)
+		ruleRemoved, err = e.removePolicy(ctx, "g", ptype, policy)
 	}
 
 	return ruleRemoved, err
@@ -389,7 +512,12 @@ func (e *Enforcer) RemoveNamedGroupingPolicy(ptype string, params ...interface{}
 
 // RemoveNamedGroupingPolicies removes role inheritance rules from the current named policy.
 func (e *Enforcer) RemoveNamedGroupingPolicies(ptype string, rules [][]string) (bool, error) {
-	return e.removePolicies("g", ptype, rules)
+	return e.RemoveNamedGroupingPoliciesWithContext(context.Background(), ptype, rules)
+}
+
+// RemoveNamedGroupingPolicies removes role inheritance rules from the current named policy.
+func (e *Enforcer) RemoveNamedGroupingPoliciesWithContext(ctx context.Context, ptype string, rules [][]string) (bool, error) {
+	return e.removePolicies(ctx, "g", ptype, rules)
 }
 
 func (e *Enforcer) UpdateGroupingPolicy(oldRule []string, newRule []string) (bool, error) {
@@ -401,17 +529,35 @@ func (e *Enforcer) UpdateGroupingPolicies(oldRules [][]string, newRules [][]stri
 	return e.UpdateNamedGroupingPolicies("g", oldRules, newRules)
 }
 
+// UpdateGroupingPolicies updates authorization rules from the current policies.
+func (e *Enforcer) UpdateGroupingPoliciesWithContext(ctx context.Context, oldRules [][]string, newRules [][]string) (bool, error) {
+	return e.UpdateNamedGroupingPolicies("g", oldRules, newRules)
+}
+
 func (e *Enforcer) UpdateNamedGroupingPolicy(ptype string, oldRule []string, newRule []string) (bool, error) {
-	return e.updatePolicy("g", ptype, oldRule, newRule)
+	return e.UpdateNamedGroupingPolicyWithContext(context.Background(), ptype, oldRule, newRule)
+}
+
+func (e *Enforcer) UpdateNamedGroupingPolicyWithContext(ctx context.Context, ptype string, oldRule []string, newRule []string) (bool, error) {
+	return e.updatePolicy(ctx, "g", ptype, oldRule, newRule)
 }
 
 func (e *Enforcer) UpdateNamedGroupingPolicies(ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
-	return e.updatePolicies("g", ptype, oldRules, newRules)
+	return e.UpdateNamedGroupingPoliciesWithContext(context.Background(), ptype, oldRules, newRules)
+}
+
+func (e *Enforcer) UpdateNamedGroupingPoliciesWithContext(ctx context.Context, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
+	return e.updatePolicies(ctx, "g", ptype, oldRules, newRules)
 }
 
 // RemoveFilteredNamedGroupingPolicy removes a role inheritance rule from the current named policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
-	return e.removeFilteredPolicy("g", ptype, fieldIndex, fieldValues...)
+	return e.RemoveFilteredNamedGroupingPolicyWithContext(context.Background(), ptype, fieldIndex, fieldValues...)
+}
+
+// RemoveFilteredNamedGroupingPolicyWithContext removes a role inheritance rule from the current named policy, field filters can be specified.
+func (e *Enforcer) RemoveFilteredNamedGroupingPolicyWithContext(ctx context.Context, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
+	return e.removeFilteredPolicy(ctx, "g", ptype, fieldIndex, fieldValues...)
 }
 
 // AddFunction adds a customized function.

@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"runtime/debug"
@@ -287,7 +288,12 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
-	newModel, err := e.prepareNewModel(e.model.Copy())
+	return e.LoadPolicyWithContext(context.Background())
+}
+
+// LoadPolicy reloads the policy from file/database.
+func (e *Enforcer) LoadPolicyWithContext(ctx context.Context) error {
+	newModel, err := e.prepareNewModel(ctx, e.model.Copy())
 	if err != nil {
 		return err
 	}
@@ -302,10 +308,17 @@ func (e *Enforcer) LoadPolicy() error {
 }
 
 // prepareNewModel prepares a new model with the policy from file/database.
-func (e *Enforcer) prepareNewModel(newModel model.Model) (model.Model, error) {
+func (e *Enforcer) prepareNewModel(ctx context.Context, newModel model.Model) (model.Model, error) {
 	newModel.ClearPolicy()
 
-	if err := e.adapter.LoadPolicy(newModel); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
+	var err error
+	switch adapter := e.adapter.(type) {
+	case persist.ContextAdapter:
+		err = adapter.LoadPolicyWithContext(ctx, newModel)
+	default:
+		err = adapter.LoadPolicy(newModel)
+	}
+	if err != nil && err.Error() != "invalid file path, file path cannot be empty" {
 		return nil, err
 	}
 
@@ -320,7 +333,7 @@ func (e *Enforcer) prepareNewModel(newModel model.Model) (model.Model, error) {
 	return newModel, nil
 }
 
-func (e *Enforcer) loadFilteredPolicy(filter interface{}) error {
+func (e *Enforcer) loadFilteredPolicy(ctx context.Context, filter interface{}) error {
 	var filteredAdapter persist.FilteredAdapter
 
 	// Attempt to cast the Adapter as a FilteredAdapter
@@ -351,14 +364,24 @@ func (e *Enforcer) loadFilteredPolicy(filter interface{}) error {
 
 // LoadFilteredPolicy reloads a filtered policy from file/database.
 func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
+	return e.LoadFilteredPolicyWithContext(context.Background(), filter)
+}
+
+// LoadFilteredPolicyWithContext reloads a filtered policy from file/database.
+func (e *Enforcer) LoadFilteredPolicyWithContext(ctx context.Context, filter interface{}) error {
 	e.model.ClearPolicy()
 
-	return e.loadFilteredPolicy(filter)
+	return e.loadFilteredPolicy(ctx, filter)
 }
 
 // LoadIncrementalFilteredPolicy append a filtered policy from file/database.
 func (e *Enforcer) LoadIncrementalFilteredPolicy(filter interface{}) error {
-	return e.loadFilteredPolicy(filter)
+	return e.LoadIncrementalFilteredPolicyWithContext(context.Background(), filter)
+}
+
+// LoadIncrementalFilteredPolicyWithContext append a filtered policy from file/database.
+func (e *Enforcer) LoadIncrementalFilteredPolicyWithContext(ctx context.Context, filter interface{}) error {
+	return e.loadFilteredPolicy(ctx, filter)
 }
 
 // IsFiltered returns true if the loaded policy has been filtered.
@@ -372,10 +395,23 @@ func (e *Enforcer) IsFiltered() bool {
 
 // SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() error {
+	return e.SavePolicyWithContext(context.Background())
+}
+
+// SavePolicyWithContext saves the current policy (usually after changed with Casbin API) back to file/database.
+func (e *Enforcer) SavePolicyWithContext(ctx context.Context) error {
 	if e.IsFiltered() {
 		return errors.New("cannot save a filtered policy")
 	}
-	if err := e.adapter.SavePolicy(e.model); err != nil {
+
+	var err error
+	switch adapter := e.adapter.(type) {
+	case persist.ContextAdapter:
+		err = adapter.SavePolicyWithContext(ctx, e.model)
+	default:
+		err = adapter.SavePolicy(e.model)
+	}
+	if err != nil {
 		return err
 	}
 	if e.watcher != nil {

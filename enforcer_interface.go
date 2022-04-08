@@ -15,6 +15,8 @@
 package casbin
 
 import (
+	"context"
+
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effector"
 	"github.com/casbin/casbin/v2/model"
@@ -43,10 +45,14 @@ type IEnforcer interface {
 	SetEffector(eft effector.Effector)
 	ClearPolicy()
 	LoadPolicy() error
+	LoadPolicyWithContext(ctx context.Context) error
 	LoadFilteredPolicy(filter interface{}) error
+	LoadFilteredPolicyWithContext(ctx context.Context, filter interface{}) error
 	LoadIncrementalFilteredPolicy(filter interface{}) error
+	LoadIncrementalFilteredPolicyWithContext(ctx context.Context, filter interface{}) error
 	IsFiltered() bool
 	SavePolicy() error
+	SavePolicyWithContext(ctx context.Context) error
 	EnableEnforce(enable bool)
 	EnableLog(enable bool)
 	EnableAutoNotifyWatcher(enable bool)
@@ -107,27 +113,47 @@ type IEnforcer interface {
 	HasPolicy(params ...interface{}) bool
 	HasNamedPolicy(ptype string, params ...interface{}) bool
 	AddPolicy(params ...interface{}) (bool, error)
+	AddPolicyWithContext(ctx context.Context, params ...interface{}) (bool, error)
 	AddPolicies(rules [][]string) (bool, error)
+	AddPoliciesWithContext(ctx context.Context, rules [][]string) (bool, error)
 	AddNamedPolicy(ptype string, params ...interface{}) (bool, error)
+	AddNamedPolicyWithContext(ctx context.Context, ptype string, params ...interface{}) (bool, error)
 	AddNamedPolicies(ptype string, rules [][]string) (bool, error)
+	AddNamedPoliciesWithContext(ctx context.Context, ptype string, rules [][]string) (bool, error)
 	RemovePolicy(params ...interface{}) (bool, error)
+	RemovePolicyWithContext(ctx context.Context, params ...interface{}) (bool, error)
 	RemovePolicies(rules [][]string) (bool, error)
+	RemovePoliciesWithContext(ctx context.Context, rules [][]string) (bool, error)
 	RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) (bool, error)
+	RemoveFilteredPolicyWithContext(ctx context.Context, fieldIndex int, fieldValues ...string) (bool, error)
 	RemoveNamedPolicy(ptype string, params ...interface{}) (bool, error)
+	RemoveNamedPolicyWithContext(ctx context.Context, ptype string, params ...interface{}) (bool, error)
 	RemoveNamedPolicies(ptype string, rules [][]string) (bool, error)
+	RemoveNamedPoliciesWithContext(ctx context.Context, ptype string, rules [][]string) (bool, error)
 	RemoveFilteredNamedPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error)
+	RemoveFilteredNamedPolicyWithContext(ctx context.Context, ptype string, fieldIndex int, fieldValues ...string) (bool, error)
 	HasGroupingPolicy(params ...interface{}) bool
 	HasNamedGroupingPolicy(ptype string, params ...interface{}) bool
 	AddGroupingPolicy(params ...interface{}) (bool, error)
+	AddGroupingPolicyWithContext(ctx context.Context, params ...interface{}) (bool, error)
 	AddGroupingPolicies(rules [][]string) (bool, error)
+	AddGroupingPoliciesWithContext(ctx context.Context, rules [][]string) (bool, error)
 	AddNamedGroupingPolicy(ptype string, params ...interface{}) (bool, error)
+	AddNamedGroupingPolicyWithContext(ctx context.Context, ptype string, params ...interface{}) (bool, error)
 	AddNamedGroupingPolicies(ptype string, rules [][]string) (bool, error)
+	AddNamedGroupingPoliciesWithContext(ctx context.Context, ptype string, rules [][]string) (bool, error)
 	RemoveGroupingPolicy(params ...interface{}) (bool, error)
+	RemoveGroupingPolicyWithContext(ctx context.Context, params ...interface{}) (bool, error)
 	RemoveGroupingPolicies(rules [][]string) (bool, error)
+	RemoveGroupingPoliciesWithContext(ctx context.Context, rules [][]string) (bool, error)
 	RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) (bool, error)
+	RemoveFilteredGroupingPolicyWithContext(ctx context.Context, fieldIndex int, fieldValues ...string) (bool, error)
 	RemoveNamedGroupingPolicy(ptype string, params ...interface{}) (bool, error)
+	RemoveNamedGroupingPolicyWithContext(ctx context.Context, ptype string, params ...interface{}) (bool, error)
 	RemoveNamedGroupingPolicies(ptype string, rules [][]string) (bool, error)
+	RemoveNamedGroupingPoliciesWithContext(ctx context.Context, ptype string, rules [][]string) (bool, error)
 	RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error)
+	RemoveFilteredNamedGroupingPolicyWithContext(ctx context.Context, ptype string, fieldIndex int, fieldValues ...string) (bool, error)
 	AddFunction(name string, function govaluate.ExpressionFunction)
 
 	UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, error)
