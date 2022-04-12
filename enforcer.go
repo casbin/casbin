@@ -17,6 +17,7 @@ package casbin
 import (
 	"errors"
 	"fmt"
+	"runtime/debug"
 	"strings"
 
 	"github.com/Knetic/govaluate"
@@ -468,7 +469,7 @@ func NewEnforceContext(suffix string) EnforceContext {
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("panic: %v", r)
+			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
 		}
 	}()
 
