@@ -40,6 +40,15 @@ func TestSync(t *testing.T) {
 	testEnforceSync(t, e, "bob", "data2", "read", false)
 	testEnforceSync(t, e, "bob", "data2", "write", true)
 
+	// Simulate a policy change
+	e.ClearPolicy()
+	testEnforceSync(t, e, "bob", "data2", "write", false)
+
+	// Wait for at least one sync
+	time.Sleep(time.Millisecond * 300)
+
+	testEnforceSync(t, e, "bob", "data2", "write", true)
+
 	// Stop the reloading policy periodically.
 	e.StopAutoLoadPolicy()
 }

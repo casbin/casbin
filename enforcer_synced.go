@@ -111,9 +111,23 @@ func (e *SyncedEnforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *SyncedEnforcer) LoadPolicy() error {
+	e.m.RLock()
+	cleanedNewModel := e.model.Copy()
+	e.m.RUnlock()
+	newModel, err := e.prepareNewModel(cleanedNewModel)
+	if err != nil {
+		return err
+	}
+
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.LoadPolicy()
+	if e.autoBuildRoleLinks {
+		if err := e.tryBuildingRoleLinksWithModel(newModel); err != nil {
+			return err
+		}
+	}
+	e.model = newModel
+	return nil
 }
 
 // LoadFilteredPolicy reloads a filtered policy from file/database.
