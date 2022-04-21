@@ -29,8 +29,13 @@ func testEscapeAssertion(t *testing.T, s string, res string) {
 }
 
 func TestEscapeAssertion(t *testing.T) {
+	testEscapeAssertion(t, "r_sub == r_obj.value", "r_sub == r_obj.value")
+	testEscapeAssertion(t, "p_sub == r_sub.value", "p_sub == r_sub.value")
+	testEscapeAssertion(t, "r.attr.value == p.attr", "r_attr.value == p_attr")
 	testEscapeAssertion(t, "r.attr.value == p.attr", "r_attr.value == p_attr")
 	testEscapeAssertion(t, "r.attp.value || p.attr", "r_attp.value || p_attr")
+	testEscapeAssertion(t, "r2.attr.value == p2.attr", "r2_attr.value == p2_attr")
+	testEscapeAssertion(t, "r2.attp.value || p2.attr", "r2_attp.value || p2_attr")
 	testEscapeAssertion(t, "r.attp.value &&p.attr", "r_attp.value &&p_attr")
 	testEscapeAssertion(t, "r.attp.value >p.attr", "r_attp.value >p_attr")
 	testEscapeAssertion(t, "r.attp.value <p.attr", "r_attp.value <p_attr")
