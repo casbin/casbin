@@ -14,11 +14,13 @@
 
 package casbin
 
+
 import (
 	"errors"
 	"fmt"
 	"runtime/debug"
 	"strings"
+
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effector"
