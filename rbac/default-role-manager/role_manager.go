@@ -147,7 +147,7 @@ func (r *Role) toString() string {
 }
 
 func (r *Role) getRoles() []string {
-	names := []string{}
+	var names []string
 	r.rangeRoles(func(key, value interface{}) bool {
 		names = append(names, key.(string))
 		return true
@@ -156,7 +156,7 @@ func (r *Role) getRoles() []string {
 }
 
 func (r *Role) getUsers() []string {
-	names := []string{}
+	var names []string
 	r.rangeUsers(func(key, value interface{}) bool {
 		names = append(names, key.(string))
 		return true
@@ -313,7 +313,7 @@ func (rm *RoleManagerImpl) DeleteLink(name1 string, name2 string, domains ...str
 
 // HasLink determines whether role: name1 inherits role: name2.
 func (rm *RoleManagerImpl) HasLink(name1 string, name2 string, domains ...string) (bool, error) {
-	if name1 == name2 {
+	if name1 == name2 || (rm.matchingFunc != nil && rm.match(name1, name2)) {
 		return true, nil
 	}
 
@@ -330,14 +330,14 @@ func (rm *RoleManagerImpl) HasLink(name1 string, name2 string, domains ...string
 	return rm.hasLinkHelper(role.name, map[string]*Role{user.name: user}, rm.maxHierarchyLevel), nil
 }
 
-func (rm *RoleManagerImpl) hasLinkHelper(name string, roles map[string]*Role, level int) bool {
+func (rm *RoleManagerImpl) hasLinkHelper(targetName string, roles map[string]*Role, level int) bool {
 	if level <= 0 || len(roles) == 0 {
 		return false
 	}
 
 	nextRoles := map[string]*Role{}
 	for _, role := range roles {
-		if name == role.name {
+		if targetName == role.name || (rm.matchingFunc != nil && rm.match(role.name, targetName)) {
 			return true
 		}
 		role.rangeRoles(func(key, value interface{}) bool {
@@ -346,7 +346,7 @@ func (rm *RoleManagerImpl) hasLinkHelper(name string, roles map[string]*Role, le
 		})
 	}
 
-	return rm.hasLinkHelper(name, nextRoles, level-1)
+	return rm.hasLinkHelper(targetName, nextRoles, level-1)
 }
 
 // GetRoles gets the roles that a user inherits.
