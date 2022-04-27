@@ -298,6 +298,12 @@ func TestRBACModelWithPattern(t *testing.T) {
 	// of checking whether "/book/:id" equals the obj: "/book/1", it checks whether the pattern matches.
 	// You can see it as normal RBAC: "/book/:id" == "/book/1" becomes KeyMatch2("/book/:id", "/book/1")
 	e.AddNamedMatchingFunc("g2", "KeyMatch2", util.KeyMatch2)
+	e.AddNamedMatchingFunc("g", "KeyMatch2", util.KeyMatch2)
+	testEnforce(t, e, "any_user", "/pen3/1", "GET", true)
+	testEnforce(t, e, "/book/user/1", "/pen4/1", "GET", true)
+
+	testEnforce(t, e, "/book/user/1", "/pen4/1", "POST", true)
+
 	testEnforce(t, e, "alice", "/book/1", "GET", true)
 	testEnforce(t, e, "alice", "/book/2", "GET", true)
 	testEnforce(t, e, "alice", "/pen/1", "GET", true)
