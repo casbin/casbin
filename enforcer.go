@@ -252,7 +252,13 @@ func (e *Enforcer) SetAdapter(adapter persist.Adapter) {
 // SetWatcher sets the current watcher.
 func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 	e.watcher = watcher
-	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
+	if _, ok := e.watcher.(persist.WatcherEx); ok {
+		// The callback of WatcherEx has no generic implementation.
+		return nil
+	} else {
+		// In case the Watcher wants to use a customized callback function, call `SetUpdateCallback` after `SetWatcher`.
+		return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
+	}
 }
 
 // GetRoleManager gets the current role manager.

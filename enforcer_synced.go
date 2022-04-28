@@ -91,8 +91,7 @@ func (e *SyncedEnforcer) StopAutoLoadPolicy() {
 func (e *SyncedEnforcer) SetWatcher(watcher persist.Watcher) error {
 	e.m.Lock()
 	defer e.m.Unlock()
-	e.watcher = watcher
-	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
+	return e.Enforcer.SetWatcher(watcher)
 }
 
 // LoadModel reloads the model from the model CONF file.
