@@ -1,0 +1,8 @@
+p, user, /data, GET
+p, admin, /data, POST
+
+p2, user, view
+p2, admin, create
+
+g, admin, user
+g, alice, admin
