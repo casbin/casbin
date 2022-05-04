@@ -122,6 +122,13 @@ func (e *SyncedEnforcer) GetPermissionsForUser(user string, domain ...string) []
 	return e.Enforcer.GetPermissionsForUser(user, domain...)
 }
 
+// GetNamedPermissionsForUser gets permissions for a user or role by named policy.
+func (e *SyncedEnforcer) GetNamedPermissionsForUser(ptype string, user string, domain ...string) [][]string {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetNamedPermissionsForUser(ptype, user, domain...)
+}
+
 // HasPermissionForUser determines whether a user has a permission.
 func (e *SyncedEnforcer) HasPermissionForUser(user string, permission ...string) bool {
 	e.m.RLock()
@@ -156,6 +163,21 @@ func (e *SyncedEnforcer) GetImplicitPermissionsForUser(user string, domain ...st
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.Enforcer.GetImplicitPermissionsForUser(user, domain...)
+}
+
+// GetNamedImplicitPermissionsForUser gets implicit permissions for a user or role by named policy.
+// Compared to GetNamedPermissionsForUser(), this function retrieves permissions for inherited roles.
+// For example:
+// p, admin, data1, read
+// p2, admin, create
+// g, alice, admin
+//
+// GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p"
+// But you can specify the named policy "p2" to get: [["admin", "create"]] by    GetNamedImplicitPermissionsForUser("p2","alice")
+func (e *SyncedEnforcer) GetNamedImplicitPermissionsForUser(ptype string, user string, domain ...string) ([][]string, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetNamedImplicitPermissionsForUser(ptype, user, domain...)
 }
 
 // GetImplicitUsersForPermission gets implicit users for a permission.

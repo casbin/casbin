@@ -152,8 +152,16 @@ func (e *Enforcer) DeletePermissionsForUser(user string) (bool, error) {
 
 // GetPermissionsForUser gets permissions for a user or role.
 func (e *Enforcer) GetPermissionsForUser(user string, domain ...string) [][]string {
+	return e.GetNamedPermissionsForUser("p", user, domain...)
+}
+
+// GetNamedPermissionsForUser gets permissions for a user or role by named policy.
+func (e *Enforcer) GetNamedPermissionsForUser(ptype string, user string, domain ...string) [][]string {
 	permission := make([][]string, 0)
-	for ptype, assertion := range e.model["p"] {
+	for pType, assertion := range e.model["p"] {
+		if pType != ptype {
+			continue
+		}
 		args := make([]string, len(assertion.Tokens))
 		args[0] = user
 
@@ -163,7 +171,7 @@ func (e *Enforcer) GetPermissionsForUser(user string, domain ...string) [][]stri
 				args[index] = domain[0]
 			}
 		}
-		perm := e.GetFilteredPolicy(0, args...)
+		perm := e.GetFilteredNamedPolicy(ptype, 0, args...)
 		permission = append(permission, perm...)
 	}
 	return permission
@@ -255,6 +263,19 @@ func (e *Enforcer) GetImplicitUsersForRole(name string, domain ...string) ([]str
 // GetPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
 // But GetImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
 func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) ([][]string, error) {
+	return e.GetNamedImplicitPermissionsForUser("p", user, domain...)
+}
+
+// GetNamedImplicitPermissionsForUser gets implicit permissions for a user or role by named policy.
+// Compared to GetNamedPermissionsForUser(), this function retrieves permissions for inherited roles.
+// For example:
+// p, admin, data1, read
+// p2, admin, create
+// g, alice, admin
+//
+// GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p"
+// But you can specify the named policy "p2" to get: [["admin", "create"]] by    GetNamedImplicitPermissionsForUser("p2","alice")
+func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string, domain ...string) ([][]string, error) {
 	roles, err := e.GetImplicitRolesForUser(user, domain...)
 	if err != nil {
 		return nil, err
@@ -265,7 +286,7 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 	var res [][]string
 	var permissions [][]string
 	for _, role := range roles {
-		permissions = e.GetPermissionsForUser(role, domain...)
+		permissions = e.GetNamedPermissionsForUser(ptype, role, domain...)
 
 		res = append(res, permissions...)
 	}
