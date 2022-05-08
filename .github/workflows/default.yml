@@ -50,12 +50,21 @@ jobs:
         with:
           version: v1.29
 
+  semantic-pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: semantic-pull-request
+        uses: amannn/action-semantic-pull-request@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          validateSingleCommit: true
+
   semantic-release:
     needs: [test, lint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
       - name: Run semantic-release
         if: github.repository == 'casbin/casbin' && github.event_name == 'push'
         run: make release
