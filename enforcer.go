@@ -523,16 +523,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		expString = util.RemoveComments(util.EscapeAssertion(matcher))
 	}
 
-	var expression *govaluate.EvaluableExpression
-	hasEval := util.HasEval(expString)
-
-	if !hasEval {
-		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
-		if err != nil {
-			return false, err
-		}
-	}
-
 	rTokens := make(map[string]int, len(e.model["r"][rType].Tokens))
 	for i, token := range e.model["r"][rType].Tokens {
 		rTokens[token] = i
@@ -547,6 +537,18 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		rVals:   rvals,
 
 		pTokens: pTokens,
+	}
+
+	var expression *govaluate.EvaluableExpression
+	hasEval := util.HasEval(expString)
+
+	if hasEval {
+		functions["eval"] = generateEvalFunction(functions, &parameters)
+	}
+
+	expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+	if err != nil {
+		return false, err
 	}
 
 	if len(e.model["r"][rType].Tokens) != len(rvals) {
@@ -578,25 +580,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			}
 
 			parameters.pVals = pvals
-
-			if hasEval {
-				ruleNames := util.GetEvalValue(expString)
-				replacements := make(map[string]string)
-				for _, ruleName := range ruleNames {
-					if j, ok := parameters.pTokens[ruleName]; ok {
-						rule := util.EscapeAssertion(pvals[j])
-						// Increase the evaluate priority of the rule
-						replacements[ruleName] = "(" + rule + ")"
-					} else {
-						return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
-					}
-				}
-				expWithRule := util.ReplaceEvalWithMap(expString, replacements)
-				expression, err = govaluate.NewEvaluableExpressionWithFunctions(expWithRule, functions)
-				if err != nil {
-					return false, fmt.Errorf("p.sub_rule should satisfy the syntax of matcher: %s", err)
-				}
-			}
 
 			result, err := expression.Eval(parameters)
 			// log.LogPrint("Result: ", result)
@@ -796,5 +779,24 @@ func (p enforceParameters) Get(name string) (interface{}, error) {
 		return p.rVals[i], nil
 	default:
 		return nil, errors.New("No parameter '" + name + "' found.")
+	}
+}
+
+func generateEvalFunction(functions map[string]govaluate.ExpressionFunction, parameters *enforceParameters) govaluate.ExpressionFunction {
+	return func(args ...interface{}) (interface{}, error) {
+		if len(args) != 1 {
+			return nil, fmt.Errorf("Function eval(subrule string) expected %d arguments, but got %d", 1, len(args))
+		}
+
+		expression, ok := args[0].(string)
+		if !ok {
+			return nil, errors.New("Argument of eval(subrule string) must be a string")
+		}
+		expression = util.EscapeAssertion(expression)
+		expr, err := govaluate.NewEvaluableExpressionWithFunctions(expression, functions)
+		if err != nil {
+			return nil, fmt.Errorf("Error while parsing eval parameter: %s, %s", expression, err.Error())
+		}
+		return expr.Eval(parameters)
 	}
 }

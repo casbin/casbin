@@ -239,6 +239,20 @@ func BenchmarkABACModel(b *testing.B) {
 	}
 }
 
+func BenchmarkABACRuleModel(b *testing.B) {
+	e, _ := NewEnforcer("examples/abac_rule_model.conf", false)
+	sub := newTestSubject("alice", 18)
+
+	for i := 0; i < 1000; i++ {
+		_, _ = e.AddPolicy("r.sub.Age > 20", fmt.Sprintf("data%d", i), "read")
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = e.Enforce(sub, "data100", "read")
+	}
+}
+
 func BenchmarkKeyMatchModel(b *testing.B) {
 	e, _ := NewEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv", false)
 
