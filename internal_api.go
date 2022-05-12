@@ -330,6 +330,12 @@ func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][
 				return false, err
 			}
 		}
+		// For compatibility, because some adapters return oldRules containing ptype, see https://github.com/casbin/xorm-adapter/issues/49
+		for i, oldRule := range oldRules {
+			if len(oldRules[i]) == len(newRules[i])+1 {
+				oldRules[i] = oldRule[1:]
+			}
+		}
 	}
 
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
