@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"runtime/debug"
 	"strings"
+	"sync"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effector"
@@ -50,6 +51,9 @@ type Enforcer struct {
 	autoNotifyDispatcher bool
 
 	logger log.Logger
+
+	shouldLock bool
+	m          sync.RWMutex
 }
 
 // EnforceContext is used as the first element of the parameter "rvals" in method "enforce"
@@ -210,6 +214,11 @@ func (e *Enforcer) initialize() {
 // LoadModel reloads the model from the model CONF file.
 // Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
 func (e *Enforcer) LoadModel() error {
+	if e.shouldLock {
+		e.m.Lock()
+		defer e.m.Unlock()
+	}
+
 	var err error
 	e.model, err = model.NewModelFromFile(e.modelPath)
 	if err != nil {
@@ -251,6 +260,11 @@ func (e *Enforcer) SetAdapter(adapter persist.Adapter) {
 
 // SetWatcher sets the current watcher.
 func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
+	if e.shouldLock {
+		e.m.Lock()
+		defer e.m.Unlock()
+	}
+
 	e.watcher = watcher
 	if _, ok := e.watcher.(persist.WatcherEx); ok {
 		// The callback of WatcherEx has no generic implementation.
@@ -278,6 +292,11 @@ func (e *Enforcer) SetEffector(eft effector.Effector) {
 
 // ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() {
+	if e.shouldLock {
+		e.m.Lock()
+		defer e.m.Unlock()
+	}
+
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		_ = e.dispatcher.ClearPolicy()
 		return
@@ -287,6 +306,11 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
+	if e.shouldLock {
+		e.m.Lock()
+		defer e.m.Unlock()
+	}
+
 	newModel, err := e.prepareNewModel(e.model.Copy())
 	if err != nil {
 		return err
@@ -351,6 +375,11 @@ func (e *Enforcer) loadFilteredPolicy(filter interface{}) error {
 
 // LoadFilteredPolicy reloads a filtered policy from file/database.
 func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
+	if e.shouldLock {
+		e.m.Lock()
+		defer e.m.Unlock()
+	}
+
 	e.model.ClearPolicy()
 
 	return e.loadFilteredPolicy(filter)
@@ -358,6 +387,11 @@ func (e *Enforcer) LoadFilteredPolicy(filter interface{}) error {
 
 // LoadIncrementalFilteredPolicy append a filtered policy from file/database.
 func (e *Enforcer) LoadIncrementalFilteredPolicy(filter interface{}) error {
+	if e.shouldLock {
+		e.m.Lock()
+		defer e.m.Unlock()
+	}
+
 	return e.loadFilteredPolicy(filter)
 }
 
@@ -372,6 +406,11 @@ func (e *Enforcer) IsFiltered() bool {
 
 // SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() error {
+	if e.shouldLock {
+		e.m.RLock()
+		defer e.m.RUnlock()
+	}
+
 	if e.IsFiltered() {
 		return errors.New("cannot save a filtered policy")
 	}
@@ -449,6 +488,10 @@ func (e *Enforcer) buildingRoleLinksWithModel(newModel model.Model) error {
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *Enforcer) BuildRoleLinks() error {
+	if e.shouldLock {
+		e.m.Lock()
+		defer e.m.Unlock()
+	}
 	return e.buildingRoleLinksWithModel(e.model)
 }
 
@@ -683,16 +726,31 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
 func (e *Enforcer) Enforce(rvals ...interface{}) (bool, error) {
+	if e.shouldLock {
+		e.m.RLock()
+		defer e.m.RUnlock()
+	}
+
 	return e.enforce("", nil, rvals...)
 }
 
 // EnforceWithMatcher use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error) {
+	if e.shouldLock {
+		e.m.RLock()
+		defer e.m.RUnlock()
+	}
+
 	return e.enforce(matcher, nil, rvals...)
 }
 
 // EnforceEx explain enforcement by informing matched rules
 func (e *Enforcer) EnforceEx(rvals ...interface{}) (bool, []string, error) {
+	if e.shouldLock {
+		e.m.RLock()
+		defer e.m.RUnlock()
+	}
+
 	explain := []string{}
 	result, err := e.enforce("", &explain, rvals...)
 	return result, explain, err
@@ -700,6 +758,11 @@ func (e *Enforcer) EnforceEx(rvals ...interface{}) (bool, []string, error) {
 
 // EnforceExWithMatcher use a custom matcher and explain enforcement by informing matched rules
 func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error) {
+	if e.shouldLock {
+		e.m.RLock()
+		defer e.m.RUnlock()
+	}
+
 	explain := []string{}
 	result, err := e.enforce(matcher, &explain, rvals...)
 	return result, explain, err
@@ -707,6 +770,11 @@ func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (b
 
 // BatchEnforce enforce in batches
 func (e *Enforcer) BatchEnforce(requests [][]interface{}) ([]bool, error) {
+	if e.shouldLock {
+		e.m.RLock()
+		defer e.m.RUnlock()
+	}
+
 	var results []bool
 	for _, request := range requests {
 		result, err := e.enforce("", nil, request...)
@@ -720,6 +788,11 @@ func (e *Enforcer) BatchEnforce(requests [][]interface{}) ([]bool, error) {
 
 // BatchEnforceWithMatcher enforce with matcher in batches
 func (e *Enforcer) BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error) {
+	if e.shouldLock {
+		e.m.RLock()
+		defer e.m.RUnlock()
+	}
+
 	var results []bool
 	for _, request := range requests {
 		result, err := e.enforce(matcher, nil, request...)
