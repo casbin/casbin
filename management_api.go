@@ -14,7 +14,14 @@
 
 package casbin
 
-import "github.com/Knetic/govaluate"
+import (
+	"errors"
+	"fmt"
+	"strings"
+
+	"github.com/Knetic/govaluate"
+	"github.com/casbin/casbin/v2/util"
+)
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() []string {
@@ -94,6 +101,77 @@ func (e *Enforcer) GetNamedGroupingPolicy(ptype string) [][]string {
 // GetFilteredNamedGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
 func (e *Enforcer) GetFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) [][]string {
 	return e.model.GetFilteredPolicy("g", ptype, fieldIndex, fieldValues...)
+}
+
+// GetFilteredNamedPolicyWithMatcher gets rules based on matcher from the policy.
+func (e *Enforcer) GetFilteredNamedPolicyWithMatcher(ptype string, matcher string) ([][]string, error) {
+	var res [][]string
+	var err error
+
+	functions := e.fm.GetFunctions()
+	if _, ok := e.model["g"]; ok {
+		for key, ast := range e.model["g"] {
+			rm := ast.RM
+			functions[key] = util.GenerateGFunction(rm)
+		}
+	}
+
+	var expString string
+	if matcher == "" {
+		return res, fmt.Errorf("matcher is empty")
+	} else {
+		expString = util.RemoveComments(util.EscapeAssertion(matcher))
+	}
+
+	var expression *govaluate.EvaluableExpression
+
+	expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+	if err != nil {
+		return res, err
+	}
+
+	pTokens := make(map[string]int, len(e.model["p"][ptype].Tokens))
+	for i, token := range e.model["p"][ptype].Tokens {
+		pTokens[token] = i
+	}
+
+	parameters := enforceParameters{
+		pTokens: pTokens,
+	}
+
+	if policyLen := len(e.model["p"][ptype].Policy); policyLen != 0 && strings.Contains(expString, ptype+"_") {
+		for _, pvals := range e.model["p"][ptype].Policy {
+			if len(e.model["p"][ptype].Tokens) != len(pvals) {
+				return res, fmt.Errorf(
+					"invalid policy size: expected %d, got %d, pvals: %v",
+					len(e.model["p"][ptype].Tokens),
+					len(pvals),
+					pvals)
+			}
+
+			parameters.pVals = pvals
+
+			result, err := expression.Eval(parameters)
+
+			if err != nil {
+				return res, err
+			}
+
+			switch result := result.(type) {
+			case bool:
+				if result {
+					res = append(res, pvals)
+				}
+			case float64:
+				if result != 0 {
+					res = append(res, pvals)
+				}
+			default:
+				return res, errors.New("matcher result should be bool, int or float")
+			}
+		}
+	}
+	return res, nil
 }
 
 // HasPolicy determines whether an authorization rule exists.

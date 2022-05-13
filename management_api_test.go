@@ -59,6 +59,20 @@ func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]st
 	}
 }
 
+func testGetFilteredNamedPolicyWithMatcher(t *testing.T, e *Enforcer, ptype string, matcher string, res [][]string) {
+	t.Helper()
+	myRes, err := e.GetFilteredNamedPolicyWithMatcher(ptype, matcher)
+	t.Log("Policy for", matcher, ": ", myRes)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !util.Array2DEquals(res, myRes) {
+		t.Error("Policy for ", matcher, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
 func testGetGroupingPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	t.Helper()
 	myRes := e.GetGroupingPolicy()
@@ -115,6 +129,13 @@ func TestGetPolicyAPI(t *testing.T) {
 	testGetFilteredPolicy(t, e, 1, [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}}, "data2")
 	testGetFilteredPolicy(t, e, 2, [][]string{{"alice", "data1", "read"}, {"data2_admin", "data2", "read"}}, "read")
 	testGetFilteredPolicy(t, e, 2, [][]string{{"bob", "data2", "write"}, {"data2_admin", "data2", "write"}}, "write")
+
+	testGetFilteredNamedPolicyWithMatcher(t, e, "p", "'alice' == p.sub", [][]string{{"alice", "data1", "read"}})
+	testGetFilteredNamedPolicyWithMatcher(t, e, "p", "keyMatch2(p.sub, '*')", [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"}})
 
 	testGetFilteredPolicy(t, e, 0, [][]string{{"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}}, "data2_admin", "data2")
 	// Note: "" (empty string) in fieldValues means matching all values.
