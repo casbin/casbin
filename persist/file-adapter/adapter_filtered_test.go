@@ -1,6 +1,11 @@
 package fileadapter
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
 
 func TestFilterWordsMCC(t *testing.T) {
 	assert.Equal(t, filterWords([]string{"a"}, []string{"b"}), true)
