@@ -33,7 +33,17 @@ func LoadPolicyLine(line string, m model.Model) {
 	r.TrimLeadingSpace = true
 
 	tokens, err := r.Read()
-	if err != nil {
+	if err != nil || len(tokens) <= 0 {
+		return
+	}
+
+	ptype := tokens[0]
+	sec := ptype[:1]
+	if _, ok := m[sec][ptype]; !ok {
+		return
+	}
+	expectLen := len(tokens) - 1
+	if (sec == "g" && strings.Count(m[sec][ptype].Value, "_") != expectLen) || (sec == "p" && len(m[sec][ptype].Tokens) != expectLen) {
 		return
 	}
 
