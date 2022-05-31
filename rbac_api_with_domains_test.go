@@ -35,7 +35,7 @@ func testGetUsersInDomain(t *testing.T, e *Enforcer, name string, domain string,
 func testGetAllRolesInDomain(t *testing.T, e *Enforcer, domain string, res []string) {
 	t.Helper()
 	myRes := e.GetAllRolesInDomain(domain)
-	t.Log("Roles under ", domain, ": ", myRes)
+	t.Log("Roles under ", domain, ": ")
 	if !util.SetEquals(res, myRes) {
 		t.Error("Roles  under ", domain, ": ", myRes, ", supposed to be ", res)
 	}
@@ -64,7 +64,7 @@ func TestGetImplicitRolesForDomainUser(t *testing.T) {
 // TestUserAPIWithDomains: Add by Gordon
 func TestUserAPIWithDomains(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
-	testGetAllRolesInDomain(t, e, "domain1", []string{"alice"})
+	testGetAllRolesInDomain(t, e, "domain1", []string{"admin"})
 	testGetUsers(t, e, []string{"alice"}, "admin", "domain1")
 	testGetUsersInDomain(t, e, "admin", "domain1", []string{"alice"})
 
