@@ -58,19 +58,6 @@ func (e *Enforcer) GetAllRoles() []string {
 	return e.model.GetValuesForFieldInPolicyAllTypes("g", 1)
 }
 
-// GetAllRolesInDomain gets the list of roles in domain that show up in the current policy.
-func (e *Enforcer) GetAllRolesInDomain(domain string) []string {
-	var roles []string
-	for ptype := range e.model["g"] {
-		polices := e.model.GetFilteredPolicy("g", ptype, 2, domain)
-		for _, policy := range polices {
-			roles = append(roles, policy[1])
-		}
-	}
-	util.ArrayRemoveDuplicates(&roles)
-	return roles
-}
-
 // GetAllNamedRoles gets the list of roles that show up in the current named policy.
 func (e *Enforcer) GetAllNamedRoles(ptype string) []string {
 	return e.model.GetValuesForFieldInPolicy("g", ptype, 1)
