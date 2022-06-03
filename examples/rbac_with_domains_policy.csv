@@ -4,3 +4,4 @@ p, admin, domain2, data2, read
 p, admin, domain2, data2, write
 g, alice, admin, domain1
 g, bob, admin, domain2
+g2, source1,s_role,domain1
