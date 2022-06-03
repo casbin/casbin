@@ -33,8 +33,8 @@ func testGetUsersInDomain(t *testing.T, e *Enforcer, name string, domain string,
 }
 func testGetAllRolesInDomain(t *testing.T, e *Enforcer, domain string, res []string) {
 	t.Helper()
-	myRes := e.GetAllRolesInDomain(domain)
-	t.Log("Roles under ", domain, ": ")
+	myRes := e.GetAllRolesInDomain(domain, "g2")
+	t.Log("Roles under domain: ", domain, ": ", myRes)
 	if !util.SetEquals(res, myRes) {
 		t.Error("Roles  under ", domain, ": ", myRes, ", supposed to be ", res)
 	}

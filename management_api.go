@@ -59,12 +59,23 @@ func (e *Enforcer) GetAllRoles() []string {
 }
 
 // GetAllRolesInDomain gets the list of roles in domain that show up in the current policy.
-func (e *Enforcer) GetAllRolesInDomain(domain string) []string {
+func (e *Enforcer) GetAllRolesInDomain(domain string, ptypes ...string) []string {
 	var roles []string
-	for ptype := range e.model["g"] {
-		polices := e.model.GetFilteredPolicy("g", ptype, 2, domain)
+	var polices [][]string
+	if len(ptypes) > 1 {
+		return roles
+	}
+	if len(ptypes) == 1 {
+		polices = e.model.GetFilteredPolicy("g", ptypes[0], 2, domain)
 		for _, policy := range polices {
 			roles = append(roles, policy[1])
+		}
+	} else {
+		for exsitPtype := range e.model["g"] {
+			polices = e.model.GetFilteredPolicy("g", exsitPtype, 2, domain)
+			for _, policy := range polices {
+				roles = append(roles, policy[1])
+			}
 		}
 	}
 	util.ArrayRemoveDuplicates(&roles)
