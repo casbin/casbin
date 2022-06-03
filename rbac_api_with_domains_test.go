@@ -31,7 +31,14 @@ func testGetUsersInDomain(t *testing.T, e *Enforcer, name string, domain string,
 		t.Error("Users for ", name, " under ", domain, ": ", myRes, ", supposed to be ", res)
 	}
 }
-
+func testGetAllRolesInDomain(t *testing.T, e *Enforcer, domain string, res []string) {
+	t.Helper()
+	myRes := e.GetAllRolesInDomain(domain, "g2")
+	t.Log("Roles under domain: ", domain, ":", myRes)
+	if !util.SetEquals(res, myRes) {
+		t.Error("Roles  under ", domain, ": ", myRes, ", supposed to be ", res)
+	}
+}
 func testGetRolesInDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
 	t.Helper()
 	myRes := e.GetRolesForUserInDomain(name, domain)
@@ -95,6 +102,7 @@ func TestRoleAPIWithDomains(t *testing.T) {
 
 	testGetRoles(t, e, []string{}, "admin", "domain1")
 	testGetRolesInDomain(t, e, "admin", "domain1", []string{})
+	testGetAllRolesInDomain(t, e, "domain1", []string{"admin"})
 
 	testGetRoles(t, e, []string{}, "non_exist", "domain1")
 	testGetRolesInDomain(t, e, "non_exist", "domain1", []string{})
