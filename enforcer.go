@@ -287,37 +287,46 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
-	newModel, err := e.prepareNewModel(e.model.Copy())
-	if err != nil {
+	needToRebuild := false
+	newModel := e.model.Copy()
+	newModel.ClearPolicy()
+
+	var err error
+	defer func() {
+		if err != nil {
+			if e.autoBuildRoleLinks && needToRebuild {
+				_ = e.BuildRoleLinks()
+			}
+		}
+	}()
+
+	if err = e.adapter.LoadPolicy(newModel); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
+		return err
+	}
+
+	if err = newModel.SortPoliciesBySubjectHierarchy(); err != nil {
+		return err
+	}
+
+	if err = newModel.SortPoliciesByPriority(); err != nil {
 		return err
 	}
 
 	if e.autoBuildRoleLinks {
-		if err := e.tryBuildingRoleLinksWithModel(newModel); err != nil {
+		needToRebuild = true
+		for _, rm := range e.rmMap {
+			err := rm.Clear()
+			if err != nil {
+				return err
+			}
+		}
+		err = newModel.BuildRoleLinks(e.rmMap)
+		if err != nil {
 			return err
 		}
 	}
 	e.model = newModel
 	return nil
-}
-
-// prepareNewModel prepares a new model with the policy from file/database.
-func (e *Enforcer) prepareNewModel(newModel model.Model) (model.Model, error) {
-	newModel.ClearPolicy()
-
-	if err := e.adapter.LoadPolicy(newModel); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
-		return nil, err
-	}
-
-	if err := newModel.SortPoliciesBySubjectHierarchy(); err != nil {
-		return nil, err
-	}
-
-	if err := newModel.SortPoliciesByPriority(); err != nil {
-		return nil, err
-	}
-
-	return newModel, nil
 }
 
 func (e *Enforcer) loadFilteredPolicy(filter interface{}) error {
@@ -435,8 +444,8 @@ func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 	e.autoBuildRoleLinks = autoBuildRoleLinks
 }
 
-// buildingRoleLinksWithModel attempts to build the role links for a new model
-func (e *Enforcer) buildingRoleLinksWithModel(newModel model.Model) error {
+// BuildRoleLinks manually rebuild the role inheritance relations.
+func (e *Enforcer) BuildRoleLinks() error {
 	for _, rm := range e.rmMap {
 		err := rm.Clear()
 		if err != nil {
@@ -444,21 +453,7 @@ func (e *Enforcer) buildingRoleLinksWithModel(newModel model.Model) error {
 		}
 	}
 
-	return newModel.BuildRoleLinks(e.rmMap)
-}
-
-// BuildRoleLinks manually rebuild the role inheritance relations.
-func (e *Enforcer) BuildRoleLinks() error {
-	return e.buildingRoleLinksWithModel(e.model)
-}
-
-// tryBuildingRoleLinksWithModel attempts to build the role links for a new model falls back to the existing model in case of errors
-func (e *Enforcer) tryBuildingRoleLinksWithModel(newModel model.Model) error {
-	if err := e.buildingRoleLinksWithModel(newModel); err != nil {
-		_ = e.buildingRoleLinksWithModel(e.model)
-		return err
-	}
-	return nil
+	return e.model.BuildRoleLinks(e.rmMap)
 }
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
