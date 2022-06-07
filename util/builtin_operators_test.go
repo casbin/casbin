@@ -15,6 +15,8 @@
 package util
 
 import (
+	"reflect"
+	"runtime"
 	"testing"
 )
 
@@ -412,6 +414,16 @@ func testIPMatchFunc(t *testing.T, res bool, err string, args ...interface{}) {
 	}
 }
 
+func testIsPattern(t *testing.T, fn func(key string) bool, key string, expected bool) {
+	t.Helper()
+	fnName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
+
+	actual := fn(key)
+	if actual != expected {
+		t.Errorf("%s(%s) returns %v, should be %v", fnName, key, actual, expected)
+	}
+}
+
 func TestRegexMatchFunc(t *testing.T) {
 	testRegexMatchFunc(t, false, "regexMatch: Expected 2 arguments, but got 1", "/topic/create")
 	testRegexMatchFunc(t, false, "regexMatch: Expected 2 arguments, but got 3", "/topic/create/123", "/topic/create", "/topic/update")
@@ -428,6 +440,13 @@ func TestKeyMatchFunc(t *testing.T) {
 	testKeyMatchFunc(t, true, "", "/foo/bar", "/foo*")
 }
 
+func TestIsKeyMatchPattern(t *testing.T) {
+	testIsPattern(t, IsKeyMatchPattern, "/foo", false)
+	testIsPattern(t, IsKeyMatchPattern, "*", true)
+	testIsPattern(t, IsKeyMatchPattern, "/*", true)
+	testIsPattern(t, IsKeyMatchPattern, "/foo/*", true)
+}
+
 func TestKeyMatch2Func(t *testing.T) {
 	testKeyMatch2Func(t, false, "keyMatch2: Expected 2 arguments, but got 1", "/")
 	testKeyMatch2Func(t, false, "keyMatch2: Expected 2 arguments, but got 3", "/foo/create/123", "/*", "/foo/update/123")
@@ -439,6 +458,15 @@ func TestKeyMatch2Func(t *testing.T) {
 	testKeyMatch2Func(t, true, "", "/foo", "/foo")
 	testKeyMatch2Func(t, true, "", "/foo", "/foo*")
 	testKeyMatch2Func(t, false, "", "/foo", "/foo/*")
+}
+
+func TestIsKeyMatch2Pattern(t *testing.T) {
+	testIsPattern(t, IsKeyMatch2Pattern, "/foo", false)
+	testIsPattern(t, IsKeyMatch2Pattern, "*", true)
+	testIsPattern(t, IsKeyMatch2Pattern, "/*", true)
+	testIsPattern(t, IsKeyMatch2Pattern, "/foo/*", true)
+	testIsPattern(t, IsKeyMatch2Pattern, "/:resource", true)
+	testIsPattern(t, IsKeyMatch2Pattern, "/{resource}", false)
 }
 
 func TestKeyMatch3Func(t *testing.T) {
@@ -467,6 +495,15 @@ func TestKeyMatch3Func(t *testing.T) {
 	testKeyMatch3Func(t, true, "", "/proxy/myid/res/res2", "/proxy/{id}/*")
 	testKeyMatch3Func(t, true, "", "/proxy/myid/res/res2/res3", "/proxy/{id}/*")
 	testKeyMatch3Func(t, false, "", "/proxy/", "/proxy/{id}/*")
+}
+
+func TestIsKeyMatch3Pattern(t *testing.T) {
+	testIsPattern(t, IsKeyMatch3Pattern, "/foo", false)
+	testIsPattern(t, IsKeyMatch3Pattern, "*", true)
+	testIsPattern(t, IsKeyMatch3Pattern, "/*", true)
+	testIsPattern(t, IsKeyMatch3Pattern, "/foo/*", true)
+	testIsPattern(t, IsKeyMatch3Pattern, "/:resource", false)
+	testIsPattern(t, IsKeyMatch3Pattern, "/{resource}", true)
 }
 
 func TestKeyMatch4Func(t *testing.T) {

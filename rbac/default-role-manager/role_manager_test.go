@@ -264,73 +264,117 @@ func TestClear(t *testing.T) {
 }
 
 func TestDomainPatternRole(t *testing.T) {
-	rm := NewRoleManager(10)
-	rm.AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
 
-	_ = rm.AddLink("u1", "g1", "domain1")
-	_ = rm.AddLink("u2", "g1", "domain2")
-	_ = rm.AddLink("u3", "g1", "*")
-	_ = rm.AddLink("u4", "g2", "domain3")
-	// Current role inheritance tree after deleting the links:
-	//       domain1:g1    domain2:g1			domain3:g2
-	//		   /      \    /      \					|
-	//	 domain1:u1    *:g1     domain2:u2		domain3:u4
-	// 					|
-	// 				   *:u3
-	testDomainRole(t, rm, "u1", "g1", "domain1", true)
-	testDomainRole(t, rm, "u2", "g1", "domain1", false)
-	testDomainRole(t, rm, "u2", "g1", "domain2", true)
-	testDomainRole(t, rm, "u3", "g1", "domain1", true)
-	testDomainRole(t, rm, "u3", "g1", "domain2", true)
-	testDomainRole(t, rm, "u1", "g2", "domain1", false)
-	testDomainRole(t, rm, "u4", "g2", "domain3", true)
-	testDomainRole(t, rm, "u3", "g2", "domain3", false)
+	tests := []struct {
+		NewRM func() *RoleManager
+	}{
+		{
+			func() *RoleManager {
+				rm := NewRoleManager(10)
+				rm.AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
+				return rm
+			},
+		},
+		{
+			func() *RoleManager {
+				rm := NewRoleManager(10)
+				rm.SetDomainMatcher(NewPatternMatcher(util.IsKeyMatch2Pattern, util.KeyMatch2))
+				return rm
+			},
+		},
+	}
 
-	testPrintRolesWithDomain(t, rm, "u3", "domain1", []string{"g1"})
-	testPrintRolesWithDomain(t, rm, "u1", "domain1", []string{"g1"})
-	testPrintRolesWithDomain(t, rm, "u3", "domain2", []string{"g1"})
-	testPrintRolesWithDomain(t, rm, "u1", "domain2", []string{})
-	testPrintRolesWithDomain(t, rm, "u4", "domain3", []string{"g2"})
+	for _, test := range tests {
+		rm := test.NewRM()
+
+		_ = rm.AddLink("u1", "g1", "domain1")
+		_ = rm.AddLink("u2", "g1", "domain2")
+		_ = rm.AddLink("u3", "g1", "*")
+		_ = rm.AddLink("u4", "g2", "domain3")
+		// Current role inheritance tree after deleting the links:
+		//       domain1:g1    domain2:g1			domain3:g2
+		//		   /      \    /      \					|
+		//	 domain1:u1    *:g1     domain2:u2		domain3:u4
+		// 					|
+		// 				   *:u3
+		testDomainRole(t, rm, "u1", "g1", "domain1", true)
+		testDomainRole(t, rm, "u2", "g1", "domain1", false)
+		testDomainRole(t, rm, "u2", "g1", "domain2", true)
+		testDomainRole(t, rm, "u3", "g1", "domain1", true)
+		testDomainRole(t, rm, "u3", "g1", "domain2", true)
+		testDomainRole(t, rm, "u1", "g2", "domain1", false)
+		testDomainRole(t, rm, "u4", "g2", "domain3", true)
+		testDomainRole(t, rm, "u3", "g2", "domain3", false)
+
+		testPrintRolesWithDomain(t, rm, "u3", "domain1", []string{"g1"})
+		testPrintRolesWithDomain(t, rm, "u1", "domain1", []string{"g1"})
+		testPrintRolesWithDomain(t, rm, "u3", "domain2", []string{"g1"})
+		testPrintRolesWithDomain(t, rm, "u1", "domain2", []string{})
+		testPrintRolesWithDomain(t, rm, "u4", "domain3", []string{"g2"})
+	}
+
 }
 
 func TestAllMatchingFunc(t *testing.T) {
-	rm := NewRoleManager(10)
-	rm.AddMatchingFunc("keyMatch2", util.KeyMatch2)
-	rm.AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
 
-	_ = rm.AddLink("/book/:id", "book_group", "*")
-	// Current role inheritance tree after deleting the links:
-	//  		*:book_group
-	//				|
-	// 			*:/book/:id
-	testDomainRole(t, rm, "/book/1", "book_group", "domain1", true)
-	testDomainRole(t, rm, "/book/2", "book_group", "domain1", true)
+	tests := []struct {
+		NewRM func() *RoleManager
+	}{
+		{
+			func() *RoleManager {
+				rm := NewRoleManager(10)
+				rm.AddMatchingFunc("keyMatch2", util.KeyMatch2)
+				rm.AddDomainMatchingFunc("keyMatch2", util.KeyMatch2)
+				return rm
+			},
+		},
+		{
+			func() *RoleManager {
+				rm := NewRoleManager(10)
+				rm.SetRoleMatcher(NewPatternMatcher(util.IsKeyMatch2Pattern, util.KeyMatch2))
+				rm.SetDomainMatcher(NewPatternMatcher(util.IsKeyMatch2Pattern, util.KeyMatch2))
+				return rm
+			},
+		},
+	}
+
+	for _, test := range tests {
+		rm := test.NewRM()
+
+		_ = rm.AddLink("/book/:id", "book_group", "*")
+		// Current role inheritance tree after deleting the links:
+		//  		*:book_group
+		//				|
+		// 			*:/book/:id
+		testDomainRole(t, rm, "/book/1", "book_group", "domain1", true)
+		testDomainRole(t, rm, "/book/2", "book_group", "domain1", true)
+	}
 }
 
 func TestMatchingFuncOrder(t *testing.T) {
 	rm := NewRoleManager(10)
-	rm.AddMatchingFunc("regexMatch", util.RegexMatch)
+	rm.SetRoleMatcher(NewPrefixMatcher("re:", util.RegexMatch))
 
-	_ = rm.AddLink("g\\d+", "root")
+	_ = rm.AddLink("re:g\\d+", "root")
 	_ = rm.AddLink("u1", "g1")
 	testRole(t, rm, "u1", "root", true)
 
 	_ = rm.Clear()
 
 	_ = rm.AddLink("u1", "g1")
-	_ = rm.AddLink("g\\d+", "root")
+	_ = rm.AddLink("re:g\\d+", "root")
 	testRole(t, rm, "u1", "root", true)
 
 	_ = rm.Clear()
 
-	_ = rm.AddLink("u1", "g\\d+")
+	_ = rm.AddLink("u1", "re:g\\d+")
 	testRole(t, rm, "u1", "g1", true)
 	testRole(t, rm, "u1", "g2", true)
 }
 
 func TestDomainMatchingFuncWithDifferentDomain(t *testing.T) {
 	rm := NewRoleManager(10)
-	rm.AddDomainMatchingFunc("keyMatch", util.KeyMatch)
+	rm.SetDomainMatcher(NewPatternMatcher(util.IsKeyMatchPattern, util.KeyMatch))
 
 	_ = rm.AddLink("alice", "editor", "*")
 	_ = rm.AddLink("editor", "admin", "domain1")
@@ -341,15 +385,15 @@ func TestDomainMatchingFuncWithDifferentDomain(t *testing.T) {
 
 func TestTemporaryRoles(t *testing.T) {
 	rm := NewRoleManager(10)
-	rm.AddMatchingFunc("regexMatch", util.RegexMatch)
+	rm.SetRoleMatcher(NewPrefixMatcher("re:", util.RegexMatch))
 
-	_ = rm.AddLink("u\\d+", "user")
+	_ = rm.AddLink("re:u\\d+", "user")
 
 	for i := 0; i < 10; i++ {
 		testRole(t, rm, fmt.Sprintf("u%d", i), "user", true)
 	}
 
-	testPrintUsers(t, rm, "user", []string{"u\\d+"})
+	testPrintUsers(t, rm, "user", []string{"re:u\\d+"})
 	testPrintRoles(t, rm, "u1", []string{"user"})
 
 	_ = rm.AddLink("u1", "manager")
@@ -358,7 +402,7 @@ func TestTemporaryRoles(t *testing.T) {
 		testRole(t, rm, fmt.Sprintf("u%d", i), "user", true)
 	}
 
-	testPrintUsers(t, rm, "user", []string{"u\\d+", "u1"})
+	testPrintUsers(t, rm, "user", []string{"re:u\\d+", "u1"})
 	testPrintRoles(t, rm, "u1", []string{"user", "manager"})
 }
 

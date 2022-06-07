@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -122,7 +123,8 @@ func BenchmarkRoleManagerLarge(b *testing.B) {
 
 func BenchmarkBuildRoleLinksWithPatternLarge(b *testing.B) {
 	e, _ := NewEnforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv")
-	e.AddNamedMatchingFunc("g", "", util.KeyMatch4)
+	roleMatcher := defaultrolemanager.NewPatternMatcher(util.IsKeyMatch4Pattern, util.KeyMatch4)
+	e.SetNamedRoleMatcher("g", roleMatcher)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = e.BuildRoleLinks()
@@ -131,7 +133,8 @@ func BenchmarkBuildRoleLinksWithPatternLarge(b *testing.B) {
 
 func BenchmarkBuildRoleLinksWithDomainPatternLarge(b *testing.B) {
 	e, _ := NewEnforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv")
-	e.AddNamedDomainMatchingFunc("g", "", util.KeyMatch4)
+	domainMatcher := defaultrolemanager.NewPatternMatcher(util.IsKeyMatch4Pattern, util.KeyMatch4)
+	e.SetNamedDomainMatcher("g", domainMatcher)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = e.BuildRoleLinks()
@@ -140,8 +143,10 @@ func BenchmarkBuildRoleLinksWithDomainPatternLarge(b *testing.B) {
 
 func BenchmarkBuildRoleLinksWithPatternAndDomainPatternLarge(b *testing.B) {
 	e, _ := NewEnforcer("examples/performance/rbac_with_pattern_large_scale_model.conf", "examples/performance/rbac_with_pattern_large_scale_policy.csv")
-	e.AddNamedMatchingFunc("g", "", util.KeyMatch4)
-	e.AddNamedDomainMatchingFunc("g", "", util.KeyMatch4)
+	roleMatcher := defaultrolemanager.NewPatternMatcher(util.IsKeyMatch4Pattern, util.KeyMatch4)
+	domainMatcher := defaultrolemanager.NewPatternMatcher(util.IsKeyMatch4Pattern, util.KeyMatch4)
+	e.SetNamedRoleMatcher("g", roleMatcher)
+	e.SetNamedDomainMatcher("g", domainMatcher)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = e.BuildRoleLinks()

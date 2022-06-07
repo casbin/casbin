@@ -72,6 +72,17 @@ func KeyMatchFunc(args ...interface{}) (interface{}, error) {
 	return bool(KeyMatch(name1, name2)), nil
 }
 
+// IsKeyMatchPattern determines if key includes a parameterized segment
+func IsKeyMatchPattern(key string) bool {
+	segments := strings.Split(key, "/")
+	for _, seg := range segments {
+		if seg == "*" {
+			return true
+		}
+	}
+	return false
+}
+
 // KeyGet returns the matched part
 // For example, "/foo/bar/foo" matches "/foo/*"
 // "bar/foo" will been returned
@@ -121,6 +132,17 @@ func KeyMatch2Func(args ...interface{}) (interface{}, error) {
 	name2 := args[1].(string)
 
 	return bool(KeyMatch2(name1, name2)), nil
+}
+
+// IsKeyMatch2Pattern determines if key includes a parameterized segment
+func IsKeyMatch2Pattern(key string) bool {
+	segments := strings.Split(key, "/")
+	for _, seg := range segments {
+		if seg == "*" || strings.HasPrefix(seg, ":") {
+			return true
+		}
+	}
+	return false
 }
 
 // KeyGet2 returns value matched pattern
@@ -218,6 +240,17 @@ func KeyGet3Func(args ...interface{}) (interface{}, error) {
 	return KeyGet3(name1, name2, key), nil
 }
 
+// IsKeyMatch3Pattern determines if key includes a parameterized segment
+func IsKeyMatch3Pattern(key string) bool {
+	segments := strings.Split(key, "/")
+	for _, seg := range segments {
+		if seg == "*" || (strings.HasPrefix(seg, "{") && strings.HasSuffix(seg, "}")) {
+			return true
+		}
+	}
+	return false
+}
+
 // KeyMatch4 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // Besides what KeyMatch3 does, KeyMatch4 can also match repeated patterns:
 // "/parent/123/child/123" matches "/parent/{id}/child/{id}"
@@ -269,6 +302,11 @@ func KeyMatch4Func(args ...interface{}) (interface{}, error) {
 	name2 := args[1].(string)
 
 	return bool(KeyMatch4(name1, name2)), nil
+}
+
+// IsKeyMatch4Pattern determines if key includes a parameterized segment
+func IsKeyMatch4Pattern(key string) bool {
+	return IsKeyMatch3Pattern(key)
 }
 
 // KeyMatch determines whether key1 matches the pattern of key2 and ignores the parameters in key2.
