@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"runtime/debug"
 	"strings"
+	"sync"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effector"
@@ -38,10 +39,11 @@ type Enforcer struct {
 	fm        model.FunctionMap
 	eft       effector.Effector
 
-	adapter    persist.Adapter
-	watcher    persist.Watcher
-	dispatcher persist.Dispatcher
-	rmMap      map[string]rbac.RoleManager
+	adapter     persist.Adapter
+	watcher     persist.Watcher
+	dispatcher  persist.Dispatcher
+	rmMap       map[string]rbac.RoleManager
+	expressions sync.Map
 
 	enabled              bool
 	autoSave             bool
@@ -198,6 +200,7 @@ func (e *Enforcer) initialize() {
 	e.rmMap = map[string]rbac.RoleManager{}
 	e.eft = effector.NewDefaultEffector()
 	e.watcher = nil
+	e.expressions = sync.Map{}
 
 	e.enabled = true
 	e.autoSave = true
@@ -458,6 +461,7 @@ func (e *Enforcer) BuildRoleLinks() error {
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
 func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, rules [][]string) error {
+	e.invalidateCache()
 	return e.model.BuildIncrementalRoleLinks(e.rmMap, op, "g", ptype, rules)
 }
 
@@ -469,6 +473,10 @@ func NewEnforceContext(suffix string) EnforceContext {
 		EType: "e" + suffix,
 		MType: "m" + suffix,
 	}
+}
+
+func (e *Enforcer) invalidateCache() {
+	e.expressions = sync.Map{}
 }
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
@@ -537,13 +545,24 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	var expression *govaluate.EvaluableExpression
 	hasEval := util.HasEval(expString)
 
-	if hasEval {
+	if !hasEval {
+		var cachedExpression, isPresent = e.expressions.Load(expString)
+		if !isPresent {
+			expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+			if err != nil {
+				return false, err
+			}
+			e.expressions.Store(expString, expression)
+		} else {
+			expression = cachedExpression.(*govaluate.EvaluableExpression)
+		}
+	} else {
 		functions["eval"] = generateEvalFunction(functions, &parameters)
-	}
-
-	expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
-	if err != nil {
-		return false, err
+		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+		if err != nil {
+			return false, err
+		}
+		e.expressions.Store(expString, expression)
 	}
 
 	if len(e.model["r"][rType].Tokens) != len(rvals) {
