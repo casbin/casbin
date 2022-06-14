@@ -542,27 +542,14 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		pTokens: pTokens,
 	}
 
-	var expression *govaluate.EvaluableExpression
 	hasEval := util.HasEval(expString)
-
-	if !hasEval {
-		var cachedExpression, isPresent = e.matcherMap.Load(expString)
-		if !isPresent {
-			expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
-			if err != nil {
-				return false, err
-			}
-			e.matcherMap.Store(expString, expression)
-		} else {
-			expression = cachedExpression.(*govaluate.EvaluableExpression)
-		}
-	} else {
+	if hasEval {
 		functions["eval"] = generateEvalFunction(functions, &parameters)
-		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
-		if err != nil {
-			return false, err
-		}
-		e.matcherMap.Store(expString, expression)
+	}
+	var expression *govaluate.EvaluableExpression
+	expression, err = e.getAndStoreMatcherExpression(hasEval, expString, functions)
+	if err != nil {
+		return false, err
 	}
 
 	if len(e.model["r"][rType].Tokens) != len(rvals) {
@@ -693,6 +680,23 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	e.logger.LogEnforce(expString, rvals, result, logExplains)
 
 	return result, nil
+}
+
+func (e *Enforcer) getAndStoreMatcherExpression(hasEval bool, expString string, functions map[string]govaluate.ExpressionFunction) (*govaluate.EvaluableExpression, error) {
+	var expression *govaluate.EvaluableExpression
+	var err error
+	var cachedExpression, isPresent = e.matcherMap.Load(expString)
+
+	if !hasEval && isPresent {
+		expression = cachedExpression.(*govaluate.EvaluableExpression)
+	} else {
+		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+		if err != nil {
+			return nil, err
+		}
+		e.matcherMap.Store(expString, expression)
+	}
+	return expression, nil
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
