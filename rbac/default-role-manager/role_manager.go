@@ -152,7 +152,7 @@ func (r *Role) getRoles() []string {
 		names = append(names, key.(string))
 		return true
 	})
-	return names
+	return util.RemoveDuplicateElement(names)
 }
 
 func (r *Role) getUsers() []string {

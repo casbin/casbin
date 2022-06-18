@@ -138,6 +138,20 @@ func TestRole(t *testing.T) {
 	testPrintRoles(t, rm, "g1", []string{})
 	testPrintRoles(t, rm, "g2", []string{})
 	testPrintRoles(t, rm, "g3", []string{})
+
+	rm = NewRoleManager(10)
+	rm.AddMatchingFunc("keyMatch", util.KeyMatch)
+
+	_ = rm.AddLink("alice", "book_group")
+	_ = rm.AddLink("alice", "*")
+	_ = rm.AddLink("bob", "pen_group")
+
+	testRole(t, rm, "alice", "book_group", true)
+	testRole(t, rm, "alice", "pen_group", true)
+	testRole(t, rm, "bob", "pen_group", true)
+	testRole(t, rm, "bob", "book_group", false)
+	testPrintRoles(t, rm, "alice", []string{"*", "alice", "bob", "book_group", "pen_group"})
+	testPrintUsers(t, rm, "*", []string{"alice"})
 }
 
 func TestDomainRole(t *testing.T) {
