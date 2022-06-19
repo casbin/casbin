@@ -138,6 +138,27 @@ func TestRole(t *testing.T) {
 	testPrintRoles(t, rm, "g1", []string{})
 	testPrintRoles(t, rm, "g2", []string{})
 	testPrintRoles(t, rm, "g3", []string{})
+
+
+	rm = NewRoleManager(3)
+	rm.AddMatchingFunc("keyMatch", util.KeyMatch)
+
+	_ = rm.AddLink("u1", "g1")
+	_ = rm.AddLink("u1", "*")
+	_ = rm.AddLink("u2", "g2")
+
+	// Current role inheritance tree after deleting the links:
+	//          g1   g2
+	//            \ /  \
+	//             *    u2
+	//             |
+	//             u1
+	testRole(t, rm, "u1", "g1", true)
+	testRole(t, rm, "u1", "g2", true)
+	testRole(t, rm, "u2", "g2", true)
+	testRole(t, rm, "u2", "g1", false)
+	testPrintRoles(t, rm, "u1", []string{"*", "u1", "u2", "g1", "g2"})
+	testPrintUsers(t, rm, "*", []string{"u1"})
 }
 
 func TestDomainRole(t *testing.T) {
