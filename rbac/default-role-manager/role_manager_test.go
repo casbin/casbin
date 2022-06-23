@@ -361,3 +361,29 @@ func TestTemporaryRoles(t *testing.T) {
 	testPrintUsers(t, rm, "user", []string{"u\\d+", "u1"})
 	testPrintRoles(t, rm, "u1", []string{"user", "manager"})
 }
+
+func TestMaxHierarchyLevel(t *testing.T) {
+	rm := NewRoleManager(1)
+	_ = rm.AddLink("level0", "level1")
+	_ = rm.AddLink("level1", "level2")
+	_ = rm.AddLink("level2", "level3")
+
+	testRole(t, rm, "level0", "level0", true)
+	testRole(t, rm, "level0", "level1", true)
+	testRole(t, rm, "level0", "level2", false)
+	testRole(t, rm, "level0", "level3", false)
+	testRole(t, rm, "level1", "level2", true)
+	testRole(t, rm, "level1", "level3", false)
+
+	rm = NewRoleManager(2)
+	_ = rm.AddLink("level0", "level1")
+	_ = rm.AddLink("level1", "level2")
+	_ = rm.AddLink("level2", "level3")
+
+	testRole(t, rm, "level0", "level0", true)
+	testRole(t, rm, "level0", "level1", true)
+	testRole(t, rm, "level0", "level2", true)
+	testRole(t, rm, "level0", "level3", false)
+	testRole(t, rm, "level1", "level2", true)
+	testRole(t, rm, "level1", "level3", true)
+}
