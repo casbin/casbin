@@ -331,7 +331,7 @@ func (rm *RoleManagerImpl) HasLink(name1 string, name2 string, domains ...string
 }
 
 func (rm *RoleManagerImpl) hasLinkHelper(targetName string, roles map[string]*Role, level int) bool {
-	if level <= 0 || len(roles) == 0 {
+	if level < 0 || len(roles) == 0 {
 		return false
 	}
 
