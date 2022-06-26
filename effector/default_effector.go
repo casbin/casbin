@@ -14,7 +14,11 @@
 
 package effector
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/casbin/casbin/v2/constant"
+)
 
 // DefaultEffector is default effector for Casbin.
 type DefaultEffector struct {
@@ -32,7 +36,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 	explainIndex := -1
 
 	switch expr {
-	case "some(where (p_eft == allow))":
+	case constant.AllowOverrideEffect:
 		if matches[policyIndex] == 0 {
 			break
 		}
@@ -42,7 +46,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 			explainIndex = policyIndex
 			break
 		}
-	case "!some(where (p_eft == deny))":
+	case constant.DenyOverrideEffect:
 		// only check the current policyIndex
 		if matches[policyIndex] != 0 && effects[policyIndex] == Deny {
 			result = Deny
@@ -53,7 +57,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 		if policyIndex == policyLength-1 {
 			result = Allow
 		}
-	case "some(where (p_eft == allow)) && !some(where (p_eft == deny))":
+	case constant.AllowAndDenyEffect:
 		// short-circuit if matched deny rule
 		if matches[policyIndex] != 0 && effects[policyIndex] == Deny {
 			result = Deny
@@ -80,7 +84,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 				break
 			}
 		}
-	case "priority(p_eft) || deny", "subjectPriority(p_eft) || deny":
+	case constant.PriorityEffect, constant.SubjectPriorityEffect:
 		// reverse merge, short-circuit may be earlier
 		for i := len(effects) - 1; i >= 0; i-- {
 			if matches[i] == 0 {

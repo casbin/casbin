@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
 )
@@ -99,7 +100,11 @@ func (e *Enforcer) DeleteUser(user string) (bool, error) {
 		return res1, err
 	}
 
-	res2, err := e.RemoveFilteredPolicy(0, user)
+	subIndex, err := e.GetFieldIndex("p", constant.SubjectIndex)
+	if err != nil {
+		return false, err
+	}
+	res2, err := e.RemoveFilteredPolicy(subIndex, user)
 	return res1 || res2, err
 }
 
@@ -112,7 +117,11 @@ func (e *Enforcer) DeleteRole(role string) (bool, error) {
 		return res1, err
 	}
 
-	res2, err := e.RemoveFilteredPolicy(0, role)
+	subIndex, err := e.GetFieldIndex("p", constant.SubjectIndex)
+	if err != nil {
+		return false, err
+	}
+	res2, err := e.RemoveFilteredPolicy(subIndex, role)
 	return res1 || res2, err
 }
 
@@ -147,7 +156,11 @@ func (e *Enforcer) DeletePermissionForUser(user string, permission ...string) (b
 // DeletePermissionsForUser deletes permissions for a user or role.
 // Returns false if the user or role does not have any permissions (aka not affected).
 func (e *Enforcer) DeletePermissionsForUser(user string) (bool, error) {
-	return e.RemoveFilteredPolicy(0, user)
+	subIndex, err := e.GetFieldIndex("p", constant.SubjectIndex)
+	if err != nil {
+		return false, err
+	}
+	return e.RemoveFilteredPolicy(subIndex, user)
 }
 
 // GetPermissionsForUser gets permissions for a user or role.
@@ -163,13 +176,18 @@ func (e *Enforcer) GetNamedPermissionsForUser(ptype string, user string, domain 
 			continue
 		}
 		args := make([]string, len(assertion.Tokens))
-		args[0] = user
+		subIndex, err := e.GetFieldIndex("p", constant.SubjectIndex)
+		if err != nil {
+			subIndex = 0
+		}
+		args[subIndex] = user
 
 		if len(domain) > 0 {
-			index := e.getDomainIndex(ptype)
-			if index < len(assertion.Tokens) {
-				args[index] = domain[0]
+			index, err := e.GetFieldIndex(ptype, constant.DomainIndex)
+			if err != nil {
+				return permission
 			}
+			args[index] = domain[0]
 		}
 		perm := e.GetFilteredNamedPolicy(ptype, 0, args...)
 		permission = append(permission, perm...)

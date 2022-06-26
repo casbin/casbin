@@ -14,6 +14,8 @@
 
 package casbin
 
+import "github.com/casbin/casbin/v2/constant"
+
 // GetUsersForRoleInDomain gets the users that has a role inside a domain. Add by Gordon
 func (e *Enforcer) GetUsersForRoleInDomain(name string, domain string) []string {
 	res, _ := e.model["g"]["g"].RM.GetUsers(name, domain)
@@ -28,13 +30,7 @@ func (e *Enforcer) GetRolesForUserInDomain(name string, domain string) []string 
 
 // GetPermissionsForUserInDomain gets permissions for a user or role inside a domain.
 func (e *Enforcer) GetPermissionsForUserInDomain(user string, domain string) [][]string {
-	var res [][]string
-	users, _ := e.GetRolesForUser(user, domain)
-	users = append(users, user)
-	for _, singleUser := range users {
-		policy := e.GetFilteredPolicy(0, singleUser, domain)
-		res = append(res, policy...)
-	}
+	res, _ := e.GetImplicitPermissionsForUser(user, domain)
 	return res
 }
 
@@ -72,7 +68,10 @@ func (e *Enforcer) GetAllUsersByDomain(domain string) []string {
 	g := e.model["g"]["g"]
 	p := e.model["p"]["p"]
 	users := make([]string, 0)
-	index := e.getDomainIndex("p")
+	index, err := e.GetFieldIndex("p", constant.DomainIndex)
+	if err != nil {
+		return []string{}
+	}
 
 	getUser := func(index int, policies [][]string, domain string, m map[string]struct{}) []string {
 		if len(policies) == 0 || len(policies[0]) <= index {
@@ -97,7 +96,10 @@ func (e *Enforcer) GetAllUsersByDomain(domain string) []string {
 func (e *Enforcer) DeleteAllUsersByDomain(domain string) (bool, error) {
 	g := e.model["g"]["g"]
 	p := e.model["p"]["p"]
-	index := e.getDomainIndex("p")
+	index, err := e.GetFieldIndex("p", constant.DomainIndex)
+	if err != nil {
+		return false, err
+	}
 
 	getUser := func(index int, policies [][]string, domain string) [][]string {
 		if len(policies) == 0 || len(policies[0]) <= index {
