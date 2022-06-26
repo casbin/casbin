@@ -15,8 +15,6 @@
 package casbin
 
 import (
-	"fmt"
-
 	Err "github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
@@ -373,15 +371,11 @@ func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][
 	return ruleChanged, nil
 }
 
-func (e *Enforcer) getDomainIndex(ptype string) int {
-	p := e.model["p"][ptype]
-	pattern := fmt.Sprintf("%s_dom", ptype)
-	index := len(p.Tokens)
-	for i, token := range p.Tokens {
-		if token == pattern {
-			index = i
-			break
-		}
-	}
-	return index
+func (e *Enforcer) GetFieldIndex(ptype string, field string) (int, error) {
+	return e.model.GetFieldIndex(ptype, field)
+}
+
+func (e *Enforcer) SetFieldIndex(ptype string, field string, index int) {
+	assertion := e.model["p"][ptype]
+	assertion.FieldIndexMap[field] = index
 }

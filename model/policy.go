@@ -18,6 +18,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/rbac"
 	"github.com/casbin/casbin/v2/util"
 )
@@ -148,11 +149,15 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) {
 	assertion.Policy = append(assertion.Policy, rule)
 	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
 
-	if sec == "p" && assertion.priorityIndex >= 0 {
-		if idxInsert, err := strconv.Atoi(rule[assertion.priorityIndex]); err == nil {
+	hasPriority := false
+	if _, ok := assertion.FieldIndexMap[constant.PriorityIndex]; ok {
+		hasPriority = true
+	}
+	if sec == "p" && hasPriority {
+		if idxInsert, err := strconv.Atoi(rule[assertion.FieldIndexMap[constant.PriorityIndex]]); err == nil {
 			i := len(assertion.Policy) - 1
 			for ; i > 0; i-- {
-				idx, err := strconv.Atoi(assertion.Policy[i-1][assertion.priorityIndex])
+				idx, err := strconv.Atoi(assertion.Policy[i-1][assertion.FieldIndexMap[constant.PriorityIndex]])
 				if err != nil {
 					break
 				}

@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/casbin/casbin/v2/config"
+	"github.com/casbin/casbin/v2/constant"
 )
 
 var (
@@ -140,7 +141,7 @@ func testModelToText(t *testing.T, mData, mExpected string) {
 	expected := map[string]string{
 		"r": "sub, obj, act",
 		"p": "sub, obj, act",
-		"e": "some(where (p_eft == allow))",
+		"e": constant.AllowOverrideEffect,
 		"m": mExpected,
 	}
 	addData := func(ptype string) {

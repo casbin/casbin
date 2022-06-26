@@ -25,15 +25,15 @@ import (
 // Assertion represents an expression in a section of the model.
 // For example: r = sub, obj, act
 type Assertion struct {
-	Key       string
-	Value     string
-	Tokens    []string
-	Policy    [][]string
-	PolicyMap map[string]int
-	RM        rbac.RoleManager
+	Key           string
+	Value         string
+	Tokens        []string
+	Policy        [][]string
+	PolicyMap     map[string]int
+	RM            rbac.RoleManager
+	FieldIndexMap map[string]int
 
-	logger        log.Logger
-	priorityIndex int
+	logger log.Logger
 }
 
 func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
@@ -93,10 +93,6 @@ func (ast *Assertion) setLogger(logger log.Logger) {
 	ast.logger = logger
 }
 
-func (ast *Assertion) initPriorityIndex() {
-	ast.priorityIndex = -1
-}
-
 func (ast *Assertion) copy() *Assertion {
 	tokens := append([]string(nil), ast.Tokens...)
 	policy := make([][]string, len(ast.Policy))
@@ -115,7 +111,7 @@ func (ast *Assertion) copy() *Assertion {
 		PolicyMap:     policyMap,
 		Tokens:        tokens,
 		Policy:        policy,
-		priorityIndex: ast.priorityIndex,
+		FieldIndexMap: ast.FieldIndexMap,
 	}
 
 	return newAst

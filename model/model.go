@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/casbin/casbin/v2/config"
+	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/util"
 )
@@ -63,8 +64,8 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 	ast.Key = key
 	ast.Value = value
 	ast.PolicyMap = make(map[string]int)
+	ast.FieldIndexMap = make(map[string]int)
 	ast.setLogger(model.GetLogger())
-	ast.initPriorityIndex()
 
 	if sec == "r" || sec == "p" {
 		ast.Tokens = strings.Split(ast.Value, ",")
@@ -216,17 +217,14 @@ func (model Model) PrintModel() {
 }
 
 func (model Model) SortPoliciesBySubjectHierarchy() error {
-	if model["e"]["e"].Value != "subjectPriority(p_eft) || deny" {
+	if model["e"]["e"].Value != constant.SubjectPriorityEffect {
 		return nil
 	}
 	subIndex := 0
-	domainIndex := -1
 	for ptype, assertion := range model["p"] {
-		for index, token := range assertion.Tokens {
-			if token == fmt.Sprintf("%s_dom", ptype) {
-				domainIndex = index
-				break
-			}
+		domainIndex, err := model.GetFieldIndex(ptype, constant.DomainIndex)
+		if err != nil {
+			domainIndex = -1
 		}
 		policies := assertion.Policy
 		subjectHierarchyMap, err := getSubjectHierarchyMap(model["g"]["g"].Policy)
@@ -308,22 +306,17 @@ func getNameWithDomain(domain string, name string) string {
 
 func (model Model) SortPoliciesByPriority() error {
 	for ptype, assertion := range model["p"] {
-		for index, token := range assertion.Tokens {
-			if token == fmt.Sprintf("%s_priority", ptype) {
-				assertion.priorityIndex = index
-				break
-			}
-		}
-		if assertion.priorityIndex == -1 {
+		priorityIndex, err := model.GetFieldIndex(ptype, constant.PriorityIndex)
+		if err != nil {
 			continue
 		}
 		policies := assertion.Policy
 		sort.SliceStable(policies, func(i, j int) bool {
-			p1, err := strconv.Atoi(policies[i][assertion.priorityIndex])
+			p1, err := strconv.Atoi(policies[i][priorityIndex])
 			if err != nil {
 				return true
 			}
-			p2, err := strconv.Atoi(policies[j][assertion.priorityIndex])
+			p2, err := strconv.Atoi(policies[j][priorityIndex])
 			if err != nil {
 				return true
 			}
@@ -388,4 +381,24 @@ func (model Model) Copy() Model {
 
 	newModel.SetLogger(model.GetLogger())
 	return newModel
+}
+
+func (model Model) GetFieldIndex(ptype string, field string) (int, error) {
+	assertion := model["p"][ptype]
+	if index, ok := assertion.FieldIndexMap[field]; ok {
+		return index, nil
+	}
+	pattern := fmt.Sprintf("%s_"+field, ptype)
+	index := -1
+	for i, token := range assertion.Tokens {
+		if token == pattern {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		return index, fmt.Errorf(field + " index is not set, please use enforcer.SetFieldIndex() to set index")
+	}
+	assertion.FieldIndexMap[field] = index
+	return index, nil
 }
