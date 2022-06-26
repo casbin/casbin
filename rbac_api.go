@@ -17,6 +17,7 @@ package casbin
 import (
 	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/errors"
+	"github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -294,22 +295,32 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 // GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p"
 // But you can specify the named policy "p2" to get: [["admin", "create"]] by    GetNamedImplicitPermissionsForUser("p2","alice")
 func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string, domain ...string) ([][]string, error) {
-	roles, err := e.GetImplicitRolesForUser(user, domain...)
-	if err != nil {
-		return nil, err
+	permission := make([][]string, 0)
+	rm := e.GetRoleManager()
+	domainIndex, _ := e.GetFieldIndex(ptype, constant.DomainIndex)
+	for _, rule := range e.model["p"][ptype].Policy {
+		if len(domain) == 0 {
+			matched, _ := rm.HasLink(user, rule[0])
+			if matched {
+				permission = append(permission, deepCopyPolicy(rule))
+			}
+		} else {
+			for _, d := range domain {
+				matched := rm.(*defaultrolemanager.RoleManager).Match(d, rule[domainIndex])
+				if !matched {
+					continue
+				}
+				matched, _ = rm.HasLink(user, rule[0], d)
+				if matched {
+					newRule := deepCopyPolicy(rule)
+					newRule[domainIndex] = d
+					permission = append(permission, newRule)
+					break
+				}
+			}
+		}
 	}
-
-	roles = append([]string{user}, roles...)
-
-	var res [][]string
-	var permissions [][]string
-	for _, role := range roles {
-		permissions = e.GetNamedPermissionsForUser(ptype, role, domain...)
-
-		res = append(res, permissions...)
-	}
-
-	return res, nil
+	return permission, nil
 }
 
 // GetImplicitUsersForPermission gets implicit users for a permission.
@@ -396,4 +407,11 @@ func (e *Enforcer) GetImplicitResourcesForUser(user string, domain ...string) ([
 		res = append(res, resLocal...)
 	}
 	return res, nil
+}
+
+// deepCopyPolicy returns a deepcopy version of the policy to prevent changing policies through returned slice
+func deepCopyPolicy(src []string) []string {
+	newRule := make([]string, len(src))
+	copy(newRule, src)
+	return newRule
 }
