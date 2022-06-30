@@ -15,6 +15,7 @@
 package model
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -123,6 +124,30 @@ func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, f
 	}
 
 	return res
+}
+
+// HasPolicyEx determines whether a model has the specified policy rule with error.
+func (model Model) HasPolicyEx(sec string, ptype string, rule []string) (bool, error) {
+	assertion := model[sec][ptype]
+	switch sec {
+	case "p":
+		if len(rule) != len(assertion.Tokens) {
+			return false, fmt.Errorf(
+				"invalid policy rule size: expected %d, got %d, rule: %v",
+				len(model["p"][ptype].Tokens),
+				len(rule),
+				rule)
+		}
+	case "g":
+		if len(rule) < len(assertion.Tokens) {
+			return false, fmt.Errorf(
+				"invalid policy rule size: expected %d, got %d, rule: %v",
+				len(model["g"][ptype].Tokens),
+				len(rule),
+				rule)
+		}
+	}
+	return model.HasPolicy(sec, ptype, rule), nil
 }
 
 // HasPolicy determines whether a model has the specified policy rule.

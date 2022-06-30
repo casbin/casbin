@@ -44,7 +44,11 @@ func LoadPolicyLine(line string, m model.Model) {
 func LoadPolicyArray(rule []string, m model.Model) {
 	key := rule[0]
 	sec := key[:1]
-	if m.HasPolicy(sec, key, rule[1:]) {
+	ok, err := m.HasPolicyEx(sec, key, rule[1:])
+	if err != nil {
+		return
+	}
+	if ok {
 		return
 	}
 	m.AddPolicy(sec, key, rule[1:])
