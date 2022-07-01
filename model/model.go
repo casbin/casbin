@@ -72,6 +72,8 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 		for i := range ast.Tokens {
 			ast.Tokens[i] = key + "_" + strings.TrimSpace(ast.Tokens[i])
 		}
+	} else if sec == "g" {
+		ast.Tokens = strings.Split(ast.Value, ",")
 	} else {
 		ast.Value = util.RemoveComments(util.EscapeAssertion(ast.Value))
 	}
