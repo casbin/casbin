@@ -490,13 +490,25 @@ func TestCustomizedFieldIndex(t *testing.T) {
 	e, _ := NewEnforcer("examples/priority_model_explicit_customized.conf",
 		"examples/priority_policy_explicit_customized.csv")
 
+	// Due to the customized priority token, the enforcer failed to handle the priority.
+	testEnforce(t, e, "bob", "data2", "read", true)
+
+	// set PriorityIndex and reload
+	e.SetFieldIndex("p", constant.PriorityIndex, 0)
+	err := e.LoadPolicy()
+	if err != nil {
+		t.Fatalf("LoadPolicy: %v", err)
+	}
+	testEnforce(t, e, "bob", "data2", "read", false)
+
 	testEnforce(t, e, "bob", "data2", "write", true)
-	_, err := e.AddPolicy("1", "data2", "write", "deny", "bob")
+	_, err = e.AddPolicy("1", "data2", "write", "deny", "bob")
 	if err != nil {
 		t.Fatalf("AddPolicy: %v", err)
 	}
 	testEnforce(t, e, "bob", "data2", "write", false)
 
+	// Due to the customized subject token, the enforcer will raise an error before SetFieldIndex.
 	_, err = e.DeletePermissionsForUser("bob")
 	if err == nil {
 		t.Fatalf("Failed to warning SetFieldIndex")
