@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"github.com/casbin/casbin/v2/constant"
 	"sort"
 	"testing"
 
@@ -460,4 +461,58 @@ func testGetImplicitUsersForRole(t *testing.T, e *Enforcer, name string, res []s
 	if !util.SetEquals(res, myRes) {
 		t.Error("Implicit users for ", name, ": ", myRes, ", supposed to be ", res)
 	}
+}
+
+func TestExplicitPriorityModify(t *testing.T) {
+	e, _ := NewEnforcer("examples/priority_model_explicit.conf", "examples/priority_policy_explicit.csv")
+
+	testEnforce(t, e, "bob", "data2", "write", true)
+	_, err := e.AddPolicy("1", "bob", "data2", "write", "deny")
+	if err != nil {
+		t.Fatalf("AddPolicy: %v", err)
+	}
+	testEnforce(t, e, "bob", "data2", "write", false)
+
+	_, err = e.DeletePermissionsForUser("bob")
+	if err != nil {
+		t.Fatalf("DeletePermissionForUser: %v", err)
+	}
+	testEnforce(t, e, "bob", "data2", "write", true)
+
+	_, err = e.DeleteRole("data2_allow_group")
+	if err != nil {
+		t.Fatalf("DeleteRole: %v", err)
+	}
+	testEnforce(t, e, "bob", "data2", "write", false)
+}
+
+func TestCustomizedFieldIndex(t *testing.T) {
+	e, _ := NewEnforcer("examples/priority_model_explicit_customized.conf",
+		"examples/priority_policy_explicit_customized.csv")
+
+	testEnforce(t, e, "bob", "data2", "write", true)
+	_, err := e.AddPolicy("1", "data2", "write", "deny", "bob")
+	if err != nil {
+		t.Fatalf("AddPolicy: %v", err)
+	}
+	testEnforce(t, e, "bob", "data2", "write", false)
+
+	_, err = e.DeletePermissionsForUser("bob")
+	if err == nil {
+		t.Fatalf("Failed to warning SetFieldIndex")
+	}
+
+	e.SetFieldIndex("p", constant.SubjectIndex, 4)
+
+	_, err = e.DeletePermissionsForUser("bob")
+	if err != nil {
+		t.Fatalf("DeletePermissionForUser: %v", err)
+	}
+	testEnforce(t, e, "bob", "data2", "write", true)
+
+	_, err = e.DeleteRole("data2_allow_group")
+	if err != nil {
+		t.Fatalf("DeleteRole: %v", err)
+	}
+	testEnforce(t, e, "bob", "data2", "write", false)
 }
