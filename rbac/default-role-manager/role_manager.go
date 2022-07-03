@@ -201,12 +201,17 @@ func (rm *RoleManagerImpl) rebuild() {
 	})
 }
 
-func (rm *RoleManagerImpl) match(str string, pattern string) bool {
+func (rm *RoleManagerImpl) Match(str string, pattern string) bool {
 	cacheKey := strings.Join([]string{str, pattern}, "$$")
 	if v, has := rm.matchingFuncCache.Get(cacheKey); has {
 		return v.(bool)
 	} else {
-		matched := rm.matchingFunc(str, pattern)
+		var matched bool
+		if rm.matchingFunc != nil {
+			matched = rm.matchingFunc(str, pattern)
+		} else {
+			matched = str == pattern
+		}
 		rm.matchingFuncCache.Put(cacheKey, matched)
 		return matched
 	}
@@ -215,9 +220,9 @@ func (rm *RoleManagerImpl) match(str string, pattern string) bool {
 func (rm *RoleManagerImpl) rangeMatchingRoles(name string, isPattern bool, fn func(role *Role) bool) {
 	rm.allRoles.Range(func(key, value interface{}) bool {
 		name2 := key.(string)
-		if isPattern && name != name2 && rm.match(name2, name) {
+		if isPattern && name != name2 && rm.Match(name2, name) {
 			fn(value.(*Role))
-		} else if !isPattern && name != name2 && rm.match(name, name2) {
+		} else if !isPattern && name != name2 && rm.Match(name, name2) {
 			fn(value.(*Role))
 		}
 		return true
@@ -313,7 +318,7 @@ func (rm *RoleManagerImpl) DeleteLink(name1 string, name2 string, domains ...str
 
 // HasLink determines whether role: name1 inherits role: name2.
 func (rm *RoleManagerImpl) HasLink(name1 string, name2 string, domains ...string) (bool, error) {
-	if name1 == name2 || (rm.matchingFunc != nil && rm.match(name1, name2)) {
+	if name1 == name2 || (rm.matchingFunc != nil && rm.Match(name1, name2)) {
 		return true, nil
 	}
 
@@ -337,7 +342,7 @@ func (rm *RoleManagerImpl) hasLinkHelper(targetName string, roles map[string]*Ro
 
 	nextRoles := map[string]*Role{}
 	for _, role := range roles {
-		if targetName == role.name || (rm.matchingFunc != nil && rm.match(role.name, targetName)) {
+		if targetName == role.name || (rm.matchingFunc != nil && rm.Match(role.name, targetName)) {
 			return true
 		}
 		role.rangeRoles(func(key, value interface{}) bool {
@@ -507,12 +512,17 @@ func (dm *DomainManager) getDomain(domains ...string) (domain string, err error)
 	}
 }
 
-func (dm *DomainManager) match(str string, pattern string) bool {
+func (dm *DomainManager) Match(str string, pattern string) bool {
 	cacheKey := strings.Join([]string{str, pattern}, "$$")
 	if v, has := dm.matchingFuncCache.Get(cacheKey); has {
 		return v.(bool)
 	} else {
-		matched := dm.domainMatchingFunc(str, pattern)
+		var matched bool
+		if dm.domainMatchingFunc != nil {
+			matched = dm.domainMatchingFunc(str, pattern)
+		} else {
+			matched = str == pattern
+		}
 		dm.matchingFuncCache.Put(cacheKey, matched)
 		return matched
 	}
@@ -522,7 +532,7 @@ func (dm *DomainManager) rangeAffectedRoleManagers(domain string, fn func(rm *Ro
 	if dm.domainMatchingFunc != nil {
 		dm.rmMap.Range(func(key, value interface{}) bool {
 			domain2 := key.(string)
-			if domain != domain2 && dm.match(domain2, domain) {
+			if domain != domain2 && dm.Match(domain2, domain) {
 				fn(value.(*RoleManagerImpl))
 			}
 			return true
@@ -551,7 +561,7 @@ func (dm *DomainManager) getRoleManager(domain string, store bool) *RoleManagerI
 			dm.rmMap.Range(func(key, value interface{}) bool {
 				domain2 := key.(string)
 				rm2 := value.(*RoleManagerImpl)
-				if domain != domain2 && dm.match(domain, domain2) {
+				if domain != domain2 && dm.Match(domain, domain2) {
 					rm.copyFrom(rm2)
 				}
 				return true

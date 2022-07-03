@@ -314,9 +314,9 @@ func TestImplicitRoleAPI(t *testing.T) {
 	testGetRoles(t, e, []string{"/book/1/2/3/4/5", "pen_admin"}, "cathy")
 }
 
-func testGetImplicitPermissions(t *testing.T, e *Enforcer, name string, res [][]string) {
+func testGetImplicitPermissions(t *testing.T, e *Enforcer, name string, res [][]string, domain ...string) {
 	t.Helper()
-	myRes, _ := e.GetImplicitPermissionsForUser(name)
+	myRes, _ := e.GetImplicitPermissionsForUser(name, domain...)
 	t.Log("Implicit permissions for ", name, ": ", myRes)
 
 	if !util.Set2DEquals(res, myRes) {
@@ -353,10 +353,17 @@ func TestImplicitPermissionAPI(t *testing.T) {
 	testGetImplicitPermissions(t, e, "alice", [][]string{{"alice", "data1", "read"}, {"data1_admin", "data1", "read"}, {"data1_admin", "data1", "write"}, {"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}})
 	testGetImplicitPermissions(t, e, "bob", [][]string{{"bob", "data2", "write"}})
 
+	e, _ = NewEnforcer("examples/rbac_with_domain_pattern_model.conf", "examples/rbac_with_domain_pattern_policy.csv")
+	e.AddNamedDomainMatchingFunc("g", "KeyMatch", util.KeyMatch)
+
+	testGetImplicitPermissions(t, e, "admin", [][]string{{"admin", "domain1", "data1", "read"}, {"admin", "domain1", "data1", "write"}, {"admin", "domain1", "data3", "read"}}, "domain1")
+	testGetImplicitPermissions(t, e, "admin", [][]string{{"admin", "domain1", "data1", "read"}, {"admin", "domain1", "data1", "write"}, {"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}, {"admin", "domain1", "data3", "read"}}, "domain1", "domain2")
+
 	e, _ = NewEnforcer("examples/rbac_with_multiple_policy_model.conf", "examples/rbac_with_multiple_policy_policy.csv")
 
 	testGetNamedImplicitPermissions(t, e, "p", "alice", [][]string{{"user", "/data", "GET"}, {"admin", "/data", "POST"}})
 	testGetNamedImplicitPermissions(t, e, "p2", "alice", [][]string{{"user", "view"}, {"admin", "create"}})
+
 }
 
 func TestImplicitPermissionAPIWithDomain(t *testing.T) {
