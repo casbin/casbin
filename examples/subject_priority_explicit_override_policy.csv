@@ -1,0 +1,8 @@
+p, admin, data, write, deny
+p, writer, data, write, allow
+
+g, alice, writer
+g, alice, writer2
+g, writer, admin
+g, writer2, admin
+g, admin, super_admin

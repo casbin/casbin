@@ -12,19 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package constant
+package fieldIndexKey
 
 const (
-	DomainIndex   = "dom"
-	SubjectIndex  = "sub"
-	ObjectIndex   = "obj"
-	PriorityIndex = "priority"
-)
-
-const (
-	AllowOverrideEffect   = "some(where (p_eft == allow))"
-	DenyOverrideEffect    = "!some(where (p_eft == deny))"
-	AllowAndDenyEffect    = "some(where (p_eft == allow)) && !some(where (p_eft == deny))"
-	PriorityEffect        = "priority(p_eft) || deny"
-	SubjectPriorityEffect = "subjectPriority(p_eft) || deny"
+	Domain   = "dom"
+	Subject  = "sub"
+	Object   = "obj"
+	Priority = "priority"
 )

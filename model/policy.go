@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/casbin/casbin/v2/constant"
+	fieldIndexKey "github.com/casbin/casbin/v2/constant/fieldIndex"
 	"github.com/casbin/casbin/v2/rbac"
 	"github.com/casbin/casbin/v2/util"
 )
@@ -174,15 +174,19 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) {
 	assertion.Policy = append(assertion.Policy, rule)
 	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
 
+	if sec != "p" {
+		return
+	}
 	hasPriority := false
-	if _, ok := assertion.FieldIndexMap[constant.PriorityIndex]; ok {
+	priorityIndex, err := model.GetFieldIndex(ptype, fieldIndexKey.Priority)
+	if err == nil {
 		hasPriority = true
 	}
-	if sec == "p" && hasPriority {
-		if idxInsert, err := strconv.Atoi(rule[assertion.FieldIndexMap[constant.PriorityIndex]]); err == nil {
+	if hasPriority {
+		if idxInsert, err := strconv.Atoi(rule[priorityIndex]); err == nil {
 			i := len(assertion.Policy) - 1
 			for ; i > 0; i-- {
-				idx, err := strconv.Atoi(assertion.Policy[i-1][assertion.FieldIndexMap[constant.PriorityIndex]])
+				idx, err := strconv.Atoi(assertion.Policy[i-1][priorityIndex])
 				if err != nil {
 					break
 				}

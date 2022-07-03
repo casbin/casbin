@@ -1,0 +1,9 @@
+#p, 10, data1_deny_group, data1, read, deny
+#p, 10, data1_deny_group, data1, write, deny
+
+p, 10, data2_allow_group, data2, read, allow
+p, 10, data2_allow_group, data2, write, allow
+
+g, bob, data2_allow_group
+g, alice, data2_allow_group
+

@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/casbin/casbin/v2/constant/policyEffect"
 	"github.com/casbin/casbin/v2/log"
 	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
 	"github.com/casbin/casbin/v2/rbac"
@@ -633,4 +634,75 @@ func TestAllMatchModel(t *testing.T) {
 	testDomainEnforce(t, e, "alice", "domain1", "/book/1", "write", false)
 	testDomainEnforce(t, e, "alice", "domain2", "/book/1", "read", false)
 	testDomainEnforce(t, e, "alice", "domain2", "/book/1", "write", true)
+}
+
+func TestPriorityExplicitOverrideModel(t *testing.T) {
+	e, _ := NewEnforcer("examples/priority_explicit_override_model.conf", "examples/priority_explicit_override_policy.csv")
+	testEnforce(t, e, "alice", "data2", "write", true)
+	testEnforce(t, e, "bob", "data2", "write", true)
+
+	// adding a new group, simulating behaviour when two different groups are added to the same person.
+	_, _ = e.AddPolicy("10", "data2_deny_group_new", "data2", "write", "deny")
+	_, _ = e.AddGroupingPolicy("alice", "data2_deny_group_new")
+	_ = e.BuildRoleLinks()
+
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+
+	// expected enforcement result should be true,
+	// as there is a policy with a lower rank 10, that produces allow result.
+	_, _ = e.AddPolicy("5", "alice", "data2", "write", "allow")
+	testEnforce(t, e, "alice", "data2", "write", true)
+
+	// adding deny policy for alice for the same obj,
+	// to ensure that if there is at least one deny, final result will be deny.
+	_, _ = e.AddPolicy("5", "alice", "data2", "write", "deny")
+	testEnforce(t, e, "alice", "data2", "write", false)
+
+	// adding higher fake higher priority policy for alice,
+	// expected enforcement result should be true (ignore this policy).
+	_, _ = e.AddPolicy("2", "alice", "data2", "write", "allow")
+	testEnforce(t, e, "alice", "data2", "write", true)
+	_, _ = e.AddPolicy("1", "fake-subject", "fake-object", "very-fake-action", "allow")
+	testEnforce(t, e, "alice", "data2", "write", true)
+
+	// adding higher (less of 0) priority policy for alice,
+	// to override group policies again.
+	_, _ = e.AddPolicy("-1", "alice", "data2", "write", "deny")
+	testEnforce(t, e, "alice", "data2", "write", false)
+
+	e, _ = NewEnforcer("examples/priority_explicit_override_model.conf", "examples/priority_explicit_override_policy.csv")
+
+	_, _ = e.AddPolicy("5", "data3_deny_group_new", "data3", "write", "deny")
+	_, _ = e.AddPolicy("5", "data3_allow_group_new", "data3", "write", "allow")
+	_, _ = e.AddGroupingPolicy("alice", "data3_deny_group_new")
+	_, _ = e.AddGroupingPolicy("alice", "data3_allow_group_new")
+	_ = e.BuildRoleLinks()
+
+	testEnforce(t, e, "alice", "data3", "write", false)
+	e.model["e"]["e"].Value = policyEffect.PriorityAllowOverride
+	testEnforce(t, e, "alice", "data3", "write", true)
+
+	_, _ = e.AddPolicy("2", "alice", "data3", "write", "deny")
+	testEnforce(t, e, "alice", "data3", "write", false)
+
+	_, _ = e.AddPolicy("2", "alice", "data3", "write", "allow")
+	testEnforce(t, e, "alice", "data3", "write", true)
+
+	// adding higher (less of 0) priority policy for alice,
+	// to override group policies again.
+	_, _ = e.AddPolicy("-1", "alice", "data3", "write", "allow")
+	testEnforce(t, e, "alice", "data3", "write", true)
+}
+
+func TestSubjectPriorityExplicitOverrideModel(t *testing.T) {
+	e, _ := NewEnforcer("examples/subject_priority_explicit_override_model.conf", "examples/subject_priority_explicit_override_policy.csv")
+	testEnforce(t, e, "alice", "data", "write", true)
+	_, _ = e.AddPolicy("writer2", "data", "write", "deny")
+	_ = e.model.SortPoliciesBySubjectHierarchy()
+	testEnforce(t, e, "alice", "data", "write", false)
+
+	_, _ = e.AddPolicy("alice", "data", "write", "allow")
+	_ = e.model.SortPoliciesBySubjectHierarchy()
+	testEnforce(t, e, "alice", "data", "write", true)
 }

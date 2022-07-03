@@ -25,13 +25,14 @@ import (
 // Assertion represents an expression in a section of the model.
 // For example: r = sub, obj, act
 type Assertion struct {
-	Key           string
-	Value         string
-	Tokens        []string
-	Policy        [][]string
-	PolicyMap     map[string]int
-	RM            rbac.RoleManager
-	FieldIndexMap map[string]int
+	Key                 string
+	Value               string
+	Tokens              []string
+	Policy              [][]string
+	PolicyMap           map[string]int
+	RM                  rbac.RoleManager
+	FieldIndexMap       map[string]int
+	SubjectHierarchyMap map[string]int
 
 	logger log.Logger
 }

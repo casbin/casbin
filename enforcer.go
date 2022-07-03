@@ -18,9 +18,13 @@ import (
 	"errors"
 	"fmt"
 	"runtime/debug"
+	"strconv"
 	"strings"
 
 	"github.com/Knetic/govaluate"
+	consts "github.com/casbin/casbin/v2/constant"
+	fieldIndexKey "github.com/casbin/casbin/v2/constant/fieldIndex"
+	"github.com/casbin/casbin/v2/constant/policyEffect"
 	"github.com/casbin/casbin/v2/effector"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/model"
@@ -471,16 +475,15 @@ func NewEnforceContext(suffix string) EnforceContext {
 	}
 }
 
-// enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
-func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
+func (e *Enforcer) buildParams(matcher string, rvals ...interface{}) (expString string, enforceContext EnforceContext, parameters enforceParameters, expression *govaluate.EvaluableExpression, hasEval bool, err error) {
+	if len(rvals) != 0 {
+		switch rvals[0].(type) {
+		case EnforceContext:
+			enforceContext = rvals[0].(EnforceContext)
+			rvals = rvals[1:]
+		default:
+			enforceContext = NewEnforceContext("")
 		}
-	}()
-
-	if !e.enabled {
-		return true, nil
 	}
 
 	functions := e.fm.GetFunctions()
@@ -491,51 +494,29 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 	}
 
-	var (
-		rType = "r"
-		pType = "p"
-		eType = "e"
-		mType = "m"
-	)
-	if len(rvals) != 0 {
-		switch rvals[0].(type) {
-		case EnforceContext:
-			enforceContext := rvals[0].(EnforceContext)
-			rType = enforceContext.RType
-			pType = enforceContext.PType
-			eType = enforceContext.EType
-			mType = enforceContext.MType
-			rvals = rvals[1:]
-		default:
-			break
-		}
-	}
-
-	var expString string
 	if matcher == "" {
-		expString = e.model["m"][mType].Value
+		expString = e.model["m"][enforceContext.MType].Value
 	} else {
 		expString = util.RemoveComments(util.EscapeAssertion(matcher))
 	}
 
-	rTokens := make(map[string]int, len(e.model["r"][rType].Tokens))
-	for i, token := range e.model["r"][rType].Tokens {
+	rTokens := make(map[string]int, len(e.model["r"][enforceContext.RType].Tokens))
+	for i, token := range e.model["r"][enforceContext.RType].Tokens {
 		rTokens[token] = i
 	}
-	pTokens := make(map[string]int, len(e.model["p"][pType].Tokens))
-	for i, token := range e.model["p"][pType].Tokens {
+	pTokens := make(map[string]int, len(e.model["p"][enforceContext.PType].Tokens))
+	for i, token := range e.model["p"][enforceContext.PType].Tokens {
 		pTokens[token] = i
 	}
 
-	parameters := enforceParameters{
+	parameters = enforceParameters{
 		rTokens: rTokens,
 		rVals:   rvals,
 
 		pTokens: pTokens,
 	}
 
-	var expression *govaluate.EvaluableExpression
-	hasEval := util.HasEval(expString)
+	hasEval = util.HasEval(expString)
 
 	if hasEval {
 		functions["eval"] = generateEvalFunction(functions, &parameters)
@@ -543,35 +524,58 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
 	if err != nil {
-		return false, err
+		return expString, enforceContext, parameters, expression, hasEval, err
 	}
 
-	if len(e.model["r"][rType].Tokens) != len(rvals) {
-		return false, fmt.Errorf(
+	if len(e.model["r"][enforceContext.RType].Tokens) != len(rvals) {
+		return expString, enforceContext, parameters, expression, hasEval, fmt.Errorf(
 			"invalid request size: expected %d, got %d, rvals: %v",
-			len(e.model["r"][rType].Tokens),
+			len(e.model["r"][enforceContext.RType].Tokens),
 			len(rvals),
 			rvals)
 	}
+	return expString, enforceContext, parameters, expression, hasEval, nil
+}
 
-	var policyEffects []effector.Effect
-	var matcherResults []float64
+// enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
+func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
+		}
+	}()
+	if !e.enabled {
+		return true, nil
+	}
+
+	expString, enforceContext, parameters, expression, hasEval, err := e.buildParams(matcher, rvals...)
+	if err != nil {
+		return false, err
+	}
 
 	var effect effector.Effect
-	var explainIndex int
+	effect = effector.Indeterminate
+	explainIndex := -1
 
-	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") {
-		policyEffects = make([]effector.Effect, policyLen)
-		matcherResults = make([]float64, policyLen)
+	if policyLen := len(e.model["p"][enforceContext.PType].Policy); policyLen != 0 && strings.Contains(expString, enforceContext.PType+"_") {
+		var nowMatcherResult bool
+		var nowPolicyEffect effector.Effect
+		num := -1
+		prePriorityValue := &num
+		hitCount := 0
 
-		for policyIndex, pvals := range e.model["p"][pType].Policy {
+		for policyIndex, pvals := range e.model["p"][enforceContext.PType].Policy {
+			nowMatcherResult = false
 			// log.LogPrint("Policy Rule: ", pvals)
-			if len(e.model["p"][pType].Tokens) != len(pvals) {
+			if len(e.model["p"][enforceContext.PType].Tokens) != len(pvals) {
 				return false, fmt.Errorf(
 					"invalid policy size: expected %d, got %d, pvals: %v",
-					len(e.model["p"][pType].Tokens),
+					len(e.model["p"][enforceContext.PType].Tokens),
 					len(pvals),
 					pvals)
+			}
+			if e.isNextStage(enforceContext, pvals, prePriorityValue, policyIndex) && hitCount > 0 {
+				break
 			}
 
 			parameters.pVals = pvals
@@ -583,55 +587,59 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				return false, err
 			}
 
-			// set to no-match at first
-			matcherResults[policyIndex] = 0
 			switch result := result.(type) {
 			case bool:
 				if result {
-					matcherResults[policyIndex] = 1
+					nowMatcherResult = true
 				}
 			case float64:
 				if result != 0 {
-					matcherResults[policyIndex] = 1
+					nowMatcherResult = true
 				}
 			default:
 				return false, errors.New("matcher result should be bool, int or float")
 			}
 
-			if j, ok := parameters.pTokens[pType+"_eft"]; ok {
+			if j, ok := parameters.pTokens[enforceContext.PType+"_eft"]; ok {
 				eft := parameters.pVals[j]
 				if eft == "allow" {
-					policyEffects[policyIndex] = effector.Allow
+					nowPolicyEffect = effector.Allow
 				} else if eft == "deny" {
-					policyEffects[policyIndex] = effector.Deny
+					nowPolicyEffect = effector.Deny
 				} else {
-					policyEffects[policyIndex] = effector.Indeterminate
+					nowPolicyEffect = effector.Indeterminate
 				}
 			} else {
-				policyEffects[policyIndex] = effector.Allow
+				nowPolicyEffect = effector.Allow
 			}
 
-			//if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
-			//	break
-			//}
-
-			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, policyIndex, policyLen)
+			var isOver bool
+			var isHit bool
+			var resultEffect effector.Effect
+			resultEffect, isOver, isHit, err = e.eft.TryEvaluate(e.model["e"][enforceContext.EType].Value, nowPolicyEffect, nowMatcherResult)
 			if err != nil {
 				return false, err
 			}
-			if effect != effector.Indeterminate {
+			if effect == effector.Indeterminate {
+				effect = resultEffect
+			}
+			if isHit {
+				hitCount++
+				effect = resultEffect
+				if explainIndex == -1 || isOver {
+					explainIndex = policyIndex
+				}
+			}
+			if isOver {
 				break
 			}
 		}
 	} else {
-
-		if hasEval && len(e.model["p"][pType].Policy) == 0 {
+		if hasEval && len(e.model["p"][enforceContext.PType].Policy) == 0 {
 			return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
 		}
 
-		policyEffects = make([]effector.Effect, 1)
-		matcherResults = make([]float64, 1)
-		matcherResults[0] = 1
+		var nowPolicyEffect effector.Effect
 
 		parameters.pVals = make([]string, len(parameters.pTokens))
 
@@ -642,12 +650,11 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 
 		if result.(bool) {
-			policyEffects[0] = effector.Allow
+			nowPolicyEffect = effector.Allow
 		} else {
-			policyEffects[0] = effector.Indeterminate
+			nowPolicyEffect = effector.Indeterminate
 		}
-
-		effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, 0, 1)
+		effect, _, _, err = e.eft.TryEvaluate(e.model["e"][enforceContext.EType].Value, nowPolicyEffect, true)
 		if err != nil {
 			return false, err
 		}
@@ -660,8 +667,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			logExplains = append(logExplains, *explains)
 		}
 
-		if explainIndex != -1 && len(e.model["p"][pType].Policy) > explainIndex {
-			*explains = e.model["p"][pType].Policy[explainIndex]
+		if explainIndex != -1 && len(e.model["p"][enforceContext.PType].Policy) > explainIndex {
+			*explains = e.model["p"][enforceContext.PType].Policy[explainIndex]
 			logExplains = append(logExplains, *explains)
 		}
 	}
@@ -674,6 +681,57 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	e.logger.LogEnforce(expString, rvals, result, logExplains)
 
 	return result, nil
+}
+
+// isNextStage judges priority stratification
+func (e *Enforcer) isNextStage(enforceContext EnforceContext, pvals []string, prePriorityValue *int, policyIndex int) (result bool) {
+	hasPriority, isPriorityOverrideEffect, isSubjectPriorityOverrideEffect := false, false, false
+	var subjectHierarchyMap map[string]int
+	var priorityIndex int
+
+	effectType := e.model["e"][enforceContext.EType].Value
+
+	isSubjectPriorityOverrideEffect = effectType == policyEffect.SubjectPriorityDenyOverride || effectType == policyEffect.SubjectPriorityAllowOverride
+	if v, ok := e.model["g"]["g"]; ok {
+		subjectHierarchyMap = v.SubjectHierarchyMap
+	}
+
+	priorityIndex, err := e.GetFieldIndex(enforceContext.PType, fieldIndexKey.Priority)
+	if err == nil {
+		hasPriority = true
+	} else {
+		hasPriority = false
+	}
+	isPriorityOverrideEffect = effectType == policyEffect.PriorityDenyOverride || effectType == policyEffect.PriorityAllowOverride
+
+	result = false
+	if (hasPriority && isPriorityOverrideEffect) || (subjectHierarchyMap != nil && isSubjectPriorityOverrideEffect) {
+		var nowPriorityValue int
+		if isPriorityOverrideEffect {
+			nowPriorityValue, err = strconv.Atoi(pvals[priorityIndex])
+			if err != nil {
+				return true
+			}
+		} else {
+			subIndex, err := e.GetFieldIndex(enforceContext.PType, fieldIndexKey.Subject)
+			if err != nil {
+				return true
+			}
+			domIndex, err := e.GetFieldIndex(enforceContext.PType, fieldIndexKey.Domain)
+			var dom = consts.DefaultDomain
+			if err == nil {
+				dom = pvals[domIndex]
+			}
+			key := util.GetNameWithDomain(dom, pvals[subIndex])
+			nowPriorityValue = subjectHierarchyMap[key]
+		}
+		if policyIndex == 0 {
+			*prePriorityValue = nowPriorityValue
+		}
+		result = *prePriorityValue != nowPriorityValue
+		*prePriorityValue = nowPriorityValue
+	}
+	return result
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).

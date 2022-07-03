@@ -14,7 +14,7 @@
 
 package casbin
 
-import "github.com/casbin/casbin/v2/constant"
+import fieldIndexKey "github.com/casbin/casbin/v2/constant/fieldIndex"
 
 // GetUsersForRoleInDomain gets the users that has a role inside a domain. Add by Gordon
 func (e *Enforcer) GetUsersForRoleInDomain(name string, domain string) []string {
@@ -68,7 +68,7 @@ func (e *Enforcer) GetAllUsersByDomain(domain string) []string {
 	g := e.model["g"]["g"]
 	p := e.model["p"]["p"]
 	users := make([]string, 0)
-	index, err := e.GetFieldIndex("p", constant.DomainIndex)
+	index, err := e.GetFieldIndex("p", fieldIndexKey.Domain)
 	if err != nil {
 		return []string{}
 	}
@@ -96,7 +96,7 @@ func (e *Enforcer) GetAllUsersByDomain(domain string) []string {
 func (e *Enforcer) DeleteAllUsersByDomain(domain string) (bool, error) {
 	g := e.model["g"]["g"]
 	p := e.model["p"]["p"]
-	index, err := e.GetFieldIndex("p", constant.DomainIndex)
+	index, err := e.GetFieldIndex("p", fieldIndexKey.Domain)
 	if err != nil {
 		return false, err
 	}
