@@ -482,7 +482,7 @@ func TestExplicitPriorityModify(t *testing.T) {
 
 	_, err = e.DeletePermissionsForUser("bob")
 	if err != nil {
-		t.Fatalf("DeletePermissionForUser: %v", err)
+		t.Fatalf("DeletePermissionsForUser: %v", err)
 	}
 	testEnforce(t, e, "bob", "data2", "write", true)
 
@@ -534,4 +534,64 @@ func TestCustomizedFieldIndex(t *testing.T) {
 		t.Fatalf("DeleteRole: %v", err)
 	}
 	testEnforce(t, e, "bob", "data2", "write", false)
+}
+
+func testStringListSetEquals(t *testing.T, title string, f func() []string, res []string) {
+	t.Helper()
+	myRes := f()
+	t.Log(title+": ", myRes)
+
+	if !util.SetEquals(res, myRes) {
+		t.Error(title+": ", myRes, ", supposed to be ", res)
+	}
+}
+
+func TestExplicitPriorityCompatibility(t *testing.T) {
+	e, _ := NewEnforcer("examples/priority_model_explicit.conf", "examples/priority_policy_explicit.csv")
+
+	testStringListSetEquals(t, "GetAllSubjects", e.GetAllSubjects, []string{"data1_deny_group", "data2_allow_group", "alice", "bob"})
+	testStringListSetEquals(t, "GetAllObjects", e.GetAllObjects, []string{"data1", "data2"})
+	testStringListSetEquals(t, "GetAllActions", e.GetAllActions, []string{"read", "write"})
+	testStringListSetEquals(t, "GetAllRoles", e.GetAllRoles, []string{"data2_allow_group", "data1_deny_group"})
+
+	testStringListSetEquals(t, "GetAllSubjects", func() []string {
+		return e.GetAllNamedSubjects("p")
+	}, []string{"data1_deny_group", "data2_allow_group", "alice", "bob"})
+
+	testStringListSetEquals(t, "GetAllObjects", func() []string {
+		return e.GetAllNamedObjects("p")
+	}, []string{"data1", "data2"})
+
+	testStringListSetEquals(t, "GetAllActions", func() []string {
+		return e.GetAllNamedActions("p")
+	}, []string{"read", "write"})
+
+	testStringListSetEquals(t, "GetAllRoles", func() []string {
+		return e.GetAllNamedRoles("g")
+	}, []string{"data2_allow_group", "data1_deny_group"})
+
+	testEnforce(t, e, "bob", "data2", "write", true)
+
+	_, err := e.AddPermissionForUser("bob", "1", "data2", "write", "deny")
+	if err != nil {
+		t.Fatalf("AddPermissionForUser: %v", err)
+	}
+	testEnforce(t, e, "bob", "data2", "write", false)
+
+	_, err = e.DeletePermissionForUser("bob", "data2", "write", "deny")
+	if err != nil {
+		t.Fatalf("DeletePermissionForUser: %v", err)
+	}
+	testEnforce(t, e, "bob", "data2", "write", true)
+
+	_, err = e.AddPermissionsForUser("bob", []string{"1", "data2", "write", "deny"})
+	if err != nil {
+		t.Fatalf("AddPermissionsForUser: %v", err)
+	}
+	testEnforce(t, e, "bob", "data2", "write", false)
+
+	ok := e.HasPermissionForUser("bob", "data2", "write", "deny")
+	if !ok {
+		t.Errorf("HasPermissionForUser: supposed to be true")
+	}
 }

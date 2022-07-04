@@ -157,6 +157,24 @@ func (model Model) HasPolicy(sec string, ptype string, rule []string) bool {
 	return ok
 }
 
+// HasFilteredPolicy determines whether a model has the specified policy rule.
+func (model Model) HasFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) bool {
+	for _, rule := range model[sec][ptype].Policy {
+		matched := true
+		for i, fieldValue := range fieldValues {
+			if fieldValue != "" && rule[fieldIndex+i] != fieldValue {
+				matched = false
+				break
+			}
+		}
+
+		if matched {
+			return true
+		}
+	}
+	return false
+}
+
 // HasPolicies determines whether a model has any of the specified policies. If one is found we return true.
 func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool {
 	for i := 0; i < len(rules); i++ {

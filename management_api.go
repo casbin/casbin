@@ -17,6 +17,7 @@ package casbin
 import (
 	"errors"
 	"fmt"
+	"github.com/casbin/casbin/v2/constant"
 	"strings"
 
 	"github.com/Knetic/govaluate"
@@ -25,32 +26,38 @@ import (
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() []string {
-	return e.model.GetValuesForFieldInPolicyAllTypes("p", 0)
+	return e.model.GetValuesForFieldInPolicyAllTypes("p",
+		e.GetFieldIndexWithDefault("p", constant.SubjectIndex, 0))
 }
 
 // GetAllNamedSubjects gets the list of subjects that show up in the current named policy.
 func (e *Enforcer) GetAllNamedSubjects(ptype string) []string {
-	return e.model.GetValuesForFieldInPolicy("p", ptype, 0)
+	return e.model.GetValuesForFieldInPolicy("p", ptype,
+		e.GetFieldIndexWithDefault("p", constant.SubjectIndex, 0))
 }
 
 // GetAllObjects gets the list of objects that show up in the current policy.
 func (e *Enforcer) GetAllObjects() []string {
-	return e.model.GetValuesForFieldInPolicyAllTypes("p", 1)
+	return e.model.GetValuesForFieldInPolicyAllTypes("p",
+		e.GetFieldIndexWithDefault("p", constant.ObjectIndex, 1))
 }
 
 // GetAllNamedObjects gets the list of objects that show up in the current named policy.
 func (e *Enforcer) GetAllNamedObjects(ptype string) []string {
-	return e.model.GetValuesForFieldInPolicy("p", ptype, 1)
+	return e.model.GetValuesForFieldInPolicy("p", ptype,
+		e.GetFieldIndexWithDefault("p", constant.ObjectIndex, 1))
 }
 
 // GetAllActions gets the list of actions that show up in the current policy.
 func (e *Enforcer) GetAllActions() []string {
-	return e.model.GetValuesForFieldInPolicyAllTypes("p", 2)
+	return e.model.GetValuesForFieldInPolicyAllTypes("p",
+		e.GetFieldIndexWithDefault("p", constant.ActionIndex, 2))
 }
 
 // GetAllNamedActions gets the list of actions that show up in the current named policy.
 func (e *Enforcer) GetAllNamedActions(ptype string) []string {
-	return e.model.GetValuesForFieldInPolicy("p", ptype, 2)
+	return e.model.GetValuesForFieldInPolicy("p", ptype,
+		e.GetFieldIndexWithDefault("p", constant.ActionIndex, 2))
 }
 
 // GetAllRoles gets the list of roles that show up in the current policy.
@@ -179,6 +186,11 @@ func (e *Enforcer) HasPolicy(params ...interface{}) bool {
 	return e.HasNamedPolicy("p", params...)
 }
 
+// HasFilteredPolicy determines whether an authorization rule exists, field filters can be specified.
+func (e *Enforcer) HasFilteredPolicy(fieldIndex int, fieldValues ...string) bool {
+	return e.HasFilteredNamedPolicyy("p", fieldIndex, fieldValues...)
+}
+
 // HasNamedPolicy determines whether a named authorization rule exists.
 func (e *Enforcer) HasNamedPolicy(ptype string, params ...interface{}) bool {
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
@@ -191,6 +203,11 @@ func (e *Enforcer) HasNamedPolicy(ptype string, params ...interface{}) bool {
 	}
 
 	return e.model.HasPolicy("p", ptype, policy)
+}
+
+// HasFilteredPolicy determines whether an authorization rule exists, field filters can be specified.
+func (e *Enforcer) HasFilteredNamedPolicyy(ptype string, fieldIndex int, fieldValues ...string) bool {
+	return e.model.HasFilteredPolicy("p", ptype, fieldIndex, fieldValues...)
 }
 
 // AddPolicy adds an authorization rule to the current policy.

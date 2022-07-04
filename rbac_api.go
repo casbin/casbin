@@ -129,13 +129,21 @@ func (e *Enforcer) DeleteRole(role string) (bool, error) {
 // DeletePermission deletes a permission.
 // Returns false if the permission does not exist (aka not affected).
 func (e *Enforcer) DeletePermission(permission ...string) (bool, error) {
-	return e.RemoveFilteredPolicy(1, permission...)
+	rule, err := e.generateRuleForUserFromPermission("", permission, true)
+	if err != nil {
+		return false, err
+	}
+	return e.RemoveFilteredPolicy(0, rule...)
 }
 
 // AddPermissionForUser adds a permission for a user or role.
 // Returns false if the user or role already has the permission (aka not affected).
 func (e *Enforcer) AddPermissionForUser(user string, permission ...string) (bool, error) {
-	return e.AddPolicy(util.JoinSlice(user, permission...))
+	rule, err := e.generateRuleForUserFromPermission(user, permission)
+	if err != nil {
+		return false, err
+	}
+	return e.AddPolicy(rule)
 }
 
 // AddPermissionsForUser adds multiple permissions for a user or role.
@@ -143,7 +151,11 @@ func (e *Enforcer) AddPermissionForUser(user string, permission ...string) (bool
 func (e *Enforcer) AddPermissionsForUser(user string, permissions ...[]string) (bool, error) {
 	var rules [][]string
 	for _, permission := range permissions {
-		rules = append(rules, util.JoinSlice(user, permission...))
+		rule, err := e.generateRuleForUserFromPermission(user, permission)
+		if err != nil {
+			return false, err
+		}
+		rules = append(rules, rule)
 	}
 	return e.AddPolicies(rules)
 }
@@ -151,7 +163,49 @@ func (e *Enforcer) AddPermissionsForUser(user string, permissions ...[]string) (
 // DeletePermissionForUser deletes a permission for a user or role.
 // Returns false if the user or role does not have the permission (aka not affected).
 func (e *Enforcer) DeletePermissionForUser(user string, permission ...string) (bool, error) {
-	return e.RemovePolicy(util.JoinSlice(user, permission...))
+	rule, err := e.generateRuleForUserFromPermission(user, permission, true)
+	if err != nil {
+		return false, err
+	}
+	return e.RemoveFilteredPolicy(0, rule...)
+}
+
+func (e *Enforcer) generateRuleForUserFromPermission(user string, permissions []string, excludePriorityInPermissions ...bool) ([]string, error) {
+	// if `excludePriorityInPermissions` = true, it means that `permissions` don't contain a priority value,
+	//e.g., ["alice", "read"] and the priority field need to be pre-occupied.
+	// Otherwise, if `excludePriorityInPermissions` ls left blank and `permissions` is like ["1", "alice", "read"],
+	// we don't need to pre-occupied the priority field.
+	isExcludingPriority := len(excludePriorityInPermissions) > 0 && excludePriorityInPermissions[0]
+
+	subIndex, err := e.GetFieldIndex("p", constant.SubjectIndex)
+	if err != nil {
+		return []string{}, err
+	}
+	priorityIndex, _ := e.GetFieldIndex("p", constant.PriorityIndex)
+
+	const OCCUPIED = "1"
+
+	rule := make([]string, len(e.model["p"]["p"].Tokens))
+	rule[subIndex] = OCCUPIED
+	if isExcludingPriority && priorityIndex != -1 {
+		rule[priorityIndex] = OCCUPIED
+	}
+
+	i := 0
+	for _, permission := range permissions {
+		for rule[i] != "" {
+			i++
+		}
+		rule[i] = permission
+		i++
+	}
+
+	rule[subIndex] = user
+	if isExcludingPriority && priorityIndex != -1 {
+		rule[priorityIndex] = ""
+	}
+
+	return rule, err
 }
 
 // DeletePermissionsForUser deletes permissions for a user or role.
@@ -198,7 +252,8 @@ func (e *Enforcer) GetNamedPermissionsForUser(ptype string, user string, domain 
 
 // HasPermissionForUser determines whether a user has a permission.
 func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool {
-	return e.HasPolicy(util.JoinSlice(user, permission...))
+	rule, _ := e.generateRuleForUserFromPermission(user, permission, true)
+	return e.HasFilteredPolicy(0, rule...)
 }
 
 // GetImplicitRolesForUser gets implicit roles that a user has.

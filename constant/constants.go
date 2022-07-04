@@ -18,6 +18,7 @@ const (
 	DomainIndex   = "dom"
 	SubjectIndex  = "sub"
 	ObjectIndex   = "obj"
+	ActionIndex   = "act"
 	PriorityIndex = "priority"
 )
 
