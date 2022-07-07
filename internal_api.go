@@ -15,6 +15,8 @@
 package casbin
 
 import (
+	"fmt"
+
 	Err "github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
@@ -190,6 +192,10 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 }
 
 func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
+	if len(newRules) != len(oldRules) {
+		return false, fmt.Errorf("the length of oldRules should be equal to the length of newRules, but got the length of oldRules is %d, the length of newRules is %d", len(oldRules), len(newRules))
+	}
+
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.UpdatePolicies(sec, ptype, oldRules, newRules)
 	}
