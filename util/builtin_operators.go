@@ -182,6 +182,42 @@ func KeyMatch3Func(args ...interface{}) (interface{}, error) {
 	return bool(KeyMatch3(name1, name2)), nil
 }
 
+// KeyGet3 returns value matched pattern
+// For example, "project/proj_project1_admin/" matches "project/proj_{project}_admin/"
+// if the pathVar == "project", then "project1" will be returned
+func KeyGet3(key1, key2 string, pathVar string) string {
+	key2 = strings.Replace(key2, "/*", "/.*", -1)
+
+	re := regexp.MustCompile(`\{[^/]+?\}`) // non-greedy match of `{...}` to support multiple {} in `/.../`
+	keys := re.FindAllString(key2, -1)
+	key2 = re.ReplaceAllString(key2, "$1([^/]+?)$2")
+	key2 = "^" + key2 + "$"
+	re2 := regexp.MustCompile(key2)
+	values := re2.FindAllStringSubmatch(key1, -1)
+	if len(values) == 0 {
+		return ""
+	}
+	for i, key := range keys {
+		if pathVar == key[1:len(key)-1] {
+			return values[0][i+1]
+		}
+	}
+	return ""
+}
+
+// KeyGet3Func is the wrapper for KeyGet3
+func KeyGet3Func(args ...interface{}) (interface{}, error) {
+	if err := validateVariadicArgs(3, args...); err != nil {
+		return false, fmt.Errorf("%s: %s", "keyGet3", err)
+	}
+
+	name1 := args[0].(string)
+	name2 := args[1].(string)
+	key := args[2].(string)
+
+	return KeyGet3(name1, name2, key), nil
+}
+
 // KeyMatch4 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // Besides what KeyMatch3 does, KeyMatch4 can also match repeated patterns:
 // "/parent/123/child/123" matches "/parent/{id}/child/{id}"
