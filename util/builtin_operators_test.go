@@ -158,6 +158,7 @@ func TestKeyGet2(t *testing.T) {
 
 	testKeyGet2(t, "/alice/all", "/:/all", "", "")
 }
+
 func testKeyMatch3(t *testing.T, key1 string, key2 string, res bool) {
 	t.Helper()
 	myRes := KeyMatch3(key1, key2)
@@ -169,7 +170,7 @@ func testKeyMatch3(t *testing.T, key1 string, key2 string, res bool) {
 }
 
 func TestKeyMatch3(t *testing.T) {
-	// keyMatch3() is similar with KeyMatch2(), except using "/proxy/{id}" instead of "/proxy/:id".
+	// KeyGet3() is similar with KeyGet2(), except using "/proxy/{id}" instead of "/proxy/:id".
 	testKeyMatch3(t, "/foo", "/foo", true)
 	testKeyMatch3(t, "/foo", "/foo*", true)
 	testKeyMatch3(t, "/foo", "/foo/*", false)
@@ -193,6 +194,56 @@ func TestKeyMatch3(t *testing.T) {
 	testKeyMatch3(t, "/proxy/", "/proxy/{id}/*", false)
 
 	testKeyMatch3(t, "/myid/using/myresid", "/{id/using/{resId}", false)
+}
+
+func testKeyGet3(t *testing.T, key1 string, key2 string, pathVar string, res string) {
+	t.Helper()
+	myRes := KeyGet3(key1, key2, pathVar)
+	t.Logf(`%s < %s: %s = "%s"`, key1, key2, pathVar, myRes)
+
+	if myRes != res {
+		t.Errorf(`%s < %s: %s = "%s" supposed to be "%s"`, key1, key2, pathVar, myRes, res)
+	}
+}
+
+func TestKeyGet3(t *testing.T) {
+	// keyMatch3() is similar with KeyMatch2(), except using "/proxy/{id}" instead of "/proxy/:id".
+	testKeyGet2(t, "/foo", "/foo", "id", "")
+	testKeyGet2(t, "/foo", "/foo*", "id", "")
+	testKeyGet2(t, "/foo", "/foo/*", "id", "")
+	testKeyGet2(t, "/foo/bar", "/foo", "id", "")
+	testKeyGet2(t, "/foo/bar", "/foo*", "id", "")
+	testKeyGet2(t, "/foo/bar", "/foo/*", "id", "")
+	testKeyGet2(t, "/foobar", "/foo", "id", "")
+	testKeyGet2(t, "/foobar", "/foo*", "id", "")
+	testKeyGet2(t, "/foobar", "/foo/*", "id", "")
+
+	testKeyGet3(t, "/", "/{resource}", "resource", "")
+	testKeyGet3(t, "/resource1", "/{resource}", "resource", "resource1")
+	testKeyGet3(t, "/myid", "/{id}/using/{resId}", "id", "")
+	testKeyGet3(t, "/myid/using/myresid", "/{id}/using/{resId}", "id", "myid")
+	testKeyGet3(t, "/myid/using/myresid", "/{id}/using/{resId}", "resId", "myresid")
+
+	testKeyGet3(t, "/proxy/myid", "/proxy/{id}/*", "id", "")
+	testKeyGet3(t, "/proxy/myid/", "/proxy/{id}/*", "id", "myid")
+	testKeyGet3(t, "/proxy/myid/res", "/proxy/{id}/*", "id", "myid")
+	testKeyGet3(t, "/proxy/myid/res/res2", "/proxy/{id}/*", "id", "myid")
+	testKeyGet3(t, "/proxy/myid/res/res2/res3", "/proxy/{id}/*", "id", "myid")
+	testKeyGet3(t, "/proxy/", "/proxy/{id}/*", "id", "")
+
+	testKeyGet3(t, "/api/group1_group_name/project1_admin/info", "/api/{proj}_admin/info",
+		"proj", "")
+	testKeyGet3(t, "/{id/using/myresid", "/{id/using/{resId}", "resId", "myresid")
+	testKeyGet3(t, "/{id/using/myresid/status}", "/{id/using/{resId}/status}", "resId", "myresid")
+
+	testKeyGet3(t, "/proxy/myid/res/res2/res3", "/proxy/{id}/*/{res}", "res", "res3")
+	testKeyGet3(t, "/api/project1_admin/info", "/api/{proj}_admin/info", "proj", "project1")
+	testKeyGet3(t, "/api/group1_group_name/project1_admin/info", "/api/{g}_{gn}/{proj}_admin/info",
+		"g", "group1")
+	testKeyGet3(t, "/api/group1_group_name/project1_admin/info", "/api/{g}_{gn}/{proj}_admin/info",
+		"gn", "group_name")
+	testKeyGet3(t, "/api/group1_group_name/project1_admin/info", "/api/{g}_{gn}/{proj}_admin/info",
+		"proj", "project1")
 }
 
 func testKeyMatch4(t *testing.T, key1 string, key2 string, res bool) {
