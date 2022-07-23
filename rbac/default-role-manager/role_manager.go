@@ -28,40 +28,40 @@ const defaultDomain string = ""
 
 type MatchingFunc func(arg1 string, arg2 string) bool
 
-type IPatternMatcher interface {
+type IPatternFuncs interface {
 	IsPattern(str string) bool
 	Match(str, pattern string) bool
 }
 
-type PatternMatcher struct {
+type PatternFuncs struct {
 	patternFn func(str string) bool
 	matchFn   MatchingFunc
 }
 
-func NewPatternMatcher(isPatternFn func(str string) bool, matchFn MatchingFunc) *PatternMatcher {
-	return &PatternMatcher{isPatternFn, matchFn}
+func NewPatternFuncs(isPatternFn func(str string) bool, matchFn MatchingFunc) *PatternFuncs {
+	return &PatternFuncs{isPatternFn, matchFn}
 }
 
-func (m *PatternMatcher) IsPattern(str string) bool {
+func (m *PatternFuncs) IsPattern(str string) bool {
 	return m.patternFn(str)
 }
-func (m *PatternMatcher) Match(str, pattern string) bool {
+func (m *PatternFuncs) Match(str, pattern string) bool {
 	return m.matchFn(str, pattern)
 }
 
-type PrefixMatcher struct {
+type PatternFuncsWithPrefix struct {
 	prefix  string
 	matchFn MatchingFunc
 }
 
-func NewPrefixMatcher(prefix string, matchFn MatchingFunc) *PrefixMatcher {
-	return &PrefixMatcher{prefix, matchFn}
+func NewPatternFuncsWithPrefix(prefix string, matchFn MatchingFunc) *PatternFuncsWithPrefix {
+	return &PatternFuncsWithPrefix{prefix, matchFn}
 }
 
-func (m *PrefixMatcher) IsPattern(str string) bool {
+func (m *PatternFuncsWithPrefix) IsPattern(str string) bool {
 	return strings.HasPrefix(str, m.prefix)
 }
-func (m *PrefixMatcher) Match(str, pattern string) bool {
+func (m *PatternFuncsWithPrefix) Match(str, pattern string) bool {
 	if m.IsPattern(pattern) {
 		return m.matchFn(str, pattern[len(m.prefix):])
 	}
@@ -209,7 +209,7 @@ type RoleManagerImpl struct {
 	allRoles          *sync.Map
 	patternRoles      *sync.Map
 	maxHierarchyLevel int
-	roleMatcher       IPatternMatcher
+	patternFuncs      IPatternFuncs
 	logger            log.Logger
 	matchingFuncCache *util.SyncLRUCache
 }
@@ -225,9 +225,9 @@ func NewRoleManagerImpl(maxHierarchyLevel int) *RoleManagerImpl {
 }
 
 // use this constructor to avoid rebuild of AddMatchingFunc
-func newRoleManagerWithMatcher(maxHierarchyLevel int, matcher IPatternMatcher) *RoleManagerImpl {
+func newRoleManagerWithMatcher(maxHierarchyLevel int, patternFuncs IPatternFuncs) *RoleManagerImpl {
 	rm := NewRoleManagerImpl(maxHierarchyLevel)
-	rm.roleMatcher = matcher
+	rm.patternFuncs = patternFuncs
 	return rm
 }
 
@@ -247,8 +247,8 @@ func (rm *RoleManagerImpl) Match(str string, pattern string) bool {
 		return v.(bool)
 	} else {
 		var matched bool
-		if rm.roleMatcher != nil {
-			matched = rm.roleMatcher.Match(str, pattern)
+		if rm.patternFuncs != nil {
+			matched = rm.patternFuncs.Match(str, pattern)
 		} else {
 			matched = str == pattern
 		}
@@ -294,8 +294,8 @@ func (rm *RoleManagerImpl) getRole(name string) (r *Role, created bool) {
 		role = newRole(name)
 		rm.allRoles.Store(name, role)
 
-		if rm.roleMatcher != nil {
-			if rm.roleMatcher.IsPattern(name) {
+		if rm.patternFuncs != nil {
+			if rm.patternFuncs.IsPattern(name) {
 				rm.patternRoles.Store(name, nil)
 				rm.rangeMatchingRoles(name, func(r *Role) {
 					role.addMatch(r)
@@ -327,14 +327,14 @@ func (rm *RoleManagerImpl) removeRole(name string) {
 
 // AddMatchingFunc support use pattern in g
 func (rm *RoleManagerImpl) AddMatchingFunc(name string, fn MatchingFunc) {
-	matcher := NewPatternMatcher(func(str string) bool {
+	matcher := NewPatternFuncs(func(str string) bool {
 		return true
 	}, fn)
-	rm.SetRoleMatcher(matcher)
+	rm.SetPatternFuncsForRoles(matcher)
 }
 
-func (rm *RoleManagerImpl) SetRoleMatcher(matcher IPatternMatcher) {
-	rm.roleMatcher = matcher
+func (rm *RoleManagerImpl) SetPatternFuncsForRoles(patternFuncs IPatternFuncs) {
+	rm.patternFuncs = patternFuncs
 	rm.rebuild()
 }
 
@@ -374,7 +374,7 @@ func (rm *RoleManagerImpl) DeleteLink(name1 string, name2 string, domains ...str
 
 // HasLink determines whether role: name1 inherits role: name2.
 func (rm *RoleManagerImpl) HasLink(name1 string, name2 string, domains ...string) (bool, error) {
-	if name1 == name2 || (rm.roleMatcher != nil && rm.Match(name1, name2)) {
+	if name1 == name2 || (rm.patternFuncs != nil && rm.Match(name1, name2)) {
 		return true, nil
 	}
 
@@ -398,7 +398,7 @@ func (rm *RoleManagerImpl) hasLinkHelper(targetName string, roles map[string]*Ro
 
 	nextRoles := map[string]*Role{}
 	for _, role := range roles {
-		if targetName == role.name || (rm.roleMatcher != nil && rm.Match(role.name, targetName)) {
+		if targetName == role.name || (rm.patternFuncs != nil && rm.Match(role.name, targetName)) {
 			return true
 		}
 		role.rangeRoles(func(key, value interface{}) bool {
@@ -486,13 +486,13 @@ func (rm *RoleManagerImpl) BuildRelationship(name1 string, name2 string, domain 
 }
 
 type DomainManager struct {
-	rmMap             *sync.Map
-	patternMap        *sync.Map
-	maxHierarchyLevel int
-	roleMatcher       IPatternMatcher
-	domainMatcher     IPatternMatcher
-	logger            log.Logger
-	matchingFuncCache *util.SyncLRUCache
+	rmMap              *sync.Map
+	patternMap         *sync.Map
+	maxHierarchyLevel  int
+	rolePatternFuncs   IPatternFuncs
+	domainPatternFuncs IPatternFuncs
+	logger             log.Logger
+	matchingFuncCache  *util.SyncLRUCache
 }
 
 // NewDomainManager is the constructor for creating an instance of the
@@ -511,30 +511,30 @@ func (dm *DomainManager) SetLogger(logger log.Logger) {
 
 // AddMatchingFunc support use pattern in g
 func (dm *DomainManager) AddMatchingFunc(name string, fn MatchingFunc) {
-	matcher := NewPatternMatcher(func(str string) bool {
+	matcher := NewPatternFuncs(func(str string) bool {
 		return true
 	}, fn)
-	dm.SetRoleMatcher(matcher)
+	dm.SetPatternFuncsForRoles(matcher)
 }
 
-func (dm *DomainManager) SetRoleMatcher(matcher IPatternMatcher) {
-	dm.roleMatcher = matcher
+func (dm *DomainManager) SetPatternFuncsForRoles(patternFuncs IPatternFuncs) {
+	dm.rolePatternFuncs = patternFuncs
 	dm.rmMap.Range(func(key, value interface{}) bool {
-		value.(*RoleManagerImpl).SetRoleMatcher(matcher)
+		value.(*RoleManagerImpl).SetPatternFuncsForRoles(patternFuncs)
 		return true
 	})
 }
 
 // AddDomainMatchingFunc support use domain pattern in g
 func (dm *DomainManager) AddDomainMatchingFunc(name string, fn MatchingFunc) {
-	matcher := NewPatternMatcher(func(str string) bool {
+	patternFuncs := NewPatternFuncs(func(str string) bool {
 		return true
 	}, fn)
-	dm.SetDomainMatcher(matcher)
+	dm.SetPatternFuncsForDomains(patternFuncs)
 }
 
-func (dm *DomainManager) SetDomainMatcher(matcher IPatternMatcher) {
-	dm.domainMatcher = matcher
+func (dm *DomainManager) SetPatternFuncsForDomains(patternFuncs IPatternFuncs) {
+	dm.domainPatternFuncs = patternFuncs
 	dm.rebuild()
 }
 
@@ -579,8 +579,8 @@ func (dm *DomainManager) Match(str string, pattern string) bool {
 		return v.(bool)
 	} else {
 		var matched bool
-		if dm.domainMatcher != nil {
-			matched = dm.domainMatcher.Match(str, pattern)
+		if dm.domainPatternFuncs != nil {
+			matched = dm.domainPatternFuncs.Match(str, pattern)
 		} else {
 			matched = str == pattern
 		}
@@ -623,12 +623,12 @@ func (dm *DomainManager) getRoleManager(domain string, store bool) *RoleManagerI
 	var ok bool
 
 	if rm, ok = dm.load(domain); !ok {
-		rm = newRoleManagerWithMatcher(dm.maxHierarchyLevel, dm.roleMatcher)
+		rm = newRoleManagerWithMatcher(dm.maxHierarchyLevel, dm.rolePatternFuncs)
 		if store {
 			dm.rmMap.Store(domain, rm)
 		}
-		if dm.domainMatcher != nil {
-			if dm.domainMatcher.IsPattern(domain) {
+		if dm.domainPatternFuncs != nil {
+			if dm.domainPatternFuncs.IsPattern(domain) {
 				dm.patternMap.Store(domain, nil)
 			}
 			dm.rangeMatchingPatterns(domain, func(rm2 *RoleManagerImpl) {
@@ -652,7 +652,7 @@ func (dm *DomainManager) AddLink(name1 string, name2 string, domains ...string) 
 	roleManager := dm.getRoleManager(domain, true) //create role manager if it does not exist
 	_ = roleManager.AddLink(name1, name2, domains...)
 
-	if dm.domainMatcher != nil && dm.domainMatcher.IsPattern(domain) {
+	if dm.domainPatternFuncs != nil && dm.domainPatternFuncs.IsPattern(domain) {
 		dm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
 			_ = rm.AddLink(name1, name2, domains...)
 		})
@@ -670,7 +670,7 @@ func (dm *DomainManager) DeleteLink(name1 string, name2 string, domains ...strin
 	roleManager := dm.getRoleManager(domain, true) //create role manager if it does not exist
 	_ = roleManager.DeleteLink(name1, name2, domains...)
 
-	if dm.domainMatcher != nil && dm.domainMatcher.IsPattern(domain) {
+	if dm.domainPatternFuncs != nil && dm.domainPatternFuncs.IsPattern(domain) {
 		dm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
 			_ = rm.DeleteLink(name1, name2, domains...)
 		})

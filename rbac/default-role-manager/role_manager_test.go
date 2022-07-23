@@ -139,7 +139,6 @@ func TestRole(t *testing.T) {
 	testPrintRoles(t, rm, "g2", []string{})
 	testPrintRoles(t, rm, "g3", []string{})
 
-
 	rm = NewRoleManager(3)
 	rm.AddMatchingFunc("keyMatch", util.KeyMatch)
 
@@ -278,7 +277,7 @@ func TestDomainPatternRole(t *testing.T) {
 		{
 			func() *RoleManager {
 				rm := NewRoleManager(10)
-				rm.SetDomainMatcher(NewPatternMatcher(util.IsKeyMatch2Pattern, util.KeyMatch2))
+				rm.SetPatternFuncsForDomains(NewPatternFuncs(util.IsKeyMatch2Pattern, util.KeyMatch2))
 				return rm
 			},
 		},
@@ -331,8 +330,8 @@ func TestAllMatchingFunc(t *testing.T) {
 		{
 			func() *RoleManager {
 				rm := NewRoleManager(10)
-				rm.SetRoleMatcher(NewPatternMatcher(util.IsKeyMatch2Pattern, util.KeyMatch2))
-				rm.SetDomainMatcher(NewPatternMatcher(util.IsKeyMatch2Pattern, util.KeyMatch2))
+				rm.SetPatternFuncsForRoles(NewPatternFuncs(util.IsKeyMatch2Pattern, util.KeyMatch2))
+				rm.SetPatternFuncsForDomains(NewPatternFuncs(util.IsKeyMatch2Pattern, util.KeyMatch2))
 				return rm
 			},
 		},
@@ -353,7 +352,7 @@ func TestAllMatchingFunc(t *testing.T) {
 
 func TestMatchingFuncOrder(t *testing.T) {
 	rm := NewRoleManager(10)
-	rm.SetRoleMatcher(NewPrefixMatcher("re:", util.RegexMatch))
+	rm.SetPatternFuncsForRoles(NewPatternFuncsWithPrefix("re:", util.RegexMatch))
 
 	_ = rm.AddLink("re:g\\d+", "root")
 	_ = rm.AddLink("u1", "g1")
@@ -374,7 +373,7 @@ func TestMatchingFuncOrder(t *testing.T) {
 
 func TestDomainMatchingFuncWithDifferentDomain(t *testing.T) {
 	rm := NewRoleManager(10)
-	rm.SetDomainMatcher(NewPatternMatcher(util.IsKeyMatchPattern, util.KeyMatch))
+	rm.SetPatternFuncsForDomains(NewPatternFuncs(util.IsKeyMatchPattern, util.KeyMatch))
 
 	_ = rm.AddLink("alice", "editor", "*")
 	_ = rm.AddLink("editor", "admin", "domain1")
@@ -385,7 +384,7 @@ func TestDomainMatchingFuncWithDifferentDomain(t *testing.T) {
 
 func TestTemporaryRoles(t *testing.T) {
 	rm := NewRoleManager(10)
-	rm.SetRoleMatcher(NewPrefixMatcher("re:", util.RegexMatch))
+	rm.SetPatternFuncsForRoles(NewPatternFuncsWithPrefix("re:", util.RegexMatch))
 
 	_ = rm.AddLink("re:u\\d+", "user")
 
