@@ -131,10 +131,10 @@ func TestKeyGet2(t *testing.T) {
 	testKeyGet2(t, "/foo", "/foo*", "id", "")
 	testKeyGet2(t, "/foo", "/foo/*", "id", "")
 	testKeyGet2(t, "/foo/bar", "/foo", "id", "")
-	testKeyGet2(t, "/foo/bar", "/foo*", "id", "") // different with KeyMatch.
+	testKeyGet2(t, "/foo/bar", "/foo*", "id", "")
 	testKeyGet2(t, "/foo/bar", "/foo/*", "id", "")
 	testKeyGet2(t, "/foobar", "/foo", "id", "")
-	testKeyGet2(t, "/foobar", "/foo*", "id", "") // different with KeyMatch.
+	testKeyGet2(t, "/foobar", "/foo*", "id", "")
 	testKeyGet2(t, "/foobar", "/foo/*", "id", "")
 
 	testKeyGet2(t, "/", "/:resource", "resource", "")
@@ -170,7 +170,7 @@ func testKeyMatch3(t *testing.T, key1 string, key2 string, res bool) {
 }
 
 func TestKeyMatch3(t *testing.T) {
-	// KeyGet3() is similar with KeyGet2(), except using "/proxy/{id}" instead of "/proxy/:id".
+	// keyMatch3() is similar with KeyMatch2(), except using "/proxy/{id}" instead of "/proxy/:id".
 	testKeyMatch3(t, "/foo", "/foo", true)
 	testKeyMatch3(t, "/foo", "/foo*", true)
 	testKeyMatch3(t, "/foo", "/foo/*", false)
@@ -207,16 +207,16 @@ func testKeyGet3(t *testing.T, key1 string, key2 string, pathVar string, res str
 }
 
 func TestKeyGet3(t *testing.T) {
-	// keyMatch3() is similar with KeyMatch2(), except using "/proxy/{id}" instead of "/proxy/:id".
-	testKeyGet2(t, "/foo", "/foo", "id", "")
-	testKeyGet2(t, "/foo", "/foo*", "id", "")
-	testKeyGet2(t, "/foo", "/foo/*", "id", "")
-	testKeyGet2(t, "/foo/bar", "/foo", "id", "")
-	testKeyGet2(t, "/foo/bar", "/foo*", "id", "")
-	testKeyGet2(t, "/foo/bar", "/foo/*", "id", "")
-	testKeyGet2(t, "/foobar", "/foo", "id", "")
-	testKeyGet2(t, "/foobar", "/foo*", "id", "")
-	testKeyGet2(t, "/foobar", "/foo/*", "id", "")
+	// KeyGet3() is similar with KeyGet2(), except using "/proxy/{id}" instead of "/proxy/:id".
+	testKeyGet3(t, "/foo", "/foo", "id", "")
+	testKeyGet3(t, "/foo", "/foo*", "id", "")
+	testKeyGet3(t, "/foo", "/foo/*", "id", "")
+	testKeyGet3(t, "/foo/bar", "/foo", "id", "")
+	testKeyGet3(t, "/foo/bar", "/foo*", "id", "")
+	testKeyGet3(t, "/foo/bar", "/foo/*", "id", "")
+	testKeyGet3(t, "/foobar", "/foo", "id", "")
+	testKeyGet3(t, "/foobar", "/foo*", "id", "")
+	testKeyGet3(t, "/foobar", "/foo/*", "id", "")
 
 	testKeyGet3(t, "/", "/{resource}", "resource", "")
 	testKeyGet3(t, "/resource1", "/{resource}", "resource", "resource1")
