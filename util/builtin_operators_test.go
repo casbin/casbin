@@ -193,7 +193,7 @@ func TestKeyMatch3(t *testing.T) {
 	testKeyMatch3(t, "/proxy/myid/res/res2/res3", "/proxy/{id}/*", true)
 	testKeyMatch3(t, "/proxy/", "/proxy/{id}/*", false)
 
-	testKeyMatch3(t, "/myid/using/myresid", "/{id/using/{resId}", false)
+	testKeyMatch3(t, "/myid/using/myresid", "/{id}/using/{resId}", false)
 }
 
 func testKeyGet3(t *testing.T, key1 string, key2 string, pathVar string, res string) {
@@ -233,8 +233,8 @@ func TestKeyGet3(t *testing.T) {
 
 	testKeyGet3(t, "/api/group1_group_name/project1_admin/info", "/api/{proj}_admin/info",
 		"proj", "")
-	testKeyGet3(t, "/{id/using/myresid", "/{id/using/{resId}", "resId", "myresid")
-	testKeyGet3(t, "/{id/using/myresid/status}", "/{id/using/{resId}/status}", "resId", "myresid")
+	testKeyGet3(t, "/id/using/myresid", "/{id}/using/{resId}", "resId", "myresid")
+	testKeyGet3(t, "/id/using/myresid/status", "/{id}/using/{resId}/status", "resId", "myresid")
 
 	testKeyGet3(t, "/proxy/myid/res/res2/res3", "/proxy/{id}/*/{res}", "res", "res3")
 	testKeyGet3(t, "/api/project1_admin/info", "/api/{proj}_admin/info", "proj", "project1")
