@@ -261,6 +261,11 @@ func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 	}
 }
 
+// GetNamedRoleManager gets the specified role manager.
+func (e *Enforcer) GetNamedRoleManager(ptype string) rbac.RoleManager {
+	return e.rmMap[ptype]
+}
+
 // GetRoleManager gets the current role manager.
 func (e *Enforcer) GetRoleManager() rbac.RoleManager {
 	return e.rmMap["g"]
@@ -269,6 +274,11 @@ func (e *Enforcer) GetRoleManager() rbac.RoleManager {
 // SetRoleManager sets the current role manager.
 func (e *Enforcer) SetRoleManager(rm rbac.RoleManager) {
 	e.rmMap["g"] = rm
+}
+
+// SetNamedRoleManager sets the specified role manager.
+func (e *Enforcer) SetNamedRoleManager(ptype string, rm rbac.RoleManager) {
+	e.rmMap[ptype] = rm
 }
 
 // SetEffector sets the current effector.

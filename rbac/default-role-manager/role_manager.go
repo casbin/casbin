@@ -437,12 +437,13 @@ func (rm *RoleManagerImpl) BuildRelationship(name1 string, name2 string, domain 
 }
 
 type DomainManager struct {
-	rmMap              *sync.Map
-	maxHierarchyLevel  int
-	matchingFunc       MatchingFunc
-	domainMatchingFunc MatchingFunc
-	logger             log.Logger
-	matchingFuncCache  *util.SyncLRUCache
+	rmMap                  *sync.Map
+	maxHierarchyLevel      int
+	matchingFunc           MatchingFunc
+	domainMatchingFunc     MatchingFunc
+	logger                 log.Logger
+	matchingFuncCache      *util.SyncLRUCache
+	domainHierarchyManager *RoleManager // Used to manage hierarchical relationships between domains
 }
 
 // NewDomainManager is the constructor for creating an instance of the
@@ -452,6 +453,11 @@ func NewDomainManager(maxHierarchyLevel int) *DomainManager {
 	_ = dm.Clear() // init rmMap and rmCache
 	dm.maxHierarchyLevel = maxHierarchyLevel
 	return dm
+}
+
+func (dm *DomainManager) SetDomainHierarchyManager(dhm *RoleManager) {
+	dm.domainHierarchyManager = dhm
+	dm.rebuild()
 }
 
 // SetLogger sets role manager's logger.
@@ -529,10 +535,18 @@ func (dm *DomainManager) Match(str string, pattern string) bool {
 }
 
 func (dm *DomainManager) rangeAffectedRoleManagers(domain string, fn func(rm *RoleManagerImpl)) {
-	if dm.domainMatchingFunc != nil {
+	if dm.domainMatchingFunc != nil || dm.domainHierarchyManager != nil {
 		dm.rmMap.Range(func(key, value interface{}) bool {
 			domain2 := key.(string)
-			if domain != domain2 && dm.Match(domain2, domain) {
+			matched := false
+			if dm.domainMatchingFunc != nil {
+				matched = dm.Match(domain2, domain)
+			}
+			hasLink := false
+			if dm.domainHierarchyManager != nil {
+				hasLink, _ = dm.domainHierarchyManager.HasLink(domain2, domain)
+			}
+			if domain != domain2 && (matched || hasLink) {
 				fn(value.(*RoleManagerImpl))
 			}
 			return true
@@ -557,11 +571,19 @@ func (dm *DomainManager) getRoleManager(domain string, store bool) *RoleManagerI
 		if store {
 			dm.rmMap.Store(domain, rm)
 		}
-		if dm.domainMatchingFunc != nil {
+		if dm.domainMatchingFunc != nil || dm.domainHierarchyManager != nil {
 			dm.rmMap.Range(func(key, value interface{}) bool {
 				domain2 := key.(string)
 				rm2 := value.(*RoleManagerImpl)
-				if domain != domain2 && dm.Match(domain, domain2) {
+				matched := false
+				if dm.domainMatchingFunc != nil {
+					matched = dm.Match(domain, domain2)
+				}
+				hasLink := false
+				if dm.domainHierarchyManager != nil {
+					hasLink, _ = dm.domainHierarchyManager.HasLink(domain, domain2)
+				}
+				if domain != domain2 && (matched || hasLink) {
 					rm.copyFrom(rm2)
 				}
 				return true

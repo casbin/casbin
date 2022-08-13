@@ -1,0 +1,12 @@
+p, admin, globalDom, data, read
+p, admin, subDom1, data, read
+p, admin, lowerSubDom1, data, read
+
+p, admin, lowerSubDom1, data2, read
+
+g, alice, admin, globalDom
+g, bob, admin, subDom1
+
+g2, subDom1, globalDom
+g2, subDom2, globalDom
+g2, lowerSubDom1, subDom1
