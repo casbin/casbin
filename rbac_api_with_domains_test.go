@@ -18,6 +18,7 @@ import (
 	"sort"
 	"testing"
 
+	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -266,4 +267,56 @@ func TestGetAllDomains(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	testGetAllDomains(t, e, []string{"domain1", "domain2"})
+}
+
+func TestDomainHierarchical(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domains_hierarchical_model.conf", "examples/rbac_with_domains_hierarchical_policy.csv")
+	origin := e.GetNamedRoleManager("g").(*defaultrolemanager.RoleManager)
+	dest := e.GetNamedRoleManager("g2").(*defaultrolemanager.RoleManager)
+	origin.SetDomainHierarchyManager(dest)
+
+	//testDomainEnforce(t, e, "alice", "globalDom", "data", "read", true)
+	//testDomainEnforce(t, e, "alice", "subDom1", "data", "read", true)
+	//// admin of subDom2 cannot read data because there is no corresponding policy
+	//testDomainEnforce(t, e, "alice", "subDom2", "data", "read", false)
+	//testDomainEnforce(t, e, "alice", "lowerSubDom1", "data", "read", true)
+	//testDomainEnforce(t, e, "alice", "lowerSubDom1", "data2", "read", true)
+	//
+	//testDomainEnforce(t, e, "bob", "globalDom", "data", "read", false)
+	//testDomainEnforce(t, e, "bob", "subDom2", "data", "read", false)
+	//testDomainEnforce(t, e, "bob", "subDom1", "data", "read", true)
+	//testDomainEnforce(t, e, "bob", "lowerSubDom1", "data", "read", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data2", "read", true)
+	testDomainEnforce(t, e, "alice", "domain2", "data2", "read", true)
+	testDomainEnforce(t, e, "alice", "domain1", "sdata2", "read", true)
+	testDomainEnforce(t, e, "alice", "sibling2", "sdata2", "read", true)
+	testDomainEnforce(t, e, "alice", "domain3", "data3", "write", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data3", "write", true)
+	testDomainEnforce(t, e, "alice", "domain2", "data3", "write", true)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
+	testDomainEnforce(t, e, "bob", "domain2", "data3", "write", true)
+	testDomainEnforce(t, e, "bob", "domain3", "data3", "write", true)
+
+	testDomainEnforce(t, e, "bob", "domain1", "data3", "write", false)
+	testDomainEnforce(t, e, "bob", "domain1", "data2", "read", false)
+	testDomainEnforce(t, e, "bob", "domain1", "data1", "read", false)
+	testDomainEnforce(t, e, "bob", "domain2", "data1", "read", false)
+	testDomainEnforce(t, e, "bob", "domain3", "data1", "write", false)
+	testDomainEnforce(t, e, "alice", "domain2", "data1", "read", false)
+	testDomainEnforce(t, e, "alice", "domain3", "data1", "read", false)
+	testDomainEnforce(t, e, "alice", "sibling2", "data1", "read", false)
+	// alice data2
+	testDomainEnforce(t, e, "alice", "domain3", "data2", "read", false)
+	testDomainEnforce(t, e, "alice", "sibling2", "data2", "read", false)
+	// alice data3
+	testDomainEnforce(t, e, "alice", "sibling2", "data3", "write", false)
+	// alice sdata2
+	testDomainEnforce(t, e, "alice", "domain2", "sdata2", "read", false)
+	// bob data2
+	testDomainEnforce(t, e, "bob", "domain3", "data2", "read", false)
+	testDomainEnforce(t, e, "bob", "domain1", "sdata2", "read", false)
+	testDomainEnforce(t, e, "bob", "domain2", "sdata2", "read", false)
+	testDomainEnforce(t, e, "bob", "sibling2", "sdata2", "read", false)
+	testDomainEnforce(t, e, "bob", "domain3", "sdata2", "read", false)
 }

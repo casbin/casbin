@@ -1,0 +1,11 @@
+p, admin, domain1, data1, (read|write)
+p, admin, domain2, data2, (read|write)
+p, admin, domain3, data3, (write)
+p, admin, sibling2, sdata2, (read|write)
+
+g, alice, admin, domain1
+g, bob, admin, domain2
+
+g2, domain2, domain1
+g2, sibling2, domain1
+g2, domain3, domain2
