@@ -266,9 +266,19 @@ func (e *Enforcer) GetRoleManager() rbac.RoleManager {
 	return e.rmMap["g"]
 }
 
+// GetNamedRoleManager gets the role manager for the named policy.
+func (e *Enforcer) GetNamedRoleManager(ptype string) rbac.RoleManager {
+	return e.rmMap[ptype]
+}
+
 // SetRoleManager sets the current role manager.
 func (e *Enforcer) SetRoleManager(rm rbac.RoleManager) {
 	e.rmMap["g"] = rm
+}
+
+// SetNamedRoleManager sets the role manager for the named policy.
+func (e *Enforcer) SetNamedRoleManager(ptype string, rm rbac.RoleManager) {
+	e.rmMap[ptype] = rm
 }
 
 // SetEffector sets the current effector.
