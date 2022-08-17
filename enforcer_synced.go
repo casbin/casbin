@@ -46,6 +46,11 @@ func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 	return e, nil
 }
 
+// GetLock return the private RWMutex lock
+func (e *SyncedEnforcer) GetLock() *sync.RWMutex {
+	return &e.m
+}
+
 // IsAutoLoadingRunning check if SyncedEnforcer is auto loading policies
 func (e *SyncedEnforcer) IsAutoLoadingRunning() bool {
 	return atomic.LoadInt32(&(e.autoLoadRunning)) != 0
