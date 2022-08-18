@@ -358,7 +358,15 @@ func TestImplicitPermissionAPI(t *testing.T) {
 	e.AddNamedDomainMatchingFunc("g", "KeyMatch", util.KeyMatch)
 
 	testGetImplicitPermissions(t, e, "admin", [][]string{{"admin", "domain1", "data1", "read"}, {"admin", "domain1", "data1", "write"}, {"admin", "domain1", "data3", "read"}}, "domain1")
-	testGetImplicitPermissions(t, e, "admin", [][]string{{"admin", "domain1", "data1", "read"}, {"admin", "domain1", "data1", "write"}, {"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}, {"admin", "domain1", "data3", "read"}}, "domain1", "domain2")
+
+	_, err := e.GetImplicitPermissionsForUser("admin", "domain1", "domain2")
+	if err == nil {
+		t.Error("GetImplicitPermissionsForUser should not support multiple domains")
+	}
+
+	testGetImplicitPermissions(t, e, "alice",
+		[][]string{{"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}, {"admin", "domain2", "data3", "read"}},
+		"domain2")
 
 	e, _ = NewEnforcer("examples/rbac_with_multiple_policy_model.conf", "examples/rbac_with_multiple_policy_policy.csv")
 
