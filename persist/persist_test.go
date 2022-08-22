@@ -46,8 +46,8 @@ func TestDuplicateRuleInAdapter(t *testing.T) {
 	e.ClearPolicy()
 
 	//simulate adapter.LoadPolicy with duplicate rules
-	persist.LoadPolicyArray([]string{"p", "alice", "data1", "read"}, e.GetModel())
-	persist.LoadPolicyArray([]string{"p", "alice", "data1", "read"}, e.GetModel())
+	_ = persist.LoadPolicyArray([]string{"p", "alice", "data1", "read"}, e.GetModel())
+	_ = persist.LoadPolicyArray([]string{"p", "alice", "data1", "read"}, e.GetModel())
 
 	testRuleCount(t, e.GetModel(), 1, "p", "p", "LoadPolicyArray")
 }
