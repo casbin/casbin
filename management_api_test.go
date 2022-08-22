@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/casbin/casbin/v2/util"
@@ -300,4 +301,292 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 	testGetRoles(t, e, []string{"data5_admin"}, "admin")
 	testGetRoles(t, e, []string{"admin_groups"}, "eve")
 
+}
+
+func assert(t *testing.T, res, exp interface{}) {
+	ok := reflect.DeepEqual(res, exp)
+	if !ok {
+		t.Errorf("%v != %v", res, exp)
+	}
+}
+
+func TestExistedOrMissedPolicy(t *testing.T) {
+	var (
+		ok       bool
+		err      error
+		affected [][]string
+		e        *Enforcer
+	)
+
+	// test for adding a policy that already exists
+	e, _ = NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"}})
+
+	ok = e.model.AddPolicy("p", "p", []string{"alice", "data1", "read"})
+	assert(t, ok, false)
+
+	ok = e.model.AddPolicies("p", "p", [][]string{
+		{"alice", "data1", "write"},
+		{"alice", "data1", "read"}, // duplicate
+	})
+	assert(t, ok, false)
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+
+		//{"alice", "data1", "write"},
+	})
+
+	affected = e.model.AddPoliciesWithAffected("p", "p", [][]string{
+		{"alice", "data1", "write"}, // new
+		{"alice", "data1", "read"},  // duplicate
+	})
+	assert(t, affected, [][]string{
+		{"alice", "data1", "write"}, // new
+		//{"alice", "data1", "read"}, // duplicate
+	})
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+
+		{"alice", "data1", "write"}, //new
+	})
+
+	ok, err = e.AddPolicy([]string{"alice", "data1", "read"})
+	assert(t, ok, false)
+	assert(t, err, nil)
+
+	ok, err = e.AddPolicies([][]string{
+		{"alice", "data1", "read"},
+		{"alice", "data2", "read"}, // new
+	})
+	assert(t, ok, true)
+	assert(t, err, nil)
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+
+		{"alice", "data1", "write"},
+		{"alice", "data2", "read"}, // new
+	})
+
+	ok, err = e.AddPolicies([][]string{
+		{"alice", "data1", "read"}, // duplicate
+		{"alice", "data2", "read"}, // duplicate
+	})
+	assert(t, ok, false)
+	assert(t, err, nil)
+
+	// test for removing a policy that does not exist
+	e, _ = NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"}})
+
+	ok = e.model.RemovePolicy("p", "p", []string{"eva", "data1", "read"})
+	assert(t, ok, false)
+
+	ok = e.model.RemovePolicies("p", "p", [][]string{
+		{"alice", "data1", "read"},
+		{"eva", "data1", "read"}, // missing
+	})
+	assert(t, ok, false)
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+	})
+
+	affected = e.model.RemovePoliciesWithAffected("p", "p", [][]string{
+		{"alice", "data1", "read"},
+		{"eva", "data1", "read"}, // missing
+	})
+	assert(t, affected, [][]string{
+		{"alice", "data1", "read"},
+		//{"eva", "data1", "read"}, // missing
+	})
+	testGetPolicy(t, e, [][]string{
+		//{"alice", "data1", "read"}, // deleted
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+	})
+
+	ok, err = e.RemovePolicy([]string{"alice", "data1", "read"})
+	assert(t, ok, false)
+	assert(t, err, nil)
+
+	ok, err = e.RemovePolicies([][]string{
+		{"bob", "data2", "write"},
+		{"eva", "data1", "read"}, // missing
+	})
+	assert(t, ok, true)
+	assert(t, err, nil)
+	testGetPolicy(t, e, [][]string{
+		//{"alice", "data1", "read"},
+		//{"bob", "data2", "write"}, // deleted
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+	})
+
+	ok, err = e.RemovePolicies([][]string{
+		{"bob", "data2", "write"}, // missing
+		{"eva", "data1", "read"},  // missing
+	})
+	assert(t, ok, false)
+	assert(t, err, nil)
+
+	// test for update policies
+	e, _ = NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"}})
+
+	ok = e.model.UpdatePolicy("p", "p",
+		[]string{"carol", "data1", "get"}, // missing
+		[]string{"carol", "data1", "read"},
+	)
+	assert(t, ok, false)
+
+	ok = e.model.UpdatePolicy("p", "p",
+		[]string{"bob", "data2", "write"},
+		[]string{"alice", "data1", "read"}, // existing
+	)
+	assert(t, ok, false)
+
+	ok = e.model.UpdatePolicies("p", "p", [][]string{
+		{"alice", "data1", "read"},
+		{"eva", "data1", "read"}, // missing
+	},
+		[][]string{
+			{"eva", "data2", "read"},
+			{"eva", "data2", "write"},
+		})
+	assert(t, ok, false)
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+	})
+
+	ok = e.model.UpdatePolicies("p", "p", [][]string{
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "write"},
+	},
+		[][]string{
+			{"eva", "data1", "read"},
+			{"alice", "data1", "read"}, // existing
+		})
+	assert(t, ok, false)
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+	})
+
+	affected = e.model.UpdatePoliciesWithAffected("p", "p", [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+	},
+		[][]string{
+			{"eva", "data1", "read"},
+			{"data2_admin", "data2", "read"}, // existing
+		})
+	assert(t, affected, [][]string{
+		{"alice", "data1", "read"},
+		//{"bob", "data2", "write"},
+	})
+	testGetPolicy(t, e, [][]string{
+		{"eva", "data1", "read"}, // updated
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+	})
+
+	affected = e.model.UpdatePoliciesWithAffected("p", "p", [][]string{
+		{"eva", "data1", "read"},
+		{"carol", "data2", "write"}, // missing
+	},
+		[][]string{
+			{"alice", "data1", "read"},
+			{"alice", "data2", "write"},
+		})
+	assert(t, affected, [][]string{
+		{"eva", "data1", "read"},
+		//{"bob", "data2", "write"},
+	})
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"}, // updated
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+	})
+
+	ok, err = e.UpdatePolicy(
+		[]string{"carol", "data1", "get"}, // missing
+		[]string{"carol", "data1", "read"},
+	)
+	assert(t, ok, false)
+	assert(t, err, nil)
+
+	ok, err = e.UpdatePolicy(
+		[]string{"bob", "data2", "write"},
+		[]string{"alice", "data1", "read"}, // existing
+	)
+	assert(t, ok, false)
+	assert(t, err, nil)
+
+	ok, err = e.UpdatePolicies([][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+	},
+		[][]string{
+			{"eva", "data1", "read"},
+			{"data2_admin", "data2", "read"}, // existing
+		})
+	assert(t, ok, true)
+	assert(t, err, nil)
+	testGetPolicy(t, e, [][]string{
+		{"eva", "data1", "read"}, // updated
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+	})
+
+	ok, err = e.UpdatePolicies([][]string{
+		{"eva", "data1", "read"},
+		{"carol", "data2", "write"}, // missing
+	},
+		[][]string{
+			{"alice", "data1", "read"},
+			{"alice", "data2", "write"},
+		})
+	assert(t, ok, true)
+	assert(t, err, nil)
+	testGetPolicy(t, e, [][]string{
+		{"alice", "data1", "read"}, // updated
+		{"bob", "data2", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+	})
 }

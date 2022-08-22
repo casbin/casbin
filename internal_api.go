@@ -16,7 +16,6 @@ package casbin
 
 import (
 	"fmt"
-
 	Err "github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
@@ -30,14 +29,15 @@ func (e *Enforcer) shouldPersist() bool {
 	return e.adapter != nil && e.autoSave
 }
 
-// addPolicy adds a rule to the current policy.
+// addPolicy adds a rule.
+// It returns false if the rule already exists.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
-	if e.dispatcher != nil && e.autoNotifyDispatcher {
-		return true, e.dispatcher.AddPolicies(sec, ptype, [][]string{rule})
-	}
-
 	if e.model.HasPolicy(sec, ptype, rule) {
 		return false, nil
+	}
+
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.AddPolicies(sec, ptype, [][]string{rule})
 	}
 
 	if e.shouldPersist() {
@@ -70,14 +70,15 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 	return true, nil
 }
 
-// addPolicies adds rules to the current policy.
+// addPolicies adds rules and ignores duplicates.
+// If all policies exist, it returns false.
 func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	if e.dispatcher != nil && e.autoNotifyDispatcher {
-		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
+	if e.model.HasAllPolicies(sec, ptype, rules) {
+		return false, nil
 	}
 
-	if e.model.HasPolicies(sec, ptype, rules) {
-		return false, nil
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
 	}
 
 	if e.shouldPersist() {
@@ -88,10 +89,10 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 		}
 	}
 
-	e.model.AddPolicies(sec, ptype, rules)
+	affectedPolicies := e.model.AddPoliciesWithAffected(sec, ptype, rules)
 
 	if sec == "g" {
-		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
+		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, affectedPolicies)
 		if err != nil {
 			return true, err
 		}
@@ -100,7 +101,7 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForAddPolicies(sec, ptype, rules...)
+			err = watcher.UpdateForAddPolicies(sec, ptype, affectedPolicies...)
 		} else {
 			err = e.watcher.Update()
 		}
@@ -110,8 +111,13 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 	return true, nil
 }
 
-// removePolicy removes a rule from the current policy.
+// removePolicy removes the specified rule.
+// It returns false if the rule does not exist.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
+	if !e.model.HasPolicy(sec, ptype, rule) {
+		return false, nil
+	}
+
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.RemovePolicies(sec, ptype, [][]string{rule})
 	}
@@ -124,15 +130,13 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		}
 	}
 
-	ruleRemoved := e.model.RemovePolicy(sec, ptype, rule)
-	if !ruleRemoved {
-		return ruleRemoved, nil
-	}
+	_ = e.model.RemovePolicy(sec, ptype, rule)
+	// the returned value will always be true because HasPolicy() returns true.
 
 	if sec == "g" {
 		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{rule})
 		if err != nil {
-			return ruleRemoved, err
+			return true, err
 		}
 	}
 
@@ -143,14 +147,17 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		} else {
 			err = e.watcher.Update()
 		}
-		return ruleRemoved, err
-
+		return true, err
 	}
 
-	return ruleRemoved, nil
+	return true, nil
 }
 
 func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
+	if !e.model.HasPolicy(sec, ptype, oldRule) || e.model.HasPolicy(sec, ptype, newRule) {
+		return false, nil
+	}
+
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.UpdatePolicy(sec, ptype, oldRule, newRule)
 	}
@@ -162,19 +169,17 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 			}
 		}
 	}
-	ruleUpdated := e.model.UpdatePolicy(sec, ptype, oldRule, newRule)
-	if !ruleUpdated {
-		return ruleUpdated, nil
-	}
+	_ = e.model.UpdatePolicy(sec, ptype, oldRule, newRule)
+	// we already have a check in the beginning and UpdatePolicy() will definitely return true.
 
 	if sec == "g" {
 		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{oldRule}) // remove the old rule
 		if err != nil {
-			return ruleUpdated, err
+			return true, err
 		}
 		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{newRule}) // add the new rule
 		if err != nil {
-			return ruleUpdated, err
+			return true, err
 		}
 	}
 
@@ -185,15 +190,21 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 		} else {
 			err = e.watcher.Update()
 		}
-		return ruleUpdated, err
+		return true, err
 	}
 
-	return ruleUpdated, nil
+	return true, nil
 }
 
 func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
 	if len(newRules) != len(oldRules) {
 		return false, fmt.Errorf("the length of oldRules should be equal to the length of newRules, but got the length of oldRules is %d, the length of newRules is %d", len(oldRules), len(newRules))
+	}
+
+	if !e.model.HasAnyPolicies(sec, ptype, oldRules) ||
+		e.model.HasAllPolicies(sec, ptype, newRules) ||
+		model.CheckDuplicatePolicy(newRules) {
+		return false, nil
 	}
 
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
@@ -208,19 +219,17 @@ func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string,
 		}
 	}
 
-	ruleUpdated := e.model.UpdatePolicies(sec, ptype, oldRules, newRules)
-	if !ruleUpdated {
-		return ruleUpdated, nil
-	}
+	_ = e.model.UpdatePoliciesWithAffected(sec, ptype, oldRules, newRules)
+	// the returned value will always be true because we have a check in the beginning.
 
 	if sec == "g" {
 		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, oldRules) // remove the old rules
 		if err != nil {
-			return ruleUpdated, err
+			return true, err
 		}
 		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, newRules) // add the new rules
 		if err != nil {
-			return ruleUpdated, err
+			return true, err
 		}
 	}
 
@@ -231,15 +240,16 @@ func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string,
 		} else {
 			err = e.watcher.Update()
 		}
-		return ruleUpdated, err
+		return true, err
 	}
 
-	return ruleUpdated, nil
+	return true, nil
 }
 
-// removePolicies removes rules from the current policy.
+// removePolicies removes the specified rules.
+//If all policies do not exist, it returns false.
 func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	if !e.model.HasPolicies(sec, ptype, rules) {
+	if !e.model.HasAnyPolicies(sec, ptype, rules) {
 		return false, nil
 	}
 
@@ -255,35 +265,37 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 		}
 	}
 
-	rulesRemoved := e.model.RemovePolicies(sec, ptype, rules)
-	if !rulesRemoved {
-		return rulesRemoved, nil
-	}
+	affectedPolicies := e.model.RemovePoliciesWithAffected(sec, ptype, rules)
 
 	if sec == "g" {
-		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, rules)
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, affectedPolicies)
 		if err != nil {
-			return rulesRemoved, err
+			return true, err
 		}
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForRemovePolicies(sec, ptype, rules...)
+			err = watcher.UpdateForRemovePolicies(sec, ptype, affectedPolicies...)
 		} else {
 			err = e.watcher.Update()
 		}
 		return true, err
 	}
 
-	return rulesRemoved, nil
+	return true, nil
 }
 
 // removeFilteredPolicy removes rules based on field filters from the current policy.
+// If no rules are filtered out, it returns false.
 func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
 	if len(fieldValues) == 0 {
 		return false, Err.INVALID_FIELDVAULES_PARAMETER
+	}
+
+	if !e.model.HasFilteredPolicies(sec, ptype, fieldIndex, fieldValues...) {
+		return false, nil
 	}
 
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
@@ -298,15 +310,13 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 		}
 	}
 
-	ruleRemoved, effects := e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
-	if !ruleRemoved {
-		return ruleRemoved, nil
-	}
+	_, affectedPolicies := e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	// the first returned value is always true because HasFilteredPolicies() returned true
 
 	if sec == "g" {
-		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effects)
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, affectedPolicies)
 		if err != nil {
-			return ruleRemoved, err
+			return true, err
 		}
 	}
 	if e.watcher != nil && e.autoNotifyWatcher {
@@ -316,10 +326,10 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 		} else {
 			err = e.watcher.Update()
 		}
-		return ruleRemoved, err
+		return true, err
 	}
 
-	return ruleRemoved, nil
+	return true, nil
 }
 
 func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
@@ -327,6 +337,16 @@ func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][
 		oldRules [][]string
 		err      error
 	)
+
+	if !e.model.HasFilteredPolicies(sec, ptype, fieldIndex, fieldValues...) ||
+		e.model.HasAllPolicies(sec, ptype, newRules) ||
+		model.CheckDuplicatePolicy(newRules) {
+		return false, nil
+	}
+
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.UpdateFilteredPolicies(sec, ptype, oldRules, newRules)
+	}
 
 	if e.shouldPersist() {
 		if oldRules, err = e.adapter.(persist.UpdatableAdapter).UpdateFilteredPolicies(sec, ptype, newRules, fieldIndex, fieldValues...); err != nil {
@@ -342,25 +362,18 @@ func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][
 		}
 	}
 
-	if e.dispatcher != nil && e.autoNotifyDispatcher {
-		return true, e.dispatcher.UpdateFilteredPolicies(sec, ptype, oldRules, newRules)
-	}
-
-	ruleChanged := e.model.RemovePolicies(sec, ptype, oldRules)
+	_ = e.model.RemovePolicies(sec, ptype, oldRules)
+	// the returned value will always be true because we have a check in the beginning.
 	e.model.AddPolicies(sec, ptype, newRules)
-	ruleChanged = ruleChanged && len(newRules) != 0
-	if !ruleChanged {
-		return ruleChanged, nil
-	}
 
 	if sec == "g" {
 		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, oldRules) // remove the old rules
 		if err != nil {
-			return ruleChanged, err
+			return true, err
 		}
 		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, newRules) // add the new rules
 		if err != nil {
-			return ruleChanged, err
+			return true, err
 		}
 	}
 
@@ -371,10 +384,10 @@ func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][
 		} else {
 			err = e.watcher.Update()
 		}
-		return ruleChanged, err
+		return true, err
 	}
 
-	return ruleChanged, nil
+	return true, nil
 }
 
 func (e *Enforcer) GetFieldIndex(ptype string, field string) (int, error) {

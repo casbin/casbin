@@ -235,7 +235,7 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err6.Error())
 	}
 
-	removed, err7 := e.RemoveGroupingPolicy("bob", "admin2")
+	removed, err7 := e.RemoveGroupingPolicy("bob", "admin", "domain2")
 	if removed {
 		t.Errorf("removed should be false")
 	}
@@ -271,7 +271,7 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err9.Error())
 	}
 
-	removed, err10 := e.RemoveFilteredNamedGroupingPolicy("g", 0, "eve")
+	removed, err10 := e.RemoveFilteredNamedGroupingPolicy("g", 0, "alice")
 	if removed {
 		t.Errorf("removed should be false")
 	}
