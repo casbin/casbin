@@ -17,16 +17,21 @@ package casbin
 import "testing"
 
 type SampleWatcher struct {
+	callback func(string)
 }
 
-func (w SampleWatcher) Close() {
+func (w *SampleWatcher) Close() {
 }
 
-func (w SampleWatcher) SetUpdateCallback(func(string)) error {
+func (w *SampleWatcher) SetUpdateCallback(callback func(string)) error {
+	w.callback = callback
 	return nil
 }
 
-func (w SampleWatcher) Update() error {
+func (w *SampleWatcher) Update() error {
+	if w.callback != nil {
+		w.callback("")
+	}
 	return nil
 }
 
@@ -35,7 +40,7 @@ func TestSetWatcher(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	sampleWatcher := SampleWatcher{}
+	sampleWatcher := &SampleWatcher{}
 	err = e.SetWatcher(sampleWatcher)
 	if err != nil {
 		t.Fatal(err)
@@ -43,5 +48,44 @@ func TestSetWatcher(t *testing.T) {
 	err = e.SavePolicy() //calls watcher.Update()
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestSelfModify(t *testing.T) {
+	e, err := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sampleWatcher := &SampleWatcher{}
+	err = e.SetWatcher(sampleWatcher)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var called int
+
+	called = -1
+	_ = e.watcher.SetUpdateCallback(func(s string) {
+		called = 1
+	})
+	_, err = e.AddPolicy("eva", "data", "read") //calls watcher.Update()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if called != 1 {
+		t.Fatal("callback should be called")
+	}
+
+	called = -1
+	_ = e.watcher.SetUpdateCallback(func(s string) {
+		called = 1
+	})
+	_, err = e.SelfAddPolicy("p", "p", []string{"eva", "data", "write"}) //calls watcher.Update()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if called != -1 {
+		t.Fatal("callback should not be called")
 	}
 }

@@ -50,7 +50,7 @@ func (w SampleWatcherEx) UpdateForRemovePolicies(sec string, ptype string, rules
 func TestSetWatcherEx(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	sampleWatcherEx := SampleWatcherEx{}
+	sampleWatcherEx := &SampleWatcherEx{}
 	err := e.SetWatcher(sampleWatcherEx)
 	if err != nil {
 		t.Fatal(err)
