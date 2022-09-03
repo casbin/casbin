@@ -29,7 +29,7 @@ func (w SampleWatcherUpdatable) UpdateForUpdatePolicy(params ...string) error {
 func TestSetWatcherUpdatable(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
-	sampleWatcherEx := SampleWatcherUpdatable{}
+	sampleWatcherEx := &SampleWatcherUpdatable{}
 	err := e.SetWatcher(sampleWatcherEx)
 	if err != nil {
 		t.Fatal(err)

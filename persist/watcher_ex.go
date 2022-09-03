@@ -16,7 +16,7 @@ package persist
 
 import "github.com/casbin/casbin/v2/model"
 
-// WatcherEx is the strengthen for Casbin watchers.
+// WatcherEx is the strengthened Casbin watchers.
 type WatcherEx interface {
 	Watcher
 	// UpdateForAddPolicy calls the update callback of other instances to synchronize their policy.

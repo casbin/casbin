@@ -291,7 +291,7 @@ func (e *Enforcer) RemoveNamedPolicies(ptype string, rules [][]string) (bool, er
 
 // RemoveFilteredNamedPolicy removes an authorization rule from the current named policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredNamedPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
-	return e.removeFilteredPolicy("p", ptype, fieldIndex, fieldValues...)
+	return e.removeFilteredPolicy("p", ptype, fieldIndex, fieldValues)
 }
 
 // HasGroupingPolicy determines whether a role inheritance rule exists.
@@ -411,10 +411,38 @@ func (e *Enforcer) UpdateNamedGroupingPolicies(ptype string, oldRules [][]string
 
 // RemoveFilteredNamedGroupingPolicy removes a role inheritance rule from the current named policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
-	return e.removeFilteredPolicy("g", ptype, fieldIndex, fieldValues...)
+	return e.removeFilteredPolicy("g", ptype, fieldIndex, fieldValues)
 }
 
 // AddFunction adds a customized function.
 func (e *Enforcer) AddFunction(name string, function govaluate.ExpressionFunction) {
 	e.fm.AddFunction(name, function)
+}
+
+func (e *Enforcer) SelfAddPolicy(sec string, ptype string, rule []string) (bool, error) {
+	return e.addPolicyWithoutNotify(sec, ptype, rule)
+}
+
+func (e *Enforcer) SelfAddPolicies(sec string, ptype string, rules [][]string) (bool, error) {
+	return e.addPoliciesWithoutNotify(sec, ptype, rules)
+}
+
+func (e *Enforcer) SelfRemovePolicy(sec string, ptype string, rule []string) (bool, error) {
+	return e.removePolicyWithoutNotify(sec, ptype, rule)
+}
+
+func (e *Enforcer) SelfSelfRemovePolicies(sec string, ptype string, rules [][]string) (bool, error) {
+	return e.removePoliciesWithoutNotify(sec, ptype, rules)
+}
+
+func (e *Enforcer) SelfRemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
+	return e.removeFilteredPolicyWithoutNotify(sec, ptype, fieldIndex, fieldValues)
+}
+
+func (e *Enforcer) SelfUpdatePolicy(sec string, ptype string, oldRule, newRule []string) (bool, error) {
+	return e.updatePolicyWithoutNotify(sec, ptype, oldRule, newRule)
+}
+
+func (e *Enforcer) SelfUpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) (bool, error) {
+	return e.updatePoliciesWithoutNotify(sec, ptype, oldRules, newRules)
 }
