@@ -431,7 +431,7 @@ func (e *Enforcer) SelfRemovePolicy(sec string, ptype string, rule []string) (bo
 	return e.removePolicyWithoutNotify(sec, ptype, rule)
 }
 
-func (e *Enforcer) SelfSelfRemovePolicies(sec string, ptype string, rules [][]string) (bool, error) {
+func (e *Enforcer) SelfRemovePolicies(sec string, ptype string, rules [][]string) (bool, error) {
 	return e.removePoliciesWithoutNotify(sec, ptype, rules)
 }
 
