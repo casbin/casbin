@@ -141,7 +141,7 @@ type IEnforcer interface {
 	SelfAddPolicy(sec string, ptype string, rule []string) (bool, error)
 	SelfAddPolicies(sec string, ptype string, rules [][]string) (bool, error)
 	SelfRemovePolicy(sec string, ptype string, rule []string) (bool, error)
-	SelfSelfRemovePolicies(sec string, ptype string, rules [][]string) (bool, error)
+	SelfRemovePolicies(sec string, ptype string, rules [][]string) (bool, error)
 	SelfRemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error)
 	SelfUpdatePolicy(sec string, ptype string, oldRule, newRule []string) (bool, error)
 	SelfUpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) (bool, error)
