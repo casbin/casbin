@@ -269,7 +269,7 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 		}
 		// For compatibility, because some adapters return oldRules containing ptype, see https://github.com/casbin/xorm-adapter/issues/49
 		for i, oldRule := range oldRules {
-			if len(oldRules[i]) == len(newRules[i])+1 {
+			if len(oldRules[i]) == len(e.model[sec][ptype].Tokens)+1 {
 				oldRules[i] = oldRule[1:]
 			}
 		}
