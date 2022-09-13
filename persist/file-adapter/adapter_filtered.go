@@ -77,7 +77,7 @@ func (a *FilteredAdapter) LoadFilteredPolicy(model model.Model, filter interface
 	return err
 }
 
-func (a *FilteredAdapter) loadFilteredPolicyFile(model model.Model, filter *Filter, handler func(string, model.Model)) error {
+func (a *FilteredAdapter) loadFilteredPolicyFile(model model.Model, filter *Filter, handler func(string, model.Model) error) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
@@ -92,7 +92,10 @@ func (a *FilteredAdapter) loadFilteredPolicyFile(model model.Model, filter *Filt
 			continue
 		}
 
-		handler(line, model)
+		err = handler(line, model)
+		if err != nil {
+			return err
+		}
 	}
 	return scanner.Err()
 }
