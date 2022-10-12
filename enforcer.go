@@ -353,6 +353,10 @@ func (e *Enforcer) loadFilteredPolicy(filter interface{}) error {
 		return err
 	}
 
+	if err := e.model.SortPoliciesBySubjectHierarchy(); err != nil {
+		return err
+	}
+
 	if err := e.model.SortPoliciesByPriority(); err != nil {
 		return err
 	}

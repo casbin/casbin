@@ -531,6 +531,25 @@ func TestSubjectPriorityWithDomain(t *testing.T) {
 	})
 }
 
+func TestSubjectPriorityInFilter(t *testing.T) {
+	e, _ := NewEnforcer()
+
+	adapter := fileadapter.NewFilteredAdapter("examples/subject_priority_policy_with_domain.csv")
+	_ = e.InitWithAdapter("examples/subject_priority_model_with_domain.conf", adapter)
+	if err := e.loadFilteredPolicy(&fileadapter.Filter{
+		P: []string{"", "", "domain1"},
+	}); err != nil {
+		t.Errorf("unexpected error in LoadFilteredPolicy: %v", err)
+	}
+
+	testBatchEnforce(t, e, [][]interface{}{
+		{"alice", "data1", "domain1", "write"},
+		{"admin", "data1", "domain1", "write"},
+	}, []bool{
+		true, false,
+	})
+}
+
 func TestMultiplePolicyDefinitions(t *testing.T) {
 	e, _ := NewEnforcer("examples/multiple_policy_definitions_model.conf", "examples/multiple_policy_definitions_policy.csv")
 	enforceContext := NewEnforceContext("2")
