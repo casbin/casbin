@@ -446,3 +446,31 @@ func (e *Enforcer) SelfUpdatePolicy(sec string, ptype string, oldRule, newRule [
 func (e *Enforcer) SelfUpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) (bool, error) {
 	return e.updatePoliciesWithoutNotify(sec, ptype, oldRules, newRules)
 }
+
+func (e *Enforcer) AddReplicaPolicy(sec string, ptype string, rule []string) (bool, error) {
+	return e.addPolicyWithoutNotifyAndPersist(sec, ptype, rule)
+}
+
+func (e *Enforcer) AddReplicaPolicies(sec string, ptype string, rules [][]string) (bool, error) {
+	return e.addPoliciesWithoutNotifyAndPersist(sec, ptype, rules)
+}
+
+func (e *Enforcer) RemoveReplicaPolicy(sec string, ptype string, rule []string) (bool, error) {
+	return e.removePolicyWithoutNotifyAndPersist(sec, ptype, rule)
+}
+
+func (e *Enforcer) RemoveReplicaPolicies(sec string, ptype string, rules [][]string) (bool, error) {
+	return e.removePoliciesWithoutNotifyAndPersist(sec, ptype, rules)
+}
+
+func (e *Enforcer) RemoveReplicaFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
+	return e.removeFilteredPolicyWithoutNotifyAndPersist(sec, ptype, fieldIndex, fieldValues)
+}
+
+func (e *Enforcer) UpdateReplicaPolicy(sec string, ptype string, oldRule, newRule []string) (bool, error) {
+	return e.updatePolicyWithoutNotifyAndPersist(sec, ptype, oldRule, newRule)
+}
+
+func (e *Enforcer) UpdateReplicaPolicies(sec string, ptype string, oldRules, newRules [][]string) (bool, error) {
+	return e.updatePoliciesWithoutNotifyAndPersist(sec, ptype, oldRules, newRules)
+}

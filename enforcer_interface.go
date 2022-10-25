@@ -145,6 +145,15 @@ type IEnforcer interface {
 	SelfRemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error)
 	SelfUpdatePolicy(sec string, ptype string, oldRule, newRule []string) (bool, error)
 	SelfUpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) (bool, error)
+
+	/* Management API with autoNotifyWatcher and persist disabled for replica node in distributed system*/
+	AddReplicaPolicy(sec string, ptype string, rule []string) (bool, error)
+	AddReplicaPolicies(sec string, ptype string, rules [][]string) (bool, error)
+	RemoveReplicaPolicy(sec string, ptype string, rule []string) (bool, error)
+	RemoveReplicaPolicies(sec string, ptype string, rules [][]string) (bool, error)
+	RemoveReplicaFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error)
+	UpdateReplicaPolicy(sec string, ptype string, oldRule, newRule []string) (bool, error)
+	UpdateReplicaPolicies(sec string, ptype string, oldRules, newRules [][]string) (bool, error)
 }
 
 var _ IDistributedEnforcer = &DistributedEnforcer{}

@@ -459,6 +459,172 @@ func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][
 	return true, nil
 }
 
+// addPolicy adds a rule to the current policy.
+func (e *Enforcer) addPolicyWithoutNotifyAndPersist(sec string, ptype string, rule []string) (bool, error) {
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.AddPolicies(sec, ptype, [][]string{rule})
+	}
+
+	if e.model.HasPolicy(sec, ptype, rule) {
+		return false, nil
+	}
+
+	e.model.AddPolicy(sec, ptype, rule)
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{rule})
+		if err != nil {
+			return true, err
+		}
+	}
+
+	return true, nil
+}
+
+// addPolicies adds rules to the current policy.
+func (e *Enforcer) addPoliciesWithoutNotifyAndPersist(sec string, ptype string, rules [][]string) (bool, error) {
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
+	}
+
+	if e.model.HasPolicies(sec, ptype, rules) {
+		return false, nil
+	}
+
+	e.model.AddPolicies(sec, ptype, rules)
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
+		if err != nil {
+			return true, err
+		}
+	}
+
+	return true, nil
+}
+
+// removePolicy removes a rule from the current policy.
+func (e *Enforcer) removePolicyWithoutNotifyAndPersist(sec string, ptype string, rule []string) (bool, error) {
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.RemovePolicies(sec, ptype, [][]string{rule})
+	}
+
+	ruleRemoved := e.model.RemovePolicy(sec, ptype, rule)
+	if !ruleRemoved {
+		return ruleRemoved, nil
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{rule})
+		if err != nil {
+			return ruleRemoved, err
+		}
+	}
+
+	return ruleRemoved, nil
+}
+
+func (e *Enforcer) updatePolicyWithoutNotifyAndPersist(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.UpdatePolicy(sec, ptype, oldRule, newRule)
+	}
+
+	ruleUpdated := e.model.UpdatePolicy(sec, ptype, oldRule, newRule)
+	if !ruleUpdated {
+		return ruleUpdated, nil
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{oldRule}) // remove the old rule
+		if err != nil {
+			return ruleUpdated, err
+		}
+		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{newRule}) // add the new rule
+		if err != nil {
+			return ruleUpdated, err
+		}
+	}
+
+	return ruleUpdated, nil
+}
+
+func (e *Enforcer) updatePoliciesWithoutNotifyAndPersist(sec string, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
+	if len(newRules) != len(oldRules) {
+		return false, fmt.Errorf("the length of oldRules should be equal to the length of newRules, but got the length of oldRules is %d, the length of newRules is %d", len(oldRules), len(newRules))
+	}
+
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.UpdatePolicies(sec, ptype, oldRules, newRules)
+	}
+
+	ruleUpdated := e.model.UpdatePolicies(sec, ptype, oldRules, newRules)
+	if !ruleUpdated {
+		return ruleUpdated, nil
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, oldRules) // remove the old rules
+		if err != nil {
+			return ruleUpdated, err
+		}
+		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, newRules) // add the new rules
+		if err != nil {
+			return ruleUpdated, err
+		}
+	}
+
+	return ruleUpdated, nil
+}
+
+// removePolicies removes rules from the current policy.
+func (e *Enforcer) removePoliciesWithoutNotifyAndPersist(sec string, ptype string, rules [][]string) (bool, error) {
+	if !e.model.HasPolicies(sec, ptype, rules) {
+		return false, nil
+	}
+
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.RemovePolicies(sec, ptype, rules)
+	}
+
+	rulesRemoved := e.model.RemovePolicies(sec, ptype, rules)
+	if !rulesRemoved {
+		return rulesRemoved, nil
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, rules)
+		if err != nil {
+			return rulesRemoved, err
+		}
+	}
+	return rulesRemoved, nil
+}
+
+// removeFilteredPolicy removes rules based on field filters from the current policy.
+func (e *Enforcer) removeFilteredPolicyWithoutNotifyAndPersist(sec string, ptype string, fieldIndex int, fieldValues []string) (bool, error) {
+	if len(fieldValues) == 0 {
+		return false, Err.INVALID_FIELDVAULES_PARAMETER
+	}
+
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	}
+
+	ruleRemoved, effects := e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	if !ruleRemoved {
+		return ruleRemoved, nil
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effects)
+		if err != nil {
+			return ruleRemoved, err
+		}
+	}
+
+	return ruleRemoved, nil
+}
+
 func (e *Enforcer) GetFieldIndex(ptype string, field string) (int, error) {
 	return e.model.GetFieldIndex(ptype, field)
 }
