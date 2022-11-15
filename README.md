@@ -270,6 +270,10 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/casbin/sponsor/8/website" target="_blank"><img src="https://opencollective.com/casbin/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/casbin/sponsor/9/website" target="_blank"><img src="https://opencollective.com/casbin/sponsor/9/avatar.svg"></a>
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=casbin/casbin&type=Date)](https://star-history.com/#casbin/casbin&Date)
+
 ## License
 
 This project is licensed under the [Apache 2.0 license](LICENSE).
