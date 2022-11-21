@@ -16,11 +16,9 @@ package model
 
 import (
 	"errors"
-	"strings"
-	"sync"
-
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
+	"strings"
 )
 
 // Assertion represents an expression in a section of the model.
@@ -33,7 +31,6 @@ type Assertion struct {
 	PolicyMap     map[string]int
 	RM            rbac.RoleManager
 	FieldIndexMap map[string]int
-	m             sync.RWMutex
 
 	logger log.Logger
 }
