@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"runtime/debug"
 	"strings"
+	"sync"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effector"
@@ -298,8 +299,12 @@ func (e *Enforcer) ClearPolicy() {
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
 	needToRebuild := false
+	var mux sync.Mutex
+
+	mux.Lock()
 	newModel := e.model.Copy()
 	newModel.ClearPolicy()
+	mux.Unlock()
 
 	var err error
 	defer func() {
