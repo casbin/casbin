@@ -118,7 +118,7 @@ Further more, if you are using ABAC,  you can try operator `in` like following i
 m = r.obj == p.obj && r.act == p.act || r.obj in ('data2', 'data3')
 ```
 
-But you **SHOULD** make sure that the length of the array is **MORE** than **1**, otherwise there will cause it to panic.
+But you **SHOULD** make sure that the length of the array is **GREATER** than **1**, otherwise it will panic.
 
 For more operators, you may take a look at [govaluate](https://github.com/Knetic/govaluate)
 
