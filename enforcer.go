@@ -297,9 +297,8 @@ func (e *Enforcer) ClearPolicy() {
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
 	needToRebuild := false
-
 	newModel := e.model.Copy()
-	//newModel.ClearPolicy()
+	newModel.ClearPolicy()
 
 	var err error
 	defer func() {

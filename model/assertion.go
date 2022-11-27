@@ -94,17 +94,6 @@ func (ast *Assertion) setLogger(logger log.Logger) {
 
 func (ast *Assertion) copy() *Assertion {
 	tokens := append([]string(nil), ast.Tokens...)
-	if ast.Key == "p" || ast.Key == "g" {
-		newAst := &Assertion{
-			Key:           ast.Key,
-			Value:         ast.Value,
-			PolicyMap:     map[string]int{},
-			Tokens:        tokens,
-			Policy:        nil,
-			FieldIndexMap: ast.FieldIndexMap,
-		}
-		return newAst
-	}
 	policy := make([][]string, len(ast.Policy))
 
 	for i, p := range ast.Policy {
