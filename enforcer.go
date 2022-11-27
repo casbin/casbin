@@ -741,18 +741,18 @@ func (e *Enforcer) BatchEnforceWithMatcher(matcher string, requests [][]interfac
 }
 
 // AddNamedMatchingFunc add MatchingFunc by ptype RoleManager
-func (e *Enforcer) AddNamedMatchingFunc(ptype, name string, fn defaultrolemanager.MatchingFunc) bool {
+func (e *Enforcer) AddNamedMatchingFunc(ptype, name string, fn rbac.MatchingFunc) bool {
 	if rm, ok := e.rmMap[ptype]; ok {
-		rm.(*defaultrolemanager.RoleManager).AddMatchingFunc(name, fn)
+		rm.AddMatchingFunc(name, fn)
 		return true
 	}
 	return false
 }
 
 // AddNamedDomainMatchingFunc add MatchingFunc by ptype to RoleManager
-func (e *Enforcer) AddNamedDomainMatchingFunc(ptype, name string, fn defaultrolemanager.MatchingFunc) bool {
+func (e *Enforcer) AddNamedDomainMatchingFunc(ptype, name string, fn rbac.MatchingFunc) bool {
 	if rm, ok := e.rmMap[ptype]; ok {
-		rm.(*defaultrolemanager.RoleManager).AddDomainMatchingFunc(name, fn)
+		rm.AddDomainMatchingFunc(name, fn)
 		return true
 	}
 	return false

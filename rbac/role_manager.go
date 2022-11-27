@@ -16,9 +16,10 @@ package rbac
 
 import (
 	"context"
-
 	"github.com/casbin/casbin/v2/log"
 )
+
+type MatchingFunc func(arg1 string, arg2 string) bool
 
 // RoleManager provides interface to define the operations for managing roles.
 type RoleManager interface {
@@ -49,6 +50,12 @@ type RoleManager interface {
 	PrintRoles() error
 	// SetLogger sets role manager's logger.
 	SetLogger(logger log.Logger)
+	//Match support domain matching when getting permissions
+	Match(str string, pattern string) bool
+	// AddMatchingFunc support use pattern in g
+	AddMatchingFunc(name string, fn MatchingFunc)
+	// AddDomainMatchingFunc support use domain pattern in g
+	AddDomainMatchingFunc(name string, fn MatchingFunc)
 }
 
 // RoleManagerWithContext provides a context-aware interface to define the operations for managing roles.
