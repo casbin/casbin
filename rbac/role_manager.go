@@ -49,6 +49,8 @@ type RoleManager interface {
 	PrintRoles() error
 	// SetLogger sets role manager's logger.
 	SetLogger(logger log.Logger)
+	//Match support domain matching when getting permissions
+	Match(str string, pattern string) bool
 }
 
 // RoleManagerWithContext provides a context-aware interface to define the operations for managing roles.

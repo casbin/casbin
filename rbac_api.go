@@ -17,7 +17,6 @@ package casbin
 import (
 	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/errors"
-	"github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -308,7 +307,7 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string,
 			return nil, errors.ERR_DOMAIN_PARAMETER
 		} else {
 			d := domain[0]
-			matched := rm.(*defaultrolemanager.RoleManager).Match(d, rule[domainIndex])
+			matched := rm.Match(d, rule[domainIndex])
 			if !matched {
 				continue
 			}
