@@ -17,9 +17,6 @@ package casbin
 import (
 	"errors"
 	"fmt"
-	"runtime/debug"
-	"strings"
-
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effector"
 	"github.com/casbin/casbin/v2/log"
@@ -29,6 +26,8 @@ import (
 	"github.com/casbin/casbin/v2/rbac"
 	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
+	"runtime/debug"
+	"strings"
 )
 
 // Enforcer is the main interface for authorization enforcement and policy management.
@@ -298,8 +297,9 @@ func (e *Enforcer) ClearPolicy() {
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
 	needToRebuild := false
+
 	newModel := e.model.Copy()
-	newModel.ClearPolicy()
+	//newModel.ClearPolicy()
 
 	var err error
 	defer func() {
