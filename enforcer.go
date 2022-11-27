@@ -741,6 +741,7 @@ func (e *Enforcer) BatchEnforceWithMatcher(matcher string, requests [][]interfac
 }
 
 // AddNamedMatchingFunc add MatchingFunc by ptype RoleManager
+// Deprecated: AddNamedMatchingFunc will be removed with next major release, use SetNamedPatternFuncsForRoles instead
 func (e *Enforcer) AddNamedMatchingFunc(ptype, name string, fn defaultrolemanager.MatchingFunc) bool {
 	if rm, ok := e.rmMap[ptype]; ok {
 		rm.(*defaultrolemanager.RoleManager).AddMatchingFunc(name, fn)
@@ -749,10 +750,29 @@ func (e *Enforcer) AddNamedMatchingFunc(ptype, name string, fn defaultrolemanage
 	return false
 }
 
+// SetNamedPatternFuncsForRoles set pattern functions of RoleManager specified by ptype
+func (e *Enforcer) SetNamedPatternFuncsForRoles(ptype string, patternFuncs defaultrolemanager.IPatternFuncs) bool {
+	if rm, ok := e.rmMap[ptype]; ok {
+		rm.(*defaultrolemanager.RoleManager).SetPatternFuncsForRoles(patternFuncs)
+		return true
+	}
+	return false
+}
+
 // AddNamedDomainMatchingFunc add MatchingFunc by ptype to RoleManager
+// Deprecated: AddNamedDomainMatchingFunc will be removed with next major release, use SetNamedPatternFuncsForDomains instead
 func (e *Enforcer) AddNamedDomainMatchingFunc(ptype, name string, fn defaultrolemanager.MatchingFunc) bool {
 	if rm, ok := e.rmMap[ptype]; ok {
 		rm.(*defaultrolemanager.RoleManager).AddDomainMatchingFunc(name, fn)
+		return true
+	}
+	return false
+}
+
+// SetNamedPatternFuncsForDomains set pattern functions of RoleManager specified by ptype
+func (e *Enforcer) SetNamedPatternFuncsForDomains(ptype string, patternFuncs defaultrolemanager.IPatternFuncs) bool {
+	if rm, ok := e.rmMap[ptype]; ok {
+		rm.(*defaultrolemanager.RoleManager).SetPatternFuncsForDomains(patternFuncs)
 		return true
 	}
 	return false
