@@ -366,10 +366,9 @@ func (rm *testCustomRoleManager) GetAllDomains() ([]string, error) {
 func (rm *testCustomRoleManager) PrintRoles() error           { return nil }
 func (rm *testCustomRoleManager) SetLogger(logger log.Logger) {}
 
-func (rm *testCustomRoleManager) Match(str string, pattern string) bool             { return true }
-func (rm *testCustomRoleManager) AddMatchingFunc(name string, fn rbac.MatchingFunc) {}
-func (rm *testCustomRoleManager) AddDomainMatchingFunc(name string, fn rbac.MatchingFunc) {
-}
+func (rm *testCustomRoleManager) Match(str string, pattern string) bool                   { return true }
+func (rm *testCustomRoleManager) AddMatchingFunc(name string, fn rbac.MatchingFunc)       {}
+func (rm *testCustomRoleManager) AddDomainMatchingFunc(name string, fn rbac.MatchingFunc) {}
 
 func TestRBACModelWithCustomRoleManager(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
