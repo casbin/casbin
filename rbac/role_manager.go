@@ -51,11 +51,11 @@ type RoleManager interface {
 	PrintRoles() error
 	// SetLogger sets role manager's logger.
 	SetLogger(logger log.Logger)
-	//Match support domain matching when getting permissions
+	// Match matches the domain with the pattern
 	Match(str string, pattern string) bool
-	// AddMatchingFunc support use pattern in g
+	// AddMatchingFunc adds the matching function
 	AddMatchingFunc(name string, fn MatchingFunc)
-	// AddDomainMatchingFunc support use domain pattern in g
+	// AddDomainMatchingFunc adds the domain matching function
 	AddDomainMatchingFunc(name string, fn MatchingFunc)
 }
 
