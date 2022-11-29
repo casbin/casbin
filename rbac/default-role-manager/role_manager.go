@@ -21,12 +21,11 @@ import (
 
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/log"
+	"github.com/casbin/casbin/v2/rbac"
 	"github.com/casbin/casbin/v2/util"
 )
 
 const defaultDomain string = ""
-
-type MatchingFunc func(arg1 string, arg2 string) bool
 
 // Role represents the data structure for a role in RBAC.
 type Role struct {
@@ -168,8 +167,8 @@ func (r *Role) getUsers() []string {
 type RoleManagerImpl struct {
 	allRoles           *sync.Map
 	maxHierarchyLevel  int
-	matchingFunc       MatchingFunc
-	domainMatchingFunc MatchingFunc
+	matchingFunc       rbac.MatchingFunc
+	domainMatchingFunc rbac.MatchingFunc
 	logger             log.Logger
 	matchingFuncCache  *util.SyncLRUCache
 }
@@ -185,7 +184,7 @@ func NewRoleManagerImpl(maxHierarchyLevel int) *RoleManagerImpl {
 }
 
 // use this constructor to avoid rebuild of AddMatchingFunc
-func newRoleManagerWithMatchingFunc(maxHierarchyLevel int, fn MatchingFunc) *RoleManagerImpl {
+func newRoleManagerWithMatchingFunc(maxHierarchyLevel int, fn rbac.MatchingFunc) *RoleManagerImpl {
 	rm := NewRoleManagerImpl(maxHierarchyLevel)
 	rm.matchingFunc = fn
 	return rm
@@ -276,13 +275,13 @@ func (rm *RoleManagerImpl) removeRole(name string) {
 }
 
 // AddMatchingFunc support use pattern in g
-func (rm *RoleManagerImpl) AddMatchingFunc(name string, fn MatchingFunc) {
+func (rm *RoleManagerImpl) AddMatchingFunc(name string, fn rbac.MatchingFunc) {
 	rm.matchingFunc = fn
 	rm.rebuild()
 }
 
 // AddDomainMatchingFunc support use domain pattern in g
-func (rm *RoleManagerImpl) AddDomainMatchingFunc(name string, fn MatchingFunc) {
+func (rm *RoleManagerImpl) AddDomainMatchingFunc(name string, fn rbac.MatchingFunc) {
 	rm.domainMatchingFunc = fn
 }
 
@@ -439,8 +438,8 @@ func (rm *RoleManagerImpl) BuildRelationship(name1 string, name2 string, domain 
 type DomainManager struct {
 	rmMap              *sync.Map
 	maxHierarchyLevel  int
-	matchingFunc       MatchingFunc
-	domainMatchingFunc MatchingFunc
+	matchingFunc       rbac.MatchingFunc
+	domainMatchingFunc rbac.MatchingFunc
 	logger             log.Logger
 	matchingFuncCache  *util.SyncLRUCache
 }
@@ -460,7 +459,7 @@ func (dm *DomainManager) SetLogger(logger log.Logger) {
 }
 
 // AddMatchingFunc support use pattern in g
-func (dm *DomainManager) AddMatchingFunc(name string, fn MatchingFunc) {
+func (dm *DomainManager) AddMatchingFunc(name string, fn rbac.MatchingFunc) {
 	dm.matchingFunc = fn
 	dm.rmMap.Range(func(key, value interface{}) bool {
 		value.(*RoleManagerImpl).AddMatchingFunc(name, fn)
@@ -469,7 +468,7 @@ func (dm *DomainManager) AddMatchingFunc(name string, fn MatchingFunc) {
 }
 
 // AddDomainMatchingFunc support use domain pattern in g
-func (dm *DomainManager) AddDomainMatchingFunc(name string, fn MatchingFunc) {
+func (dm *DomainManager) AddDomainMatchingFunc(name string, fn rbac.MatchingFunc) {
 	dm.domainMatchingFunc = fn
 	dm.rmMap.Range(func(key, value interface{}) bool {
 		value.(*RoleManagerImpl).AddDomainMatchingFunc(name, fn)

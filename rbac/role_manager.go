@@ -20,6 +20,8 @@ import (
 	"github.com/casbin/casbin/v2/log"
 )
 
+type MatchingFunc func(arg1 string, arg2 string) bool
+
 // RoleManager provides interface to define the operations for managing roles.
 type RoleManager interface {
 	// Clear clears all stored data and resets the role manager to the initial state.
@@ -49,6 +51,12 @@ type RoleManager interface {
 	PrintRoles() error
 	// SetLogger sets role manager's logger.
 	SetLogger(logger log.Logger)
+	// Match matches the domain with the pattern
+	Match(str string, pattern string) bool
+	// AddMatchingFunc adds the matching function
+	AddMatchingFunc(name string, fn MatchingFunc)
+	// AddDomainMatchingFunc adds the domain matching function
+	AddDomainMatchingFunc(name string, fn MatchingFunc)
 }
 
 // RoleManagerWithContext provides a context-aware interface to define the operations for managing roles.
