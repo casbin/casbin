@@ -16,6 +16,7 @@ package rbac
 
 import (
 	"context"
+
 	"github.com/casbin/casbin/v2/log"
 )
 
