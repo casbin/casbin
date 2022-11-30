@@ -6,10 +6,9 @@ This project adheres to the [Contributor Covenant 1.2.](https://www.contributor-
 
 ## Questions
 
-* We do our best to have an [up-to-date documentation](https://casbin.org/docs/en/overview)
-* [Stack Overflow](https://stackoverflow.com) is the best place to start if you have a question. Please use the [casbin tag](https://stackoverflow.com/tags/casbin/info) we are actively monitoring. We encourage you to use Stack Overflow specially for Modeling Access Control Problems, in order to build a shared knowledge base.
-* You can also join our [Gitter community](https://gitter.im/casbin/Lobby).
-
+- We do our best to have an [up-to-date documentation](https://casbin.org/docs/overview)
+- [Stack Overflow](https://stackoverflow.com) is the best place to start if you have a question. Please use the [casbin tag](https://stackoverflow.com/tags/casbin/info) we are actively monitoring. We encourage you to use Stack Overflow specially for Modeling Access Control Problems, in order to build a shared knowledge base.
+- You can also join our [Gitter community](https://gitter.im/casbin/Lobby).
 
 ## Reporting issues
 
@@ -26,7 +25,6 @@ What are the steps to reproduce the issue?
 In what environment did you encounter the issue?
 
 Feature requests can also be submitted as issues.
-
 
 ## Pull requests
 
