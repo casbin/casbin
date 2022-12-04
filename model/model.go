@@ -24,7 +24,9 @@ import (
 	"strings"
 
 	"github.com/casbin/casbin/v2/config"
-	"github.com/casbin/casbin/v2/constant"
+	consts "github.com/casbin/casbin/v2/constant"
+	fieldIndexKey "github.com/casbin/casbin/v2/constant/fieldIndex"
+	"github.com/casbin/casbin/v2/constant/policyEffect"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/util"
 )
@@ -34,9 +36,6 @@ type Model map[string]AssertionMap
 
 // AssertionMap is the collection of assertions, can be "r", "p", "g", "e", "m".
 type AssertionMap map[string]*Assertion
-
-const defaultDomain string = ""
-const defaultSeparator = "::"
 
 var sectionNameMap = map[string]string{
 	"r": "request_definition",
@@ -219,27 +218,29 @@ func (model Model) PrintModel() {
 }
 
 func (model Model) SortPoliciesBySubjectHierarchy() error {
-	if model["e"]["e"].Value != constant.SubjectPriorityEffect {
+	effect := model["e"]["e"].Value
+	if effect != policyEffect.SubjectPriority && effect != policyEffect.SubjectPriorityAllowOverride && effect != policyEffect.SubjectPriorityDenyOverride {
 		return nil
 	}
 	subIndex := 0
 	for ptype, assertion := range model["p"] {
-		domainIndex, err := model.GetFieldIndex(ptype, constant.DomainIndex)
+		domainIndex, err := model.GetFieldIndex(ptype, fieldIndexKey.Domain)
 		if err != nil {
 			domainIndex = -1
 		}
 		policies := assertion.Policy
 		subjectHierarchyMap, err := getSubjectHierarchyMap(model["g"]["g"].Policy)
+		model["g"]["g"].SubjectHierarchyMap = subjectHierarchyMap
 		if err != nil {
 			return err
 		}
 		sort.SliceStable(policies, func(i, j int) bool {
-			domain1, domain2 := defaultDomain, defaultDomain
+			domain1, domain2 := consts.DefaultDomain, consts.DefaultDomain
 			if domainIndex != -1 {
 				domain1 = policies[i][domainIndex]
 				domain2 = policies[j][domainIndex]
 			}
-			name1, name2 := getNameWithDomain(domain1, policies[i][subIndex]), getNameWithDomain(domain2, policies[j][subIndex])
+			name1, name2 := util.GetNameWithDomain(domain1, policies[i][subIndex]), util.GetNameWithDomain(domain2, policies[j][subIndex])
 			p1 := subjectHierarchyMap[name1]
 			p2 := subjectHierarchyMap[name2]
 			return p1 > p2
@@ -259,12 +260,12 @@ func getSubjectHierarchyMap(policies [][]string) (map[string]int, error) {
 		if len(policy) < 2 {
 			return nil, errors.New("policy g expect 2 more params")
 		}
-		domain := defaultDomain
+		domain := consts.DefaultDomain
 		if len(policy) != 2 {
 			domain = policy[2]
 		}
-		child := getNameWithDomain(domain, policy[0])
-		parent := getNameWithDomain(domain, policy[1])
+		child := util.GetNameWithDomain(domain, policy[0])
+		parent := util.GetNameWithDomain(domain, policy[1])
 		policyMap[parent] = append(policyMap[parent], child)
 		if _, ok := subjectHierarchyMap[child]; !ok {
 			subjectHierarchyMap[child] = 0
@@ -302,13 +303,9 @@ func getSubjectHierarchyMap(policies [][]string) (map[string]int, error) {
 	return subjectHierarchyMap, nil
 }
 
-func getNameWithDomain(domain string, name string) string {
-	return domain + defaultSeparator + name
-}
-
 func (model Model) SortPoliciesByPriority() error {
 	for ptype, assertion := range model["p"] {
-		priorityIndex, err := model.GetFieldIndex(ptype, constant.PriorityIndex)
+		priorityIndex, err := model.GetFieldIndex(ptype, fieldIndexKey.Priority)
 		if err != nil {
 			continue
 		}
@@ -387,11 +384,18 @@ func (model Model) Copy() Model {
 
 func (model Model) GetFieldIndex(ptype string, field string) (int, error) {
 	assertion := model["p"][ptype]
-	if index, ok := assertion.FieldIndexMap[field]; ok {
-		return index, nil
+	index := -1
+	if assertion == nil {
+		return -1, fmt.Errorf("ptype error, ptype:%s", ptype)
+	}
+	if v, ok := assertion.FieldIndexMap[field]; ok && v != -1 {
+		return v, nil
+	}
+	err := fmt.Errorf("%s index is not set, please use enforcer.SetFieldIndex(%s, fieldIndexKey.%s, index) to set the index, see https://github.com/casbin/casbin/pull/1041", field, ptype, field)
+	if assertion.FieldIndexMap[field] == -1 {
+		return -1, err
 	}
 	pattern := fmt.Sprintf("%s_"+field, ptype)
-	index := -1
 	for i, token := range assertion.Tokens {
 		if token == pattern {
 			index = i
@@ -399,7 +403,8 @@ func (model Model) GetFieldIndex(ptype string, field string) (int, error) {
 		}
 	}
 	if index == -1 {
-		return index, fmt.Errorf(field + " index is not set, please use enforcer.SetFieldIndex() to set index")
+		assertion.FieldIndexMap[field] = index
+		return -1, err
 	}
 	assertion.FieldIndexMap[field] = index
 	return index, nil

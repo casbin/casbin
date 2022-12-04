@@ -19,6 +19,8 @@ import (
 	"sort"
 	"strings"
 	"sync"
+
+	consts "github.com/casbin/casbin/v2/constant"
 )
 
 var evalReg = regexp.MustCompile(`\beval\((?P<rule>[^)]*)\)`)
@@ -332,4 +334,8 @@ func (cache *SyncLRUCache) Put(key interface{}, value interface{}) {
 	cache.rwm.Lock()
 	defer cache.rwm.Unlock()
 	cache.LRUCache.Put(key, value)
+}
+
+func GetNameWithDomain(domain string, name string) string {
+	return domain + consts.DefaultSeparator + name
 }

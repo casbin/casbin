@@ -17,7 +17,7 @@ package effector
 import (
 	"errors"
 
-	"github.com/casbin/casbin/v2/constant"
+	"github.com/casbin/casbin/v2/constant/policyEffect"
 )
 
 // DefaultEffector is default effector for Casbin.
@@ -30,13 +30,85 @@ func NewDefaultEffector() *DefaultEffector {
 	return &e
 }
 
+func (e *DefaultEffector) TryEvaluate(expr string, effect Effect, match bool) (result Effect, isOver bool, isHit bool, err error) {
+	result = Indeterminate
+	isOver = false
+	isHit = false
+
+	switch expr {
+	case policyEffect.AllowOverride:
+		result = Deny
+		if match && effect == Allow {
+			result = Allow
+			isOver = true
+			isHit = true
+		}
+	case policyEffect.DenyOverride:
+		result = Allow
+		if match && effect == Deny {
+			result = Deny
+			isOver = true
+			isHit = true
+		}
+	case policyEffect.AllowAndDeny:
+		if !match {
+			break
+		}
+		if effect == Allow {
+			result = Allow
+			isHit = true
+		} else if effect == Deny {
+			result = Deny
+			isOver = true
+			isHit = true
+		}
+	case policyEffect.Priority, policyEffect.SubjectPriority:
+		if !match {
+			break
+		}
+		if effect == Allow || effect == Deny {
+			result = effect
+			isOver = true
+			isHit = true
+		}
+	case policyEffect.PriorityDenyOverride, policyEffect.SubjectPriorityDenyOverride:
+		if !match {
+			break
+		}
+		if effect == Allow {
+			result = Allow
+			isHit = true
+		} else if effect == Deny {
+			result = Deny
+			isOver = true
+			isHit = true
+		}
+	case policyEffect.PriorityAllowOverride, policyEffect.SubjectPriorityAllowOverride:
+		if !match {
+			break
+		}
+		if effect == Allow {
+			result = Allow
+			isOver = true
+			isHit = true
+		} else if effect == Deny {
+			result = Deny
+			isHit = true
+		}
+	default:
+		return Deny, false, false, errors.New("unsupported effect")
+	}
+
+	return result, isOver, isHit, nil
+}
+
 // MergeEffects merges all matching results collected by the enforcer into a single decision.
 func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []float64, policyIndex int, policyLength int) (Effect, int, error) {
 	result := Indeterminate
 	explainIndex := -1
 
 	switch expr {
-	case constant.AllowOverrideEffect:
+	case policyEffect.AllowOverride:
 		if matches[policyIndex] == 0 {
 			break
 		}
@@ -46,7 +118,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 			explainIndex = policyIndex
 			break
 		}
-	case constant.DenyOverrideEffect:
+	case policyEffect.DenyOverride:
 		// only check the current policyIndex
 		if matches[policyIndex] != 0 && effects[policyIndex] == Deny {
 			result = Deny
@@ -57,7 +129,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 		if policyIndex == policyLength-1 {
 			result = Allow
 		}
-	case constant.AllowAndDenyEffect:
+	case policyEffect.AllowAndDeny:
 		// short-circuit if matched deny rule
 		if matches[policyIndex] != 0 && effects[policyIndex] == Deny {
 			result = Deny
@@ -84,7 +156,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 				break
 			}
 		}
-	case constant.PriorityEffect, constant.SubjectPriorityEffect:
+	case policyEffect.Priority, policyEffect.SubjectPriority:
 		// reverse merge, short-circuit may be earlier
 		for i := len(effects) - 1; i >= 0; i-- {
 			if matches[i] == 0 {
