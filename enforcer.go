@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"runtime/debug"
 	"strings"
+	"sync"
 
 	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/effector"
@@ -42,6 +43,7 @@ type Enforcer struct {
 	watcher    persist.Watcher
 	dispatcher persist.Dispatcher
 	rmMap      map[string]rbac.RoleManager
+	matcherMap sync.Map
 
 	enabled              bool
 	autoSave             bool
@@ -198,6 +200,7 @@ func (e *Enforcer) initialize() {
 	e.rmMap = map[string]rbac.RoleManager{}
 	e.eft = effector.NewDefaultEffector()
 	e.watcher = nil
+	e.matcherMap = sync.Map{}
 
 	e.enabled = true
 	e.autoSave = true
@@ -472,6 +475,7 @@ func (e *Enforcer) BuildRoleLinks() error {
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
 func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, rules [][]string) error {
+	e.invalidateMatcherMap()
 	return e.model.BuildIncrementalRoleLinks(e.rmMap, op, "g", ptype, rules)
 }
 
@@ -483,6 +487,10 @@ func NewEnforceContext(suffix string) EnforceContext {
 		EType: "e" + suffix,
 		MType: "m" + suffix,
 	}
+}
+
+func (e *Enforcer) invalidateMatcherMap() {
+	e.matcherMap = sync.Map{}
 }
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
@@ -548,14 +556,12 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		pTokens: pTokens,
 	}
 
-	var expression *govaluate.EvaluableExpression
 	hasEval := util.HasEval(expString)
-
 	if hasEval {
 		functions["eval"] = generateEvalFunction(functions, &parameters)
 	}
-
-	expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+	var expression *govaluate.EvaluableExpression
+	expression, err = e.getAndStoreMatcherExpression(hasEval, expString, functions)
 	if err != nil {
 		return false, err
 	}
@@ -688,6 +694,23 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	e.logger.LogEnforce(expString, rvals, result, logExplains)
 
 	return result, nil
+}
+
+func (e *Enforcer) getAndStoreMatcherExpression(hasEval bool, expString string, functions map[string]govaluate.ExpressionFunction) (*govaluate.EvaluableExpression, error) {
+	var expression *govaluate.EvaluableExpression
+	var err error
+	var cachedExpression, isPresent = e.matcherMap.Load(expString)
+
+	if !hasEval && isPresent {
+		expression = cachedExpression.(*govaluate.EvaluableExpression)
+	} else {
+		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+		if err != nil {
+			return nil, err
+		}
+		e.matcherMap.Store(expString, expression)
+	}
+	return expression, nil
 }
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
