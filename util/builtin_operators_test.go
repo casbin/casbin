@@ -494,6 +494,35 @@ func TestKeyMatch5Func(t *testing.T) {
 	testKeyMatch5Func(t, false, "", "/parent/child/?status=1&type=2", "/parent/child")
 	testKeyMatch5Func(t, false, "", "/parent/child?status=1&type=2", "/parent/child/")
 
+	testKeyMatch5Func(t, true, "", "/foo", "/foo")
+	testKeyMatch5Func(t, true, "", "/foo", "/foo*")
+	testKeyMatch5Func(t, false, "", "/foo", "/foo/*")
+	testKeyMatch5Func(t, false, "", "/foo/bar", "/foo")
+	testKeyMatch5Func(t, false, "", "/foo/bar", "/foo*")
+	testKeyMatch5Func(t, true, "", "/foo/bar", "/foo/*")
+	testKeyMatch5Func(t, false, "", "/foobar", "/foo")
+	testKeyMatch5Func(t, false, "", "/foobar", "/foo*")
+	testKeyMatch5Func(t, false, "", "/foobar", "/foo/*")
+
+	testKeyMatch5Func(t, false, "", "/", "/{resource}")
+	testKeyMatch5Func(t, true, "", "/resource1", "/{resource}")
+	testKeyMatch5Func(t, false, "", "/myid", "/{id}/using/{resId}")
+	testKeyMatch5Func(t, true, "", "/myid/using/myresid", "/{id}/using/{resId}")
+
+	testKeyMatch5Func(t, false, "", "/proxy/myid", "/proxy/{id}/*")
+	testKeyMatch5Func(t, true, "", "/proxy/myid/", "/proxy/{id}/*")
+	testKeyMatch5Func(t, true, "", "/proxy/myid/res", "/proxy/{id}/*")
+	testKeyMatch5Func(t, true, "", "/proxy/myid/res/res2", "/proxy/{id}/*")
+	testKeyMatch5Func(t, true, "", "/proxy/myid/res/res2/res3", "/proxy/{id}/*")
+	testKeyMatch5Func(t, false, "", "/proxy/", "/proxy/{id}/*")
+
+	testKeyMatch5Func(t, false, "", "/proxy/myid?status=1&type=2", "/proxy/{id}/*")
+	testKeyMatch5Func(t, true, "", "/proxy/myid/", "/proxy/{id}/*")
+	testKeyMatch5Func(t, true, "", "/proxy/myid/res?status=1&type=2", "/proxy/{id}/*")
+	testKeyMatch5Func(t, true, "", "/proxy/myid/res/res2?status=1&type=2", "/proxy/{id}/*")
+	testKeyMatch5Func(t, true, "", "/proxy/myid/res/res2/res3?status=1&type=2", "/proxy/{id}/*")
+	testKeyMatch5Func(t, false, "", "/proxy/", "/proxy/{id}/*")
+
 }
 
 func TestIPMatchFunc(t *testing.T) {
