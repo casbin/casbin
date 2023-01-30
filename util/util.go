@@ -15,10 +15,13 @@
 package util
 
 import (
+	"github.com/k0kubun/pp/v3"
 	"regexp"
 	"sort"
 	"strings"
 	"sync"
+
+	_ "github.com/k0kubun/pp/v3"
 )
 
 var evalReg = regexp.MustCompile(`\beval\((?P<rule>[^)]*)\)`)
@@ -331,5 +334,13 @@ func (cache *SyncLRUCache) Get(key interface{}) (value interface{}, ok bool) {
 func (cache *SyncLRUCache) Put(key interface{}, value interface{}) {
 	cache.rwm.Lock()
 	defer cache.rwm.Unlock()
+
+	defer func() {
+		if err := recover(); err != nil {
+			pp.Println(cache.LRUCache)
+			panic(err)
+		}
+	}()
+
 	cache.LRUCache.Put(key, value)
 }
