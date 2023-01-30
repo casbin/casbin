@@ -1,2 +1,31 @@
 # Always validate the PR title AND all the commits
 titleAndCommits: true
+# Enable/disable creation of status checks
+enabled: <boolean> # default: true
+# Validate the PR title, and ignore all commit messages
+titleOnly: <boolean> # default: false
+# Validate all commit messages, and ignore the PR title
+commitsOnly: <boolean> # default: false
+# Validate the PR title and all commit messages
+titleAndCommits: <boolean> # default: false
+# If commitsOnly or titleAndCommits is set to true, then only a single commit needs to pass validation instead of every commit
+# If neither of those options are set to true then this option is ignored
+anyCommit: <boolean> # default: false
+# The values allowed for the "type" part of the PR title/commit message. e.g. for a PR title/commit message of "feat: add some stuff", the type would be "feat"
+types: # default: feat | fix | docs | style | refactor | perf | test | build | ci | chore | revert
+  - <string>
+  - <string>
+  - ...
+# The values allowed for the "scope" part of the PR title/commit message. e.g. for a PR title/commit message of "feat(awesome-feature): add some stuff", the type would be "awesome-feature"
+scopes: # default: any value
+  - <string>
+  - <string>
+  - ...
+# Allow merge commits (e.g. 'Merge branch "master" into fix/delete-all-tests')
+# If neither of commitsOnly or titleAndCommits is set to true then this option is ignored
+allowMergeCommits: <boolean> # default: false
+# Allow revert commits (e.g. 'Revert "fix: delete all tests"')
+# If neither of commitsOnly or titleAndCommits is set to true then this option is ignored
+allowRevertCommits: <boolean> # default: false
+# Allows a custom URL for the "Details" link (which appears next to the success/failure message from the app) to be specified
+targetUrl: <string> # default: https://github.com/Ezard/semantic-prs
