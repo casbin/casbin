@@ -17,6 +17,7 @@ package util
 import (
 	"github.com/k0kubun/pp/v3"
 	"regexp"
+	"runtime/debug"
 	"sort"
 	"strings"
 	"sync"
@@ -331,13 +332,22 @@ func (cache *SyncLRUCache) Get(key interface{}) (value interface{}, ok bool) {
 	return cache.LRUCache.Get(key)
 }
 
+func init() {
+	pp.BufferFoldThreshold = 1024 * 10
+}
+
 func (cache *SyncLRUCache) Put(key interface{}, value interface{}) {
 	cache.rwm.Lock()
 	defer cache.rwm.Unlock()
 
 	defer func() {
 		if err := recover(); err != nil {
-			pp.Println(cache.LRUCache)
+			pp.Println(cache.m)
+			pp.Println(key, value)
+			pp.Println(string(debug.Stack()))
+			pp.Println(cache.tail)
+			pp.Println(cache.head)
+			pp.Println(len(cache.m), cache.capacity)
 			panic(err)
 		}
 	}()
