@@ -119,7 +119,7 @@ func (e *SyncedEnforcer) ClearPolicy() {
 func (e *SyncedEnforcer) LoadPolicy() error {
 	e.m.Lock()
 	defer e.m.Unlock()
-	return e.Enforcer.LoadPolicy()
+	return e.Enforcer.Enforce()
 }
 
 // LoadPolicyFast is not blocked when adapter calls LoadPolicy.

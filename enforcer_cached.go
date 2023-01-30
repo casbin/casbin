@@ -93,7 +93,7 @@ func (e *CachedEnforcer) LoadPolicy() error {
 			return err
 		}
 	}
-	return e.Enforcer.LoadPolicy()
+	return e.Enforcer.Enforce()
 }
 
 func (e *CachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
