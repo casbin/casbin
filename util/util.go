@@ -274,6 +274,8 @@ func (cache *LRUCache) remove(n *node, listOnly bool) {
 	}
 
 	if n.prev == nil || n.next == nil {
+		pp.Println(cache.tail, fmt.Sprintf("%p", cache.tail.prev))
+		pp.Println(cache.head, fmt.Sprintf("%p", cache.head))
 		return
 	}
 
