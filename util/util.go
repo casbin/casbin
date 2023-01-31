@@ -15,9 +15,9 @@
 package util
 
 import (
+	"fmt"
 	"github.com/k0kubun/pp/v3"
 	"regexp"
-	"runtime/debug"
 	"sort"
 	"strings"
 	"sync"
@@ -272,6 +272,11 @@ func (cache *LRUCache) remove(n *node, listOnly bool) {
 	if !listOnly {
 		delete(cache.m, n.key)
 	}
+
+	if n.prev == nil || n.next == nil {
+		return
+	}
+
 	n.prev.next = n.next
 	n.next.prev = n.prev
 }
@@ -344,9 +349,8 @@ func (cache *SyncLRUCache) Put(key interface{}, value interface{}) {
 		if err := recover(); err != nil {
 			pp.Println(cache.m)
 			pp.Println(key, value)
-			pp.Println(string(debug.Stack()))
-			pp.Println(cache.tail)
-			pp.Println(cache.head)
+			pp.Println(cache.tail, fmt.Sprintf("%p", cache.tail.prev))
+			pp.Println(cache.head, fmt.Sprintf("%p", cache.head))
 			pp.Println(len(cache.m), cache.capacity)
 			panic(err)
 		}
