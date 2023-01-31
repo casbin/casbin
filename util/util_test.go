@@ -15,10 +15,7 @@
 package util
 
 import (
-	"math/rand"
-	"sync"
 	"testing"
-	"time"
 )
 
 func testEscapeAssertion(t *testing.T, s string, res string) {
@@ -225,23 +222,4 @@ func TestLRUCache(t *testing.T) {
 	testCachePut(t, cache, "four", 4)
 	testCacheGet(t, cache, "two", nil, false)
 	testCacheEqual(t, cache, []int{1, 3, 4})
-}
-
-func TestName(t *testing.T) {
-	cache := NewSyncLRUCache(100)
-	var wg sync.WaitGroup
-	for {
-		wg.Add(100)
-		for i := 0; i < 100; i++ {
-			go func() {
-				defer wg.Done()
-				var vv = rand.Int31n(1000)
-				if _, ok := cache.Get(vv); !ok {
-					cache.Put(vv, vv)
-				}
-			}()
-		}
-		wg.Wait()
-		time.Sleep(time.Millisecond * 10)
-	}
 }

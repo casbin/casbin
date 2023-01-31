@@ -15,13 +15,10 @@
 package util
 
 import (
-	"fmt"
 	"regexp"
 	"sort"
 	"strings"
 	"sync"
-
-	pp "github.com/k0kubun/pp/v3"
 )
 
 var evalReg = regexp.MustCompile(`\beval\((?P<rule>[^)]*)\)`)
@@ -255,8 +252,8 @@ func NewLRUCache(capacity int) *LRUCache {
 	cache.capacity = capacity
 	cache.m = map[interface{}]*node{}
 
-	head := &node{}
-	tail := &node{}
+	head := &node{key: "head", value: "head"}
+	tail := &node{key: "tail", value: "tail"}
 
 	head.next = tail
 	tail.prev = head
@@ -270,14 +267,6 @@ func NewLRUCache(capacity int) *LRUCache {
 func (cache *LRUCache) remove(n *node, listOnly bool) {
 	if !listOnly {
 		delete(cache.m, n.key)
-	}
-
-	if n.prev == nil || n.next == nil {
-		pp.Println(cache.tail, fmt.Sprintf("%p", cache.tail.prev))
-		pp.Println(cache.head, fmt.Sprintf("%p", cache.head))
-		pp.Println(len(cache.m), cache.capacity)
-		pp.Println(len(cache.m), cache.capacity)
-		return
 	}
 
 	n.prev.next = n.next
@@ -335,29 +324,13 @@ func NewSyncLRUCache(capacity int) *SyncLRUCache {
 }
 
 func (cache *SyncLRUCache) Get(key interface{}) (value interface{}, ok bool) {
-	cache.rwm.RLock()
-	defer cache.rwm.RUnlock()
+	cache.rwm.Lock()
+	defer cache.rwm.Lock()
 	return cache.LRUCache.Get(key)
-}
-
-func init() {
-	pp.BufferFoldThreshold = 1024 * 10
 }
 
 func (cache *SyncLRUCache) Put(key interface{}, value interface{}) {
 	cache.rwm.Lock()
 	defer cache.rwm.Unlock()
-
-	defer func() {
-		if err := recover(); err != nil {
-			pp.Println(cache.m)
-			pp.Println(key, value)
-			pp.Println(cache.tail, fmt.Sprintf("%p", cache.tail.prev))
-			pp.Println(cache.head, fmt.Sprintf("%p", cache.head))
-			pp.Println(len(cache.m), cache.capacity)
-			panic(err)
-		}
-	}()
-
 	cache.LRUCache.Put(key, value)
 }
