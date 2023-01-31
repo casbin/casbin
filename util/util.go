@@ -16,13 +16,12 @@ package util
 
 import (
 	"fmt"
-	"github.com/k0kubun/pp/v3"
 	"regexp"
 	"sort"
 	"strings"
 	"sync"
 
-	_ "github.com/k0kubun/pp/v3"
+	pp "github.com/k0kubun/pp/v3"
 )
 
 var evalReg = regexp.MustCompile(`\beval\((?P<rule>[^)]*)\)`)
@@ -276,6 +275,8 @@ func (cache *LRUCache) remove(n *node, listOnly bool) {
 	if n.prev == nil || n.next == nil {
 		pp.Println(cache.tail, fmt.Sprintf("%p", cache.tail.prev))
 		pp.Println(cache.head, fmt.Sprintf("%p", cache.head))
+		pp.Println(len(cache.m), cache.capacity)
+		pp.Println(len(cache.m), cache.capacity)
 		return
 	}
 
