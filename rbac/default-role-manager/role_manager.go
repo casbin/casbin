@@ -420,11 +420,15 @@ func rangeLinks(users *sync.Map, fn func(name1, name2 string, domain ...string) 
 		user := value.(*Role)
 		user.roles.Range(func(key, _ interface{}) bool {
 			roleName := key.(string)
-			return fn(user.name, roleName, defaultDomain)
+			if !fn(user.name, roleName, defaultDomain) {
+				return false
+			}
+			return true
 		})
 		return true
 	})
 }
+
 
 func (rm *RoleManagerImpl) Range(fn func(name1, name2 string, domain ...string) bool) {
 	rangeLinks(rm.allRoles, fn)
