@@ -66,13 +66,12 @@ type EnforceContext struct {
 //
 // File:
 //
-// 	e := casbin.NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.csv")
+//	e := casbin.NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.csv")
 //
 // MySQL DB:
 //
-// 	a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
-// 	e := casbin.NewEnforcer("path/to/basic_model.conf", a)
-//
+//	a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
+//	e := casbin.NewEnforcer("path/to/basic_model.conf", a)
 func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 	e := &Enforcer{logger: &log.DefaultLogger{}}
 
@@ -276,11 +275,13 @@ func (e *Enforcer) GetNamedRoleManager(ptype string) rbac.RoleManager {
 
 // SetRoleManager sets the current role manager.
 func (e *Enforcer) SetRoleManager(rm rbac.RoleManager) {
+	e.invalidateMatcherMap()
 	e.rmMap["g"] = rm
 }
 
 // SetNamedRoleManager sets the role manager for the named policy.
 func (e *Enforcer) SetNamedRoleManager(ptype string, rm rbac.RoleManager) {
+	e.invalidateMatcherMap()
 	e.rmMap[ptype] = rm
 }
 
@@ -291,6 +292,8 @@ func (e *Enforcer) SetEffector(eft effector.Effector) {
 
 // ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() {
+	e.invalidateMatcherMap()
+
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		_ = e.dispatcher.ClearPolicy()
 		return
@@ -300,6 +303,8 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
+	e.invalidateMatcherMap()
+
 	needToRebuild := false
 	newModel := e.model.Copy()
 	newModel.ClearPolicy()
@@ -343,6 +348,8 @@ func (e *Enforcer) LoadPolicy() error {
 }
 
 func (e *Enforcer) loadFilteredPolicy(filter interface{}) error {
+	e.invalidateMatcherMap()
+
 	var filteredAdapter persist.FilteredAdapter
 
 	// Attempt to cast the Adapter as a FilteredAdapter
