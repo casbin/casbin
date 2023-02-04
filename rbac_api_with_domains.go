@@ -146,7 +146,7 @@ func (e *Enforcer) GetAllDomains() ([]string, error) {
 }
 
 // GetAllRolesByDomain would get all roles associated with the domain.
-// note: Does not contain implicit roles
+// note: Not applicable to Domains with inheritance relationship  (implicit roles)
 func (e *Enforcer) GetAllRolesByDomain(domain string) []string {
 	g := e.model["g"]["g"]
 	policies := g.Policy
