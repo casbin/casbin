@@ -155,9 +155,9 @@ func (e *Enforcer) GetAllRolesByDomain(domain string) []string {
 
 	for _, policy := range policies {
 		if policy[len(policy)-1] == domain {
-			role := policy[len(policy)-1]
+			role := policy[len(policy)-2]
 			if _, ok := existMap[role]; !ok {
-				roles = append(roles, policy[len(policy)-2])
+				roles = append(roles, role)
 				existMap[role] = true
 			}
 		}
