@@ -323,8 +323,8 @@ func NewSyncLRUCache(capacity int) *SyncLRUCache {
 }
 
 func (cache *SyncLRUCache) Get(key interface{}) (value interface{}, ok bool) {
-	cache.rwm.RLock()
-	defer cache.rwm.RUnlock()
+	cache.rwm.Lock()
+	defer cache.rwm.Unlock()
 	return cache.LRUCache.Get(key)
 }
 

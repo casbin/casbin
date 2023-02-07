@@ -144,3 +144,24 @@ func (e *Enforcer) DeleteDomains(domains ...string) (bool, error) {
 func (e *Enforcer) GetAllDomains() ([]string, error) {
 	return e.model["g"]["g"].RM.GetAllDomains()
 }
+
+// GetAllRolesByDomain would get all roles associated with the domain.
+// note: Not applicable to Domains with inheritance relationship  (implicit roles)
+func (e *Enforcer) GetAllRolesByDomain(domain string) []string {
+	g := e.model["g"]["g"]
+	policies := g.Policy
+	roles := make([]string, 0)
+	existMap := make(map[string]bool) // remove duplicates
+
+	for _, policy := range policies {
+		if policy[len(policy)-1] == domain {
+			role := policy[len(policy)-2]
+			if _, ok := existMap[role]; !ok {
+				roles = append(roles, role)
+				existMap[role] = true
+			}
+		}
+	}
+
+	return roles
+}

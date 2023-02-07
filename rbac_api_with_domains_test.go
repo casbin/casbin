@@ -267,3 +267,23 @@ func TestGetAllDomains(t *testing.T) {
 
 	testGetAllDomains(t, e, []string{"domain1", "domain2"})
 }
+
+func testGetAllRolesByDomain(t *testing.T, e *Enforcer, domain string, expected []string) {
+	if !util.SetEquals(e.GetAllRolesByDomain(domain), expected) {
+		t.Errorf("roles in %s: %v, supposed to be %v\n", domain, e.GetAllRolesByDomain(domain), expected)
+	}
+}
+
+func TestGetAllRolesByDomain(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+
+	testGetAllRolesByDomain(t, e, "domain1", []string{"admin"})
+	testGetAllRolesByDomain(t, e, "domain2", []string{"admin"})
+
+	e, _ = NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy2.csv")
+
+	testGetAllRolesByDomain(t, e, "domain1", []string{"admin"})
+	testGetAllRolesByDomain(t, e, "domain2", []string{"admin"})
+	testGetAllRolesByDomain(t, e, "domain3", []string{"user"})
+
+}
