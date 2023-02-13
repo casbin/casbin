@@ -15,43 +15,43 @@
 package casbin
 
 func (e *SyncedEnforcer) SelfAddPolicy(sec string, ptype string, rule []string) (bool, error) {
-	e.m.RLock()
-	defer e.m.RUnlock()
+	e.m.Lock()
+	defer e.m.Unlock()
 	return e.addPolicyWithoutNotify(sec, ptype, rule)
 }
 
 func (e *SyncedEnforcer) SelfAddPolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	e.m.RLock()
-	defer e.m.RUnlock()
+	e.m.Lock()
+	defer e.m.Unlock()
 	return e.addPoliciesWithoutNotify(sec, ptype, rules)
 }
 
 func (e *SyncedEnforcer) SelfRemovePolicy(sec string, ptype string, rule []string) (bool, error) {
-	e.m.RLock()
-	defer e.m.RUnlock()
+	e.m.Lock()
+	defer e.m.Unlock()
 	return e.removePolicyWithoutNotify(sec, ptype, rule)
 }
 
 func (e *SyncedEnforcer) SelfRemovePolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	e.m.RLock()
-	defer e.m.RUnlock()
+	e.m.Lock()
+	defer e.m.Unlock()
 	return e.removePoliciesWithoutNotify(sec, ptype, rules)
 }
 
 func (e *SyncedEnforcer) SelfRemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
-	e.m.RLock()
-	defer e.m.RUnlock()
+	e.m.Lock()
+	defer e.m.Unlock()
 	return e.removeFilteredPolicyWithoutNotify(sec, ptype, fieldIndex, fieldValues)
 }
 
 func (e *SyncedEnforcer) SelfUpdatePolicy(sec string, ptype string, oldRule, newRule []string) (bool, error) {
-	e.m.RLock()
-	defer e.m.RUnlock()
+	e.m.Lock()
+	defer e.m.Unlock()
 	return e.updatePolicyWithoutNotify(sec, ptype, oldRule, newRule)
 }
 
 func (e *SyncedEnforcer) SelfUpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) (bool, error) {
-	e.m.RLock()
-	defer e.m.RUnlock()
+	e.m.Lock()
+	defer e.m.Unlock()
 	return e.updatePoliciesWithoutNotify(sec, ptype, oldRules, newRules)
 }
