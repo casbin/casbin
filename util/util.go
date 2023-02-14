@@ -70,6 +70,52 @@ func Array2DEquals(a [][]string, b [][]string) bool {
 	return true
 }
 
+// SortedArray2DEquals determines whether two 2-dimensional string arrays are identical.
+func SortedArray2DEquals(a [][]string, b [][]string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	copyA := make([][]string, len(a))
+	copy(copyA, a)
+	copyB := make([][]string, len(b))
+	copy(copyB, b)
+
+	if len(copyA) != 0 {
+		sort.Slice(copyA, func(i, j int) bool {
+			elementLen := len(copyA[0])
+			for k := 0; k < elementLen; k++ {
+				if copyA[i][k] < copyA[j][k] {
+					return true
+				} else if copyA[i][k] > copyA[j][k] {
+					return false
+				}
+			}
+			return true
+		})
+	}
+
+	if len(copyB) != 0 {
+		sort.Slice(copyB, func(i, j int) bool {
+			elementLen := len(copyB[0])
+			for k := 0; k < elementLen; k++ {
+				if copyB[i][k] < copyB[j][k] {
+					return true
+				} else if copyB[i][k] > copyB[j][k] {
+					return false
+				}
+			}
+			return true
+		})
+	}
+
+	for i, v := range copyA {
+		if !ArrayEquals(v, copyB[i]) {
+			return false
+		}
+	}
+	return true
+}
+
 // ArrayRemoveDuplicates removes any duplicated elements in a string array.
 func ArrayRemoveDuplicates(s *[]string) {
 	found := make(map[string]bool)

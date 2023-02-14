@@ -596,3 +596,45 @@ func (e *SyncedEnforcer) AddFunction(name string, function govaluate.ExpressionF
 	defer e.m.Unlock()
 	e.Enforcer.AddFunction(name, function)
 }
+
+func (e *SyncedEnforcer) SelfAddPolicy(sec string, ptype string, rule []string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.SelfAddPolicy(sec, ptype, rule)
+}
+
+func (e *SyncedEnforcer) SelfAddPolicies(sec string, ptype string, rules [][]string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.SelfAddPolicies(sec, ptype, rules)
+}
+
+func (e *SyncedEnforcer) SelfRemovePolicy(sec string, ptype string, rule []string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.SelfRemovePolicy(sec, ptype, rule)
+}
+
+func (e *SyncedEnforcer) SelfRemovePolicies(sec string, ptype string, rules [][]string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.SelfRemovePolicies(sec, ptype, rules)
+}
+
+func (e *SyncedEnforcer) SelfRemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.SelfRemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+}
+
+func (e *SyncedEnforcer) SelfUpdatePolicy(sec string, ptype string, oldRule, newRule []string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.SelfUpdatePolicy(sec, ptype, oldRule, newRule)
+}
+
+func (e *SyncedEnforcer) SelfUpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.SelfUpdatePolicies(sec, ptype, oldRules, newRules)
+}
