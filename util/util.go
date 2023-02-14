@@ -70,6 +70,44 @@ func Array2DEquals(a [][]string, b [][]string) bool {
 	return true
 }
 
+// SortArray2D  Sorts the two-dimensional string array
+func SortArray2D(arr [][]string) {
+	if len(arr) != 0 {
+		sort.Slice(arr, func(i, j int) bool {
+			elementLen := len(arr[0])
+			for k := 0; k < elementLen; k++ {
+				if arr[i][k] < arr[j][k] {
+					return true
+				} else if arr[i][k] > arr[j][k] {
+					return false
+				}
+			}
+			return true
+		})
+	}
+}
+
+// SortedArray2DEquals determines whether two 2-dimensional string arrays are identical.
+func SortedArray2DEquals(a [][]string, b [][]string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	copyA := make([][]string, len(a))
+	copy(copyA, a)
+	copyB := make([][]string, len(b))
+	copy(copyB, b)
+
+	SortArray2D(copyA)
+	SortArray2D(copyB)
+
+	for i, v := range copyA {
+		if !ArrayEquals(v, copyB[i]) {
+			return false
+		}
+	}
+	return true
+}
+
 // ArrayRemoveDuplicates removes any duplicated elements in a string array.
 func ArrayRemoveDuplicates(s *[]string) {
 	found := make(map[string]bool)

@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"github.com/casbin/casbin/v2/util"
 	"testing"
 	"time"
 )
@@ -64,5 +65,297 @@ func TestStopAutoLoadPolicy(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 	if e.IsAutoLoadingRunning() {
 		t.Error("auto load is still running")
+	}
+}
+
+func testSyncedEnforcerGetPolicy(t *testing.T, e *SyncedEnforcer, res [][]string) {
+	t.Helper()
+	myRes := e.GetPolicy()
+
+	if !util.SortedArray2DEquals(res, myRes) {
+		t.Error("Policy: ", myRes, ", supposed to be ", res)
+	} else {
+		t.Log("Policy: ", myRes)
+	}
+}
+
+func TestSyncedEnforcerSelfAddPolicy(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user1", "data1", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user2", "data2", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user3", "data3", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user4", "data4", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user5", "data5", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user6", "data6", "read"}) }()
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "read"},
+			{"user2", "data2", "read"},
+			{"user3", "data3", "read"},
+			{"user4", "data4", "read"},
+			{"user5", "data5", "read"},
+			{"user6", "data6", "read"},
+		})
+	}
+}
+
+func TestSyncedEnforcerSelfAddPolicies(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		go func() {
+			_, _ = e.SelfAddPolicies("p", "p", [][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}})
+		}()
+		go func() {
+			_, _ = e.SelfAddPolicies("p", "p", [][]string{{"user3", "data3", "read"}, {"user4", "data4", "read"}})
+		}()
+		go func() {
+			_, _ = e.SelfAddPolicies("p", "p", [][]string{{"user5", "data5", "read"}, {"user6", "data6", "read"}})
+		}()
+
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "read"},
+			{"user2", "data2", "read"},
+			{"user3", "data3", "read"},
+			{"user4", "data4", "read"},
+			{"user5", "data5", "read"},
+			{"user6", "data6", "read"},
+		})
+	}
+}
+
+func TestSyncedEnforcerSelfRemovePolicy(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user1", "data1", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user2", "data2", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user3", "data3", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user4", "data4", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user5", "data5", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user6", "data6", "read"}) }()
+
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "read"},
+			{"user2", "data2", "read"},
+			{"user3", "data3", "read"},
+			{"user4", "data4", "read"},
+			{"user5", "data5", "read"},
+			{"user6", "data6", "read"},
+		})
+
+		go func() { _, _ = e.SelfRemovePolicy("p", "p", []string{"user1", "data1", "read"}) }()
+		go func() { _, _ = e.SelfRemovePolicy("p", "p", []string{"user2", "data2", "read"}) }()
+		go func() { _, _ = e.SelfRemovePolicy("p", "p", []string{"user3", "data3", "read"}) }()
+		go func() { _, _ = e.SelfRemovePolicy("p", "p", []string{"user4", "data4", "read"}) }()
+		go func() { _, _ = e.SelfRemovePolicy("p", "p", []string{"user5", "data5", "read"}) }()
+		go func() { _, _ = e.SelfRemovePolicy("p", "p", []string{"user6", "data6", "read"}) }()
+
+		time.Sleep(100 * time.Millisecond)
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+		})
+	}
+}
+
+func TestSyncedEnforcerSelfRemovePolicies(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user1", "data1", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user2", "data2", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user3", "data3", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user4", "data4", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user5", "data5", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user6", "data6", "read"}) }()
+
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "read"},
+			{"user2", "data2", "read"},
+			{"user3", "data3", "read"},
+			{"user4", "data4", "read"},
+			{"user5", "data5", "read"},
+			{"user6", "data6", "read"},
+		})
+
+		go func() {
+			_, _ = e.SelfRemovePolicies("p", "p", [][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}})
+		}()
+		go func() {
+			_, _ = e.SelfRemovePolicies("p", "p", [][]string{{"user3", "data3", "read"}, {"user4", "data4", "read"}})
+		}()
+		go func() {
+			_, _ = e.SelfRemovePolicies("p", "p", [][]string{{"user5", "data5", "read"}, {"user6", "data6", "read"}})
+		}()
+
+		time.Sleep(100 * time.Millisecond)
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+		})
+	}
+}
+
+func TestSyncedEnforcerSelfRemoveFilteredPolicy(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user1", "data1", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user2", "data2", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user3", "data3", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user4", "data4", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user5", "data5", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user6", "data6", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user7", "data7", "write"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user8", "data8", "write"}) }()
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "read"},
+			{"user2", "data2", "read"},
+			{"user3", "data3", "read"},
+			{"user4", "data4", "read"},
+			{"user5", "data5", "read"},
+			{"user6", "data6", "read"},
+			{"user7", "data7", "write"},
+			{"user8", "data8", "write"},
+		})
+
+		go func() { _, _ = e.SelfRemoveFilteredPolicy("p", "p", 0, "user1") }()
+		go func() { _, _ = e.SelfRemoveFilteredPolicy("p", "p", 0, "user2") }()
+		go func() { _, _ = e.SelfRemoveFilteredPolicy("p", "p", 1, "data3") }()
+		go func() { _, _ = e.SelfRemoveFilteredPolicy("p", "p", 1, "data4") }()
+		go func() { _, _ = e.SelfRemoveFilteredPolicy("p", "p", 0, "user5") }()
+		go func() { _, _ = e.SelfRemoveFilteredPolicy("p", "p", 0, "user6") }()
+		go func() { _, _ = e.SelfRemoveFilteredPolicy("p", "p", 2, "write") }()
+
+		time.Sleep(100 * time.Millisecond)
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+		})
+	}
+}
+
+func TestSyncedEnforcerSelfUpdatePolicy(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user1", "data1", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user2", "data2", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user3", "data3", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user4", "data4", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user5", "data5", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user6", "data6", "read"}) }()
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "read"},
+			{"user2", "data2", "read"},
+			{"user3", "data3", "read"},
+			{"user4", "data4", "read"},
+			{"user5", "data5", "read"},
+			{"user6", "data6", "read"},
+		})
+
+		go func() {
+			_, _ = e.SelfUpdatePolicy("p", "p", []string{"user1", "data1", "read"}, []string{"user1", "data1", "write"})
+		}()
+		go func() {
+			_, _ = e.SelfUpdatePolicy("p", "p", []string{"user2", "data2", "read"}, []string{"user2", "data2", "write"})
+		}()
+		go func() {
+			_, _ = e.SelfUpdatePolicy("p", "p", []string{"user3", "data3", "read"}, []string{"user3", "data3", "write"})
+		}()
+		go func() {
+			_, _ = e.SelfUpdatePolicy("p", "p", []string{"user4", "data4", "read"}, []string{"user4", "data4", "write"})
+		}()
+		go func() {
+			_, _ = e.SelfUpdatePolicy("p", "p", []string{"user5", "data5", "read"}, []string{"user5", "data5", "write"})
+		}()
+		go func() {
+			_, _ = e.SelfUpdatePolicy("p", "p", []string{"user6", "data6", "read"}, []string{"user6", "data6", "write"})
+		}()
+
+		time.Sleep(100 * time.Millisecond)
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "write"},
+			{"user2", "data2", "write"},
+			{"user3", "data3", "write"},
+			{"user4", "data4", "write"},
+			{"user5", "data5", "write"},
+			{"user6", "data6", "write"},
+		})
+	}
+}
+
+func TestSyncedEnforcerSelfUpdatePolicies(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user1", "data1", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user2", "data2", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user3", "data3", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user4", "data4", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user5", "data5", "read"}) }()
+		go func() { _, _ = e.SelfAddPolicy("p", "p", []string{"user6", "data6", "read"}) }()
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "read"},
+			{"user2", "data2", "read"},
+			{"user3", "data3", "read"},
+			{"user4", "data4", "read"},
+			{"user5", "data5", "read"},
+			{"user6", "data6", "read"},
+		})
+
+		go func() {
+			_, _ = e.SelfUpdatePolicies("p", "p",
+				[][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}},
+				[][]string{{"user1", "data1", "write"}, {"user2", "data2", "write"}})
+		}()
+
+		go func() {
+			_, _ = e.SelfUpdatePolicies("p", "p",
+				[][]string{{"user3", "data3", "read"}, {"user4", "data4", "read"}},
+				[][]string{{"user3", "data3", "write"}, {"user4", "data4", "write"}})
+		}()
+
+		go func() {
+			_, _ = e.SelfUpdatePolicies("p", "p",
+				[][]string{{"user5", "data5", "read"}, {"user6", "data6", "read"}},
+				[][]string{{"user5", "data5", "write"}, {"user6", "data6", "write"}})
+		}()
+
+		time.Sleep(100 * time.Millisecond)
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "write"},
+			{"user2", "data2", "write"},
+			{"user3", "data3", "write"},
+			{"user4", "data4", "write"},
+			{"user5", "data5", "write"},
+			{"user6", "data6", "write"},
+		})
 	}
 }
