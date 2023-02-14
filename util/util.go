@@ -70,6 +70,23 @@ func Array2DEquals(a [][]string, b [][]string) bool {
 	return true
 }
 
+// SortArray2D  Sorts the two-dimensional string array
+func SortArray2D(arr [][]string) {
+	if len(arr) != 0 {
+		sort.Slice(arr, func(i, j int) bool {
+			elementLen := len(arr[0])
+			for k := 0; k < elementLen; k++ {
+				if arr[i][k] < arr[j][k] {
+					return true
+				} else if arr[i][k] > arr[j][k] {
+					return false
+				}
+			}
+			return true
+		})
+	}
+}
+
 // SortedArray2DEquals determines whether two 2-dimensional string arrays are identical.
 func SortedArray2DEquals(a [][]string, b [][]string) bool {
 	if len(a) != len(b) {
@@ -80,33 +97,8 @@ func SortedArray2DEquals(a [][]string, b [][]string) bool {
 	copyB := make([][]string, len(b))
 	copy(copyB, b)
 
-	if len(copyA) != 0 {
-		sort.Slice(copyA, func(i, j int) bool {
-			elementLen := len(copyA[0])
-			for k := 0; k < elementLen; k++ {
-				if copyA[i][k] < copyA[j][k] {
-					return true
-				} else if copyA[i][k] > copyA[j][k] {
-					return false
-				}
-			}
-			return true
-		})
-	}
-
-	if len(copyB) != 0 {
-		sort.Slice(copyB, func(i, j int) bool {
-			elementLen := len(copyB[0])
-			for k := 0; k < elementLen; k++ {
-				if copyB[i][k] < copyB[j][k] {
-					return true
-				} else if copyB[i][k] > copyB[j][k] {
-					return false
-				}
-			}
-			return true
-		})
-	}
+	SortArray2D(copyA)
+	SortArray2D(copyB)
 
 	for i, v := range copyA {
 		if !ArrayEquals(v, copyB[i]) {
