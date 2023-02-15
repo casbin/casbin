@@ -376,6 +376,15 @@ func (e *SyncedEnforcer) AddPolicies(rules [][]string) (bool, error) {
 	return e.Enforcer.AddPolicies(rules)
 }
 
+// AddPoliciesEx adds authorization rules to the current policy.
+// If the rule already exists, the rule will not be added.
+// But unlike AddPolicies, other non-existent rules are added instead of returning false directly
+func (e *SyncedEnforcer) AddPoliciesEx(rules [][]string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.AddPoliciesEx(rules)
+}
+
 // AddNamedPolicy adds an authorization rule to the current named policy.
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
@@ -392,6 +401,15 @@ func (e *SyncedEnforcer) AddNamedPolicies(ptype string, rules [][]string) (bool,
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.AddNamedPolicies(ptype, rules)
+}
+
+// AddNamedPoliciesEx adds authorization rules to the current named policy.
+// If the rule already exists, the rule will not be added.
+// But unlike AddNamedPolicies, other non-existent rules are added instead of returning false directly
+func (e *SyncedEnforcer) AddNamedPoliciesEx(ptype string, rules [][]string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.AddNamedPoliciesEx(ptype, rules)
 }
 
 // RemovePolicy removes an authorization rule from the current policy.
@@ -506,6 +524,15 @@ func (e *SyncedEnforcer) AddGroupingPolicies(rules [][]string) (bool, error) {
 	return e.Enforcer.AddGroupingPolicies(rules)
 }
 
+// AddGroupingPoliciesEx adds role inheritance rules to the current policy.
+// If the rule already exists, the rule will not be added.
+// But unlike AddGroupingPolicies, other non-existent rules are added instead of returning false directly
+func (e *SyncedEnforcer) AddGroupingPoliciesEx(rules [][]string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.AddGroupingPoliciesEx(rules)
+}
+
 // AddNamedGroupingPolicy adds a named role inheritance rule to the current policy.
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
@@ -522,6 +549,15 @@ func (e *SyncedEnforcer) AddNamedGroupingPolicies(ptype string, rules [][]string
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.AddNamedGroupingPolicies(ptype, rules)
+}
+
+// AddNamedGroupingPoliciesEx adds named role inheritance rules to the current policy.
+// If the rule already exists, the rule will not be added.
+// But unlike AddNamedGroupingPolicies, other non-existent rules are added instead of returning false directly
+func (e *SyncedEnforcer) AddNamedGroupingPoliciesEx(ptype string, rules [][]string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.AddNamedGroupingPoliciesEx(ptype, rules)
 }
 
 // RemoveGroupingPolicy removes a role inheritance rule from the current policy.
@@ -607,6 +643,12 @@ func (e *SyncedEnforcer) SelfAddPolicies(sec string, ptype string, rules [][]str
 	e.m.Lock()
 	defer e.m.Unlock()
 	return e.Enforcer.SelfAddPolicies(sec, ptype, rules)
+}
+
+func (e *SyncedEnforcer) SelfAddPoliciesEx(sec string, ptype string, rules [][]string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.SelfAddPoliciesEx(sec, ptype, rules)
 }
 
 func (e *SyncedEnforcer) SelfRemovePolicy(sec string, ptype string, rule []string) (bool, error) {

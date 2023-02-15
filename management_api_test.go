@@ -226,6 +226,19 @@ func TestModifyPolicyAPI(t *testing.T) {
 	_, _ = e.UpdatePolicies([][]string{{"eve", "data3", "write"}, {"leyo", "data4", "read"}, {"katy", "data4", "write"}},
 		[][]string{{"eve", "data3", "read"}, {"leyo", "data4", "write"}, {"katy", "data1", "write"}})
 	testGetPolicy(t, e, [][]string{{"eve", "data3", "read"}, {"jack", "data4", "read"}, {"katy", "data1", "write"}, {"leyo", "data4", "write"}, {"ham", "data4", "write"}})
+
+	e.ClearPolicy()
+	_, _ = e.AddPoliciesEx([][]string{{"user1", "data1", "read"}, {"user1", "data1", "read"}})
+	testGetPolicy(t, e, [][]string{{"user1", "data1", "read"}})
+	// {"user1", "data1", "read"} repeated
+	_, _ = e.AddPoliciesEx([][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}})
+	testGetPolicy(t, e, [][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}})
+	// {"user1", "data1", "read"}, {"user2", "data2", "read"} repeated
+	_, _ = e.AddNamedPoliciesEx("p", [][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}, {"user3", "data3", "read"}})
+	testGetPolicy(t, e, [][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}, {"user3", "data3", "read"}})
+	// {"user1", "data1", "read"}, {"user2", "data2", "read"}, , {"user3", "data3", "read"} repeated
+	_, _ = e.SelfAddPoliciesEx("p", "p", [][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}, {"user3", "data3", "read"}, {"user4", "data4", "read"}})
+	testGetPolicy(t, e, [][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}, {"user3", "data3", "read"}, {"user4", "data4", "read"}})
 }
 
 func TestModifyGroupingPolicyAPI(t *testing.T) {
@@ -300,4 +313,13 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 	testGetRoles(t, e, []string{"data5_admin"}, "admin")
 	testGetRoles(t, e, []string{"admin_groups"}, "eve")
 
+	e.ClearPolicy()
+	_, _ = e.AddGroupingPoliciesEx([][]string{{"user1", "member"}})
+	testGetUsers(t, e, []string{"user1"}, "member")
+	// {"user1", "member"} repeated
+	_, _ = e.AddGroupingPoliciesEx([][]string{{"user1", "member"}, {"user2", "member"}})
+	testGetUsers(t, e, []string{"user1", "user2"}, "member")
+	// {"user1", "member"}, {"user2", "member"} repeated
+	_, _ = e.AddNamedGroupingPoliciesEx("g", [][]string{{"user1", "member"}, {"user2", "member"}, {"user3", "member"}})
+	testGetUsers(t, e, []string{"user1", "user2", "user3"}, "member")
 }

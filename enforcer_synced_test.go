@@ -15,7 +15,9 @@
 package casbin
 
 import (
+	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
+	"sort"
 	"testing"
 	"time"
 )
@@ -114,6 +116,43 @@ func TestSyncedEnforcerSelfAddPolicies(t *testing.T) {
 		}()
 		go func() {
 			_, _ = e.SelfAddPolicies("p", "p", [][]string{{"user5", "data5", "read"}, {"user6", "data6", "read"}})
+		}()
+
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "read"},
+			{"user2", "data2", "read"},
+			{"user3", "data3", "read"},
+			{"user4", "data4", "read"},
+			{"user5", "data5", "read"},
+			{"user6", "data6", "read"},
+		})
+	}
+}
+
+func TestSyncedEnforcerSelfAddPoliciesEx(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		go func() {
+			_, _ = e.SelfAddPoliciesEx("p", "p", [][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}})
+		}()
+		go func() {
+			_, _ = e.SelfAddPoliciesEx("p", "p", [][]string{{"user2", "data2", "read"}, {"user3", "data3", "read"}})
+		}()
+		go func() {
+			_, _ = e.SelfAddPoliciesEx("p", "p", [][]string{{"user3", "data3", "read"}, {"user4", "data4", "read"}})
+		}()
+		go func() {
+			_, _ = e.SelfAddPoliciesEx("p", "p", [][]string{{"user4", "data4", "read"}, {"user5", "data5", "read"}})
+		}()
+		go func() {
+			_, _ = e.SelfAddPoliciesEx("p", "p", [][]string{{"user5", "data5", "read"}, {"user6", "data6", "read"}})
+		}()
+		go func() {
+			_, _ = e.SelfAddPoliciesEx("p", "p", [][]string{{"user6", "data6", "read"}, {"user1", "data1", "read"}})
 		}()
 
 		time.Sleep(100 * time.Millisecond)
@@ -357,5 +396,134 @@ func TestSyncedEnforcerSelfUpdatePolicies(t *testing.T) {
 			{"user5", "data5", "write"},
 			{"user6", "data6", "write"},
 		})
+	}
+}
+
+func TestSyncedEnforcerAddPoliciesEx(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		go func() { _, _ = e.AddPoliciesEx([][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}}) }()
+		go func() { _, _ = e.AddPoliciesEx([][]string{{"user2", "data2", "read"}, {"user3", "data3", "read"}}) }()
+		go func() { _, _ = e.AddPoliciesEx([][]string{{"user4", "data4", "read"}, {"user5", "data5", "read"}}) }()
+		go func() { _, _ = e.AddPoliciesEx([][]string{{"user5", "data5", "read"}, {"user6", "data6", "read"}}) }()
+		go func() { _, _ = e.AddPoliciesEx([][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}}) }()
+		go func() { _, _ = e.AddPoliciesEx([][]string{{"user2", "data2", "read"}, {"user3", "data3", "read"}}) }()
+		go func() { _, _ = e.AddPoliciesEx([][]string{{"user4", "data4", "read"}, {"user5", "data5", "read"}}) }()
+		go func() { _, _ = e.AddPoliciesEx([][]string{{"user5", "data5", "read"}, {"user6", "data6", "read"}}) }()
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "read"},
+			{"user2", "data2", "read"},
+			{"user3", "data3", "read"},
+			{"user4", "data4", "read"},
+			{"user5", "data5", "read"},
+			{"user6", "data6", "read"},
+		})
+	}
+}
+
+func TestSyncedEnforcerAddNamedPoliciesEx(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+		go func() {
+			_, _ = e.AddNamedPoliciesEx("p", [][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}})
+		}()
+		go func() {
+			_, _ = e.AddNamedPoliciesEx("p", [][]string{{"user2", "data2", "read"}, {"user3", "data3", "read"}})
+		}()
+		go func() {
+			_, _ = e.AddNamedPoliciesEx("p", [][]string{{"user4", "data4", "read"}, {"user5", "data5", "read"}})
+		}()
+		go func() {
+			_, _ = e.AddNamedPoliciesEx("p", [][]string{{"user5", "data5", "read"}, {"user6", "data6", "read"}})
+		}()
+		go func() {
+			_, _ = e.AddNamedPoliciesEx("p", [][]string{{"user1", "data1", "read"}, {"user2", "data2", "read"}})
+		}()
+		go func() {
+			_, _ = e.AddNamedPoliciesEx("p", [][]string{{"user2", "data2", "read"}, {"user3", "data3", "read"}})
+		}()
+		go func() {
+			_, _ = e.AddNamedPoliciesEx("p", [][]string{{"user4", "data4", "read"}, {"user5", "data5", "read"}})
+		}()
+		go func() {
+			_, _ = e.AddNamedPoliciesEx("p", [][]string{{"user5", "data5", "read"}, {"user6", "data6", "read"}})
+		}()
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetPolicy(t, e, [][]string{
+			{"alice", "data1", "read"},
+			{"bob", "data2", "write"},
+			{"user1", "data1", "read"},
+			{"user2", "data2", "read"},
+			{"user3", "data3", "read"},
+			{"user4", "data4", "read"},
+			{"user5", "data5", "read"},
+			{"user6", "data6", "read"},
+		})
+	}
+}
+
+func testSyncedEnforcerGetUsers(t *testing.T, e *SyncedEnforcer, res []string, name string, domain ...string) {
+	t.Helper()
+	myRes, err := e.GetUsersForRole(name, domain...)
+	myResCopy := make([]string, len(myRes))
+	copy(myResCopy, myRes)
+	sort.Strings(myRes)
+	sort.Strings(res)
+	switch err {
+	case nil:
+		break
+	case errors.ERR_NAME_NOT_FOUND:
+		t.Log("No name found")
+	default:
+		t.Error("Users for ", name, " could not be fetched: ", err.Error())
+	}
+	t.Log("Users for ", name, ": ", myRes)
+
+	if !util.SetEquals(res, myRes) {
+		t.Error("Users for ", name, ": ", myRes, ", supposed to be ", res)
+	}
+}
+func TestSyncedEnforcerAddGroupingPoliciesEx(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+		e.ClearPolicy()
+
+		go func() { _, _ = e.AddGroupingPoliciesEx([][]string{{"user1", "member"}, {"user2", "member"}}) }()
+		go func() { _, _ = e.AddGroupingPoliciesEx([][]string{{"user2", "member"}, {"user3", "member"}}) }()
+		go func() { _, _ = e.AddGroupingPoliciesEx([][]string{{"user4", "member"}, {"user5", "member"}}) }()
+		go func() { _, _ = e.AddGroupingPoliciesEx([][]string{{"user5", "member"}, {"user6", "member"}}) }()
+		go func() { _, _ = e.AddGroupingPoliciesEx([][]string{{"user1", "member"}, {"user2", "member"}}) }()
+		go func() { _, _ = e.AddGroupingPoliciesEx([][]string{{"user2", "member"}, {"user3", "member"}}) }()
+		go func() { _, _ = e.AddGroupingPoliciesEx([][]string{{"user4", "member"}, {"user5", "member"}}) }()
+		go func() { _, _ = e.AddGroupingPoliciesEx([][]string{{"user5", "member"}, {"user6", "member"}}) }()
+
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetUsers(t, e, []string{"user1", "user2", "user3", "user4", "user5", "user6"}, "member")
+	}
+}
+
+func TestSyncedEnforcerAddNamedGroupingPoliciesEx(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		e, _ := NewSyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+		e.ClearPolicy()
+
+		go func() { _, _ = e.AddNamedGroupingPoliciesEx("g", [][]string{{"user1", "member"}, {"user2", "member"}}) }()
+		go func() { _, _ = e.AddNamedGroupingPoliciesEx("g", [][]string{{"user2", "member"}, {"user3", "member"}}) }()
+		go func() { _, _ = e.AddNamedGroupingPoliciesEx("g", [][]string{{"user4", "member"}, {"user5", "member"}}) }()
+		go func() { _, _ = e.AddNamedGroupingPoliciesEx("g", [][]string{{"user5", "member"}, {"user6", "member"}}) }()
+		go func() { _, _ = e.AddNamedGroupingPoliciesEx("g", [][]string{{"user1", "member"}, {"user2", "member"}}) }()
+		go func() { _, _ = e.AddNamedGroupingPoliciesEx("g", [][]string{{"user2", "member"}, {"user3", "member"}}) }()
+		go func() { _, _ = e.AddNamedGroupingPoliciesEx("g", [][]string{{"user4", "member"}, {"user5", "member"}}) }()
+		go func() { _, _ = e.AddNamedGroupingPoliciesEx("g", [][]string{{"user5", "member"}, {"user6", "member"}}) }()
+
+		time.Sleep(100 * time.Millisecond)
+
+		testSyncedEnforcerGetUsers(t, e, []string{"user1", "user2", "user3", "user4", "user5", "user6"}, "member")
 	}
 }

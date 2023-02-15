@@ -110,6 +110,8 @@ type IEnforcer interface {
 	AddPolicies(rules [][]string) (bool, error)
 	AddNamedPolicy(ptype string, params ...interface{}) (bool, error)
 	AddNamedPolicies(ptype string, rules [][]string) (bool, error)
+	AddPoliciesEx(rules [][]string) (bool, error)
+	AddNamedPoliciesEx(ptype string, rules [][]string) (bool, error)
 	RemovePolicy(params ...interface{}) (bool, error)
 	RemovePolicies(rules [][]string) (bool, error)
 	RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) (bool, error)
@@ -120,8 +122,10 @@ type IEnforcer interface {
 	HasNamedGroupingPolicy(ptype string, params ...interface{}) bool
 	AddGroupingPolicy(params ...interface{}) (bool, error)
 	AddGroupingPolicies(rules [][]string) (bool, error)
+	AddGroupingPoliciesEx(rules [][]string) (bool, error)
 	AddNamedGroupingPolicy(ptype string, params ...interface{}) (bool, error)
 	AddNamedGroupingPolicies(ptype string, rules [][]string) (bool, error)
+	AddNamedGroupingPoliciesEx(ptype string, rules [][]string) (bool, error)
 	RemoveGroupingPolicy(params ...interface{}) (bool, error)
 	RemoveGroupingPolicies(rules [][]string) (bool, error)
 	RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) (bool, error)
@@ -140,6 +144,7 @@ type IEnforcer interface {
 	/* Management API with autoNotifyWatcher disabled */
 	SelfAddPolicy(sec string, ptype string, rule []string) (bool, error)
 	SelfAddPolicies(sec string, ptype string, rules [][]string) (bool, error)
+	SelfAddPoliciesEx(sec string, ptype string, rules [][]string) (bool, error)
 	SelfRemovePolicy(sec string, ptype string, rule []string) (bool, error)
 	SelfRemovePolicies(sec string, ptype string, rules [][]string) (bool, error)
 	SelfRemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error)

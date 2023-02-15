@@ -64,7 +64,7 @@ func (e *Enforcer) addPolicyWithoutNotify(sec string, ptype string, rule []strin
 	return true, nil
 }
 
-// addPolicies adds rules to the current policy.
+// addPoliciesWithoutNotify adds rules to the current policy without notify
 func (e *Enforcer) addPoliciesWithoutNotify(sec string, ptype string, rules [][]string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
@@ -72,6 +72,33 @@ func (e *Enforcer) addPoliciesWithoutNotify(sec string, ptype string, rules [][]
 
 	if e.model.HasPolicies(sec, ptype, rules) {
 		return false, nil
+	}
+
+	if e.shouldPersist() {
+		if err := e.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, rules); err != nil {
+			if err.Error() != notImplemented {
+				return false, err
+			}
+		}
+	}
+
+	e.model.AddPolicies(sec, ptype, rules)
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
+		if err != nil {
+			return true, err
+		}
+	}
+
+	return true, nil
+}
+
+// addPoliciesWithoutNotifyEx adds rules to the current policy without notify
+// Unlike addPoliciesWithoutNotify, if a rule already exists, it continues to check the next rule instead of returning false directly
+func (e *Enforcer) addPoliciesWithoutNotifyEx(sec string, ptype string, rules [][]string) (bool, error) {
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
 	}
 
 	if e.shouldPersist() {
@@ -328,16 +355,34 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 	}
 
 	if e.shouldNotify() {
-		var err error
-		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForAddPolicies(sec, ptype, rules...)
-		} else {
-			err = e.watcher.Update()
-		}
-		return true, err
+		return e.notifyWatcher(sec, ptype, rules)
 	}
 
 	return true, nil
+}
+
+// addPolicies adds rules to the current policy.
+func (e *Enforcer) addPoliciesEx(sec string, ptype string, rules [][]string) (bool, error) {
+	ok, err := e.addPoliciesWithoutNotifyEx(sec, ptype, rules)
+	if !ok || err != nil {
+		return ok, err
+	}
+
+	if e.shouldNotify() {
+		return e.notifyWatcher(sec, ptype, rules)
+	}
+
+	return true, nil
+}
+
+func (e *Enforcer) notifyWatcher(sec string, ptype string, rules [][]string) (bool, error) {
+	var err error
+	if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+		err = watcher.UpdateForAddPolicies(sec, ptype, rules...)
+	} else {
+		err = e.watcher.Update()
+	}
+	return true, err
 }
 
 // removePolicy removes a rule from the current policy.
