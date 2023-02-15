@@ -207,6 +207,13 @@ func (e *Enforcer) AddPolicies(rules [][]string) (bool, error) {
 	return e.AddNamedPolicies("p", rules)
 }
 
+// AddPoliciesEx adds authorization rules to the current policy.
+// If the rule already exists, the rule will not be added.
+// But unlike AddPolicies, other non-existent rules are added instead of returning false directly
+func (e *Enforcer) AddPoliciesEx(rules [][]string) (bool, error) {
+	return e.AddNamedPoliciesEx("p", rules)
+}
+
 // AddNamedPolicy adds an authorization rule to the current named policy.
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
@@ -227,7 +234,14 @@ func (e *Enforcer) AddNamedPolicy(ptype string, params ...interface{}) (bool, er
 // If the rule already exists, the function returns false for the corresponding rule and the rule will not be added.
 // Otherwise the function returns true for the corresponding by adding the new rule.
 func (e *Enforcer) AddNamedPolicies(ptype string, rules [][]string) (bool, error) {
-	return e.addPolicies("p", ptype, rules)
+	return e.addPolicies("p", ptype, rules, false)
+}
+
+// AddNamedPoliciesEx adds authorization rules to the current named policy.
+// If the rule already exists, the rule will not be added.
+// But unlike AddNamedPolicies, other non-existent rules are added instead of returning false directly
+func (e *Enforcer) AddNamedPoliciesEx(ptype string, rules [][]string) (bool, error) {
+	return e.addPolicies("p", ptype, rules, true)
 }
 
 // RemovePolicy removes an authorization rule from the current policy.
@@ -327,6 +341,13 @@ func (e *Enforcer) AddGroupingPolicies(rules [][]string) (bool, error) {
 	return e.AddNamedGroupingPolicies("g", rules)
 }
 
+// AddGroupingPoliciesEx adds role inheritance rules to the current policy.
+// If the rule already exists, the rule will not be added.
+// But unlike AddGroupingPolicies, other non-existent rules are added instead of returning false directly
+func (e *Enforcer) AddGroupingPoliciesEx(rules [][]string) (bool, error) {
+	return e.AddNamedGroupingPoliciesEx("g", rules)
+}
+
 // AddNamedGroupingPolicy adds a named role inheritance rule to the current policy.
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
@@ -351,7 +372,14 @@ func (e *Enforcer) AddNamedGroupingPolicy(ptype string, params ...interface{}) (
 // If the rule already exists, the function returns false for the corresponding policy rule and the rule will not be added.
 // Otherwise the function returns true for the corresponding policy rule by adding the new rule.
 func (e *Enforcer) AddNamedGroupingPolicies(ptype string, rules [][]string) (bool, error) {
-	return e.addPolicies("g", ptype, rules)
+	return e.addPolicies("g", ptype, rules, false)
+}
+
+// AddNamedGroupingPoliciesEx adds named role inheritance rules to the current policy.
+// If the rule already exists, the rule will not be added.
+// But unlike AddNamedGroupingPolicies, other non-existent rules are added instead of returning false directly
+func (e *Enforcer) AddNamedGroupingPoliciesEx(ptype string, rules [][]string) (bool, error) {
+	return e.addPolicies("g", ptype, rules, true)
 }
 
 // RemoveGroupingPolicy removes a role inheritance rule from the current policy.
@@ -424,7 +452,11 @@ func (e *Enforcer) SelfAddPolicy(sec string, ptype string, rule []string) (bool,
 }
 
 func (e *Enforcer) SelfAddPolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	return e.addPoliciesWithoutNotify(sec, ptype, rules)
+	return e.addPoliciesWithoutNotify(sec, ptype, rules, false)
+}
+
+func (e *Enforcer) SelfAddPoliciesEx(sec string, ptype string, rules [][]string) (bool, error) {
+	return e.addPoliciesWithoutNotify(sec, ptype, rules, true)
 }
 
 func (e *Enforcer) SelfRemovePolicy(sec string, ptype string, rule []string) (bool, error) {
