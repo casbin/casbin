@@ -43,7 +43,6 @@ func (sa *Adapter) LoadPolicy(model model.Model) error {
 		if str == "" {
 			continue
 		}
-		//ignore error
 		_ = persist.LoadPolicyLine(str, model)
 	}
 
