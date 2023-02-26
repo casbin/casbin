@@ -1,4 +1,4 @@
-// Copyright 2017 The string-adapter Authors. All Rights Reserved.
+// Copyright 2017 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package string_adapter
+package stringadapter
 
 import (
 	"bytes"
@@ -24,21 +24,25 @@ import (
 	"github.com/casbin/casbin/v2/util"
 )
 
+// Adapter is the string adapter for Casbin.
+// It can load policy from string or save policy to string.
 type Adapter struct {
 	Line string
 }
 
+// NewAdapter is the constructor for Adapter.
 func NewAdapter(line string) *Adapter {
 	return &Adapter{
 		Line: line,
 	}
 }
 
-func (sa *Adapter) LoadPolicy(model model.Model) error {
-	if sa.Line == "" {
+// LoadPolicy loads all policy rules from the storage.
+func (a *Adapter) LoadPolicy(model model.Model) error {
+	if a.Line == "" {
 		return errors.New("invalid line, line cannot be empty")
 	}
-	strs := strings.Split(sa.Line, "\n")
+	strs := strings.Split(a.Line, "\n")
 	for _, str := range strs {
 		if str == "" {
 			continue
@@ -49,7 +53,8 @@ func (sa *Adapter) LoadPolicy(model model.Model) error {
 	return nil
 }
 
-func (sa *Adapter) SavePolicy(model model.Model) error {
+// SavePolicy saves all policy rules to the storage.
+func (a *Adapter) SavePolicy(model model.Model) error {
 	var tmp bytes.Buffer
 	for ptype, ast := range model["p"] {
 		for _, rule := range ast.Policy {
@@ -66,19 +71,22 @@ func (sa *Adapter) SavePolicy(model model.Model) error {
 			tmp.WriteString("\n")
 		}
 	}
-	sa.Line = strings.TrimRight(tmp.String(), "\n")
+	a.Line = strings.TrimRight(tmp.String(), "\n")
 	return nil
 }
 
-func (sa *Adapter) AddPolicy(sec string, ptype string, rule []string) error {
+// AddPolicy adds a policy rule to the storage.
+func (a *Adapter) AddPolicy(sec string, ptype string, rule []string) error {
 	return errors.New("not implemented")
 }
 
-func (sa *Adapter) RemovePolicy(sec string, ptype string, rule []string) error {
-	sa.Line = ""
+// RemovePolicy removes a policy rule from the storage.
+func (a *Adapter) RemovePolicy(sec string, ptype string, rule []string) error {
+	a.Line = ""
 	return nil
 }
 
-func (sa *Adapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
+// RemoveFilteredPolicy removes policy rules that match the filter from the storage.
+func (a *Adapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
 	return errors.New("not implemented")
 }

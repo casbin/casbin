@@ -1,4 +1,4 @@
-// Copyright 2017 The string-adapter Authors. All Rights Reserved.
+// Copyright 2017 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package string_adapter
+package stringadapter
 
 import (
 	"testing"
@@ -45,19 +45,19 @@ p, data_group_admin, /admin/*, POST
 p, data_group_admin, /bob_data/*, POST
 g, alice, data_group_admin
 `
-	sa := NewAdapter(line)
-	md := model.NewModel()
-	err := md.LoadModelFromText(conf)
+	a := NewAdapter(line)
+	m := model.NewModel()
+	err := m.LoadModelFromText(conf)
 	if err != nil {
-		t.Error(err)
+		t.Errorf("load model from text failed: %v", err.Error())
 		return
 	}
-	e, _ := casbin.NewEnforcer(md, sa)
+	e, _ := casbin.NewEnforcer(m, a)
 	sub := "alice"
 	obj := "/alice_data/login"
 	act := "POST"
-	if res, _ := e.Enforce(sub, obj, act); res != true {
-		t.Error("**error**")
+	if res, _ := e.Enforce(sub, obj, act); !res {
+		t.Error("unexpected enforce result")
 	}
 }
 
@@ -84,18 +84,18 @@ p, data_group_admin, data3, read
 p, data_group_admin, data3, write
 g, alice, data_group_admin
 `
-	sa := NewAdapter(line)
-	md := model.NewModel()
-	err := md.LoadModelFromText(conf)
+	a := NewAdapter(line)
+	m := model.NewModel()
+	err := m.LoadModelFromText(conf)
 	if err != nil {
-		t.Error(err)
+		t.Errorf("load model from text failed: %v", err.Error())
 		return
 	}
-	e, _ := casbin.NewEnforcer(md, sa)
+	e, _ := casbin.NewEnforcer(m, a)
 	sub := "alice" // the user that wants to access a resource.
 	obj := "data1" // the resource that is going to be accessed.
 	act := "read"  // the operation that the user performs on the resource.
-	if res, _ := e.Enforce(sub, obj, act); res != true {
-		t.Error("**error**")
+	if res, _ := e.Enforce(sub, obj, act); !res {
+		t.Error("unexpected enforce result")
 	}
 }
