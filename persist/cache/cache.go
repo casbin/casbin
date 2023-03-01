@@ -20,7 +20,7 @@ var ErrNoSuchKey = errors.New("there's no such key existing in cache")
 
 type Cache interface {
 	// Set puts key and value into cache.
-	// First parameter for extra should be uint denoting expected survival time.
+	// First parameter for extra should be time.Time object denoting expected survival time.
 	// If survival time equals 0 or less, the key will always be survival.
 	Set(key string, value bool, extra ...interface{}) error
 
