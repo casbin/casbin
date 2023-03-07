@@ -140,6 +140,8 @@ type IEnforcer interface {
 
 	UpdateGroupingPolicy(oldRule []string, newRule []string) (bool, error)
 	UpdateGroupingPolicies(oldRules [][]string, newRules [][]string) (bool, error)
+	UpdateNamedGroupingPolicy(ptype string, oldRule []string, newRule []string) (bool, error)
+	UpdateNamedGroupingPolicies(ptype string, oldRules [][]string, newRules [][]string) (bool, error)
 
 	/* Management API with autoNotifyWatcher disabled */
 	SelfAddPolicy(sec string, ptype string, rule []string) (bool, error)
