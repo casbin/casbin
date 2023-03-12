@@ -160,8 +160,8 @@ func (e *SyncedEnforcer) GetImplicitRolesForUser(name string, domain ...string) 
 // GetPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
 // But GetImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
 func (e *SyncedEnforcer) GetImplicitPermissionsForUser(user string, domain ...string) ([][]string, error) {
-	e.m.RLock()
-	defer e.m.RUnlock()
+	e.m.Lock()
+	defer e.m.Unlock()
 	return e.Enforcer.GetImplicitPermissionsForUser(user, domain...)
 }
 
