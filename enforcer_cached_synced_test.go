@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func testSyncEnforceCache(t *testing.T, e *SyncCachedEnforcer, sub string, obj interface{}, act string, res bool) {
+func testSyncEnforceCache(t *testing.T, e *SyncedCachedEnforcer, sub string, obj interface{}, act string, res bool) {
 	t.Helper()
 	if myRes, _ := e.Enforce(sub, obj, act); myRes != res {
 		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, myRes, res)

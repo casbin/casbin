@@ -9,8 +9,8 @@ import (
 	"github.com/casbin/casbin/v2/persist/cache"
 )
 
-// SyncCachedEnforcer wraps Enforcer and provides decision sync cache
-type SyncCachedEnforcer struct {
+// SyncedCachedEnforcer wraps Enforcer and provides decision sync cache
+type SyncedCachedEnforcer struct {
 	*Enforcer
 	expireTime  time.Duration
 	cache       cache.Cache
@@ -19,8 +19,8 @@ type SyncCachedEnforcer struct {
 }
 
 // NewSyncedCachedEnforcer creates a sync cached enforcer via file or DB.
-func NewSyncedCachedEnforcer(params ...interface{}) (*SyncCachedEnforcer, error) {
-	e := &SyncCachedEnforcer{}
+func NewSyncedCachedEnforcer(params ...interface{}) (*SyncedCachedEnforcer, error) {
+	e := &SyncedCachedEnforcer{}
 	var err error
 	e.Enforcer, err = NewEnforcer(params...)
 	if err != nil {
@@ -34,7 +34,7 @@ func NewSyncedCachedEnforcer(params ...interface{}) (*SyncCachedEnforcer, error)
 }
 
 // EnableCache determines whether to enable cache on Enforce(). When enableCache is enabled, cached result (true | false) will be returned for previous decisions.
-func (e *SyncCachedEnforcer) EnableCache(enableCache bool) {
+func (e *SyncedCachedEnforcer) EnableCache(enableCache bool) {
 	var enabled int32
 	if enableCache {
 		enabled = 1
@@ -44,7 +44,7 @@ func (e *SyncCachedEnforcer) EnableCache(enableCache bool) {
 
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
 // if rvals is not string , ingore the cache
-func (e *SyncCachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
+func (e *SyncedCachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 	if atomic.LoadInt32(&e.enableCache) == 0 {
 		e.locker.RLock()
 		defer e.locker.RUnlock()
@@ -75,7 +75,7 @@ func (e *SyncCachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 	return res, err
 }
 
-func (e *SyncCachedEnforcer) LoadPolicy() error {
+func (e *SyncedCachedEnforcer) LoadPolicy() error {
 	if atomic.LoadInt32(&e.enableCache) != 0 {
 		if err := e.cache.Clear(); err != nil {
 			return err
@@ -86,7 +86,7 @@ func (e *SyncCachedEnforcer) LoadPolicy() error {
 	return e.Enforcer.LoadPolicy()
 }
 
-func (e *SyncCachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
+func (e *SyncedCachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
 	if atomic.LoadInt32(&e.enableCache) != 0 {
 		key, ok := e.getKey(params...)
 		if ok {
@@ -100,7 +100,7 @@ func (e *SyncCachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
 	return e.Enforcer.RemovePolicy(params...)
 }
 
-func (e *SyncCachedEnforcer) RemovePolicies(rules [][]string) (bool, error) {
+func (e *SyncedCachedEnforcer) RemovePolicies(rules [][]string) (bool, error) {
 	if len(rules) != 0 {
 		if atomic.LoadInt32(&e.enableCache) != 0 {
 			irule := make([]interface{}, len(rules[0]))
@@ -120,27 +120,27 @@ func (e *SyncCachedEnforcer) RemovePolicies(rules [][]string) (bool, error) {
 	return e.Enforcer.RemovePolicies(rules)
 }
 
-func (e *SyncCachedEnforcer) getCachedResult(key string) (res bool, err error) {
+func (e *SyncedCachedEnforcer) getCachedResult(key string) (res bool, err error) {
 	return e.cache.Get(key)
 }
 
-func (e *SyncCachedEnforcer) SetExpireTime(expireTime time.Duration) {
+func (e *SyncedCachedEnforcer) SetExpireTime(expireTime time.Duration) {
 	e.locker.Lock()
 	defer e.locker.Unlock()
 	e.expireTime = expireTime
 }
 
-func (e *SyncCachedEnforcer) SetCache(c cache.Cache) {
+func (e *SyncedCachedEnforcer) SetCache(c cache.Cache) {
 	e.locker.Lock()
 	defer e.locker.Unlock()
 	e.cache = c
 }
 
-func (e *SyncCachedEnforcer) setCachedResult(key string, res bool, extra ...interface{}) error {
+func (e *SyncedCachedEnforcer) setCachedResult(key string, res bool, extra ...interface{}) error {
 	return e.cache.Set(key, res, extra...)
 }
 
-func (e *SyncCachedEnforcer) getKey(params ...interface{}) (string, bool) {
+func (e *SyncedCachedEnforcer) getKey(params ...interface{}) (string, bool) {
 	key := strings.Builder{}
 	for _, param := range params {
 		switch typedParam := param.(type) {
@@ -157,6 +157,6 @@ func (e *SyncCachedEnforcer) getKey(params ...interface{}) (string, bool) {
 }
 
 // InvalidateCache deletes all the existing cached decisions.
-func (e *SyncCachedEnforcer) InvalidateCache() error {
+func (e *SyncedCachedEnforcer) InvalidateCache() error {
 	return e.cache.Clear()
 }
