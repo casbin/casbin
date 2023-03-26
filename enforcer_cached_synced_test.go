@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"sync"
 	"testing"
 )
 
@@ -28,11 +29,15 @@ func testSyncEnforceCache(t *testing.T, e *SyncedCachedEnforcer, sub string, obj
 func TestSyncCache(t *testing.T) {
 	e, _ := NewSyncedCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 	// The cache is enabled by default for NewCachedEnforcer.
+	g := sync.WaitGroup{}
+	g.Add(20)
 	for i := 0; i < 20; i++ {
 		go func() {
 			testSyncEnforceCache(t, e, "alice", "data1", "write", false)
+			g.Done()
 		}()
 	}
+	g.Wait()
 
 	testSyncEnforceCache(t, e, "alice", "data1", "read", true)
 	testSyncEnforceCache(t, e, "alice", "data1", "write", false)
