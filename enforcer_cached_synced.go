@@ -15,7 +15,6 @@
 package casbin
 
 import (
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -142,19 +141,7 @@ func (e *SyncedCachedEnforcer) setCachedResult(key string, res bool, extra ...in
 }
 
 func (e *SyncedCachedEnforcer) getKey(params ...interface{}) (string, bool) {
-	key := strings.Builder{}
-	for _, param := range params {
-		switch typedParam := param.(type) {
-		case string:
-			key.WriteString(typedParam)
-		case CacheableParam:
-			key.WriteString(typedParam.GetCacheKey())
-		default:
-			return "", false
-		}
-		key.WriteString("$$")
-	}
-	return key.String(), true
+	return GetCacheKey(params...)
 }
 
 // InvalidateCache deletes all the existing cached decisions.

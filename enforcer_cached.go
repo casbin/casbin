@@ -147,6 +147,10 @@ func (e *CachedEnforcer) setCachedResult(key string, res bool, extra ...interfac
 }
 
 func (e *CachedEnforcer) getKey(params ...interface{}) (string, bool) {
+	return GetCacheKey(params...)
+}
+
+func GetCacheKey(params ...interface{}) (string, bool) {
 	key := strings.Builder{}
 	for _, param := range params {
 		switch typedParam := param.(type) {
