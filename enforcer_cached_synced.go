@@ -25,7 +25,7 @@ import (
 
 // SyncedCachedEnforcer wraps Enforcer and provides decision sync cache
 type SyncedCachedEnforcer struct {
-	*Enforcer
+	*SyncedEnforcer
 	expireTime  time.Duration
 	cache       cache.Cache
 	enableCache int32
@@ -36,7 +36,7 @@ type SyncedCachedEnforcer struct {
 func NewSyncedCachedEnforcer(params ...interface{}) (*SyncedCachedEnforcer, error) {
 	e := &SyncedCachedEnforcer{}
 	var err error
-	e.Enforcer, err = NewEnforcer(params...)
+	e.SyncedEnforcer, err = NewSyncedEnforcer(params...)
 	if err != nil {
 		return nil, err
 	}
@@ -60,16 +60,12 @@ func (e *SyncedCachedEnforcer) EnableCache(enableCache bool) {
 // if rvals is not string , ingore the cache
 func (e *SyncedCachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 	if atomic.LoadInt32(&e.enableCache) == 0 {
-		e.locker.RLock()
-		defer e.locker.RUnlock()
-		return e.Enforcer.Enforce(rvals...)
+		return e.SyncedEnforcer.Enforce(rvals...)
 	}
 
 	key, ok := e.getKey(rvals...)
 	if !ok {
-		e.locker.RLock()
-		defer e.locker.RUnlock()
-		return e.Enforcer.Enforce(rvals...)
+		return e.SyncedEnforcer.Enforce(rvals...)
 	}
 
 	if res, err := e.getCachedResult(key); err == nil {
@@ -78,9 +74,7 @@ func (e *SyncedCachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 		return res, err
 	}
 
-	e.locker.RLock()
-	res, err := e.Enforcer.Enforce(rvals...)
-	e.locker.RUnlock()
+	res, err := e.SyncedEnforcer.Enforce(rvals...)
 	if err != nil {
 		return false, err
 	}
@@ -95,43 +89,35 @@ func (e *SyncedCachedEnforcer) LoadPolicy() error {
 			return err
 		}
 	}
-	e.locker.Lock()
-	defer e.locker.Unlock()
-	return e.Enforcer.LoadPolicy()
+	return e.SyncedEnforcer.LoadPolicy()
+}
+
+func (e *SyncedCachedEnforcer) AddPolicy(params ...interface{}) (bool, error) {
+	if ok, err := e.checkOneAndRemoveCache(params...); !ok {
+		return ok, err
+	}
+	return e.SyncedEnforcer.AddPolicy(params...)
+}
+
+func (e *SyncedCachedEnforcer) AddPolicies(rules [][]string) (bool, error) {
+	if ok, err := e.checkManyAndRemoveCache(rules); !ok {
+		return ok, err
+	}
+	return e.SyncedEnforcer.RemovePolicies(rules)
 }
 
 func (e *SyncedCachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
-	if atomic.LoadInt32(&e.enableCache) != 0 {
-		key, ok := e.getKey(params...)
-		if ok {
-			if err := e.cache.Delete(key); err != nil && err != cache.ErrNoSuchKey {
-				return false, err
-			}
-		}
+	if ok, err := e.checkOneAndRemoveCache(params...); !ok {
+		return ok, err
 	}
-	e.locker.Lock()
-	defer e.locker.Unlock()
-	return e.Enforcer.RemovePolicy(params...)
+	return e.SyncedEnforcer.RemovePolicy(params...)
 }
 
 func (e *SyncedCachedEnforcer) RemovePolicies(rules [][]string) (bool, error) {
-	if len(rules) != 0 {
-		if atomic.LoadInt32(&e.enableCache) != 0 {
-			irule := make([]interface{}, len(rules[0]))
-			for _, rule := range rules {
-				for i, param := range rule {
-					irule[i] = param
-				}
-				key, _ := e.getKey(irule...)
-				if err := e.cache.Delete(key); err != nil && err != cache.ErrNoSuchKey {
-					return false, err
-				}
-			}
-		}
+	if ok, err := e.checkManyAndRemoveCache(rules); !ok {
+		return ok, err
 	}
-	e.locker.Lock()
-	defer e.locker.Unlock()
-	return e.Enforcer.RemovePolicies(rules)
+	return e.SyncedEnforcer.RemovePolicies(rules)
 }
 
 func (e *SyncedCachedEnforcer) getCachedResult(key string) (res bool, err error) {
@@ -144,6 +130,7 @@ func (e *SyncedCachedEnforcer) SetExpireTime(expireTime time.Duration) {
 	e.expireTime = expireTime
 }
 
+// SetCache need to be sync cache
 func (e *SyncedCachedEnforcer) SetCache(c cache.Cache) {
 	e.locker.Lock()
 	defer e.locker.Unlock()
@@ -173,4 +160,34 @@ func (e *SyncedCachedEnforcer) getKey(params ...interface{}) (string, bool) {
 // InvalidateCache deletes all the existing cached decisions.
 func (e *SyncedCachedEnforcer) InvalidateCache() error {
 	return e.cache.Clear()
+}
+
+func (e *SyncedCachedEnforcer) checkOneAndRemoveCache(params ...interface{}) (bool, error) {
+	if atomic.LoadInt32(&e.enableCache) != 0 {
+		key, ok := e.getKey(params...)
+		if ok {
+			if err := e.cache.Delete(key); err != nil && err != cache.ErrNoSuchKey {
+				return false, err
+			}
+		}
+	}
+	return true, nil
+}
+
+func (e *SyncedCachedEnforcer) checkManyAndRemoveCache(rules [][]string) (bool, error) {
+	if len(rules) != 0 {
+		if atomic.LoadInt32(&e.enableCache) != 0 {
+			irule := make([]interface{}, len(rules[0]))
+			for _, rule := range rules {
+				for i, param := range rule {
+					irule[i] = param
+				}
+				key, _ := e.getKey(irule...)
+				if err := e.cache.Delete(key); err != nil && err != cache.ErrNoSuchKey {
+					return false, err
+				}
+			}
+		}
+	}
+	return true, nil
 }
