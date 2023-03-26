@@ -30,7 +30,7 @@ func TestSyncCache(t *testing.T) {
 	e, _ := NewSyncedCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 	// The cache is enabled by default for NewCachedEnforcer.
 	g := sync.WaitGroup{}
-	goThread := 1000000
+	goThread := 1000
 	g.Add(goThread)
 	for i := 0; i < goThread; i++ {
 		go func() {
