@@ -147,6 +147,17 @@ func (e *CachedEnforcer) setCachedResult(key string, res bool, extra ...interfac
 }
 
 func (e *CachedEnforcer) getKey(params ...interface{}) (string, bool) {
+	return GetCacheKey(params...)
+}
+
+// InvalidateCache deletes all the existing cached decisions.
+func (e *CachedEnforcer) InvalidateCache() error {
+	e.locker.Lock()
+	defer e.locker.Unlock()
+	return e.cache.Clear()
+}
+
+func GetCacheKey(params ...interface{}) (string, bool) {
 	key := strings.Builder{}
 	for _, param := range params {
 		switch typedParam := param.(type) {
@@ -160,11 +171,4 @@ func (e *CachedEnforcer) getKey(params ...interface{}) (string, bool) {
 		key.WriteString("$$")
 	}
 	return key.String(), true
-}
-
-// InvalidateCache deletes all the existing cached decisions.
-func (e *CachedEnforcer) InvalidateCache() error {
-	e.locker.Lock()
-	defer e.locker.Unlock()
-	return e.cache.Clear()
 }
