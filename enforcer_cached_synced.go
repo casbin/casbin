@@ -102,7 +102,7 @@ func (e *SyncedCachedEnforcer) AddPolicies(rules [][]string) (bool, error) {
 	if ok, err := e.checkManyAndRemoveCache(rules); !ok {
 		return ok, err
 	}
-	return e.SyncedEnforcer.RemovePolicies(rules)
+	return e.SyncedEnforcer.AddPolicies(rules)
 }
 
 func (e *SyncedCachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
