@@ -82,6 +82,11 @@ func TestKeyMatchModelInMemory(t *testing.T) {
 	testEnforce(t, e, "cathy", "/cathy_data", "DELETE", false)
 }
 
+func TestKeyMatchWithRBACInDomain(t *testing.T) {
+	e, _ := NewEnforcer("examples/keymatch_with_rbac_in_domain.conf", "examples/keymatch_with_rbac_in_domain.csv")
+	testDomainEnforce(t, e, "Username==test2", "engines/engine1", "*", "attach", true)
+}
+
 func TestKeyMatchModelInMemoryDeny(t *testing.T) {
 	m := model.NewModel()
 	m.AddDef("r", "r", "sub, obj, act")

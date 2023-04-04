@@ -429,6 +429,10 @@ func (e *Enforcer) initRmMap() {
 			_ = rm.Clear()
 		} else {
 			e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
+			matchFun := "keyMatch(r_dom, p_dom)"
+			if strings.Contains(e.model["m"]["m"].Value, matchFun) {
+				e.AddNamedDomainMatchingFunc(ptype, "g", util.KeyMatch)
+			}
 		}
 	}
 }
