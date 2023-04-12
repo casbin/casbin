@@ -38,7 +38,9 @@ func TestSyncCache(t *testing.T) {
 		go func() {
 			_, _ = e.AddPolicy("alice", "data2", "read")
 			testSyncEnforceCache(t, e, "alice", "data2", "read", true)
-			e.InvalidateCache()
+			if e.InvalidateCache() != nil {
+				panic("never reached")
+			}
 			g.Done()
 		}()
 	}
