@@ -17,6 +17,7 @@ package casbin
 import (
 	"sync"
 	"testing"
+	"time"
 )
 
 func testSyncEnforceCache(t *testing.T, e *SyncedCachedEnforcer, sub string, obj interface{}, act string, res bool) {
@@ -28,6 +29,7 @@ func testSyncEnforceCache(t *testing.T, e *SyncedCachedEnforcer, sub string, obj
 
 func TestSyncCache(t *testing.T) {
 	e, _ := NewSyncedCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	e.expireTime = time.Millisecond
 	// The cache is enabled by default for NewCachedEnforcer.
 	g := sync.WaitGroup{}
 	goThread := 1000
@@ -36,6 +38,7 @@ func TestSyncCache(t *testing.T) {
 		go func() {
 			_, _ = e.AddPolicy("alice", "data2", "read")
 			testSyncEnforceCache(t, e, "alice", "data2", "read", true)
+			e.InvalidateCache()
 			g.Done()
 		}()
 	}
@@ -43,6 +46,9 @@ func TestSyncCache(t *testing.T) {
 	_, _ = e.RemovePolicy("alice", "data2", "read")
 
 	testSyncEnforceCache(t, e, "alice", "data1", "read", true)
+	time.Sleep(time.Millisecond * 2) // coverage for expire
+	testSyncEnforceCache(t, e, "alice", "data1", "read", true)
+
 	testSyncEnforceCache(t, e, "alice", "data1", "write", false)
 	testSyncEnforceCache(t, e, "alice", "data2", "read", false)
 	testSyncEnforceCache(t, e, "alice", "data2", "write", false)
