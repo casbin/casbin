@@ -16,11 +16,11 @@ package casbin
 
 import (
 	"github.com/casbin/casbin/v2/constant"
-	"sort"
-	"testing"
-
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
+	"log"
+	"sort"
+	"testing"
 )
 
 func testGetRoles(t *testing.T, e *Enforcer, res []string, name string, domain ...string) {
@@ -541,4 +541,36 @@ func TestCustomizedFieldIndex(t *testing.T) {
 		t.Fatalf("DeleteRole: %v", err)
 	}
 	testEnforce(t, e, "bob", "data2", "write", false)
+}
+
+func testAccessibleBy(t *testing.T, e *Enforcer, user string, act string, res []string, expectedErr error) {
+	myRes, actualErr := e.AccessibleBy(user, act)
+
+	if actualErr != expectedErr {
+		t.Error("actual Err: ", actualErr, ", supposed to be ", expectedErr)
+	}
+	if actualErr == nil {
+		log.Print("Policy: ", myRes)
+		if !util.ArrayEquals(res, myRes) {
+			t.Error("Policy: ", myRes, ", supposed to be ", res)
+		}
+	}
+}
+
+func TestAccessibleBy(t *testing.T) {
+	e, _ := NewEnforcer("examples/accessible_by_model.conf", "examples/accessible_by_policy.csv")
+	testAccessibleBy(t, e, "alice", "read", []string{"price < 25", "category_id = 2"}, nil)
+	testAccessibleBy(t, e, "admin", "read", []string{"category_id = 2"}, nil)
+	testAccessibleBy(t, e, "bob", "write", []string{"author = bob"}, nil)
+
+	// test ERR_EMPTY_RESULT_ACCESSIBLEBY
+	testAccessibleBy(t, e, "alice", "write", []string{}, errors.ERR_EMPTY_RESULT_ACCESSIBLEBY)
+	testAccessibleBy(t, e, "bob", "read", []string{}, errors.ERR_EMPTY_RESULT_ACCESSIBLEBY)
+
+	// test ERR_OBJ_ACCESSIBLEBY
+	// should : e.AddPolicy("alice", "r.obj.price > 50", "read")
+	ok, _ := e.AddPolicy("alice", "price > 50", "read")
+	if ok {
+		testAccessibleBy(t, e, "alice", "read", []string{}, errors.ERR_OBJ_ACCESSIBLEBY)
+	}
 }

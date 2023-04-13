@@ -414,3 +414,45 @@ func deepCopyPolicy(src []string) []string {
 	copy(newRule, src)
 	return newRule
 }
+
+// AccessibleBy returns a string array of object conditions that the user can access.
+// The parameter 'user' is the user to query, and 'action' is the specific operation that the user can perform.
+// This can be used with the database adapter to convert object property conditions to SQL conditions
+// Note:
+// 0. The policy of object requires that it conform to the format: `r.obj.condition`
+// for example: p, alice, r.obj.price < 25, read
+// condition needs to correspond to a database field in order to be converted into an SQL statement
+//
+// 1. When the policy of the object does not conform to the required format , return an error: ERR_OBJ_ACCESSIBLEBY
+//
+// 2. If the 'objectConditions' array is empty, return an error: ERR_EMPTY_RESULT_ACCESSIBLEBY.
+// This error is returned because some data adapters' ORM return full table data by default
+// when they receive an empty condition, which tends to behave contrary to expectations.(e.g. GORM)
+// If you are using an adapter that does not behave like this, you can choose to ignore this error.
+func (e *Enforcer) AccessibleBy(user string, action string) ([]string, error) {
+	permissions, err := e.GetImplicitPermissionsForUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	var objectConditions []string
+	for _, policy := range permissions {
+		if policy[2] == action {
+			// policy[1] : policy obj
+			// policy[1][0:6] r.obj.condition => r.obj.
+			// policy[1][6:] r.obj.condition => condition
+
+			// Check the policy obj format
+			if policy[1][0:6] != "r.obj." {
+				return nil, errors.ERR_OBJ_ACCESSIBLEBY
+			}
+			objectConditions = append(objectConditions, policy[1][6:])
+		}
+	}
+
+	if len(objectConditions) == 0 {
+		return nil, errors.ERR_EMPTY_RESULT_ACCESSIBLEBY
+	}
+
+	return objectConditions, nil
+}
