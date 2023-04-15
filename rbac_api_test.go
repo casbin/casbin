@@ -15,10 +15,11 @@
 package casbin
 
 import (
-	"github.com/casbin/casbin/v2/constant"
+	"log"
 	"sort"
 	"testing"
 
+	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
 )
@@ -541,4 +542,53 @@ func TestCustomizedFieldIndex(t *testing.T) {
 		t.Fatalf("DeleteRole: %v", err)
 	}
 	testEnforce(t, e, "bob", "data2", "write", false)
+}
+
+func testGetAllowedObjectConditions(t *testing.T, e *Enforcer, user string, act string, prefix string, res []string, expectedErr error) {
+	myRes, actualErr := e.GetAllowedObjectConditions(user, act, prefix)
+
+	if actualErr != expectedErr {
+		t.Error("actual Err: ", actualErr, ", supposed to be ", expectedErr)
+	}
+	if actualErr == nil {
+		log.Print("Policy: ", myRes)
+		if !util.ArrayEquals(res, myRes) {
+			t.Error("Policy: ", myRes, ", supposed to be ", res)
+		}
+	}
+}
+
+func TestGetAllowedObjectConditions(t *testing.T) {
+	e, _ := NewEnforcer("examples/object_conditions_model.conf", "examples/object_conditions_policy.csv")
+	testGetAllowedObjectConditions(t, e, "alice", "read", "r.obj.", []string{"price < 25", "category_id = 2"}, nil)
+	testGetAllowedObjectConditions(t, e, "admin", "read", "r.obj.", []string{"category_id = 2"}, nil)
+	testGetAllowedObjectConditions(t, e, "bob", "write", "r.obj.", []string{"author = bob"}, nil)
+
+	// test ERR_EMPTY_CONDITION
+	testGetAllowedObjectConditions(t, e, "alice", "write", "r.obj.", []string{}, errors.ERR_EMPTY_CONDITION)
+	testGetAllowedObjectConditions(t, e, "bob", "read", "r.obj.", []string{}, errors.ERR_EMPTY_CONDITION)
+
+	// test ERR_OBJ_CONDITION
+	// should : e.AddPolicy("alice", "r.obj.price > 50", "read")
+	ok, _ := e.AddPolicy("alice", "price > 50", "read")
+	if ok {
+		testGetAllowedObjectConditions(t, e, "alice", "read", "r.obj.", []string{}, errors.ERR_OBJ_CONDITION)
+	}
+
+	// test prefix
+	e.ClearPolicy()
+	err := e.GetRoleManager().DeleteLink("alice", "admin")
+	if err != nil {
+		panic(err)
+	}
+	ok, _ = e.AddPolicies([][]string{
+		{"alice", "r.book.price < 25", "read"},
+		{"admin", "r.book.category_id = 2", "read"},
+		{"bob", "r.book.author = bob", "write"},
+	})
+	if ok {
+		testGetAllowedObjectConditions(t, e, "alice", "read", "r.book.", []string{"price < 25"}, nil)
+		testGetAllowedObjectConditions(t, e, "admin", "read", "r.book.", []string{"category_id = 2"}, nil)
+		testGetAllowedObjectConditions(t, e, "bob", "write", "r.book.", []string{"author = bob"}, nil)
+	}
 }

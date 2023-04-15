@@ -15,6 +15,8 @@
 package casbin
 
 import (
+	"strings"
+
 	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
@@ -413,4 +415,40 @@ func deepCopyPolicy(src []string) []string {
 	newRule := make([]string, len(src))
 	copy(newRule, src)
 	return newRule
+}
+
+// GetAllowedObjectConditions returns a string array of object conditions that the user can access.
+// For example: conditions, err := e.GetAllowedObjectConditions("alice", "read", "r.obj.")
+// Note:
+//
+// 0. prefix: You can customize the prefix of the object conditions, and "r.obj." is commonly used as a prefix.
+// After removing the prefix, the remaining part is the condition of the object.
+// If there is an obj policy that does not meet the prefix requirement, an errors.ERR_OBJ_CONDITION will be returned.
+//
+// 1. If the 'objectConditions' array is empty, return errors.ERR_EMPTY_CONDITION
+// This error is returned because some data adapters' ORM return full table data by default
+// when they receive an empty condition, which tends to behave contrary to expectations.(e.g. GORM)
+// If you are using an adapter that does not behave like this, you can choose to ignore this error.
+func (e *Enforcer) GetAllowedObjectConditions(user string, action string, prefix string) ([]string, error) {
+	permissions, err := e.GetImplicitPermissionsForUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	var objectConditions []string
+	for _, policy := range permissions {
+		// policy {sub, obj, act}
+		if policy[2] == action {
+			if !strings.HasPrefix(policy[1], prefix) {
+				return nil, errors.ERR_OBJ_CONDITION
+			}
+			objectConditions = append(objectConditions, strings.TrimPrefix(policy[1], prefix))
+		}
+	}
+
+	if len(objectConditions) == 0 {
+		return nil, errors.ERR_EMPTY_CONDITION
+	}
+
+	return objectConditions, nil
 }

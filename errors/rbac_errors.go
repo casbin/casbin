@@ -23,4 +23,8 @@ var (
 	ERR_LINK_NOT_FOUND            = errors.New("error: link between name1 and name2 does not exist")
 	ERR_USE_DOMAIN_PARAMETER      = errors.New("error: useDomain should be 1 parameter")
 	INVALID_FIELDVAULES_PARAMETER = errors.New("fieldValues requires at least one parameter")
+
+	// GetAllowedObjectConditions errors
+	ERR_OBJ_CONDITION   = errors.New("need to meet the prefix required by the object condition")
+	ERR_EMPTY_CONDITION = errors.New("GetAllowedObjectConditions have an empty condition")
 )

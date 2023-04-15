@@ -1,0 +1,5 @@
+p, alice, r.obj.price < 25, read
+p, admin, r.obj.category_id = 2, read
+p, bob, r.obj.author = bob, write
+
+g, alice, admin
