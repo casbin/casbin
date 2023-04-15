@@ -15,12 +15,13 @@
 package casbin
 
 import (
-	"github.com/casbin/casbin/v2/constant"
-	"github.com/casbin/casbin/v2/errors"
-	"github.com/casbin/casbin/v2/util"
 	"log"
 	"sort"
 	"testing"
+
+	"github.com/casbin/casbin/v2/constant"
+	"github.com/casbin/casbin/v2/errors"
+	"github.com/casbin/casbin/v2/util"
 )
 
 func testGetRoles(t *testing.T, e *Enforcer, res []string, name string, domain ...string) {
