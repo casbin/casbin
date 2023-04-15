@@ -15,6 +15,8 @@
 package casbin
 
 import (
+	"strings"
+
 	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
@@ -415,21 +417,19 @@ func deepCopyPolicy(src []string) []string {
 	return newRule
 }
 
-// AccessibleBy returns a string array of object conditions that the user can access.
-// The parameter 'user' is the user to query, and 'action' is the specific operation that the user can perform.
-// This can be used with the database adapter to convert object property conditions to SQL conditions
+// GetAllowedObjectConditions returns a string array of object conditions that the user can access.
+// For example: conditions, err := e.GetAllowedObjectConditions("alice", "read", "r.obj.")
 // Note:
-// 0. The policy of object requires that it conform to the format: `r.obj.condition`
-// for example: p, alice, r.obj.price < 25, read
-// condition needs to correspond to a database field in order to be converted into an SQL statement
 //
-// 1. When the policy of the object does not conform to the required format , return an error: ERR_OBJ_ACCESSIBLEBY
+// 0. prefix: You can customize the prefix of the object conditions, and "r.obj." is commonly used as a prefix.
+// After removing the prefix, the remaining part is the condition of the object.
+// If there is an obj policy that does not meet the prefix requirement, an errors.ERR_OBJ_CONDITION will be returned.
 //
-// 2. If the 'objectConditions' array is empty, return an error: ERR_EMPTY_RESULT_ACCESSIBLEBY.
+// 1. If the 'objectConditions' array is empty, return errors.ERR_EMPTY_CONDITION
 // This error is returned because some data adapters' ORM return full table data by default
 // when they receive an empty condition, which tends to behave contrary to expectations.(e.g. GORM)
 // If you are using an adapter that does not behave like this, you can choose to ignore this error.
-func (e *Enforcer) AccessibleBy(user string, action string) ([]string, error) {
+func (e *Enforcer) GetAllowedObjectConditions(user string, action string, prefix string) ([]string, error) {
 	permissions, err := e.GetImplicitPermissionsForUser(user)
 	if err != nil {
 		return nil, err
@@ -437,21 +437,17 @@ func (e *Enforcer) AccessibleBy(user string, action string) ([]string, error) {
 
 	var objectConditions []string
 	for _, policy := range permissions {
+		// policy {sub, obj, act}
 		if policy[2] == action {
-			// policy[1] : policy obj
-			// policy[1][0:6] r.obj.condition => r.obj.
-			// policy[1][6:] r.obj.condition => condition
-
-			// Check the policy obj format
-			if policy[1][0:6] != "r.obj." {
-				return nil, errors.ERR_OBJ_ACCESSIBLEBY
+			if !strings.HasPrefix(policy[1], prefix) {
+				return nil, errors.ERR_OBJ_CONDITION
 			}
-			objectConditions = append(objectConditions, policy[1][6:])
+			objectConditions = append(objectConditions, strings.TrimPrefix(policy[1], prefix))
 		}
 	}
 
 	if len(objectConditions) == 0 {
-		return nil, errors.ERR_EMPTY_RESULT_ACCESSIBLEBY
+		return nil, errors.ERR_EMPTY_CONDITION
 	}
 
 	return objectConditions, nil

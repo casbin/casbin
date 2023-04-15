@@ -24,7 +24,7 @@ var (
 	ERR_USE_DOMAIN_PARAMETER      = errors.New("error: useDomain should be 1 parameter")
 	INVALID_FIELDVAULES_PARAMETER = errors.New("fieldValues requires at least one parameter")
 
-	// AccessibleBy errors
-	ERR_OBJ_ACCESSIBLEBY          = errors.New("AccessibleBy need obj conditions like 'r.obj.conditions'")
-	ERR_EMPTY_RESULT_ACCESSIBLEBY = errors.New("AccessibleBy have an empty result")
+	// GetAllowedObjectConditions errors
+	ERR_OBJ_CONDITION   = errors.New("need to meet the prefix required by the object condition")
+	ERR_EMPTY_CONDITION = errors.New("GetAllowedObjectConditions have an empty condition")
 )
