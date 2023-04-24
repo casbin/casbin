@@ -201,7 +201,16 @@ func (rm *RoleManagerImpl) rebuild() {
 }
 
 func (rm *RoleManagerImpl) Match(str string, pattern string) bool {
-	return str == pattern
+	if str == pattern {
+		return true
+	}
+
+	if rm.matchingFunc != nil {
+		return rm.matchingFunc(str, pattern)
+	} else {
+		return false
+	}
+
 	//cacheKey := strings.Join([]string{str, pattern}, "$$")
 	//if v, has := rm.matchingFuncCache.Get(cacheKey); has {
 	//	return v.(bool)
@@ -513,7 +522,16 @@ func (dm *DomainManager) getDomain(domains ...string) (domain string, err error)
 }
 
 func (dm *DomainManager) Match(str string, pattern string) bool {
-	return str == pattern
+	if str == pattern {
+		return true
+	}
+
+	if dm.domainMatchingFunc != nil {
+		return dm.domainMatchingFunc(str, pattern)
+	} else {
+		return false
+	}
+
 	//cacheKey := strings.Join([]string{str, pattern}, "$$")
 	//if v, has := dm.matchingFuncCache.Get(cacheKey); has {
 	//	return v.(bool)
