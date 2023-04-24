@@ -56,12 +56,12 @@ func (r *Role) removeRole(role *Role) {
 	role.removeUser(r)
 }
 
-//should only be called inside addRole
+// should only be called inside addRole
 func (r *Role) addUser(user *Role) {
 	r.users.Store(user.name, user)
 }
 
-//should only be called inside removeRole
+// should only be called inside removeRole
 func (r *Role) removeUser(user *Role) {
 	r.users.Delete(user.name)
 }
@@ -201,19 +201,20 @@ func (rm *RoleManagerImpl) rebuild() {
 }
 
 func (rm *RoleManagerImpl) Match(str string, pattern string) bool {
-	cacheKey := strings.Join([]string{str, pattern}, "$$")
-	if v, has := rm.matchingFuncCache.Get(cacheKey); has {
-		return v.(bool)
-	} else {
-		var matched bool
-		if rm.matchingFunc != nil {
-			matched = rm.matchingFunc(str, pattern)
-		} else {
-			matched = str == pattern
-		}
-		rm.matchingFuncCache.Put(cacheKey, matched)
-		return matched
-	}
+	return str == pattern
+	//cacheKey := strings.Join([]string{str, pattern}, "$$")
+	//if v, has := rm.matchingFuncCache.Get(cacheKey); has {
+	//	return v.(bool)
+	//} else {
+	//	var matched bool
+	//	if rm.matchingFunc != nil {
+	//		matched = rm.matchingFunc(str, pattern)
+	//	} else {
+	//		matched = str == pattern
+	//	}
+	//	rm.matchingFuncCache.Put(cacheKey, matched)
+	//	return matched
+	//}
 }
 
 func (rm *RoleManagerImpl) rangeMatchingRoles(name string, isPattern bool, fn func(role *Role) bool) {
@@ -493,7 +494,7 @@ func (dm *DomainManager) rebuild() {
 	})
 }
 
-//Clear clears all stored data and resets the role manager to the initial state.
+// Clear clears all stored data and resets the role manager to the initial state.
 func (dm *DomainManager) Clear() error {
 	dm.rmMap = &sync.Map{}
 	dm.matchingFuncCache = util.NewSyncLRUCache(100)
@@ -512,19 +513,20 @@ func (dm *DomainManager) getDomain(domains ...string) (domain string, err error)
 }
 
 func (dm *DomainManager) Match(str string, pattern string) bool {
-	cacheKey := strings.Join([]string{str, pattern}, "$$")
-	if v, has := dm.matchingFuncCache.Get(cacheKey); has {
-		return v.(bool)
-	} else {
-		var matched bool
-		if dm.domainMatchingFunc != nil {
-			matched = dm.domainMatchingFunc(str, pattern)
-		} else {
-			matched = str == pattern
-		}
-		dm.matchingFuncCache.Put(cacheKey, matched)
-		return matched
-	}
+	return str == pattern
+	//cacheKey := strings.Join([]string{str, pattern}, "$$")
+	//if v, has := dm.matchingFuncCache.Get(cacheKey); has {
+	//	return v.(bool)
+	//} else {
+	//	var matched bool
+	//	if dm.domainMatchingFunc != nil {
+	//		matched = dm.domainMatchingFunc(str, pattern)
+	//	} else {
+	//		matched = str == pattern
+	//	}
+	//	dm.matchingFuncCache.Put(cacheKey, matched)
+	//	return matched
+	//}
 }
 
 func (dm *DomainManager) rangeAffectedRoleManagers(domain string, fn func(rm *RoleManagerImpl)) {
