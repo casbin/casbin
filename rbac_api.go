@@ -478,25 +478,59 @@ func removeDuplicatePermissions(permissions [][]string) [][]string {
 // GetImplicitUsersForResource("data2") will return [[bob data2 write] [alice data2 read] [alice data2 write]]
 // GetImplicitUsersForResource("data1") will return [[alice data1 read]]
 // Note: only users will be returned, roles (2nd arg in "g") will be excluded.
-func (e *Enforcer) GetImplicitUsersForResource(resource string, domain ...string) ([][]string, error) {
+func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, error) {
 	permissions := make([][]string, 0)
-	subjectIndex, err := e.GetFieldIndex("p", "sub")
-	if err != nil {
-		return nil, err
-	}
-	objectIndex, err := e.GetFieldIndex("p", "obj")
-	if err != nil {
-		return nil, err
-	}
-	domainIndex, _ := e.GetFieldIndex("p", "dom")
+	subjectIndex, _ := e.GetFieldIndex("p", "sub")
+	objectIndex, _ := e.GetFieldIndex("p", "obj")
 	rm := e.GetRoleManager()
 
 	isRole := make(map[string]bool)
-	if domainIndex == -1 {
-		for _, role := range e.GetAllRoles() {
-			isRole[role] = true
+	for _, role := range e.GetAllRoles() {
+		isRole[role] = true
+	}
+
+	for _, rule := range e.model["p"]["p"].Policy {
+		obj := rule[objectIndex]
+		if obj != resource {
+			continue
+		}
+
+		sub := rule[subjectIndex]
+
+		if !isRole[sub] {
+			permissions = append(permissions, rule)
+		} else {
+			inheritUserSet := make([]string, 0)
+			users, err := rm.GetUsers(sub)
+			if err != nil {
+				return nil, err
+			}
+			inheritUserSet = append(inheritUserSet, users...)
+
+			util.ArrayRemoveDuplicates(&inheritUserSet)
+
+			for i := 0; i < len(inheritUserSet); i++ {
+				implicitUserRule := deepCopyPolicy(rule)
+				implicitUserRule[subjectIndex] = inheritUserSet[i]
+				permissions = append(permissions, implicitUserRule)
+			}
 		}
 	}
+
+	res := removeDuplicatePermissions(permissions)
+	return res, nil
+}
+
+// GetImplicitUsersForResourceByDomain return implicit user based on resource and domain.
+// Compared to GetImplicitUsersForResource, domain is supported
+func (e *Enforcer) GetImplicitUsersForResourceByDomain(resource string, domain ...string) ([][]string, error) {
+	permissions := make([][]string, 0)
+	subjectIndex, _ := e.GetFieldIndex("p", "sub")
+	objectIndex, _ := e.GetFieldIndex("p", "obj")
+	rm := e.GetRoleManager()
+
+	isRole := make(map[string]bool)
+
 	for _, d := range domain {
 		for _, role := range e.GetAllRolesByDomain(d) {
 			isRole[role] = true
@@ -515,13 +549,6 @@ func (e *Enforcer) GetImplicitUsersForResource(resource string, domain ...string
 			permissions = append(permissions, rule)
 		} else {
 			inheritUserSet := make([]string, 0)
-			if domainIndex == -1 {
-				users, err := rm.GetUsers(sub)
-				if err != nil {
-					return nil, err
-				}
-				inheritUserSet = append(inheritUserSet, users...)
-			}
 
 			for _, d := range domain {
 				domIndex, err := e.GetFieldIndex("p", "dom")

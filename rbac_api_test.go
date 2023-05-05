@@ -595,7 +595,7 @@ func TestGetAllowedObjectConditions(t *testing.T) {
 
 func testGetImplicitUsersForResource(t *testing.T, e *Enforcer, res [][]string, resource string, domain ...string) {
 	t.Helper()
-	myRes, err := e.GetImplicitUsersForResource(resource, domain...)
+	myRes, err := e.GetImplicitUsersForResource(resource)
 	if err != nil {
 		panic(err)
 	}
@@ -620,17 +620,32 @@ func TestGetImplicitUsersForResource(t *testing.T) {
 	testGetImplicitUsersForResource(t, e, [][]string{{"bob", "data2", "write"},
 		{"alice", "data2", "read"},
 		{"alice", "data2", "write"}}, "data2")
+}
 
-	// test domain
-	e, _ = NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
-	testGetImplicitUsersForResource(t, e, [][]string{{"alice", "domain1", "data1", "read"},
+func testGetImplicitUsersForResourceByDomain(t *testing.T, e *Enforcer, res [][]string, resource string, domain ...string) {
+	t.Helper()
+	myRes, err := e.GetImplicitUsersForResourceByDomain(resource, domain...)
+	if err != nil {
+		panic(err)
+	}
+
+	if !util.Set2DEquals(res, myRes) {
+		t.Error("Implicit users for ", resource, "in domain ", domain, " : ", myRes, ", supposed to be ", res)
+	} else {
+		t.Log("Implicit users for ", resource, "in domain ", domain, " : ", myRes)
+	}
+}
+
+func TestGetImplicitUsersForResourceByDomain(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+	testGetImplicitUsersForResourceByDomain(t, e, [][]string{{"alice", "domain1", "data1", "read"},
 		{"alice", "domain1", "data1", "write"}}, "data1", "domain1")
 
-	testGetImplicitUsersForResource(t, e, [][]string{}, "data2", "domain1")
+	testGetImplicitUsersForResourceByDomain(t, e, [][]string{}, "data2", "domain1")
 
-	testGetImplicitUsersForResource(t, e, [][]string{{"alice", "domain1", "data1", "read"},
+	testGetImplicitUsersForResourceByDomain(t, e, [][]string{{"alice", "domain1", "data1", "read"},
 		{"alice", "domain1", "data1", "write"}}, "data1", "domain1", "domain2")
 
-	testGetImplicitUsersForResource(t, e, [][]string{{"bob", "domain2", "data2", "read"},
+	testGetImplicitUsersForResourceByDomain(t, e, [][]string{{"bob", "domain2", "data2", "read"},
 		{"bob", "domain2", "data2", "write"}}, "data2", "domain2")
 }
