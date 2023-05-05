@@ -500,18 +500,14 @@ func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, err
 		if !isRole[sub] {
 			permissions = append(permissions, rule)
 		} else {
-			inheritUserSet := make([]string, 0)
 			users, err := rm.GetUsers(sub)
 			if err != nil {
 				return nil, err
 			}
-			inheritUserSet = append(inheritUserSet, users...)
 
-			util.ArrayRemoveDuplicates(&inheritUserSet)
-
-			for i := 0; i < len(inheritUserSet); i++ {
+			for _, user := range users {
 				implicitUserRule := deepCopyPolicy(rule)
-				implicitUserRule[subjectIndex] = inheritUserSet[i]
+				implicitUserRule[subjectIndex] = user
 				permissions = append(permissions, implicitUserRule)
 			}
 		}
@@ -523,18 +519,17 @@ func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, err
 
 // GetImplicitUsersForResourceByDomain return implicit user based on resource and domain.
 // Compared to GetImplicitUsersForResource, domain is supported
-func (e *Enforcer) GetImplicitUsersForResourceByDomain(resource string, domain ...string) ([][]string, error) {
+func (e *Enforcer) GetImplicitUsersForResourceByDomain(resource string, domain string) ([][]string, error) {
 	permissions := make([][]string, 0)
 	subjectIndex, _ := e.GetFieldIndex("p", "sub")
 	objectIndex, _ := e.GetFieldIndex("p", "obj")
+	domIndex, _ := e.GetFieldIndex("p", "dom")
 	rm := e.GetRoleManager()
 
 	isRole := make(map[string]bool)
 
-	for _, d := range domain {
-		for _, role := range e.GetAllRolesByDomain(d) {
-			isRole[role] = true
-		}
+	for _, role := range e.GetAllRolesByDomain(domain) {
+		isRole[role] = true
 	}
 
 	for _, rule := range e.model["p"]["p"].Policy {
@@ -548,27 +543,17 @@ func (e *Enforcer) GetImplicitUsersForResourceByDomain(resource string, domain .
 		if !isRole[sub] {
 			permissions = append(permissions, rule)
 		} else {
-			inheritUserSet := make([]string, 0)
-
-			for _, d := range domain {
-				domIndex, err := e.GetFieldIndex("p", "dom")
-				if err != nil {
-					return nil, err
-				}
-				if d != rule[domIndex] {
-					continue
-				}
-				users, err := rm.GetUsers(sub, d)
-				if err != nil {
-					return nil, err
-				}
-				inheritUserSet = append(inheritUserSet, users...)
+			if domain != rule[domIndex] {
+				continue
 			}
-			util.ArrayRemoveDuplicates(&inheritUserSet)
+			users, err := rm.GetUsers(sub, domain)
+			if err != nil {
+				return nil, err
+			}
 
-			for i := 0; i < len(inheritUserSet); i++ {
+			for _, user := range users {
 				implicitUserRule := deepCopyPolicy(rule)
-				implicitUserRule[subjectIndex] = inheritUserSet[i]
+				implicitUserRule[subjectIndex] = user
 				permissions = append(permissions, implicitUserRule)
 			}
 		}
