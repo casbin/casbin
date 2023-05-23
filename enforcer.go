@@ -17,6 +17,7 @@ package casbin
 import (
 	"errors"
 	"fmt"
+	"github.com/casbin/casbin/v2/constant"
 	"runtime/debug"
 	"strings"
 	"sync"
@@ -585,15 +586,15 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			rvals)
 	}
 
-	var policyEffects []effector.Effect
-	var matcherResults []float64
+	var policyEffects = make(map[int]effector.Effect)
+	var matcherResults = make(map[int]float64)
 
 	var effect effector.Effect
 	var explainIndex int
 
 	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") {
-		policyEffects = make([]effector.Effect, policyLen)
-		matcherResults = make([]float64, policyLen)
+		//policyEffects = make([]effector.Effect, policyLen)
+		//matcherResults = make([]float64, policyLen)
 
 		for policyIndex, pvals := range e.model["p"][pType].Policy {
 			// log.LogPrint("Policy Rule: ", pvals)
@@ -603,6 +604,12 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 					len(e.model["p"][pType].Tokens),
 					len(pvals),
 					pvals)
+			}
+
+			if len(rvals) == 4 && strings.HasPrefix(rvals[1].(string), "org_") {
+				if rvals[1] != pvals[1] {
+					continue
+				}
 			}
 
 			parameters.pVals = pvals
@@ -646,22 +653,35 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			//	break
 			//}
 
-			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, policyIndex, policyLen)
-			if err != nil {
-				return false, err
+			effect = effector.Indeterminate
+			explainIndex = -1
+
+			var expr = e.model["e"][eType].Value
+			if matcherResults[policyIndex] != 0 && expr == constant.AllowOverrideEffect {
+				// only check the current policyIndex
+				if policyEffects[policyIndex] == effector.Allow {
+					effect = effector.Allow
+					explainIndex = policyIndex
+					break
+				}
+			} else {
+				effect, explainIndex, err = e.eft.MergeEffects(expr, policyEffects, matcherResults, policyIndex, policyLen)
+				if err != nil {
+					return false, err
+				}
 			}
+
 			if effect != effector.Indeterminate {
 				break
 			}
 		}
 	} else {
-
 		if hasEval && len(e.model["p"][pType].Policy) == 0 {
 			return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
 		}
 
-		policyEffects = make([]effector.Effect, 1)
-		matcherResults = make([]float64, 1)
+		//policyEffects = make([]effector.Effect, 1)
+		//matcherResults = make([]float64, 1)
 		matcherResults[0] = 1
 
 		parameters.pVals = make([]string, len(parameters.pTokens))
