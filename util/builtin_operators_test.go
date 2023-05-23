@@ -413,25 +413,25 @@ func testIPMatchFunc(t *testing.T, res bool, err string, args ...interface{}) {
 }
 
 func TestRegexMatchFunc(t *testing.T) {
-	testRegexMatchFunc(t, false, "regexMatch: Expected 2 arguments, but got 1", "/topic/create")
-	testRegexMatchFunc(t, false, "regexMatch: Expected 2 arguments, but got 3", "/topic/create/123", "/topic/create", "/topic/update")
-	testRegexMatchFunc(t, false, "regexMatch: Argument must be a string", "/topic/create", false)
+	testRegexMatchFunc(t, false, "regexMatch: expected 2 arguments, but got 1", "/topic/create")
+	testRegexMatchFunc(t, false, "regexMatch: expected 2 arguments, but got 3", "/topic/create/123", "/topic/create", "/topic/update")
+	testRegexMatchFunc(t, false, "regexMatch: argument must be a string", "/topic/create", false)
 	testRegexMatchFunc(t, true, "", "/topic/create/123", "/topic/create")
 }
 
 func TestKeyMatchFunc(t *testing.T) {
-	testKeyMatchFunc(t, false, "keyMatch: Expected 2 arguments, but got 1", "/foo")
-	testKeyMatchFunc(t, false, "keyMatch: Expected 2 arguments, but got 3", "/foo/create/123", "/foo/*", "/foo/update/123")
-	testKeyMatchFunc(t, false, "keyMatch: Argument must be a string", "/foo", true)
+	testKeyMatchFunc(t, false, "keyMatch: expected 2 arguments, but got 1", "/foo")
+	testKeyMatchFunc(t, false, "keyMatch: expected 2 arguments, but got 3", "/foo/create/123", "/foo/*", "/foo/update/123")
+	testKeyMatchFunc(t, false, "keyMatch: argument must be a string", "/foo", true)
 	testKeyMatchFunc(t, false, "", "/foo/bar", "/foo")
 	testKeyMatchFunc(t, true, "", "/foo/bar", "/foo/*")
 	testKeyMatchFunc(t, true, "", "/foo/bar", "/foo*")
 }
 
 func TestKeyMatch2Func(t *testing.T) {
-	testKeyMatch2Func(t, false, "keyMatch2: Expected 2 arguments, but got 1", "/")
-	testKeyMatch2Func(t, false, "keyMatch2: Expected 2 arguments, but got 3", "/foo/create/123", "/*", "/foo/update/123")
-	testKeyMatch2Func(t, false, "keyMatch2: Argument must be a string", "/foo", true)
+	testKeyMatch2Func(t, false, "keyMatch2: expected 2 arguments, but got 1", "/")
+	testKeyMatch2Func(t, false, "keyMatch2: expected 2 arguments, but got 3", "/foo/create/123", "/*", "/foo/update/123")
+	testKeyMatch2Func(t, false, "keyMatch2: argument must be a string", "/foo", true)
 
 	testKeyMatch2Func(t, false, "", "/", "/:resource")
 	testKeyMatch2Func(t, true, "", "/resource1", "/:resource")
@@ -442,9 +442,9 @@ func TestKeyMatch2Func(t *testing.T) {
 }
 
 func TestKeyMatch3Func(t *testing.T) {
-	testKeyMatch3Func(t, false, "keyMatch3: Expected 2 arguments, but got 1", "/")
-	testKeyMatch3Func(t, false, "keyMatch3: Expected 2 arguments, but got 3", "/foo/create/123", "/*", "/foo/update/123")
-	testKeyMatch3Func(t, false, "keyMatch3: Argument must be a string", "/foo", true)
+	testKeyMatch3Func(t, false, "keyMatch3: expected 2 arguments, but got 1", "/")
+	testKeyMatch3Func(t, false, "keyMatch3: expected 2 arguments, but got 3", "/foo/create/123", "/*", "/foo/update/123")
+	testKeyMatch3Func(t, false, "keyMatch3: argument must be a string", "/foo", true)
 
 	testKeyMatch3Func(t, true, "", "/foo", "/foo")
 	testKeyMatch3Func(t, true, "", "/foo", "/foo*")
@@ -470,9 +470,9 @@ func TestKeyMatch3Func(t *testing.T) {
 }
 
 func TestKeyMatch4Func(t *testing.T) {
-	testKeyMatch4Func(t, false, "keyMatch4: Expected 2 arguments, but got 1", "/parent/123/child/123")
-	testKeyMatch4Func(t, false, "keyMatch4: Expected 2 arguments, but got 3", "/parent/123/child/123", "/parent/{id}/child/{id}", true)
-	testKeyMatch4Func(t, false, "keyMatch4: Argument must be a string", "/parent/123/child/123", true)
+	testKeyMatch4Func(t, false, "keyMatch4: expected 2 arguments, but got 1", "/parent/123/child/123")
+	testKeyMatch4Func(t, false, "keyMatch4: expected 2 arguments, but got 3", "/parent/123/child/123", "/parent/{id}/child/{id}", true)
+	testKeyMatch4Func(t, false, "keyMatch4: argument must be a string", "/parent/123/child/123", true)
 
 	testKeyMatch4Func(t, true, "", "/parent/123/child/123", "/parent/{id}/child/{id}")
 	testKeyMatch4Func(t, false, "", "/parent/123/child/456", "/parent/{id}/child/{id}")
@@ -483,9 +483,9 @@ func TestKeyMatch4Func(t *testing.T) {
 }
 
 func TestKeyMatch5Func(t *testing.T) {
-	testKeyMatch5Func(t, false, "keyMatch5: Expected 2 arguments, but got 1", "/foo")
-	testKeyMatch5Func(t, false, "keyMatch5: Expected 2 arguments, but got 3", "/foo/create/123", "/foo/*", "/foo/update/123")
-	testKeyMatch5Func(t, false, "keyMatch5: Argument must be a string", "/parent/123", true)
+	testKeyMatch5Func(t, false, "keyMatch5: expected 2 arguments, but got 1", "/foo")
+	testKeyMatch5Func(t, false, "keyMatch5: expected 2 arguments, but got 3", "/foo/create/123", "/foo/*", "/foo/update/123")
+	testKeyMatch5Func(t, false, "keyMatch5: argument must be a string", "/parent/123", true)
 
 	testKeyMatch5Func(t, true, "", "/parent/child?status=1&type=2", "/parent/child")
 	testKeyMatch5Func(t, false, "", "/parent?status=1&type=2", "/parent/child")
@@ -526,8 +526,8 @@ func TestKeyMatch5Func(t *testing.T) {
 }
 
 func TestIPMatchFunc(t *testing.T) {
-	testIPMatchFunc(t, false, "ipMatch: Expected 2 arguments, but got 1", "192.168.2.123")
-	testIPMatchFunc(t, false, "ipMatch: Argument must be a string", "192.168.2.123", 128)
+	testIPMatchFunc(t, false, "ipMatch: expected 2 arguments, but got 1", "192.168.2.123")
+	testIPMatchFunc(t, false, "ipMatch: argument must be a string", "192.168.2.123", 128)
 	testIPMatchFunc(t, true, "", "192.168.2.123", "192.168.2.0/24")
 }
 

@@ -43,7 +43,7 @@ func testGetUsers(t *testing.T, e *Enforcer, res []string, name string, domain .
 	switch err {
 	case nil:
 		break
-	case errors.ERR_NAME_NOT_FOUND:
+	case errors.ErrNameNotFound:
 		t.Log("No name found")
 	default:
 		t.Error("Users for ", name, " could not be fetched: ", err.Error())
@@ -564,15 +564,15 @@ func TestGetAllowedObjectConditions(t *testing.T) {
 	testGetAllowedObjectConditions(t, e, "admin", "read", "r.obj.", []string{"category_id = 2"}, nil)
 	testGetAllowedObjectConditions(t, e, "bob", "write", "r.obj.", []string{"author = bob"}, nil)
 
-	// test ERR_EMPTY_CONDITION
-	testGetAllowedObjectConditions(t, e, "alice", "write", "r.obj.", []string{}, errors.ERR_EMPTY_CONDITION)
-	testGetAllowedObjectConditions(t, e, "bob", "read", "r.obj.", []string{}, errors.ERR_EMPTY_CONDITION)
+	// test ErrEmptyCondition
+	testGetAllowedObjectConditions(t, e, "alice", "write", "r.obj.", []string{}, errors.ErrEmptyCondition)
+	testGetAllowedObjectConditions(t, e, "bob", "read", "r.obj.", []string{}, errors.ErrEmptyCondition)
 
-	// test ERR_OBJ_CONDITION
+	// test ErrObjCondition
 	// should : e.AddPolicy("alice", "r.obj.price > 50", "read")
 	ok, _ := e.AddPolicy("alice", "price > 50", "read")
 	if ok {
-		testGetAllowedObjectConditions(t, e, "alice", "read", "r.obj.", []string{}, errors.ERR_OBJ_CONDITION)
+		testGetAllowedObjectConditions(t, e, "alice", "read", "r.obj.", []string{}, errors.ErrObjCondition)
 	}
 
 	// test prefix

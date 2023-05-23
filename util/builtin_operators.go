@@ -34,13 +34,13 @@ var (
 // validate the variadic parameter size and type as string
 func validateVariadicArgs(expectedLen int, args ...interface{}) error {
 	if len(args) != expectedLen {
-		return fmt.Errorf("Expected %d arguments, but got %d", expectedLen, len(args))
+		return fmt.Errorf("expected %d arguments, but got %d", expectedLen, len(args))
 	}
 
 	for _, p := range args {
 		_, ok := p.(string)
 		if !ok {
-			return errors.New("Argument must be a string")
+			return errors.New("argument must be a string")
 		}
 	}
 

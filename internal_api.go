@@ -227,7 +227,7 @@ func (e *Enforcer) removePoliciesWithoutNotify(sec string, ptype string, rules [
 // removeFilteredPolicy removes rules based on field filters from the current policy.
 func (e *Enforcer) removeFilteredPolicyWithoutNotify(sec string, ptype string, fieldIndex int, fieldValues []string) (bool, error) {
 	if len(fieldValues) == 0 {
-		return false, Err.INVALID_FIELDVAULES_PARAMETER
+		return false, Err.ErrInvalidFieldValuesParameter
 	}
 
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
