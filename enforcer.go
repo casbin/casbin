@@ -828,17 +828,17 @@ func (p enforceParameters) Get(name string) (interface{}, error) {
 func generateEvalFunction(functions map[string]govaluate.ExpressionFunction, parameters *enforceParameters) govaluate.ExpressionFunction {
 	return func(args ...interface{}) (interface{}, error) {
 		if len(args) != 1 {
-			return nil, fmt.Errorf("Function eval(subrule string) expected %d arguments, but got %d", 1, len(args))
+			return nil, fmt.Errorf("function eval(subrule string) expected %d arguments, but got %d", 1, len(args))
 		}
 
 		expression, ok := args[0].(string)
 		if !ok {
-			return nil, errors.New("Argument of eval(subrule string) must be a string")
+			return nil, errors.New("argument of eval(subrule string) must be a string")
 		}
 		expression = util.EscapeAssertion(expression)
 		expr, err := govaluate.NewEvaluableExpressionWithFunctions(expression, functions)
 		if err != nil {
-			return nil, fmt.Errorf("Error while parsing eval parameter: %s, %s", expression, err.Error())
+			return nil, fmt.Errorf("error while parsing eval parameter: %s, %s", expression, err.Error())
 		}
 		return expr.Eval(parameters)
 	}

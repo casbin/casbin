@@ -86,7 +86,7 @@ func (e *Enforcer) DeleteRolesForUser(user string, domain ...string) (bool, erro
 	if len(domain) == 0 {
 		args = []string{user}
 	} else if len(domain) > 1 {
-		return false, errors.ERR_DOMAIN_PARAMETER
+		return false, errors.ErrDomainParameter
 	} else {
 		args = []string{user, "", domain[0]}
 	}
@@ -306,7 +306,7 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string,
 				permission = append(permission, deepCopyPolicy(rule))
 			}
 		} else if len(domain) > 1 {
-			return nil, errors.ERR_DOMAIN_PARAMETER
+			return nil, errors.ErrDomainParameter
 		} else {
 			d := domain[0]
 			matched := rm.Match(d, rule[domainIndex])
@@ -440,14 +440,14 @@ func (e *Enforcer) GetAllowedObjectConditions(user string, action string, prefix
 		// policy {sub, obj, act}
 		if policy[2] == action {
 			if !strings.HasPrefix(policy[1], prefix) {
-				return nil, errors.ERR_OBJ_CONDITION
+				return nil, errors.ErrObjCondition
 			}
 			objectConditions = append(objectConditions, strings.TrimPrefix(policy[1], prefix))
 		}
 	}
 
 	if len(objectConditions) == 0 {
-		return nil, errors.ERR_EMPTY_CONDITION
+		return nil, errors.ErrEmptyCondition
 	}
 
 	return objectConditions, nil

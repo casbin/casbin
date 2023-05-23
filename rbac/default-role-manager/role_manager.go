@@ -507,7 +507,7 @@ func (dm *DomainManager) getDomain(domains ...string) (domain string, err error)
 	case 1:
 		return domains[0], nil
 	default:
-		return "", errors.ERR_DOMAIN_PARAMETER
+		return "", errors.ErrDomainParameter
 	}
 }
 
