@@ -12,7 +12,7 @@ This project adheres to the [Contributor Covenant 1.2.](https://www.contributor-
 
 ## Reporting issues
 
-Reporting issues are a great way to contribute to the project. We are perpetually grateful about a well-written, thorough bug report.
+Reporting issues are a great way to contribute to the project. We are perpetually grateful about a well-written, through bug report.
 
 Before raising a new issue, check our [issue list](https://github.com/casbin/casbin/issues) to determine if it already contains the problem that you are facing.
 
