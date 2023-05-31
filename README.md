@@ -15,7 +15,11 @@ Casbin
 
 **News**: still worry about how to write the correct Casbin policy? ``Casbin online editor`` is coming to help! Try it at: https://casbin.org/editor/
 
-![casbin Logo](casbin-logo.png)
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/casbin/casbin/master/casbin-logo-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/casbin/casbin/master/casbin-logo.png" />
+    <img src="https://raw.githubusercontent.com/casbin/casbin/master/casbin-logo.png" alt="casbin logo" />
+</picutre>
 
 Casbin is a powerful and efficient open-source access control library for Golang projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model).
 
