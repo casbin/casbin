@@ -180,6 +180,15 @@ func BenchmarkCachedPriorityModel(b *testing.B) {
 	}
 }
 
+func BenchmarkCachedWithEnforceContext(b *testing.B) {
+	e, _ := NewCachedEnforcer("examples/priority_model_enforce_context.conf", "examples/priority_policy_enforce_context.csv", false)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = e.Enforce(EnforceContext{RType: "r2", PType: "p", EType: "e", MType: "m2"}, "alice", "data1")
+	}
+}
+
 func BenchmarkCachedRBACModelMediumParallel(b *testing.B) {
 	e, _ := NewCachedEnforcer("examples/rbac_model.conf", false)
 
