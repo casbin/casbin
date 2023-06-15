@@ -35,6 +35,6 @@ jobs:
           # Enable alert commit comment
           comment-on-alert: true
           comment-always: true
-          gh-pages-branch: benchmark-monitoring-pages
+          gh-pages-branch: gh-pages
           # alert-comment-cc-users: '@XXX'
           auto-push: true
