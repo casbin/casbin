@@ -128,7 +128,7 @@ func BenchmarkRBACModelSmall(b *testing.B) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", false)
 
 	// 100 roles, 10 resources.
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 100000; i++ {
 		_, err := e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read")
 		if err != nil {
 			b.Fatal(err)
