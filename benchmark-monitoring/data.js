@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1686836376348,
+  "lastUpdate": 1686932558114,
   "repoUrl": "https://github.com/casbin/casbin",
   "entries": {
     "Benchmark": [
@@ -312,6 +312,318 @@ window.BENCHMARK_DATA = {
             "value": 16193,
             "unit": "ns/op\t    7541 B/op\t     111 allocs/op",
             "extra": "77476 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "46661603+PokIsemaine@users.noreply.github.com",
+            "name": "鱼竿钓鱼干",
+            "username": "PokIsemaine"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4f18f44a619c1045258d3d980348027e3107082d",
+          "message": "ci: change CI benchmark alert threshold (#1266)",
+          "timestamp": "2023-06-17T00:18:17+08:00",
+          "tree_id": "2c8a631c329bf5edbfb83b9e2cb12f1b4352b5e7",
+          "url": "https://github.com/casbin/casbin/commit/4f18f44a619c1045258d3d980348027e3107082d"
+        },
+        "date": 1686932557412,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkCachedRaw",
+            "value": 20.9,
+            "unit": "ns/op\t       0 B/op\t       0 allocs/op",
+            "extra": "57444519 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedBasicModel",
+            "value": 208.1,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "5718826 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModel",
+            "value": 207.8,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "5740225 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelSmall",
+            "value": 226.5,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "5259009 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelMedium",
+            "value": 222.6,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "5229240 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelLarge",
+            "value": 204.9,
+            "unit": "ns/op\t      96 B/op\t       3 allocs/op",
+            "extra": "5382606 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithResourceRoles",
+            "value": 215.2,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "5523656 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithDomains",
+            "value": 233,
+            "unit": "ns/op\t     120 B/op\t       4 allocs/op",
+            "extra": "4998908 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedABACModel",
+            "value": 3674,
+            "unit": "ns/op\t    1519 B/op\t      18 allocs/op",
+            "extra": "307078 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedKeyMatchModel",
+            "value": 237,
+            "unit": "ns/op\t     152 B/op\t       4 allocs/op",
+            "extra": "5045019 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithDeny",
+            "value": 208.2,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "5727698 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedPriorityModel",
+            "value": 210.8,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "5693319 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelMediumParallel",
+            "value": 201.6,
+            "unit": "ns/op\t     105 B/op\t       4 allocs/op",
+            "extra": "5262932 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicySmall",
+            "value": 653.1,
+            "unit": "ns/op\t     150 B/op\t       6 allocs/op",
+            "extra": "1854058 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicyMedium",
+            "value": 684.6,
+            "unit": "ns/op\t     157 B/op\t       6 allocs/op",
+            "extra": "1764549 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicyLarge",
+            "value": 703.5,
+            "unit": "ns/op\t     165 B/op\t       7 allocs/op",
+            "extra": "1712857 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicySmall",
+            "value": 651.8,
+            "unit": "ns/op\t     152 B/op\t       6 allocs/op",
+            "extra": "1778103 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicyMedium",
+            "value": 820.2,
+            "unit": "ns/op\t     178 B/op\t       7 allocs/op",
+            "extra": "1432188 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicyLarge",
+            "value": 1494,
+            "unit": "ns/op\t     459 B/op\t       9 allocs/op",
+            "extra": "944884 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicySmall",
+            "value": 665.2,
+            "unit": "ns/op\t     166 B/op\t       7 allocs/op",
+            "extra": "1777087 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicyMedium",
+            "value": 779.1,
+            "unit": "ns/op\t     178 B/op\t       7 allocs/op",
+            "extra": "1388252 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicyLarge",
+            "value": 1583,
+            "unit": "ns/op\t     293 B/op\t      13 allocs/op",
+            "extra": "752514 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRaw",
+            "value": 20.9,
+            "unit": "ns/op\t       0 B/op\t       0 allocs/op",
+            "extra": "57419490 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkBasicModel",
+            "value": 4746,
+            "unit": "ns/op\t    1488 B/op\t      17 allocs/op",
+            "extra": "246157 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRBACModel",
+            "value": 7155,
+            "unit": "ns/op\t    2034 B/op\t      35 allocs/op",
+            "extra": "163630 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/small",
+            "value": 62094,
+            "unit": "ns/op\t   19964 B/op\t     480 allocs/op",
+            "extra": "19478 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/medium",
+            "value": 645213,
+            "unit": "ns/op\t  191227 B/op\t    4827 allocs/op",
+            "extra": "1831 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/large",
+            "value": 7078603,
+            "unit": "ns/op\t 1899238 B/op\t   48175 allocs/op",
+            "extra": "170 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSmall",
+            "value": 75295,
+            "unit": "ns/op\t   20053 B/op\t     615 allocs/op",
+            "extra": "16150 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelMedium",
+            "value": 715653,
+            "unit": "ns/op\t  194332 B/op\t    6023 allocs/op",
+            "extra": "1413 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelLarge",
+            "value": 8093452,
+            "unit": "ns/op\t 1945018 B/op\t   60803 allocs/op",
+            "extra": "140 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithResourceRoles",
+            "value": 5887,
+            "unit": "ns/op\t    1820 B/op\t      27 allocs/op",
+            "extra": "195484 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDomains",
+            "value": 6558,
+            "unit": "ns/op\t    1803 B/op\t      25 allocs/op",
+            "extra": "180169 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkABACModel",
+            "value": 3614,
+            "unit": "ns/op\t    1511 B/op\t      17 allocs/op",
+            "extra": "315313 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkABACRuleModel",
+            "value": 5153754,
+            "unit": "ns/op\t 1302518 B/op\t   40088 allocs/op",
+            "extra": "231 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkKeyMatchModel",
+            "value": 7663,
+            "unit": "ns/op\t    3018 B/op\t      37 allocs/op",
+            "extra": "154326 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDeny",
+            "value": 8959,
+            "unit": "ns/op\t    2441 B/op\t      49 allocs/op",
+            "extra": "132133 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPriorityModel",
+            "value": 5405,
+            "unit": "ns/op\t    1738 B/op\t      22 allocs/op",
+            "extra": "219210 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDomainPatternLarge",
+            "value": 27940,
+            "unit": "ns/op\t   16596 B/op\t     164 allocs/op",
+            "extra": "42956 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerSmall",
+            "value": 100748,
+            "unit": "ns/op\t   11952 B/op\t     797 allocs/op",
+            "extra": "10000 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerMedium",
+            "value": 1056333,
+            "unit": "ns/op\t  125907 B/op\t    8741 allocs/op",
+            "extra": "1070 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerLarge",
+            "value": 11741690,
+            "unit": "ns/op\t 1349914 B/op\t   89741 allocs/op",
+            "extra": "98 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithPatternLarge",
+            "value": 7222853799,
+            "unit": "ns/op\t5284878896 B/op\t60929448 allocs/op",
+            "extra": "1 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithDomainPatternLarge",
+            "value": 199841725,
+            "unit": "ns/op\t139516489 B/op\t 1670216 allocs/op",
+            "extra": "6 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithPatternAndDomainPatternLarge",
+            "value": 7444518276,
+            "unit": "ns/op\t5421875096 B/op\t62539860 allocs/op",
+            "extra": "1 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithPatternLarge",
+            "value": 12753,
+            "unit": "ns/op\t    7537 B/op\t     111 allocs/op",
+            "extra": "94293 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithDomainPatternLarge",
+            "value": 697.4,
+            "unit": "ns/op\t      80 B/op\t       5 allocs/op",
+            "extra": "1727203 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithPatternAndDomainPatternLarge",
+            "value": 12825,
+            "unit": "ns/op\t    7537 B/op\t     111 allocs/op",
+            "extra": "93298 times\n2 procs"
           }
         ]
       }
