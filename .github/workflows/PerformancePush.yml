@@ -28,7 +28,7 @@ jobs:
           benchmark-data-dir-path: benchmark-monitoring
           save-data-file: false
           fail-on-alert: true
-          alert-threshold: '150%'
+          alert-threshold: '110%'
           fail-threshold: '200%'
           # GitHub API token to make a commit comment
           github-token: ${{ secrets.GITHUB_TOKEN }}
