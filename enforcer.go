@@ -62,6 +62,10 @@ type EnforceContext struct {
 	MType string
 }
 
+func (e EnforceContext) GetCacheKey() string {
+	return "EnforceContext{" + e.RType + "-" + e.PType + "-" + e.EType + "-" + e.MType + "}"
+}
+
 // NewEnforcer creates an enforcer via file or DB.
 //
 // File:
