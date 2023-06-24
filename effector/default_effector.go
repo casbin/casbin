@@ -31,7 +31,7 @@ func NewDefaultEffector() *DefaultEffector {
 }
 
 // MergeEffects merges all matching results collected by the enforcer into a single decision.
-func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []float64, policyIndex int, policyLength int) (Effect, int, error) {
+func (e *DefaultEffector) MergeEffects(expr string, effects map[int]Effect, matches map[int]float64, policyIndex int, policyLength int) (Effect, int, error) {
 	result := Indeterminate
 	explainIndex := -1
 
