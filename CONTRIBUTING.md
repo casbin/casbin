@@ -8,7 +8,7 @@ This project adheres to the [Contributor Covenant 1.2.](https://www.contributor-
 
 - We do our best to have an [up-to-date documentation](https://casbin.org/docs/overview)
 - [Stack Overflow](https://stackoverflow.com) is the best place to start if you have a question. Please use the [casbin tag](https://stackoverflow.com/tags/casbin/info) we are actively monitoring. We encourage you to use Stack Overflow specially for Modeling Access Control Problems, in order to build a shared knowledge base.
-- You can also join our [Gitter community](https://gitter.im/casbin/Lobby).
+- You can also join our [Discord](https://discord.gg/S5UjpzGZjN).
 
 ## Reporting issues
 
