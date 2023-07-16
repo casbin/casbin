@@ -17,11 +17,14 @@ package casbin
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"runtime/debug"
 	"strings"
 	"sync"
 
 	"github.com/Knetic/govaluate"
+	"github.com/tidwall/gjson"
+
 	"github.com/casbin/casbin/v2/effector"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/model"
@@ -564,6 +567,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		pTokens[token] = i
 	}
 
+	expString = requestJsonReplace(expString, rTokens, rvals)
+
 	parameters := enforceParameters{
 		rTokens: rTokens,
 		rVals:   rvals,
@@ -609,7 +614,13 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 					pvals)
 			}
 
-			parameters.pVals = pvals
+			pvalsCopy := make([]string, len(pvals))
+			copy(pvalsCopy, pvals)
+			for i, pStr := range pvalsCopy {
+				pvalsCopy[i] = requestJsonReplace(pStr, rTokens, rvals)
+			}
+
+			parameters.pVals = pvalsCopy
 
 			result, err := expression.Eval(parameters)
 			// log.LogPrint("Result: ", result)
@@ -646,9 +657,9 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				policyEffects[policyIndex] = effector.Allow
 			}
 
-			//if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
+			// if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
 			//	break
-			//}
+			// }
 
 			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, policyIndex, policyLen)
 			if err != nil {
@@ -709,6 +720,31 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	e.logger.LogEnforce(expString, rvals, result, logExplains)
 
 	return result, nil
+}
+
+var requestObjectRegex = regexp.MustCompile(`r[_.][A-Za-z_0-9]+\.[A-Za-z_0-9.]+[A-Za-z_0-9]`)
+var requestObjectRegexPrefix = regexp.MustCompile(`r[_.][A-Za-z_0-9]+\.`)
+
+// requestJsonReplace used to support request parameters of type json
+// It will replace the access of the request object in matchers or policy with the actual value in the request json parameter
+// For example: request sub = `{"Owner": "alice", "Age": 30}`
+// policy: p, r.sub.Age > 18, /data1, read  ==>  p, 30 > 18, /data1, read
+// matchers: m = r.sub == r.obj.Owner  ==>  m = r.sub == "alice"
+func requestJsonReplace(str string, rTokens map[string]int, rvals []interface{}) string {
+	matches := requestObjectRegex.FindStringSubmatch(str)
+	for _, matchesStr := range matches {
+		prefix := requestObjectRegexPrefix.FindString(matchesStr)
+		jsonPath := strings.TrimPrefix(matchesStr, prefix)
+		tokenIndex := rTokens[prefix[:len(prefix)-1]]
+		if jsonStr, ok := rvals[tokenIndex].(string); ok {
+			newStr := gjson.Get(jsonStr, jsonPath).String()
+			if !util.IsNumeric(newStr) {
+				newStr = `"` + newStr + `"`
+			}
+			str = strings.Replace(str, matchesStr, newStr, -1)
+		}
+	}
+	return str
 }
 
 func (e *Enforcer) getAndStoreMatcherExpression(hasEval bool, expString string, functions map[string]govaluate.ExpressionFunction) (*govaluate.EvaluableExpression, error) {

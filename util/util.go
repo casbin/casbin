@@ -25,6 +25,12 @@ var evalReg = regexp.MustCompile(`\beval\((?P<rule>[^)]*)\)`)
 
 var escapeAssertionRegex = regexp.MustCompile(`\b((r|p)[0-9]*)\.`)
 
+var numericRegex = regexp.MustCompile(`^-?\d+(?:\.\d+)?$`)
+
+func IsNumeric(s string) bool {
+	return numericRegex.MatchString(s)
+}
+
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
 func EscapeAssertion(s string) string {
 	s = escapeAssertionRegex.ReplaceAllStringFunc(s, func(m string) string {

@@ -412,6 +412,19 @@ func TestABACModel(t *testing.T) {
 	testEnforce(t, e, "bob", data1, "write", false)
 	testEnforce(t, e, "bob", data2, "read", true)
 	testEnforce(t, e, "bob", data2, "write", true)
+
+	// json request
+	data1Json := `{ "Name": "data1", "Owner": "alice"}`
+	data2Json := `{ "Name": "data2", "Owner": "bob"}`
+
+	testEnforce(t, e, "alice", data1Json, "read", true)
+	testEnforce(t, e, "alice", data1Json, "write", true)
+	testEnforce(t, e, "alice", data2Json, "read", false)
+	testEnforce(t, e, "alice", data2Json, "write", false)
+	testEnforce(t, e, "bob", data1Json, "read", false)
+	testEnforce(t, e, "bob", data1Json, "write", false)
+	testEnforce(t, e, "bob", data2Json, "read", true)
+	testEnforce(t, e, "bob", data2Json, "write", true)
 }
 
 func TestKeyMatchModel(t *testing.T) {
@@ -571,6 +584,14 @@ func TestABACNotUsingPolicy(t *testing.T) {
 	testEnforce(t, e, "alice", data1, "write", true)
 	testEnforce(t, e, "alice", data2, "read", false)
 	testEnforce(t, e, "alice", data2, "write", false)
+
+	data1Json := `{"Name": "data1", "Owner": "alice"}`
+	data2Json := `{"Name": "data2", "Owner": "bob"}`
+
+	testEnforce(t, e, "alice", data1Json, "read", true)
+	testEnforce(t, e, "alice", data1Json, "write", true)
+	testEnforce(t, e, "alice", data2Json, "read", false)
+	testEnforce(t, e, "alice", data2Json, "write", false)
 }
 
 func TestABACPolicy(t *testing.T) {
@@ -598,6 +619,24 @@ func TestABACPolicy(t *testing.T) {
 	testEnforce(t, e, sub3, "/data2", "read", false)
 	testEnforce(t, e, sub3, "/data1", "write", false)
 	testEnforce(t, e, sub3, "/data2", "write", false)
+
+	// json request
+	sub1Json := `{"Name": "alice", "Age": 16}`
+	sub2Json := `{"Name": "alice", "Age": 20}`
+	sub3Json := `{"Name": "alice", "Age": 65}`
+
+	testEnforce(t, e, sub1Json, "/data1", "read", false)
+	testEnforce(t, e, sub1Json, "/data2", "read", false)
+	testEnforce(t, e, sub1Json, "/data1", "write", false)
+	testEnforce(t, e, sub1Json, "/data2", "write", true)
+	testEnforce(t, e, sub2Json, "/data1", "read", true)
+	testEnforce(t, e, sub2Json, "/data2", "read", false)
+	testEnforce(t, e, sub2Json, "/data1", "write", false)
+	testEnforce(t, e, sub2Json, "/data2", "write", true)
+	testEnforce(t, e, sub3Json, "/data1", "read", true)
+	testEnforce(t, e, sub3Json, "/data2", "read", false)
+	testEnforce(t, e, sub3Json, "/data1", "write", false)
+	testEnforce(t, e, sub3Json, "/data2", "write", false)
 }
 
 func TestCommentModel(t *testing.T) {
