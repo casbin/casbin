@@ -53,6 +53,7 @@ type Enforcer struct {
 	autoBuildRoleLinks   bool
 	autoNotifyWatcher    bool
 	autoNotifyDispatcher bool
+	acceptJsonRequest    bool
 
 	logger log.Logger
 }
@@ -479,6 +480,11 @@ func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 	e.autoBuildRoleLinks = autoBuildRoleLinks
 }
 
+// EnableAcceptJsonRequest controls whether to accept json as a request parameter
+func (e *Enforcer) EnableAcceptJsonRequest(acceptJsonRequest bool) {
+	e.acceptJsonRequest = acceptJsonRequest
+}
+
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *Enforcer) BuildRoleLinks() error {
 	for _, rm := range e.rmMap {
@@ -567,7 +573,9 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		pTokens[token] = i
 	}
 
-	expString = requestJsonReplace(expString, rTokens, rvals)
+	if e.acceptJsonRequest {
+		expString = requestJsonReplace(expString, rTokens, rvals)
+	}
 
 	parameters := enforceParameters{
 		rTokens: rTokens,
@@ -614,13 +622,16 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 					pvals)
 			}
 
-			pvalsCopy := make([]string, len(pvals))
-			copy(pvalsCopy, pvals)
-			for i, pStr := range pvalsCopy {
-				pvalsCopy[i] = requestJsonReplace(pStr, rTokens, rvals)
+			if e.acceptJsonRequest {
+				pvalsCopy := make([]string, len(pvals))
+				copy(pvalsCopy, pvals)
+				for i, pStr := range pvalsCopy {
+					pvalsCopy[i] = requestJsonReplace(pStr, rTokens, rvals)
+				}
+				parameters.pVals = pvalsCopy
+			} else {
+				parameters.pVals = pvals
 			}
-
-			parameters.pVals = pvalsCopy
 
 			result, err := expression.Eval(parameters)
 			// log.LogPrint("Result: ", result)

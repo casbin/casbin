@@ -414,6 +414,7 @@ func TestABACModel(t *testing.T) {
 	testEnforce(t, e, "bob", data2, "write", true)
 
 	// json request
+	e.EnableAcceptJsonRequest(true)
 	data1Json := `{ "Name": "data1", "Owner": "alice"}`
 	data2Json := `{ "Name": "data2", "Owner": "bob"}`
 
@@ -585,6 +586,8 @@ func TestABACNotUsingPolicy(t *testing.T) {
 	testEnforce(t, e, "alice", data2, "read", false)
 	testEnforce(t, e, "alice", data2, "write", false)
 
+	// json request
+	e.EnableAcceptJsonRequest(true)
 	data1Json := `{"Name": "data1", "Owner": "alice"}`
 	data2Json := `{"Name": "data2", "Owner": "bob"}`
 
@@ -621,6 +624,7 @@ func TestABACPolicy(t *testing.T) {
 	testEnforce(t, e, sub3, "/data2", "write", false)
 
 	// json request
+	e.EnableAcceptJsonRequest(true)
 	sub1Json := `{"Name": "alice", "Age": 16}`
 	sub2Json := `{"Name": "alice", "Age": 20}`
 	sub3Json := `{"Name": "alice", "Age": 65}`
