@@ -22,9 +22,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Knetic/govaluate"
-	"github.com/tidwall/gjson"
-
 	"github.com/casbin/casbin/v2/effector"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/model"
@@ -33,6 +30,9 @@ import (
 	"github.com/casbin/casbin/v2/rbac"
 	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
+
+	"github.com/Knetic/govaluate"
+	"github.com/tidwall/gjson"
 )
 
 // Enforcer is the main interface for authorization enforcement and policy management.
