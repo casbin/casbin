@@ -414,6 +414,50 @@ func TestABACModel(t *testing.T) {
 	testEnforce(t, e, "bob", data2, "write", true)
 }
 
+func TestABACJsonRequest(t *testing.T) {
+	e, _ := NewEnforcer("examples/abac_model.conf")
+	e.EnableAcceptJsonRequest(true)
+
+	data1Json := `{ "Name": "data1", "Owner": "alice"}`
+	data2Json := `{ "Name": "data2", "Owner": "bob"}`
+
+	testEnforce(t, e, "alice", data1Json, "read", true)
+	testEnforce(t, e, "alice", data1Json, "write", true)
+	testEnforce(t, e, "alice", data2Json, "read", false)
+	testEnforce(t, e, "alice", data2Json, "write", false)
+	testEnforce(t, e, "bob", data1Json, "read", false)
+	testEnforce(t, e, "bob", data1Json, "write", false)
+	testEnforce(t, e, "bob", data2Json, "read", true)
+	testEnforce(t, e, "bob", data2Json, "write", true)
+
+	e, _ = NewEnforcer("examples/abac_not_using_policy_model.conf", "examples/abac_rule_effect_policy.csv")
+	e.EnableAcceptJsonRequest(true)
+
+	testEnforce(t, e, "alice", data1Json, "read", true)
+	testEnforce(t, e, "alice", data1Json, "write", true)
+	testEnforce(t, e, "alice", data2Json, "read", false)
+	testEnforce(t, e, "alice", data2Json, "write", false)
+
+	e, _ = NewEnforcer("examples/abac_rule_model.conf", "examples/abac_rule_policy.csv")
+	e.EnableAcceptJsonRequest(true)
+	sub1Json := `{"Name": "alice", "Age": 16}`
+	sub2Json := `{"Name": "alice", "Age": 20}`
+	sub3Json := `{"Name": "alice", "Age": 65}`
+
+	testEnforce(t, e, sub1Json, "/data1", "read", false)
+	testEnforce(t, e, sub1Json, "/data2", "read", false)
+	testEnforce(t, e, sub1Json, "/data1", "write", false)
+	testEnforce(t, e, sub1Json, "/data2", "write", true)
+	testEnforce(t, e, sub2Json, "/data1", "read", true)
+	testEnforce(t, e, sub2Json, "/data2", "read", false)
+	testEnforce(t, e, sub2Json, "/data1", "write", false)
+	testEnforce(t, e, sub2Json, "/data2", "write", true)
+	testEnforce(t, e, sub3Json, "/data1", "read", true)
+	testEnforce(t, e, sub3Json, "/data2", "read", false)
+	testEnforce(t, e, sub3Json, "/data1", "write", false)
+	testEnforce(t, e, sub3Json, "/data2", "write", false)
+}
+
 func TestKeyMatchModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv")
 
