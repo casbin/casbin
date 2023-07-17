@@ -626,7 +626,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				pvalsCopy := make([]string, len(pvals))
 				copy(pvalsCopy, pvals)
 				for i, pStr := range pvalsCopy {
-					pvalsCopy[i] = requestJsonReplace(pStr, rTokens, rvals)
+					pvalsCopy[i] = requestJsonReplace(util.EscapeAssertion(pStr), rTokens, rvals)
 				}
 				parameters.pVals = pvalsCopy
 			} else {
