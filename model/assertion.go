@@ -25,9 +25,11 @@ import (
 // Assertion represents an expression in a section of the model.
 // For example: r = sub, obj, act
 type Assertion struct {
-	Key           string
-	Value         string
-	Tokens        []string
+	Key    string
+	Value  string
+	Tokens []string
+	// TODO 写测试
+	ParamsTokens  []string
 	Policy        [][]string
 	PolicyMap     map[string]int
 	RM            rbac.RoleManager
@@ -80,9 +82,22 @@ func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
 		if len(rule) > count {
 			rule = rule[:count]
 		}
-		err := ast.RM.AddLink(rule[0], rule[1], rule[2:]...)
-		if err != nil {
-			return err
+
+		domainRule := rule[2:len(ast.Tokens)]
+		var domain string
+		if len(domainRule) == 0 {
+			err := ast.RM.AddLink(rule[0], rule[1])
+			if err != nil {
+				return err
+			}
+			ast.RM.SetLinkConditionFuncParams(rule[0], rule[1], rule[len(ast.Tokens):]...)
+		} else {
+			domain = domainRule[0]
+			err := ast.RM.AddLink(rule[0], rule[1], domain)
+			if err != nil {
+				return err
+			}
+			ast.RM.SetDomainLinkConditionFuncParams(rule[0], rule[1], domain, rule[len(ast.Tokens):]...)
 		}
 	}
 
