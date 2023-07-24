@@ -176,12 +176,23 @@ func (r *Role) addLinkConditionFunc(role *Role, domain string, fn rbac.LinkCondi
 	r.linkConditionFuncMap.Store(linkConditionFuncKey{role.name, domain}, fn)
 }
 
+func (r *Role) getLinkConditionFunc(role *Role, domain string) (rbac.LinkConditionFunc, bool) {
+	fn, ok := r.linkConditionFuncMap.Load(linkConditionFuncKey{role.name, domain})
+	if fn == nil {
+		return nil, ok
+	}
+	return fn.(rbac.LinkConditionFunc), ok
+}
+
 func (r *Role) setLinkConditionFuncParams(role *Role, domain string, params ...string) {
 	r.linkConditionFuncParamsMap.Store(linkConditionFuncKey{role.name, domain}, params)
 }
 
 func (r *Role) getLinkConditionFuncParams(role *Role, domain string) ([]string, bool) {
 	params, ok := r.linkConditionFuncParamsMap.Load(linkConditionFuncKey{role.name, domain})
+	if params == nil {
+		return nil, ok
+	}
 	return params.([]string), ok
 }
 
@@ -354,8 +365,8 @@ func (rm *RoleManagerImpl) CheckDomainLinkConditionFunc(userName, roleName, doma
 		return false, errors.ErrNameNotFound
 	}
 
-	if linkConditionFunc, hasLinkMatchingFunc := user.linkConditionFuncMap.Load(linkConditionFuncKey{roleName, domain}); hasLinkMatchingFunc {
-		return linkConditionFunc.(rbac.LinkConditionFunc)(params...)
+	if linkConditionFunc, hasLinkMatchingFunc := user.getLinkConditionFunc(role, domain); hasLinkMatchingFunc {
+		return linkConditionFunc(params...)
 	}
 
 	return true, nil
@@ -381,8 +392,8 @@ func (rm *RoleManagerImpl) GetLinkConditionFuncParams(userName, roleName string,
 		domainName = domain[0]
 	}
 
-	if params, ok := user.linkConditionFuncParamsMap.Load(linkConditionFuncKey{roleName, domainName}); ok {
-		return params.([]string), true
+	if params, ok := user.getLinkConditionFuncParams(role, domainName); ok {
+		return params, true
 	} else {
 		return nil, false
 	}
