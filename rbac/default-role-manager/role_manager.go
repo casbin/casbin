@@ -438,6 +438,8 @@ func (rm *RoleManagerImpl) HasLink(name1 string, name2 string, domains ...string
 	return rm.hasLinkHelper(role.name, map[string]*Role{user.name: user}, rm.maxHierarchyLevel, domains...), nil
 }
 
+// hasLinkHelper use the Breadth First Search algorithm to traverse the Role tree
+// Judging whether the user has a role (has link) is to judge whether the role node can be reached from the user node
 func (rm *RoleManagerImpl) hasLinkHelper(targetName string, roles map[string]*Role, level int, domains ...string) bool {
 	if level < 0 || len(roles) == 0 {
 		return false
@@ -449,35 +451,40 @@ func (rm *RoleManagerImpl) hasLinkHelper(targetName string, roles map[string]*Ro
 			return true
 		}
 		role.rangeRoles(func(key, value interface{}) bool {
-			nextRoleName := key.(string)
-			passLinkConditionFunc := true
-			var err error
-			if len(domains) == 0 {
-				if linkConditionFunc, existLinkCondition := rm.GetLinkConditionFunc(role.name, nextRoleName); existLinkCondition {
-					params, _ := rm.GetLinkConditionFuncParams(role.name, nextRoleName)
-					passLinkConditionFunc, err = linkConditionFunc(params...)
-				}
-			} else {
-				if linkConditionFunc, existLinkCondition := rm.GetDomainLinkConditionFunc(role.name, nextRoleName, domains[0]); existLinkCondition {
-					params, _ := rm.GetLinkConditionFuncParams(role.name, nextRoleName, domains[0])
-					passLinkConditionFunc, err = linkConditionFunc(params...)
-				}
-			}
-
-			if err != nil {
-				rm.logger.LogError(err, "hasLinkHelper LinkCondition Error")
-				return false
-			}
-
-			if passLinkConditionFunc {
-				nextRoles[key.(string)] = value.(*Role)
-			}
-
-			return true
+			nextRole := value.(*Role)
+			return rm.getNextRoles(role, nextRole, domains, nextRoles)
 		})
 	}
 
 	return rm.hasLinkHelper(targetName, nextRoles, level-1)
+}
+
+func (rm *RoleManagerImpl) getNextRoles(currentRole, nextRole *Role, domains []string, nextRoles map[string]*Role) bool {
+	passLinkConditionFunc := true
+	var err error
+	// If LinkConditionFunc exists, it needs to pass the verification to get nextRole
+	if len(domains) == 0 {
+		if linkConditionFunc, existLinkCondition := rm.GetLinkConditionFunc(currentRole.name, nextRole.name); existLinkCondition {
+			params, _ := rm.GetLinkConditionFuncParams(currentRole.name, nextRole.name)
+			passLinkConditionFunc, err = linkConditionFunc(params...)
+		}
+	} else {
+		if linkConditionFunc, existLinkCondition := rm.GetDomainLinkConditionFunc(currentRole.name, nextRole.name, domains[0]); existLinkCondition {
+			params, _ := rm.GetLinkConditionFuncParams(currentRole.name, nextRole.name, domains[0])
+			passLinkConditionFunc, err = linkConditionFunc(params...)
+		}
+	}
+
+	if err != nil {
+		rm.logger.LogError(err, "hasLinkHelper LinkCondition Error")
+		return false
+	}
+
+	if passLinkConditionFunc {
+		nextRoles[nextRole.name] = nextRole
+	}
+
+	return true
 }
 
 // GetRoles gets the roles that a user inherits.
