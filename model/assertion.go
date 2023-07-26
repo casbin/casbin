@@ -84,17 +84,14 @@ func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
 		}
 
 		domainRule := rule[2:len(ast.Tokens)]
-		var domain string
 		if len(domainRule) == 0 {
-			err := ast.RM.AddLink(rule[0], rule[1])
-			if err != nil {
+			if err := ast.RM.AddLink(rule[0], rule[1]); err != nil {
 				return err
 			}
 			ast.RM.SetLinkConditionFuncParams(rule[0], rule[1], rule[len(ast.Tokens):]...)
 		} else {
-			domain = domainRule[0]
-			err := ast.RM.AddLink(rule[0], rule[1], domain)
-			if err != nil {
+			domain := domainRule[0]
+			if err := ast.RM.AddLink(rule[0], rule[1], domain); err != nil {
 				return err
 			}
 			ast.RM.SetDomainLinkConditionFuncParams(rule[0], rule[1], domain, rule[len(ast.Tokens):]...)
