@@ -25,10 +25,9 @@ import (
 // Assertion represents an expression in a section of the model.
 // For example: r = sub, obj, act
 type Assertion struct {
-	Key    string
-	Value  string
-	Tokens []string
-	// TODO 写测试
+	Key           string
+	Value         string
+	Tokens        []string
 	ParamsTokens  []string
 	Policy        [][]string
 	PolicyMap     map[string]int
