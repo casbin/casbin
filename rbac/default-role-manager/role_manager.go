@@ -19,7 +19,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
 	"github.com/casbin/casbin/v2/util"
@@ -344,32 +343,27 @@ func (rm *RoleManagerImpl) DeleteLink(name1 string, name2 string, domains ...str
 	return nil
 }
 
-// CheckLinkConditionFunc passes the params into the LinkConditionFunc of userName->roleName and check its return value
-func (rm *RoleManagerImpl) CheckLinkConditionFunc(userName, roleName string, params ...string) (bool, error) {
-	return rm.CheckDomainLinkConditionFunc(userName, roleName, defaultDomain, params...)
+// GetLinkConditionFunc get LinkConditionFunc based on userName, roleName
+func (rm *RoleManagerImpl) GetLinkConditionFunc(userName, roleName string) (rbac.LinkConditionFunc, bool) {
+	return rm.GetDomainLinkConditionFunc(userName, roleName, defaultDomain)
 }
 
-// CheckDomainLinkConditionFunc passes the params into the LinkConditionFunc of userName->{roleName, domain}
-// and check its return value
-func (rm *RoleManagerImpl) CheckDomainLinkConditionFunc(userName, roleName, domain string, params ...string) (bool, error) {
+// GetDomainLinkConditionFunc get LinkConditionFunc based on userName, roleName, domain
+func (rm *RoleManagerImpl) GetDomainLinkConditionFunc(userName, roleName, domain string) (rbac.LinkConditionFunc, bool) {
 	user, userCreated := rm.getRole(userName)
 	role, roleCreated := rm.getRole(roleName)
 
 	if userCreated {
 		rm.removeRole(user.name)
-		return false, errors.ErrNameNotFound
+		return nil, false
 	}
 
 	if roleCreated {
 		rm.removeRole(role.name)
-		return false, errors.ErrNameNotFound
+		return nil, false
 	}
 
-	if linkConditionFunc, hasLinkMatchingFunc := user.getLinkConditionFunc(role, domain); hasLinkMatchingFunc {
-		return linkConditionFunc(params...)
-	}
-
-	return true, nil
+	return user.getLinkConditionFunc(role, domain)
 }
 
 // GetLinkConditionFuncParams gets parameters of LinkConditionFunc based on userName, roleName, domain
@@ -456,15 +450,18 @@ func (rm *RoleManagerImpl) hasLinkHelper(targetName string, roles map[string]*Ro
 		}
 		role.rangeRoles(func(key, value interface{}) bool {
 			nextRoleName := key.(string)
-			var passLinkConditionFunc bool
+			passLinkConditionFunc := true
 			var err error
-
 			if len(domains) == 0 {
-				params, _ := rm.GetLinkConditionFuncParams(role.name, nextRoleName)
-				passLinkConditionFunc, err = rm.CheckLinkConditionFunc(role.name, nextRoleName, params...)
+				if linkConditionFunc, existLinkCondition := rm.GetLinkConditionFunc(role.name, nextRoleName); existLinkCondition {
+					params, _ := rm.GetLinkConditionFuncParams(role.name, nextRoleName)
+					passLinkConditionFunc, err = linkConditionFunc(params...)
+				}
 			} else {
-				params, _ := rm.GetLinkConditionFuncParams(role.name, nextRoleName, domains[0])
-				passLinkConditionFunc, err = rm.CheckDomainLinkConditionFunc(role.name, nextRoleName, domains[0], params...)
+				if linkConditionFunc, existLinkCondition := rm.GetDomainLinkConditionFunc(role.name, nextRoleName, domains[0]); existLinkCondition {
+					params, _ := rm.GetLinkConditionFuncParams(role.name, nextRoleName, domains[0])
+					passLinkConditionFunc, err = linkConditionFunc(params...)
+				}
 			}
 
 			if err != nil {
