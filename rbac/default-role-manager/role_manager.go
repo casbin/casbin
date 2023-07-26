@@ -33,8 +33,8 @@ type Role struct {
 	users                      *sync.Map
 	matched                    *sync.Map
 	matchedBy                  *sync.Map
-	linkConditionFuncMap       *sync.Map // role.name => fn
-	linkConditionFuncParamsMap *sync.Map // role.name => params
+	linkConditionFuncMap       *sync.Map
+	linkConditionFuncParamsMap *sync.Map
 }
 
 func newRole(name string) *Role {
