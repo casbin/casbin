@@ -266,6 +266,11 @@ func (e *SyncedEnforcer) GetAllActions() []string {
 	defer e.m.RUnlock()
 	return e.Enforcer.GetAllActions()
 }
+func (e *SyncedEnforcer) AddPermissionsForUser(user string, permissions ...[]string) (bool, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.AddPermissionsForUser(user, permissions...)
+}
 
 // GetAllNamedActions gets the list of actions that show up in the current named policy.
 func (e *SyncedEnforcer) GetAllNamedActions(ptype string) []string {
