@@ -99,6 +99,14 @@ func (e *SyncedEnforcer) AddPermissionForUser(user string, permission ...string)
 	return e.Enforcer.AddPermissionForUser(user, permission...)
 }
 
+// AddPermissionsForUser adds permissions for a user or role.
+// Returns false if the user or role already has the permissions (aka not affected).
+func (e *SyncedEnforcer) AddPermissionsForUser(user string, permissions ...[]string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.AddPermissionsForUser(user, permissions...)
+}
+
 // DeletePermissionForUser deletes a permission for a user or role.
 // Returns false if the user or role does not have the permission (aka not affected).
 func (e *SyncedEnforcer) DeletePermissionForUser(user string, permission ...string) (bool, error) {
