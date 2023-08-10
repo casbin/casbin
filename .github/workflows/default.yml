@@ -1,4 +1,4 @@
-name: Default
+name: Test And Benchmark
 
 on: [push, pull_request]
 
