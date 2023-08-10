@@ -1,4 +1,4 @@
-name: Default
+name: Build
 
 on: [push, pull_request]
 
