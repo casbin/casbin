@@ -435,23 +435,23 @@ func (e *Enforcer) initRmMap() {
 	for ptype, assertion := range e.model["g"] {
 		if rm, ok := e.rmMap[ptype]; ok {
 			_ = rm.Clear()
-		} else {
-			if len(assertion.Tokens) <= 2 {
-				if len(assertion.ParamsTokens) == 0 {
-					e.rmMap[ptype] = defaultrolemanager.NewRoleManagerImpl(10)
-				} else {
-					e.rmMap[ptype] = defaultrolemanager.NewConditionalRoleManager(10)
-				}
+			continue
+		}
+		if len(assertion.Tokens) <= 2 && len(assertion.ParamsTokens) == 0 {
+			e.rmMap[ptype] = defaultrolemanager.NewRoleManagerImpl(10)
+		}
+		if len(assertion.Tokens) <= 2 && len(assertion.ParamsTokens) == 0 {
+			e.rmMap[ptype] = defaultrolemanager.NewConditionalRoleManager(10)
+		}
+		if len(assertion.Tokens) > 2 {
+			if len(assertion.ParamsTokens) == 0 {
+				e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
 			} else {
-				if len(assertion.ParamsTokens) == 0 {
-					e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
-				} else {
-					e.rmMap[ptype] = defaultrolemanager.NewConditionalDomainManager(10)
-				}
-				matchFun := "keyMatch(r_dom, p_dom)"
-				if strings.Contains(e.model["m"]["m"].Value, matchFun) {
-					e.AddNamedDomainMatchingFunc(ptype, "g", util.KeyMatch)
-				}
+				e.rmMap[ptype] = defaultrolemanager.NewConditionalDomainManager(10)
+			}
+			matchFun := "keyMatch(r_dom, p_dom)"
+			if strings.Contains(e.model["m"]["m"].Value, matchFun) {
+				e.AddNamedDomainMatchingFunc(ptype, "g", util.KeyMatch)
 			}
 		}
 	}

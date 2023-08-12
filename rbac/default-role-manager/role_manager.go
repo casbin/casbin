@@ -756,6 +756,13 @@ type ConditionalRoleManager struct {
 	RoleManagerImpl
 }
 
+func (crm *ConditionalRoleManager) copyFrom(other *ConditionalRoleManager) {
+	other.Range(func(name1, name2 string, domain ...string) bool {
+		_ = crm.AddLink(name1, name2, domain...)
+		return true
+	})
+}
+
 // use this constructor to avoid rebuild of AddMatchingFunc
 func newConditionalRoleManagerWithMatchingFunc(maxHierarchyLevel int, fn rbac.MatchingFunc) *ConditionalRoleManager {
 	rm := NewConditionalRoleManager(maxHierarchyLevel)
@@ -914,13 +921,6 @@ func (crm *ConditionalRoleManager) SetDomainLinkConditionFuncParams(userName, ro
 	role, _ := crm.getRole(roleName)
 
 	user.setLinkConditionFuncParams(role, domain, params...)
-}
-
-func (crm *ConditionalRoleManager) copyFrom(other *ConditionalRoleManager) {
-	other.Range(func(name1, name2 string, domain ...string) bool {
-		_ = crm.AddLink(name1, name2, domain...)
-		return true
-	})
 }
 
 type ConditionalDomainManager struct {
