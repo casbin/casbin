@@ -26,7 +26,9 @@ import (
 
 func testEnforce(t *testing.T, e *Enforcer, sub interface{}, obj interface{}, act string, res bool) {
 	t.Helper()
-	if myRes, _ := e.Enforce(sub, obj, act); myRes != res {
+	if myRes, err := e.Enforce(sub, obj, act); err != nil {
+		t.Errorf("Enforce Error: %s", err)
+	} else if myRes != res {
 		t.Errorf("%s, %v, %s: %t, supposed to be %t", sub, obj, act, myRes, res)
 	}
 }
@@ -40,7 +42,9 @@ func testEnforceWithoutUsers(t *testing.T, e *Enforcer, obj string, act string, 
 
 func testDomainEnforce(t *testing.T, e *Enforcer, sub string, dom string, obj string, act string, res bool) {
 	t.Helper()
-	if myRes, _ := e.Enforce(sub, dom, obj, act); myRes != res {
+	if myRes, err := e.Enforce(sub, dom, obj, act); err != nil {
+		t.Errorf("Enforce Error: %s", err)
+	} else if myRes != res {
 		t.Errorf("%s, %s, %s, %s: %t, supposed to be %t", sub, dom, obj, act, myRes, res)
 	}
 }
@@ -370,6 +374,15 @@ func (rm *testCustomRoleManager) Match(str string, pattern string) bool         
 func (rm *testCustomRoleManager) AddMatchingFunc(name string, fn rbac.MatchingFunc)       {}
 func (rm *testCustomRoleManager) AddDomainMatchingFunc(name string, fn rbac.MatchingFunc) {}
 
+func (rm *testCustomRoleManager) AddLinkConditionFunc(userName, roleName string, fn rbac.LinkConditionFunc) {
+}
+func (rm *testCustomRoleManager) SetLinkConditionFuncParams(userName, roleName string, params ...string) {
+}
+func (rm *testCustomRoleManager) AddDomainLinkConditionFunc(user string, role string, domain string, fn rbac.LinkConditionFunc) {
+}
+func (rm *testCustomRoleManager) SetDomainLinkConditionFuncParams(user string, role string, domain string, params ...string) {
+}
+
 func TestRBACModelWithCustomRoleManager(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	e.SetRoleManager(NewRoleManager())
@@ -681,4 +694,79 @@ func TestAllMatchModel(t *testing.T) {
 	testDomainEnforce(t, e, "alice", "domain1", "/book/1", "write", false)
 	testDomainEnforce(t, e, "alice", "domain2", "/book/1", "read", false)
 	testDomainEnforce(t, e, "alice", "domain2", "/book/1", "write", true)
+}
+
+func TestTemporalRolesModel(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_temporal_roles_model.conf", "examples/rbac_with_temporal_roles_policy.csv")
+
+	e.AddNamedLinkConditionFunc("g", "alice", "data2_admin", util.TimeMatchFunc)
+	e.AddNamedLinkConditionFunc("g", "alice", "data3_admin", util.TimeMatchFunc)
+	e.AddNamedLinkConditionFunc("g", "alice", "data4_admin", util.TimeMatchFunc)
+	e.AddNamedLinkConditionFunc("g", "alice", "data5_admin", util.TimeMatchFunc)
+	e.AddNamedLinkConditionFunc("g", "alice", "data6_admin", util.TimeMatchFunc)
+	e.AddNamedLinkConditionFunc("g", "alice", "data7_admin", util.TimeMatchFunc)
+	e.AddNamedLinkConditionFunc("g", "alice", "data8_admin", util.TimeMatchFunc)
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", true)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "alice", "data3", "read", true)
+	testEnforce(t, e, "alice", "data3", "write", true)
+	testEnforce(t, e, "alice", "data4", "read", true)
+	testEnforce(t, e, "alice", "data4", "write", true)
+	testEnforce(t, e, "alice", "data5", "read", true)
+	testEnforce(t, e, "alice", "data5", "write", true)
+	testEnforce(t, e, "alice", "data6", "read", false)
+	testEnforce(t, e, "alice", "data6", "write", false)
+	testEnforce(t, e, "alice", "data7", "read", true)
+	testEnforce(t, e, "alice", "data7", "write", true)
+	testEnforce(t, e, "alice", "data8", "read", false)
+	testEnforce(t, e, "alice", "data8", "write", false)
+}
+
+func TestTemporalRolesModelWithDomain(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domain_temporal_roles_model.conf", "examples/rbac_with_domain_temporal_roles_policy.csv")
+
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "data2_admin", "domain2", util.TimeMatchFunc)
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "data3_admin", "domain3", util.TimeMatchFunc)
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "data4_admin", "domain4", util.TimeMatchFunc)
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "data5_admin", "domain5", util.TimeMatchFunc)
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "data6_admin", "domain6", util.TimeMatchFunc)
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "data7_admin", "domain7", util.TimeMatchFunc)
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "data8_admin", "domain8", util.TimeMatchFunc)
+
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
+	testDomainEnforce(t, e, "alice", "domain2", "data2", "read", false)
+	testDomainEnforce(t, e, "alice", "domain2", "data2", "write", false)
+	testDomainEnforce(t, e, "alice", "domain3", "data3", "read", true)
+	testDomainEnforce(t, e, "alice", "domain3", "data3", "write", true)
+	testDomainEnforce(t, e, "alice", "domain4", "data4", "read", true)
+	testDomainEnforce(t, e, "alice", "domain4", "data4", "write", true)
+	testDomainEnforce(t, e, "alice", "domain5", "data5", "read", true)
+	testDomainEnforce(t, e, "alice", "domain5", "data5", "write", true)
+	testDomainEnforce(t, e, "alice", "domain6", "data6", "read", false)
+	testDomainEnforce(t, e, "alice", "domain6", "data6", "write", false)
+	testDomainEnforce(t, e, "alice", "domain7", "data7", "read", true)
+	testDomainEnforce(t, e, "alice", "domain7", "data7", "write", true)
+	testDomainEnforce(t, e, "alice", "domain8", "data8", "read", false)
+	testDomainEnforce(t, e, "alice", "domain8", "data8", "write", false)
+
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data1", "read", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data1", "write", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data2", "read", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data2", "write", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data3", "read", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data3", "write", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data4", "read", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data4", "write", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data5", "read", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data5", "write", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data6", "read", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data6", "write", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data7", "read", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data7", "write", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data8", "read", false)
+	testDomainEnforce(t, e, "alice", "domain_not_exist", "data8", "write", false)
 }

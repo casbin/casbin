@@ -432,14 +432,26 @@ func (e *Enforcer) SavePolicy() error {
 }
 
 func (e *Enforcer) initRmMap() {
-	for ptype := range e.model["g"] {
+	for ptype, assertion := range e.model["g"] {
 		if rm, ok := e.rmMap[ptype]; ok {
 			_ = rm.Clear()
 		} else {
-			e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
-			matchFun := "keyMatch(r_dom, p_dom)"
-			if strings.Contains(e.model["m"]["m"].Value, matchFun) {
-				e.AddNamedDomainMatchingFunc(ptype, "g", util.KeyMatch)
+			if len(assertion.Tokens) <= 2 {
+				if len(assertion.ParamsTokens) == 0 {
+					e.rmMap[ptype] = defaultrolemanager.NewRoleManagerImpl(10)
+				} else {
+					e.rmMap[ptype] = defaultrolemanager.NewConditionalRoleManager(10)
+				}
+			} else {
+				if len(assertion.ParamsTokens) == 0 {
+					e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
+				} else {
+					e.rmMap[ptype] = defaultrolemanager.NewConditionalDomainManager(10)
+				}
+				matchFun := "keyMatch(r_dom, p_dom)"
+				if strings.Contains(e.model["m"]["m"].Value, matchFun) {
+					e.AddNamedDomainMatchingFunc(ptype, "g", util.KeyMatch)
+				}
 			}
 		}
 	}
@@ -838,6 +850,45 @@ func (e *Enforcer) AddNamedMatchingFunc(ptype, name string, fn rbac.MatchingFunc
 func (e *Enforcer) AddNamedDomainMatchingFunc(ptype, name string, fn rbac.MatchingFunc) bool {
 	if rm, ok := e.rmMap[ptype]; ok {
 		rm.AddDomainMatchingFunc(name, fn)
+		return true
+	}
+	return false
+}
+
+// AddNamedLinkConditionFunc Add condition function fn for Link userName->roleName,
+// when fn returns true, Link is valid, otherwise invalid
+func (e *Enforcer) AddNamedLinkConditionFunc(ptype, user, role string, fn rbac.LinkConditionFunc) bool {
+	if rm, ok := e.rmMap[ptype]; ok {
+		rm.AddLinkConditionFunc(user, role, fn)
+		return true
+	}
+	return false
+}
+
+// AddNamedDomainLinkConditionFunc Add condition function fn for Link userName-> {roleName, domain},
+// when fn returns true, Link is valid, otherwise invalid
+func (e *Enforcer) AddNamedDomainLinkConditionFunc(ptype, user, role string, domain string, fn rbac.LinkConditionFunc) bool {
+	if rm, ok := e.rmMap[ptype]; ok {
+		rm.AddDomainLinkConditionFunc(user, role, domain, fn)
+		return true
+	}
+	return false
+}
+
+// SetNamedLinkConditionFuncParams Sets the parameters of the condition function fn for Link userName->roleName
+func (e *Enforcer) SetNamedLinkConditionFuncParams(ptype, user, role string, params ...string) bool {
+	if rm, ok := e.rmMap[ptype]; ok {
+		rm.SetLinkConditionFuncParams(user, role, params...)
+		return true
+	}
+	return false
+}
+
+// SetNamedDomainLinkConditionFuncParams Sets the parameters of the condition function fn
+// for Link userName->{roleName, domain}
+func (e *Enforcer) SetNamedDomainLinkConditionFuncParams(ptype, user, role, domain string, params ...string) bool {
+	if rm, ok := e.rmMap[ptype]; ok {
+		rm.SetDomainLinkConditionFuncParams(user, role, domain, params...)
 		return true
 	}
 	return false

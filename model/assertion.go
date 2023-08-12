@@ -28,6 +28,7 @@ type Assertion struct {
 	Key           string
 	Value         string
 	Tokens        []string
+	ParamsTokens  []string
 	Policy        [][]string
 	PolicyMap     map[string]int
 	RM            rbac.RoleManager
@@ -80,9 +81,19 @@ func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
 		if len(rule) > count {
 			rule = rule[:count]
 		}
-		err := ast.RM.AddLink(rule[0], rule[1], rule[2:]...)
-		if err != nil {
-			return err
+
+		domainRule := rule[2:len(ast.Tokens)]
+		if len(domainRule) == 0 {
+			if err := ast.RM.AddLink(rule[0], rule[1]); err != nil {
+				return err
+			}
+			ast.RM.SetLinkConditionFuncParams(rule[0], rule[1], rule[len(ast.Tokens):]...)
+		} else {
+			domain := domainRule[0]
+			if err := ast.RM.AddLink(rule[0], rule[1], domain); err != nil {
+				return err
+			}
+			ast.RM.SetDomainLinkConditionFuncParams(rule[0], rule[1], domain, rule[len(ast.Tokens):]...)
 		}
 	}
 

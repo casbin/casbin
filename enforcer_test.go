@@ -629,3 +629,107 @@ func TestEvalPriority(t *testing.T) {
 	testEnforce(t, e, "admin", "none", "write", false)
 	testEnforce(t, e, "user", "users", "write", false)
 }
+
+func TestLinkConditionFunc(t *testing.T) {
+	TrueFunc := func(args ...string) (bool, error) {
+		if len(args) != 0 {
+			return args[0] == "_" || args[0] == "true", nil
+		}
+		return false, nil
+	}
+
+	FalseFunc := func(args ...string) (bool, error) {
+		if len(args) != 0 {
+			return args[0] == "_" || args[0] == "false", nil
+		}
+		return false, nil
+	}
+
+	m, _ := model.NewModelFromFile("examples/rbac_with_temporal_roles_model.conf")
+	e, _ := NewEnforcer(m)
+
+	_, _ = e.AddPolicies([][]string{
+		{"alice", "data1", "read"},
+		{"alice", "data1", "write"},
+		{"data2_admin", "data2", "read"},
+		{"data2_admin", "data2", "write"},
+		{"data3_admin", "data3", "read"},
+		{"data3_admin", "data3", "write"},
+		{"data4_admin", "data4", "read"},
+		{"data4_admin", "data4", "write"},
+		{"data5_admin", "data5", "read"},
+		{"data5_admin", "data5", "write"},
+	})
+
+	_, _ = e.AddGroupingPolicies([][]string{
+		{"alice", "data2_admin", "_", "_"},
+		{"alice", "data3_admin", "_", "_"},
+		{"alice", "data4_admin", "_", "_"},
+		{"alice", "data5_admin", "_", "_"},
+	})
+
+	e.AddNamedLinkConditionFunc("g", "alice", "data2_admin", TrueFunc)
+	e.AddNamedLinkConditionFunc("g", "alice", "data3_admin", TrueFunc)
+	e.AddNamedLinkConditionFunc("g", "alice", "data4_admin", FalseFunc)
+	e.AddNamedLinkConditionFunc("g", "alice", "data5_admin", FalseFunc)
+
+	e.SetNamedLinkConditionFuncParams("g", "alice", "data2_admin", "true")
+	e.SetNamedLinkConditionFuncParams("g", "alice", "data3_admin", "not true")
+	e.SetNamedLinkConditionFuncParams("g", "alice", "data4_admin", "false")
+	e.SetNamedLinkConditionFuncParams("g", "alice", "data5_admin", "not false")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", true)
+	testEnforce(t, e, "alice", "data2", "read", true)
+	testEnforce(t, e, "alice", "data2", "write", true)
+	testEnforce(t, e, "alice", "data3", "read", false)
+	testEnforce(t, e, "alice", "data3", "write", false)
+	testEnforce(t, e, "alice", "data4", "read", true)
+	testEnforce(t, e, "alice", "data4", "write", true)
+	testEnforce(t, e, "alice", "data5", "read", false)
+	testEnforce(t, e, "alice", "data5", "write", false)
+
+	m, _ = model.NewModelFromFile("examples/rbac_with_domain_temporal_roles_model.conf")
+	e, _ = NewEnforcer(m)
+
+	_, _ = e.AddPolicies([][]string{
+		{"alice", "domain1", "data1", "read"},
+		{"alice", "domain1", "data1", "write"},
+		{"data2_admin", "domain2", "data2", "read"},
+		{"data2_admin", "domain2", "data2", "write"},
+		{"data3_admin", "domain3", "data3", "read"},
+		{"data3_admin", "domain3", "data3", "write"},
+		{"data4_admin", "domain4", "data4", "read"},
+		{"data4_admin", "domain4", "data4", "write"},
+		{"data5_admin", "domain5", "data5", "read"},
+		{"data5_admin", "domain5", "data5", "write"},
+	})
+
+	_, _ = e.AddGroupingPolicies([][]string{
+		{"alice", "data2_admin", "domain2", "_", "_"},
+		{"alice", "data3_admin", "domain3", "_", "_"},
+		{"alice", "data4_admin", "domain4", "_", "_"},
+		{"alice", "data5_admin", "domain5", "_", "_"},
+	})
+
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "data2_admin", "domain2", TrueFunc)
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "data3_admin", "domain3", TrueFunc)
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "data4_admin", "domain4", FalseFunc)
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "data5_admin", "domain5", FalseFunc)
+
+	e.SetNamedDomainLinkConditionFuncParams("g", "alice", "data2_admin", "domain2", "true")
+	e.SetNamedDomainLinkConditionFuncParams("g", "alice", "data3_admin", "domain3", "not true")
+	e.SetNamedDomainLinkConditionFuncParams("g", "alice", "data4_admin", "domain4", "false")
+	e.SetNamedDomainLinkConditionFuncParams("g", "alice", "data5_admin", "domain5", "not false")
+
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "write", true)
+	testDomainEnforce(t, e, "alice", "domain2", "data2", "read", true)
+	testDomainEnforce(t, e, "alice", "domain2", "data2", "write", true)
+	testDomainEnforce(t, e, "alice", "domain3", "data3", "read", false)
+	testDomainEnforce(t, e, "alice", "domain3", "data3", "write", false)
+	testDomainEnforce(t, e, "alice", "domain4", "data4", "read", true)
+	testDomainEnforce(t, e, "alice", "domain4", "data4", "write", true)
+	testDomainEnforce(t, e, "alice", "domain5", "data5", "read", false)
+	testDomainEnforce(t, e, "alice", "domain5", "data5", "write", false)
+}

@@ -95,3 +95,10 @@ func (l *DefaultLogger) LogRole(roles []string) {
 
 	log.Println("Roles: ", strings.Join(roles, "\n"))
 }
+
+func (l *DefaultLogger) LogError(err error, msg ...string) {
+	if !l.enabled {
+		return
+	}
+	log.Println(msg, err)
+}

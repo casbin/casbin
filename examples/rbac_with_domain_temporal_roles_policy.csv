@@ -1,0 +1,24 @@
+p, alice, domain1, data1, read
+p, alice, domain1, data1, write
+p, data2_admin, domain2, data2, read
+p, data2_admin, domain2, data2, write
+p, data3_admin, domain3, data3, read
+p, data3_admin, domain3, data3, write
+p, data4_admin, domain4, data4, read
+p, data4_admin, domain4, data4, write
+p, data5_admin, domain5, data5, read
+p, data5_admin, domain5, data5, write
+p, data6_admin, domain6, data6, read
+p, data6_admin, domain6, data6, write
+p, data7_admin, domain7, data7, read
+p, data7_admin, domain7, data7, write
+p, data8_admin, domain8, data8, read
+p, data8_admin, domain8, data8, write
+
+g, alice, data2_admin, domain2, 0000-01-01 00:00:00, 0000-01-02 00:00:00
+g, alice, data3_admin, domain3, 0000-01-01 00:00:00, 9999-12-30 00:00:00
+g, alice, data4_admin, domain4, _, _
+g, alice, data5_admin, domain5, _, 9999-12-30 00:00:00
+g, alice, data6_admin, domain6, _, 0000-01-02 00:00:00
+g, alice, data7_admin, domain7, 0000-01-01 00:00:00, _
+g, alice, data8_admin, domain8, 9999-12-30 00:00:00, _
