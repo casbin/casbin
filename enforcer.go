@@ -342,15 +342,32 @@ func (e *Enforcer) LoadPolicy() error {
 
 	if e.autoBuildRoleLinks {
 		needToRebuild = true
-		for _, rm := range e.rmMap {
-			err := rm.Clear()
+		if len(e.rmMap) != 0 {
+			for _, rm := range e.rmMap {
+				err := rm.Clear()
+				if err != nil {
+					return err
+				}
+			}
+
+			err = newModel.BuildRoleLinks(e.rmMap)
 			if err != nil {
 				return err
 			}
 		}
-		err = newModel.BuildRoleLinks(e.rmMap)
-		if err != nil {
-			return err
+
+		if len(e.condRmMap) != 0 {
+			for _, crm := range e.condRmMap {
+				err := crm.Clear()
+				if err != nil {
+					return err
+				}
+			}
+
+			err = newModel.BuildConditionalRoleLinks(e.condRmMap)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	e.model = newModel
@@ -552,11 +569,11 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	functions := e.fm.GetFunctions()
 	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
-			if rm := ast.RM; rm != nil {
-				functions[key] = util.GenerateGFunction(rm)
+			if len(e.rmMap) != 0 {
+				functions[key] = util.GenerateGFunction(ast.RM)
 			}
-			if condRM := ast.CondRM; condRM != nil {
-				functions[key] = util.GenerateConditionalGFunction(condRM)
+			if len(e.condRmMap) != 0 {
+				functions[key] = util.GenerateConditionalGFunction(ast.CondRM)
 			}
 		}
 	}
