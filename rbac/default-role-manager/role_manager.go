@@ -463,21 +463,6 @@ func (rm *RoleManagerImpl) BuildRelationship(name1 string, name2 string, domain 
 	return nil
 }
 
-// AddLinkConditionFunc is not supported by RoleManagerImpl
-func (rm *RoleManagerImpl) AddLinkConditionFunc(userName, roleName string, fn rbac.LinkConditionFunc) {
-}
-
-// SetLinkConditionFuncParams is not supported by RoleManagerImpl
-func (rm *RoleManagerImpl) SetLinkConditionFuncParams(userName, roleName string, params ...string) {}
-
-// AddDomainLinkConditionFunc is not supported by RoleManagerImpl
-func (rm *RoleManagerImpl) AddDomainLinkConditionFunc(user string, role string, domain string, fn rbac.LinkConditionFunc) {
-}
-
-// SetDomainLinkConditionFuncParams is not supported by RoleManagerImpl
-func (rm *RoleManagerImpl) SetDomainLinkConditionFuncParams(user string, role string, domain string, params ...string) {
-}
-
 type DomainManager struct {
 	rmMap              *sync.Map
 	maxHierarchyLevel  int
@@ -725,21 +710,6 @@ func (rm *DomainManager) GetAllDomains() ([]string, error) {
 // Deprecated: BuildRelationship is no longer required
 func (rm *DomainManager) BuildRelationship(name1 string, name2 string, domain ...string) error {
 	return nil
-}
-
-// AddLinkConditionFunc is not supported by DomainManager
-func (dm *DomainManager) AddLinkConditionFunc(userName, roleName string, fn rbac.LinkConditionFunc) {
-}
-
-// SetLinkConditionFuncParams is not supported by DomainManager
-func (dm *DomainManager) SetLinkConditionFuncParams(userName, roleName string, params ...string) {}
-
-// AddDomainLinkConditionFunc is not supported by DomainManager
-func (dm *DomainManager) AddDomainLinkConditionFunc(user string, role string, domain string, fn rbac.LinkConditionFunc) {
-}
-
-// SetDomainLinkConditionFuncParams is not supported by DomainManager
-func (dm *DomainManager) SetDomainLinkConditionFuncParams(user string, role string, domain string, params ...string) {
 }
 
 type RoleManager struct {

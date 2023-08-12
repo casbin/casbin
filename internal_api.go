@@ -91,6 +91,11 @@ func (e *Enforcer) addPoliciesWithoutNotify(sec string, ptype string, rules [][]
 		if err != nil {
 			return true, err
 		}
+
+		err = e.BuildIncrementalConditionalRoleLinks(model.PolicyAdd, ptype, rules)
+		if err != nil {
+			return true, err
+		}
 	}
 
 	return true, nil

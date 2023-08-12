@@ -59,9 +59,12 @@ type RoleManager interface {
 	AddMatchingFunc(name string, fn MatchingFunc)
 	// AddDomainMatchingFunc adds the domain matching function
 	AddDomainMatchingFunc(name string, fn MatchingFunc)
+}
 
-	// interfaces of ConditionalRoleManager and ConditionalDomainManager
-
+// ConditionalRoleManager provides interface to define the operations for managing roles.
+// Link with conditions is supported
+type ConditionalRoleManager interface {
+	RoleManager
 	// AddLinkConditionFunc Add condition function fn for Link userName->roleName,
 	// when fn returns true, Link is valid, otherwise invalid
 	AddLinkConditionFunc(userName, roleName string, fn LinkConditionFunc)
