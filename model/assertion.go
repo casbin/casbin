@@ -81,17 +81,9 @@ func (ast *Assertion) buildRoleLinks(rm rbac.RoleManager) error {
 		if len(rule) > count {
 			rule = rule[:count]
 		}
-
-		domainRule := rule[2:len(ast.Tokens)]
-		if len(domainRule) == 0 {
-			if err := ast.RM.AddLink(rule[0], rule[1]); err != nil {
-				return err
-			}
-		} else {
-			domain := domainRule[0]
-			if err := ast.RM.AddLink(rule[0], rule[1], domain); err != nil {
-				return err
-			}
+		err := ast.RM.AddLink(rule[0], rule[1], rule[2:]...)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -112,17 +104,18 @@ func (ast *Assertion) buildIncrementalConditionalRoleLinks(condRM rbac.Condition
 		if len(rule) > count {
 			rule = rule[:count]
 		}
+
+		var err error
+		domainRule := rule[2:len(ast.Tokens)]
+
 		switch op {
 		case PolicyAdd:
-			err := condRM.AddLink(rule[0], rule[1], rule[2:]...)
-			if err != nil {
-				return err
-			}
+			err = ast.addConditionalRoleLink(rule, domainRule)
 		case PolicyRemove:
-			err := condRM.DeleteLink(rule[0], rule[1], rule[2:]...)
-			if err != nil {
-				return err
-			}
+			err = ast.CondRM.DeleteLink(rule[0], rule[1], rule[2:]...)
+		}
+		if err != nil {
+			return err
 		}
 	}
 
@@ -144,21 +137,32 @@ func (ast *Assertion) buildConditionalRoleLinks(condRM rbac.ConditionalRoleManag
 		}
 
 		domainRule := rule[2:len(ast.Tokens)]
-		if len(domainRule) == 0 {
-			if err := ast.CondRM.AddLink(rule[0], rule[1]); err != nil {
-				return err
-			}
-			ast.CondRM.SetLinkConditionFuncParams(rule[0], rule[1], rule[len(ast.Tokens):]...)
-		} else {
-			domain := domainRule[0]
-			if err := ast.CondRM.AddLink(rule[0], rule[1], domain); err != nil {
-				return err
-			}
-			ast.CondRM.SetDomainLinkConditionFuncParams(rule[0], rule[1], domain, rule[len(ast.Tokens):]...)
+
+		err := ast.addConditionalRoleLink(rule, domainRule)
+		if err != nil {
+			return err
 		}
 	}
 
 	return nil
+}
+
+// addConditionalRoleLinks adds Link to rbac.ConditionalRoleManager and sets the parameters for LinkConditionFunc
+func (ast *Assertion) addConditionalRoleLink(rule []string, domainRule []string) error {
+	var err error
+	if len(domainRule) == 0 {
+		err = ast.CondRM.AddLink(rule[0], rule[1])
+		if err == nil {
+			ast.CondRM.SetLinkConditionFuncParams(rule[0], rule[1], rule[len(ast.Tokens):]...)
+		}
+	} else {
+		domain := domainRule[0]
+		err = ast.CondRM.AddLink(rule[0], rule[1], domain)
+		if err == nil {
+			ast.CondRM.SetDomainLinkConditionFuncParams(rule[0], rule[1], domain, rule[len(ast.Tokens):]...)
+		}
+	}
+	return err
 }
 
 func (ast *Assertion) setLogger(logger log.Logger) {

@@ -69,8 +69,8 @@ func (model Model) BuildIncrementalConditionalRoleLinks(condRmMap map[string]rba
 func (model Model) BuildConditionalRoleLinks(condRmMap map[string]rbac.ConditionalRoleManager) error {
 	model.PrintPolicy()
 	for ptype, ast := range model["g"] {
-		rm := condRmMap[ptype]
-		err := ast.buildConditionalRoleLinks(rm)
+		condRm := condRmMap[ptype]
+		err := ast.buildConditionalRoleLinks(condRm)
 		if err != nil {
 			return err
 		}

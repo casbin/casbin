@@ -342,35 +342,43 @@ func (e *Enforcer) LoadPolicy() error {
 
 	if e.autoBuildRoleLinks {
 		needToRebuild = true
-		if len(e.rmMap) != 0 {
-			for _, rm := range e.rmMap {
-				err := rm.Clear()
-				if err != nil {
-					return err
-				}
-			}
-
-			err = newModel.BuildRoleLinks(e.rmMap)
-			if err != nil {
-				return err
-			}
-		}
-
-		if len(e.condRmMap) != 0 {
-			for _, crm := range e.condRmMap {
-				err := crm.Clear()
-				if err != nil {
-					return err
-				}
-			}
-
-			err = newModel.BuildConditionalRoleLinks(e.condRmMap)
-			if err != nil {
-				return err
-			}
+		err := e.rebuildRoleLinks(newModel)
+		if err != nil {
+			return err
 		}
 	}
 	e.model = newModel
+	return nil
+}
+
+func (e *Enforcer) rebuildRoleLinks(newModel model.Model) error {
+	if len(e.rmMap) != 0 {
+		for _, rm := range e.rmMap {
+			err := rm.Clear()
+			if err != nil {
+				return err
+			}
+		}
+
+		err := newModel.BuildRoleLinks(e.rmMap)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(e.condRmMap) != 0 {
+		for _, crm := range e.condRmMap {
+			err := crm.Clear()
+			if err != nil {
+				return err
+			}
+		}
+
+		err := newModel.BuildConditionalRoleLinks(e.condRmMap)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
