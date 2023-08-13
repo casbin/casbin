@@ -915,7 +915,7 @@ func (dm *ConditionalDomainManager) load(name interface{}) (value *ConditionalRo
 	return nil, false
 }
 
-// load or create a RoleManager instance of domain
+// load or create a ConditionalRoleManager instance of domain
 func (cdm *ConditionalDomainManager) getConditionalRoleManager(domain string, store bool) *ConditionalRoleManager {
 	var rm *ConditionalRoleManager
 	var ok bool
@@ -956,8 +956,8 @@ func (cdm *ConditionalDomainManager) AddLink(name1 string, name2 string, domains
 	if err != nil {
 		return err
 	}
-	condtionalRoleManager := cdm.getConditionalRoleManager(domain, true) //create role manager if it does not exist
-	_ = condtionalRoleManager.AddLink(name1, name2, domain)
+	conditionalRoleManager := cdm.getConditionalRoleManager(domain, true) //create role manager if it does not exist
+	_ = conditionalRoleManager.AddLink(name1, name2, domain)
 
 	cdm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
 		_ = rm.AddLink(name1, name2, domain)

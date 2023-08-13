@@ -342,8 +342,11 @@ func (e *Enforcer) LoadPolicy() error {
 
 	if e.autoBuildRoleLinks {
 		needToRebuild = true
-		err := e.rebuildRoleLinks(newModel)
-		if err != nil {
+		if err := e.rebuildRoleLinks(newModel); err != nil {
+			return err
+		}
+
+		if err := e.rebuildConditionalRoleLinks(newModel); err != nil {
 			return err
 		}
 	}
@@ -366,6 +369,10 @@ func (e *Enforcer) rebuildRoleLinks(newModel model.Model) error {
 		}
 	}
 
+	return nil
+}
+
+func (e *Enforcer) rebuildConditionalRoleLinks(newModel model.Model) error {
 	if len(e.condRmMap) != 0 {
 		for _, crm := range e.condRmMap {
 			err := crm.Clear()
