@@ -22,15 +22,27 @@ import (
 func CasbinJsGetPermissionForUser(e IEnforcer, user string) (string, error) {
 	model := e.GetModel()
 	m := map[string]interface{}{}
+
 	m["m"] = model.ToText()
-	policies := make([][]string, 0)
+
+	pRules := [][]string{}
 	for ptype := range model["p"] {
-		policy := model.GetPolicy("p", ptype)
-		for i := range policy {
-			policies = append(policies, append([]string{ptype}, policy[i]...))
+		policies := model.GetPolicy("p", ptype)
+		for _, rules := range policies {
+			pRules = append(pRules, append([]string{ptype}, rules...))
 		}
 	}
-	m["p"] = policies
+	m["p"] = pRules
+
+	gRules := [][]string{}
+	for ptype := range model["g"] {
+		policies := model.GetPolicy("g", ptype)
+		for _, rules := range policies {
+			gRules = append(gRules, append([]string{ptype}, rules...))
+		}
+	}
+	m["g"] = gRules
+
 	result := bytes.NewBuffer([]byte{})
 	encoder := json.NewEncoder(result)
 	encoder.SetEscapeHTML(false)
