@@ -37,7 +37,7 @@ const DefaultSep = ","
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
 func (model Model) BuildIncrementalRoleLinks(rmMap map[string]rbac.RoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
-	if sec == "g" {
+	if sec == "g" && rmMap[ptype] != nil {
 		return model[sec][ptype].buildIncrementalRoleLinks(rmMap[ptype], op, rules)
 	}
 	return nil
@@ -49,6 +49,28 @@ func (model Model) BuildRoleLinks(rmMap map[string]rbac.RoleManager) error {
 	for ptype, ast := range model["g"] {
 		rm := rmMap[ptype]
 		err := ast.buildRoleLinks(rm)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// BuildIncrementalConditionalRoleLinks provides incremental build the role inheritance relations.
+func (model Model) BuildIncrementalConditionalRoleLinks(condRmMap map[string]rbac.ConditionalRoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
+	if sec == "g" && condRmMap[ptype] != nil {
+		return model[sec][ptype].buildIncrementalConditionalRoleLinks(condRmMap[ptype], op, rules)
+	}
+	return nil
+}
+
+// BuildConditionalRoleLinks initializes the roles in RBAC.
+func (model Model) BuildConditionalRoleLinks(condRmMap map[string]rbac.ConditionalRoleManager) error {
+	model.PrintPolicy()
+	for ptype, ast := range model["g"] {
+		condRm := condRmMap[ptype]
+		err := ast.buildConditionalRoleLinks(condRm)
 		if err != nil {
 			return err
 		}

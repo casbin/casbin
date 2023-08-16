@@ -22,9 +22,11 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"time"
+
+	"github.com/casbin/casbin/v2/rbac"
 
 	"github.com/Knetic/govaluate"
-	"github.com/casbin/casbin/v2/rbac"
 )
 
 var (
@@ -44,6 +46,14 @@ func validateVariadicArgs(expectedLen int, args ...interface{}) error {
 		}
 	}
 
+	return nil
+}
+
+// validate the variadic string parameter size
+func validateVariadicStringArgs(expectedLen int, args ...string) error {
+	if len(args) != expectedLen {
+		return fmt.Errorf("expected %d arguments, but got %d", expectedLen, len(args))
+	}
 	return nil
 }
 
@@ -273,7 +283,7 @@ func KeyMatch4Func(args ...interface{}) (interface{}, error) {
 }
 
 // KeyMatch5 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *
-// For example, 
+// For example,
 // - "/foo/bar?status=1&type=2" matches "/foo/bar"
 // - "/parent/child1" and "/parent/child1" matches "/parent/*"
 // - "/parent/child1?status=1" matches "/parent/*"
@@ -416,4 +426,57 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 		memorized.Store(key, v)
 		return v, nil
 	}
+}
+
+// GenerateConditionalGFunction is the factory method of the g(_, _[, _]) function with conditions.
+func GenerateConditionalGFunction(crm rbac.ConditionalRoleManager) govaluate.ExpressionFunction {
+	return func(args ...interface{}) (interface{}, error) {
+		// Like all our other govaluate functions, all args are strings.
+		var hasLink bool
+
+		name1, name2 := args[0].(string), args[1].(string)
+		if crm == nil {
+			hasLink = name1 == name2
+		} else if len(args) == 2 {
+			hasLink, _ = crm.HasLink(name1, name2)
+		} else {
+			domain := args[2].(string)
+			hasLink, _ = crm.HasLink(name1, name2, domain)
+		}
+
+		return hasLink, nil
+	}
+}
+
+// builtin LinkConditionFunc
+
+// TimeMatchFunc is the wrapper for TimeMatch.
+func TimeMatchFunc(args ...string) (bool, error) {
+	if err := validateVariadicStringArgs(2, args...); err != nil {
+		return false, fmt.Errorf("%s: %s", "TimeMatch", err)
+	}
+	return TimeMatch(args[0], args[1])
+}
+
+// TimeMatch determines whether the current time is between startTime and endTime.
+// You can use "_" to indicate that the parameter is ignored
+func TimeMatch(startTime, endTime string) (bool, error) {
+	now := time.Now()
+	if startTime != "_" {
+		if start, err := time.Parse("2006-01-02 15:04:05", startTime); err != nil {
+			return false, err
+		} else if !now.After(start) {
+			return false, nil
+		}
+	}
+
+	if endTime != "_" {
+		if end, err := time.Parse("2006-01-02 15:04:05", endTime); err != nil {
+			return false, err
+		} else if !now.Before(end) {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }

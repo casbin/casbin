@@ -139,7 +139,6 @@ func TestRole(t *testing.T) {
 	testPrintRoles(t, rm, "g2", []string{})
 	testPrintRoles(t, rm, "g3", []string{})
 
-
 	rm = NewRoleManager(3)
 	rm.AddMatchingFunc("keyMatch", util.KeyMatch)
 

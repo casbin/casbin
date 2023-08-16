@@ -54,6 +54,18 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 	return model.AddDef(sec, key, value)
 }
 
+var paramsRegex = regexp.MustCompile(`\((.*?)\)`)
+
+// getParamsToken Get ParamsToken from Assertion.Value
+func getParamsToken(value string) []string {
+	paramsString := paramsRegex.FindString(value)
+	if paramsString == "" {
+		return nil
+	}
+	paramsString = strings.TrimSuffix(strings.TrimPrefix(paramsString, "("), ")")
+	return strings.Split(paramsString, ",")
+}
+
 // AddDef adds an assertion to the model.
 func (model Model) AddDef(sec string, key string, value string) bool {
 	if value == "" {
@@ -73,7 +85,9 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 			ast.Tokens[i] = key + "_" + strings.TrimSpace(ast.Tokens[i])
 		}
 	} else if sec == "g" {
+		ast.ParamsTokens = getParamsToken(ast.Value)
 		ast.Tokens = strings.Split(ast.Value, ",")
+		ast.Tokens = ast.Tokens[:len(ast.Tokens)-len(ast.ParamsTokens)]
 	} else {
 		ast.Value = util.RemoveComments(util.EscapeAssertion(ast.Value))
 	}

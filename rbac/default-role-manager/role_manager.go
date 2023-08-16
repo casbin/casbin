@@ -19,7 +19,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
 	"github.com/casbin/casbin/v2/util"
@@ -29,11 +28,13 @@ const defaultDomain string = ""
 
 // Role represents the data structure for a role in RBAC.
 type Role struct {
-	name      string
-	roles     *sync.Map
-	users     *sync.Map
-	matched   *sync.Map
-	matchedBy *sync.Map
+	name                       string
+	roles                      *sync.Map
+	users                      *sync.Map
+	matched                    *sync.Map
+	matchedBy                  *sync.Map
+	linkConditionFuncMap       *sync.Map
+	linkConditionFuncParamsMap *sync.Map
 }
 
 func newRole(name string) *Role {
@@ -43,6 +44,8 @@ func newRole(name string) *Role {
 	r.users = &sync.Map{}
 	r.matched = &sync.Map{}
 	r.matchedBy = &sync.Map{}
+	r.linkConditionFuncMap = &sync.Map{}
+	r.linkConditionFuncParamsMap = &sync.Map{}
 	return &r
 }
 
@@ -161,6 +164,35 @@ func (r *Role) getUsers() []string {
 		return true
 	})
 	return names
+}
+
+type linkConditionFuncKey struct {
+	roleName   string
+	domainName string
+}
+
+func (r *Role) addLinkConditionFunc(role *Role, domain string, fn rbac.LinkConditionFunc) {
+	r.linkConditionFuncMap.Store(linkConditionFuncKey{role.name, domain}, fn)
+}
+
+func (r *Role) getLinkConditionFunc(role *Role, domain string) (rbac.LinkConditionFunc, bool) {
+	fn, ok := r.linkConditionFuncMap.Load(linkConditionFuncKey{role.name, domain})
+	if fn == nil {
+		return nil, ok
+	}
+	return fn.(rbac.LinkConditionFunc), ok
+}
+
+func (r *Role) setLinkConditionFuncParams(role *Role, domain string, params ...string) {
+	r.linkConditionFuncParamsMap.Store(linkConditionFuncKey{role.name, domain}, params)
+}
+
+func (r *Role) getLinkConditionFuncParams(role *Role, domain string) ([]string, bool) {
+	params, ok := r.linkConditionFuncParamsMap.Load(linkConditionFuncKey{role.name, domain})
+	if params == nil {
+		return nil, ok
+	}
+	return params.([]string), ok
 }
 
 // RoleManagerImpl provides a default implementation for the RoleManager interface
@@ -500,10 +532,8 @@ func (dm *DomainManager) getDomain(domains ...string) (domain string, err error)
 	switch len(domains) {
 	case 0:
 		return defaultDomain, nil
-	case 1:
-		return domains[0], nil
 	default:
-		return "", errors.ErrDomainParameter
+		return domains[0], nil
 	}
 }
 
@@ -690,4 +720,295 @@ func NewRoleManager(maxHierarchyLevel int) *RoleManager {
 	rm := &RoleManager{}
 	rm.DomainManager = NewDomainManager(maxHierarchyLevel)
 	return rm
+}
+
+type ConditionalRoleManager struct {
+	RoleManagerImpl
+}
+
+func (crm *ConditionalRoleManager) copyFrom(other *ConditionalRoleManager) {
+	other.Range(func(name1, name2 string, domain ...string) bool {
+		_ = crm.AddLink(name1, name2, domain...)
+		return true
+	})
+}
+
+// use this constructor to avoid rebuild of AddMatchingFunc
+func newConditionalRoleManagerWithMatchingFunc(maxHierarchyLevel int, fn rbac.MatchingFunc) *ConditionalRoleManager {
+	rm := NewConditionalRoleManager(maxHierarchyLevel)
+	rm.matchingFunc = fn
+	return rm
+}
+
+// NewConditionalRoleManager is the constructor for creating an instance of the
+// ConditionalRoleManager implementation.
+func NewConditionalRoleManager(maxHierarchyLevel int) *ConditionalRoleManager {
+	rm := ConditionalRoleManager{}
+	_ = rm.Clear() //init allRoles and matchingFuncCache
+	rm.maxHierarchyLevel = maxHierarchyLevel
+	rm.SetLogger(&log.DefaultLogger{})
+	return &rm
+}
+
+// HasLink determines whether role: name1 inherits role: name2.
+func (crm *ConditionalRoleManager) HasLink(name1 string, name2 string, domains ...string) (bool, error) {
+	if name1 == name2 || (crm.matchingFunc != nil && crm.Match(name1, name2)) {
+		return true, nil
+	}
+
+	user, userCreated := crm.getRole(name1)
+	role, roleCreated := crm.getRole(name2)
+
+	if userCreated {
+		defer crm.removeRole(user.name)
+	}
+	if roleCreated {
+		defer crm.removeRole(role.name)
+	}
+
+	return crm.hasLinkHelper(role.name, map[string]*Role{user.name: user}, crm.maxHierarchyLevel, domains...), nil
+}
+
+// hasLinkHelper use the Breadth First Search algorithm to traverse the Role tree
+// Judging whether the user has a role (has link) is to judge whether the role node can be reached from the user node
+func (crm *ConditionalRoleManager) hasLinkHelper(targetName string, roles map[string]*Role, level int, domains ...string) bool {
+	if level < 0 || len(roles) == 0 {
+		return false
+	}
+	nextRoles := map[string]*Role{}
+	for _, role := range roles {
+		if targetName == role.name || (crm.matchingFunc != nil && crm.Match(role.name, targetName)) {
+			return true
+		}
+		role.rangeRoles(func(key, value interface{}) bool {
+			nextRole := value.(*Role)
+			return crm.getNextRoles(role, nextRole, domains, nextRoles)
+		})
+	}
+
+	return crm.hasLinkHelper(targetName, nextRoles, level-1)
+}
+
+func (crm *ConditionalRoleManager) getNextRoles(currentRole, nextRole *Role, domains []string, nextRoles map[string]*Role) bool {
+	passLinkConditionFunc := true
+	var err error
+	// If LinkConditionFunc exists, it needs to pass the verification to get nextRole
+	if len(domains) == 0 {
+		if linkConditionFunc, existLinkCondition := crm.GetLinkConditionFunc(currentRole.name, nextRole.name); existLinkCondition {
+			params, _ := crm.GetLinkConditionFuncParams(currentRole.name, nextRole.name)
+			passLinkConditionFunc, err = linkConditionFunc(params...)
+		}
+	} else {
+		if linkConditionFunc, existLinkCondition := crm.GetDomainLinkConditionFunc(currentRole.name, nextRole.name, domains[0]); existLinkCondition {
+			params, _ := crm.GetLinkConditionFuncParams(currentRole.name, nextRole.name, domains[0])
+			passLinkConditionFunc, err = linkConditionFunc(params...)
+		}
+	}
+
+	if err != nil {
+		crm.logger.LogError(err, "hasLinkHelper LinkCondition Error")
+		return false
+	}
+
+	if passLinkConditionFunc {
+		nextRoles[nextRole.name] = nextRole
+	}
+
+	return true
+}
+
+// GetLinkConditionFunc get LinkConditionFunc based on userName, roleName
+func (crm *ConditionalRoleManager) GetLinkConditionFunc(userName, roleName string) (rbac.LinkConditionFunc, bool) {
+	return crm.GetDomainLinkConditionFunc(userName, roleName, defaultDomain)
+}
+
+// GetDomainLinkConditionFunc get LinkConditionFunc based on userName, roleName, domain
+func (crm *ConditionalRoleManager) GetDomainLinkConditionFunc(userName, roleName, domain string) (rbac.LinkConditionFunc, bool) {
+	user, userCreated := crm.getRole(userName)
+	role, roleCreated := crm.getRole(roleName)
+
+	if userCreated {
+		crm.removeRole(user.name)
+		return nil, false
+	}
+
+	if roleCreated {
+		crm.removeRole(role.name)
+		return nil, false
+	}
+
+	return user.getLinkConditionFunc(role, domain)
+}
+
+// GetLinkConditionFuncParams gets parameters of LinkConditionFunc based on userName, roleName, domain
+func (crm *ConditionalRoleManager) GetLinkConditionFuncParams(userName, roleName string, domain ...string) ([]string, bool) {
+	user, userCreated := crm.getRole(userName)
+	role, roleCreated := crm.getRole(roleName)
+
+	if userCreated {
+		crm.removeRole(user.name)
+		return nil, false
+	}
+
+	if roleCreated {
+		crm.removeRole(role.name)
+		return nil, false
+	}
+
+	domainName := defaultDomain
+	if len(domain) != 0 {
+		domainName = domain[0]
+	}
+
+	if params, ok := user.getLinkConditionFuncParams(role, domainName); ok {
+		return params, true
+	} else {
+		return nil, false
+	}
+}
+
+// AddLinkConditionFunc is based on userName, roleName, add LinkConditionFunc
+func (crm *ConditionalRoleManager) AddLinkConditionFunc(userName, roleName string, fn rbac.LinkConditionFunc) {
+	crm.AddDomainLinkConditionFunc(userName, roleName, defaultDomain, fn)
+}
+
+// AddDomainLinkConditionFunc is based on userName, roleName, domain, add LinkConditionFunc
+func (crm *ConditionalRoleManager) AddDomainLinkConditionFunc(userName, roleName, domain string, fn rbac.LinkConditionFunc) {
+	user, _ := crm.getRole(userName)
+	role, _ := crm.getRole(roleName)
+
+	user.addLinkConditionFunc(role, domain, fn)
+}
+
+// SetLinkConditionFuncParams sets parameters of LinkConditionFunc based on userName, roleName, domain
+func (crm *ConditionalRoleManager) SetLinkConditionFuncParams(userName, roleName string, params ...string) {
+	crm.SetDomainLinkConditionFuncParams(userName, roleName, defaultDomain, params...)
+}
+
+// SetDomainLinkConditionFuncParams sets parameters of LinkConditionFunc based on userName, roleName, domain
+func (crm *ConditionalRoleManager) SetDomainLinkConditionFuncParams(userName, roleName, domain string, params ...string) {
+	user, _ := crm.getRole(userName)
+	role, _ := crm.getRole(roleName)
+
+	user.setLinkConditionFuncParams(role, domain, params...)
+}
+
+type ConditionalDomainManager struct {
+	ConditionalRoleManager
+	DomainManager
+}
+
+// NewConditionalDomainManager is the constructor for creating an instance of the
+// ConditionalDomainManager implementation.
+func NewConditionalDomainManager(maxHierarchyLevel int) *ConditionalDomainManager {
+	rm := ConditionalDomainManager{}
+	_ = rm.Clear() //init allRoles and matchingFuncCache
+	rm.maxHierarchyLevel = maxHierarchyLevel
+	rm.SetLogger(&log.DefaultLogger{})
+	return &rm
+}
+
+func (dm *ConditionalDomainManager) load(name interface{}) (value *ConditionalRoleManager, ok bool) {
+	if r, ok := dm.rmMap.Load(name); ok {
+		return r.(*ConditionalRoleManager), true
+	}
+	return nil, false
+}
+
+// load or create a ConditionalRoleManager instance of domain
+func (cdm *ConditionalDomainManager) getConditionalRoleManager(domain string, store bool) *ConditionalRoleManager {
+	var rm *ConditionalRoleManager
+	var ok bool
+
+	if rm, ok = cdm.load(domain); !ok {
+		rm = newConditionalRoleManagerWithMatchingFunc(cdm.maxHierarchyLevel, cdm.matchingFunc)
+		if store {
+			cdm.rmMap.Store(domain, rm)
+		}
+		if cdm.domainMatchingFunc != nil {
+			cdm.rmMap.Range(func(key, value interface{}) bool {
+				domain2 := key.(string)
+				rm2 := value.(*ConditionalRoleManager)
+				if domain != domain2 && cdm.Match(domain, domain2) {
+					rm.copyFrom(rm2)
+				}
+				return true
+			})
+		}
+	}
+	return rm
+}
+
+// HasLink determines whether role: name1 inherits role: name2.
+func (cdm *ConditionalDomainManager) HasLink(name1 string, name2 string, domains ...string) (bool, error) {
+	domain, err := cdm.getDomain(domains...)
+	if err != nil {
+		return false, err
+	}
+	rm := cdm.getConditionalRoleManager(domain, false)
+	return rm.HasLink(name1, name2, domains...)
+}
+
+// AddLink adds the inheritance link between role: name1 and role: name2.
+// aka role: name1 inherits role: name2.
+func (cdm *ConditionalDomainManager) AddLink(name1 string, name2 string, domains ...string) error {
+	domain, err := cdm.getDomain(domains...)
+	if err != nil {
+		return err
+	}
+	conditionalRoleManager := cdm.getConditionalRoleManager(domain, true) //create role manager if it does not exist
+	_ = conditionalRoleManager.AddLink(name1, name2, domain)
+
+	cdm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
+		_ = rm.AddLink(name1, name2, domain)
+	})
+	return nil
+}
+
+// DeleteLink deletes the inheritance link between role: name1 and role: name2.
+// aka role: name1 does not inherit role: name2 any more.
+func (cdm *ConditionalDomainManager) DeleteLink(name1 string, name2 string, domains ...string) error {
+	domain, err := cdm.getDomain(domains...)
+	if err != nil {
+		return err
+	}
+	conditionalRoleManager := cdm.getConditionalRoleManager(domain, true) //create role manager if it does not exist
+	_ = conditionalRoleManager.DeleteLink(name1, name2, domain)
+
+	cdm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
+		_ = rm.DeleteLink(name1, name2, domain)
+	})
+	return nil
+}
+
+// AddLinkConditionFunc is based on userName, roleName, add LinkConditionFunc
+func (cdm *ConditionalDomainManager) AddLinkConditionFunc(userName, roleName string, fn rbac.LinkConditionFunc) {
+	cdm.rmMap.Range(func(key, value interface{}) bool {
+		value.(*ConditionalRoleManager).AddLinkConditionFunc(userName, roleName, fn)
+		return true
+	})
+}
+
+// AddDomainLinkConditionFunc is based on userName, roleName, domain, add LinkConditionFunc
+func (cdm *ConditionalDomainManager) AddDomainLinkConditionFunc(userName, roleName, domain string, fn rbac.LinkConditionFunc) {
+	cdm.rmMap.Range(func(key, value interface{}) bool {
+		value.(*ConditionalRoleManager).AddDomainLinkConditionFunc(userName, roleName, domain, fn)
+		return true
+	})
+}
+
+// SetLinkConditionFuncParams sets parameters of LinkConditionFunc based on userName, roleName
+func (cdm *ConditionalDomainManager) SetLinkConditionFuncParams(userName, roleName string, params ...string) {
+	cdm.rmMap.Range(func(key, value interface{}) bool {
+		value.(*ConditionalRoleManager).SetLinkConditionFuncParams(userName, roleName, params...)
+		return true
+	})
+}
+
+// SetDomainLinkConditionFuncParams sets parameters of LinkConditionFunc based on userName, roleName, domain
+func (cdm *ConditionalDomainManager) SetDomainLinkConditionFuncParams(userName, roleName, domain string, params ...string) {
+	cdm.rmMap.Range(func(key, value interface{}) bool {
+		value.(*ConditionalRoleManager).SetDomainLinkConditionFuncParams(userName, roleName, domain, params...)
+		return true
+	})
 }

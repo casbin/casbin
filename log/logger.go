@@ -35,4 +35,7 @@ type Logger interface {
 
 	// LogPolicy log info related to policy.
 	LogPolicy(policy map[string][][]string)
+
+	// LogError log info relate to error
+	LogError(err error, msg ...string)
 }

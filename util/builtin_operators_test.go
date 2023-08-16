@@ -572,3 +572,26 @@ func TestGlobMatch(t *testing.T) {
 	testGlobMatch(t, "/prefix/subprefix/foobar", "*/foo*", false)
 	testGlobMatch(t, "/prefix/subprefix/foobar", "*/foo/*", false)
 }
+
+func testTimeMatch(t *testing.T, startTime string, endTime string, res bool) {
+	t.Helper()
+	myRes, err := TimeMatch(startTime, endTime)
+	if err != nil {
+		panic(err)
+	}
+	t.Logf("%s < %s: %t", startTime, endTime, myRes)
+
+	if myRes != res {
+		t.Errorf("%s < %s: %t, supposed to be %t", startTime, endTime, !res, res)
+	}
+}
+
+func TestTestMatch(t *testing.T) {
+	testTimeMatch(t, "0000-01-01 00:00:00", "0000-01-02 00:00:00", false)
+	testTimeMatch(t, "0000-01-01 00:00:00", "9999-12-30 00:00:00", true)
+	testTimeMatch(t, "_", "_", true)
+	testTimeMatch(t, "_", "9999-12-30 00:00:00", true)
+	testTimeMatch(t, "_", "0000-01-02 00:00:00", false)
+	testTimeMatch(t, "0000-01-01 00:00:00", "_", true)
+	testTimeMatch(t, "9999-12-30 00:00:00", "_", false)
+}

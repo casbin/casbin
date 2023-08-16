@@ -45,3 +45,8 @@ func LogRole(roles []string) {
 func LogPolicy(policy map[string][][]string) {
 	logger.LogPolicy(policy)
 }
+
+// LogError logs the error information
+func LogError(err error, msg ...string) {
+	logger.LogError(err, msg...)
+}

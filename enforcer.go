@@ -46,6 +46,7 @@ type Enforcer struct {
 	watcher    persist.Watcher
 	dispatcher persist.Dispatcher
 	rmMap      map[string]rbac.RoleManager
+	condRmMap  map[string]rbac.ConditionalRoleManager
 	matcherMap sync.Map
 
 	enabled              bool
@@ -205,6 +206,7 @@ func (e *Enforcer) SetLogger(logger log.Logger) {
 
 func (e *Enforcer) initialize() {
 	e.rmMap = map[string]rbac.RoleManager{}
+	e.condRmMap = map[string]rbac.ConditionalRoleManager{}
 	e.eft = effector.NewDefaultEffector()
 	e.watcher = nil
 	e.matcherMap = sync.Map{}
@@ -340,18 +342,50 @@ func (e *Enforcer) LoadPolicy() error {
 
 	if e.autoBuildRoleLinks {
 		needToRebuild = true
+		if err := e.rebuildRoleLinks(newModel); err != nil {
+			return err
+		}
+
+		if err := e.rebuildConditionalRoleLinks(newModel); err != nil {
+			return err
+		}
+	}
+	e.model = newModel
+	return nil
+}
+
+func (e *Enforcer) rebuildRoleLinks(newModel model.Model) error {
+	if len(e.rmMap) != 0 {
 		for _, rm := range e.rmMap {
 			err := rm.Clear()
 			if err != nil {
 				return err
 			}
 		}
-		err = newModel.BuildRoleLinks(e.rmMap)
+
+		err := newModel.BuildRoleLinks(e.rmMap)
 		if err != nil {
 			return err
 		}
 	}
-	e.model = newModel
+
+	return nil
+}
+
+func (e *Enforcer) rebuildConditionalRoleLinks(newModel model.Model) error {
+	if len(e.condRmMap) != 0 {
+		for _, crm := range e.condRmMap {
+			err := crm.Clear()
+			if err != nil {
+				return err
+			}
+		}
+
+		err := newModel.BuildConditionalRoleLinks(e.condRmMap)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -432,11 +466,23 @@ func (e *Enforcer) SavePolicy() error {
 }
 
 func (e *Enforcer) initRmMap() {
-	for ptype := range e.model["g"] {
+	for ptype, assertion := range e.model["g"] {
 		if rm, ok := e.rmMap[ptype]; ok {
 			_ = rm.Clear()
-		} else {
-			e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
+			continue
+		}
+		if len(assertion.Tokens) <= 2 && len(assertion.ParamsTokens) == 0 {
+			e.rmMap[ptype] = defaultrolemanager.NewRoleManagerImpl(10)
+		}
+		if len(assertion.Tokens) <= 2 && len(assertion.ParamsTokens) != 0 {
+			e.condRmMap[ptype] = defaultrolemanager.NewConditionalRoleManager(10)
+		}
+		if len(assertion.Tokens) > 2 {
+			if len(assertion.ParamsTokens) == 0 {
+				e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
+			} else {
+				e.condRmMap[ptype] = defaultrolemanager.NewConditionalDomainManager(10)
+			}
 			matchFun := "keyMatch(r_dom, p_dom)"
 			if strings.Contains(e.model["m"]["m"].Value, matchFun) {
 				e.AddNamedDomainMatchingFunc(ptype, "g", util.KeyMatch)
@@ -503,6 +549,12 @@ func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, ru
 	return e.model.BuildIncrementalRoleLinks(e.rmMap, op, "g", ptype, rules)
 }
 
+// BuildIncrementalConditionalRoleLinks provides incremental build the role inheritance relations with conditions.
+func (e *Enforcer) BuildIncrementalConditionalRoleLinks(op model.PolicyOp, ptype string, rules [][]string) error {
+	e.invalidateMatcherMap()
+	return e.model.BuildIncrementalConditionalRoleLinks(e.condRmMap, op, "g", ptype, rules)
+}
+
 // NewEnforceContext Create a default structure based on the suffix
 func NewEnforceContext(suffix string) EnforceContext {
 	return EnforceContext{
@@ -532,8 +584,12 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	functions := e.fm.GetFunctions()
 	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
-			rm := ast.RM
-			functions[key] = util.GenerateGFunction(rm)
+			if len(e.rmMap) != 0 {
+				functions[key] = util.GenerateGFunction(ast.RM)
+			}
+			if len(e.condRmMap) != 0 {
+				functions[key] = util.GenerateConditionalGFunction(ast.CondRM)
+			}
 		}
 	}
 
@@ -838,6 +894,45 @@ func (e *Enforcer) AddNamedMatchingFunc(ptype, name string, fn rbac.MatchingFunc
 func (e *Enforcer) AddNamedDomainMatchingFunc(ptype, name string, fn rbac.MatchingFunc) bool {
 	if rm, ok := e.rmMap[ptype]; ok {
 		rm.AddDomainMatchingFunc(name, fn)
+		return true
+	}
+	return false
+}
+
+// AddNamedLinkConditionFunc Add condition function fn for Link userName->roleName,
+// when fn returns true, Link is valid, otherwise invalid
+func (e *Enforcer) AddNamedLinkConditionFunc(ptype, user, role string, fn rbac.LinkConditionFunc) bool {
+	if rm, ok := e.condRmMap[ptype]; ok {
+		rm.AddLinkConditionFunc(user, role, fn)
+		return true
+	}
+	return false
+}
+
+// AddNamedDomainLinkConditionFunc Add condition function fn for Link userName-> {roleName, domain},
+// when fn returns true, Link is valid, otherwise invalid
+func (e *Enforcer) AddNamedDomainLinkConditionFunc(ptype, user, role string, domain string, fn rbac.LinkConditionFunc) bool {
+	if rm, ok := e.condRmMap[ptype]; ok {
+		rm.AddDomainLinkConditionFunc(user, role, domain, fn)
+		return true
+	}
+	return false
+}
+
+// SetNamedLinkConditionFuncParams Sets the parameters of the condition function fn for Link userName->roleName
+func (e *Enforcer) SetNamedLinkConditionFuncParams(ptype, user, role string, params ...string) bool {
+	if rm, ok := e.condRmMap[ptype]; ok {
+		rm.SetLinkConditionFuncParams(user, role, params...)
+		return true
+	}
+	return false
+}
+
+// SetNamedDomainLinkConditionFuncParams Sets the parameters of the condition function fn
+// for Link userName->{roleName, domain}
+func (e *Enforcer) SetNamedDomainLinkConditionFuncParams(ptype, user, role, domain string, params ...string) bool {
+	if rm, ok := e.condRmMap[ptype]; ok {
+		rm.SetDomainLinkConditionFuncParams(user, role, domain, params...)
 		return true
 	}
 	return false
