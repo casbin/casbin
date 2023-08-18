@@ -19,7 +19,7 @@ import (
 
 	"github.com/casbin/casbin/v2/log/mocks"
 
-	"github.com/golang/mock/gomock"
+	"go.uber.org/mock/gomock"
 )
 
 func TestLog(t *testing.T) {
