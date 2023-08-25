@@ -47,10 +47,11 @@ func (model Model) BuildIncrementalRoleLinks(rmMap map[string]rbac.RoleManager, 
 func (model Model) BuildRoleLinks(rmMap map[string]rbac.RoleManager) error {
 	model.PrintPolicy()
 	for ptype, ast := range model["g"] {
-		rm := rmMap[ptype]
-		err := ast.buildRoleLinks(rm)
-		if err != nil {
-			return err
+		if rm := rmMap[ptype]; rm != nil {
+			err := ast.buildRoleLinks(rm)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -69,10 +70,11 @@ func (model Model) BuildIncrementalConditionalRoleLinks(condRmMap map[string]rba
 func (model Model) BuildConditionalRoleLinks(condRmMap map[string]rbac.ConditionalRoleManager) error {
 	model.PrintPolicy()
 	for ptype, ast := range model["g"] {
-		condRm := condRmMap[ptype]
-		err := ast.buildConditionalRoleLinks(condRm)
-		if err != nil {
-			return err
+		if condRm := condRmMap[ptype]; condRm != nil {
+			err := ast.buildConditionalRoleLinks(condRm)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
