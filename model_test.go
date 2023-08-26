@@ -330,6 +330,31 @@ func TestRBACModelWithPattern(t *testing.T) {
 	testEnforce(t, e, "bob", "/pen2/2", "GET", true)
 }
 
+func TestRBACModelWithDifferentTypesOfRoles(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_different_types_of_roles_model.conf", "examples/rbac_with_different_types_of_roles_policy.csv")
+
+	g := e.GetNamedGroupingPolicy("g")
+	for _, gp := range g {
+		if len(gp) != 5 {
+			t.Error("g parameters' num isn't 5")
+			return
+		}
+		e.AddNamedDomainLinkConditionFunc("g", gp[0], gp[1], gp[2], util.TimeMatchFunc)
+	}
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", true)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", true)
+	testEnforce(t, e, "bob", "data2", "write", false)
+	testEnforce(t, e, "carol", "data1", "read", false)
+	testEnforce(t, e, "carol", "data1", "write", false)
+	testEnforce(t, e, "carol", "data2", "read", false)
+	testEnforce(t, e, "carol", "data2", "write", false)
+}
+
 type testCustomRoleManager struct{}
 
 func NewRoleManager() rbac.RoleManager {

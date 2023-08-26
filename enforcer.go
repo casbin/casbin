@@ -472,16 +472,20 @@ func (e *Enforcer) initRmMap() {
 			continue
 		}
 		if len(assertion.Tokens) <= 2 && len(assertion.ParamsTokens) == 0 {
-			e.rmMap[ptype] = defaultrolemanager.NewRoleManagerImpl(10)
+			assertion.RM = defaultrolemanager.NewRoleManagerImpl(10)
+			e.rmMap[ptype] = assertion.RM
 		}
 		if len(assertion.Tokens) <= 2 && len(assertion.ParamsTokens) != 0 {
-			e.condRmMap[ptype] = defaultrolemanager.NewConditionalRoleManager(10)
+			assertion.CondRM = defaultrolemanager.NewConditionalRoleManager(10)
+			e.condRmMap[ptype] = assertion.CondRM
 		}
 		if len(assertion.Tokens) > 2 {
 			if len(assertion.ParamsTokens) == 0 {
-				e.rmMap[ptype] = defaultrolemanager.NewRoleManager(10)
+				assertion.RM = defaultrolemanager.NewRoleManager(10)
+				e.rmMap[ptype] = assertion.RM
 			} else {
-				e.condRmMap[ptype] = defaultrolemanager.NewConditionalDomainManager(10)
+				assertion.CondRM = defaultrolemanager.NewConditionalDomainManager(10)
+				e.condRmMap[ptype] = assertion.CondRM
 			}
 			matchFun := "keyMatch(r_dom, p_dom)"
 			if strings.Contains(e.model["m"]["m"].Value, matchFun) {
@@ -584,10 +588,13 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	functions := e.fm.GetFunctions()
 	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
-			if len(e.rmMap) != 0 {
+			// g must be a normal role definition (ast.RM != nil)
+			//   or a conditional role definition (ast.CondRM != nil)
+			// ast.RM and ast.CondRM shouldn't be nil at the same time
+			if ast.RM != nil {
 				functions[key] = util.GenerateGFunction(ast.RM)
 			}
-			if len(e.condRmMap) != 0 {
+			if ast.CondRM != nil {
 				functions[key] = util.GenerateConditionalGFunction(ast.CondRM)
 			}
 		}
