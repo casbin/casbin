@@ -14,9 +14,7 @@
 
 package rbac
 
-import (
-	"github.com/casbin/casbin/v2/log"
-)
+import "github.com/casbin/casbin/v2/log"
 
 type MatchingFunc func(arg1 string, arg2 string) bool
 
@@ -63,6 +61,7 @@ type RoleManager interface {
 // Link with conditions is supported
 type ConditionalRoleManager interface {
 	RoleManager
+
 	// AddLinkConditionFunc Add condition function fn for Link userName->roleName,
 	// when fn returns true, Link is valid, otherwise invalid
 	AddLinkConditionFunc(userName, roleName string, fn LinkConditionFunc)
