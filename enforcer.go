@@ -805,7 +805,7 @@ var requestObjectRegexPrefix = regexp.MustCompile(`r[_.][A-Za-z_0-9]+\.`)
 // policy: p, r.sub.Age > 18, /data1, read  ==>  p, 30 > 18, /data1, read
 // matchers: m = r.sub == r.obj.Owner  ==>  m = r.sub == "alice"
 func requestJsonReplace(str string, rTokens map[string]int, rvals []interface{}) string {
-	matches := requestObjectRegex.FindStringSubmatch(str)
+	matches := requestObjectRegex.FindAllString(str, -1)
 	for _, matchesStr := range matches {
 		prefix := requestObjectRegexPrefix.FindString(matchesStr)
 		jsonPath := strings.TrimPrefix(matchesStr, prefix)
