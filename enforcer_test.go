@@ -733,3 +733,22 @@ func TestLinkConditionFunc(t *testing.T) {
 	testDomainEnforce(t, e, "alice", "domain5", "data5", "read", false)
 	testDomainEnforce(t, e, "alice", "domain5", "data5", "write", false)
 }
+
+func TestInitWithModelAndFileAdapter(t *testing.T) {
+	m, err := model.NewModelFromFile("examples/basic_model.conf")
+
+	if err != nil {
+		t.Fatalf("Create model from file: %v", err)
+	}
+
+	e, _ := NewEnforcer(m, "examples/basic_policy.csv")
+
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", false)
+	testEnforce(t, e, "alice", "data2", "read", false)
+	testEnforce(t, e, "alice", "data2", "write", false)
+	testEnforce(t, e, "bob", "data1", "read", false)
+	testEnforce(t, e, "bob", "data1", "write", false)
+	testEnforce(t, e, "bob", "data2", "read", false)
+	testEnforce(t, e, "bob", "data2", "write", true)
+}

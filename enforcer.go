@@ -120,7 +120,15 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 		default:
 			switch params[1].(type) {
 			case string:
-				return nil, errors.New("invalid parameters for enforcer")
+				if _, ok := p0.(model.Model); !ok {
+					return nil, errors.New("invalid parameters for enforcer")
+				}
+
+				err := e.InitWithModelAndFile(p0.(model.Model), params[1].(string))
+
+				if err != nil {
+					return nil, err
+				}
 			default:
 				err := e.InitWithModelAndAdapter(p0.(model.Model), params[1].(persist.Adapter))
 				if err != nil {
@@ -170,6 +178,11 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) er
 
 	e.modelPath = modelPath
 	return nil
+}
+
+func (e *Enforcer) InitWithModelAndFile(m model.Model, policyPath string) error {
+	a := fileadapter.NewAdapter(policyPath)
+	return e.InitWithModelAndAdapter(m, a)
 }
 
 // InitWithModelAndAdapter initializes an enforcer with a model and a database adapter.
