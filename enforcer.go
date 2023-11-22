@@ -31,7 +31,7 @@ import (
 	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
 
-	"github.com/Knetic/govaluate"
+	"github.com/casbin/govaluate"
 	"github.com/tidwall/gjson"
 )
 
