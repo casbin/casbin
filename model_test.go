@@ -452,6 +452,28 @@ func TestABACModel(t *testing.T) {
 	testEnforce(t, e, "bob", data2, "write", true)
 }
 
+func TestABACMapRequest(t *testing.T) {
+	e, _ := NewEnforcer("examples/abac_model.conf")
+
+	data1 := map[string]interface{}{
+		"Name":  "data1",
+		"Owner": "alice",
+	}
+	data2 := map[string]interface{}{
+		"Name":  "data2",
+		"Owner": "bob",
+	}
+
+	testEnforce(t, e, "alice", data1, "read", true)
+	testEnforce(t, e, "alice", data1, "write", true)
+	testEnforce(t, e, "alice", data2, "read", false)
+	testEnforce(t, e, "alice", data2, "write", false)
+	testEnforce(t, e, "bob", data1, "read", false)
+	testEnforce(t, e, "bob", data1, "write", false)
+	testEnforce(t, e, "bob", data2, "read", true)
+	testEnforce(t, e, "bob", data2, "write", true)
+}
+
 func TestABACJsonRequest(t *testing.T) {
 	e, _ := NewEnforcer("examples/abac_model.conf")
 	e.EnableAcceptJsonRequest(true)

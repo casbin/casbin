@@ -26,7 +26,7 @@ import (
 
 	"github.com/casbin/casbin/v2/rbac"
 
-	"github.com/Knetic/govaluate"
+	"github.com/casbin/govaluate"
 )
 
 var (

@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Knetic/govaluate"
 	"github.com/casbin/casbin/v2/util"
+	"github.com/casbin/govaluate"
 )
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
