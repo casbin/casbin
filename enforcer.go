@@ -812,7 +812,9 @@ func requestJsonReplace(str string, rTokens map[string]int, rvals []interface{})
 		tokenIndex := rTokens[prefix[:len(prefix)-1]]
 		if jsonStr, ok := rvals[tokenIndex].(string); ok {
 			newStr := gjson.Get(jsonStr, jsonPath).String()
-			if !util.IsNumeric(newStr) {
+			if strings.Contains(newStr,`[`){
+				newStr = strings.NewReplacer(`[`, `(`, `]`, `)`, `"`, `'`).Replace(newStr)
+			} else if !util.IsNumeric(newStr) {
 				newStr = `"` + newStr + `"`
 			}
 			str = strings.Replace(str, matchesStr, newStr, -1)
