@@ -15,6 +15,7 @@
 package util
 
 import (
+	"encoding/json"
 	"regexp"
 	"sort"
 	"strings"
@@ -25,10 +26,13 @@ var evalReg = regexp.MustCompile(`\beval\((?P<rule>[^)]*)\)`)
 
 var escapeAssertionRegex = regexp.MustCompile(`\b((r|p)[0-9]*)\.`)
 
-var numericRegex = regexp.MustCompile(`^-?\d+(?:\.\d+)?$`)
-
-func IsNumeric(s string) bool {
-	return numericRegex.MatchString(s)
+func JsonToMap(jsonStr string) (map[string]interface{}, error) {
+	result := make(map[string]interface{})
+	err := json.Unmarshal([]byte(jsonStr), &result)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
