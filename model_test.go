@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -472,6 +473,37 @@ func TestABACMapRequest(t *testing.T) {
 	testEnforce(t, e, "bob", data1, "write", false)
 	testEnforce(t, e, "bob", data2, "read", true)
 	testEnforce(t, e, "bob", data2, "write", true)
+}
+
+func TestABACTypes(t *testing.T) {
+	e, _ := NewEnforcer("examples/abac_model.conf")
+	matcher := `"moderator" IN r.sub.Roles && r.sub.Enabled == true && r.sub.Age >= 21 && r.sub.Name != "foo"`
+	e.GetModel()["m"]["m"].Value = util.RemoveComments(util.EscapeAssertion(matcher))
+
+	structRequest := struct {
+		Roles   []interface{}
+		Enabled bool
+		Age     int
+		Name    string
+	}{
+		Roles:   []interface{}{"user", "moderator"},
+		Enabled: true,
+		Age:     30,
+		Name:    "alice",
+	}
+	testEnforce(t, e, structRequest, "", "", true)
+
+	mapRequest := map[string]interface{}{
+		"Roles":   []interface{}{"user", "moderator"},
+		"Enabled": true,
+		"Age":     30,
+		"Name":    "alice",
+	}
+	testEnforce(t, e, mapRequest, nil, "", true)
+
+	e.EnableAcceptJsonRequest(true)
+	jsonRequest, _ := json.Marshal(mapRequest)
+	testEnforce(t, e, string(jsonRequest), "", "", true)
 }
 
 func TestABACJsonRequest(t *testing.T) {
