@@ -296,13 +296,21 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 // GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p"
 // But you can specify the named policy "p2" to get: [["admin", "create"]] by    GetNamedImplicitPermissionsForUser("p2","alice")
 func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string, domain ...string) ([][]string, error) {
+	roles, err := e.GetImplicitRolesForUser(user, domain...)
+	if err != nil {
+		return nil, err
+	}
+	policyRoles := make(map[string]struct{}, len(roles)+1)
+	policyRoles[user] = struct{}{}
+	for _, r := range roles {
+		policyRoles[r] = struct{}{}
+	}
 	permission := make([][]string, 0)
 	rm := e.GetRoleManager()
 	domainIndex, _ := e.GetFieldIndex(ptype, constant.DomainIndex)
 	for _, rule := range e.model["p"][ptype].Policy {
 		if len(domain) == 0 {
-			matched, _ := rm.HasLink(user, rule[0])
-			if matched {
+			if _, ok := policyRoles[rule[0]]; ok {
 				permission = append(permission, deepCopyPolicy(rule))
 			}
 		} else if len(domain) > 1 {
@@ -313,8 +321,7 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string,
 			if !matched {
 				continue
 			}
-			matched, _ = rm.HasLink(user, rule[0], d)
-			if matched {
+			if _, ok := policyRoles[rule[0]]; ok {
 				newRule := deepCopyPolicy(rule)
 				newRule[domainIndex] = d
 				permission = append(permission, newRule)
