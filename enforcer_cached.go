@@ -127,8 +127,8 @@ func (e *CachedEnforcer) RemovePolicies(rules [][]string) (bool, error) {
 }
 
 func (e *CachedEnforcer) getCachedResult(key string) (res bool, err error) {
-	e.locker.RLock()
-	defer e.locker.RUnlock()
+	e.locker.Lock()
+	defer e.locker.Unlock()
 	return e.cache.Get(key)
 }
 
