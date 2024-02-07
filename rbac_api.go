@@ -166,12 +166,12 @@ func (e *Enforcer) DeletePermissionsForUser(user string) (bool, error) {
 }
 
 // GetPermissionsForUser gets permissions for a user or role.
-func (e *Enforcer) GetPermissionsForUser(user string, domain ...string) [][]string {
+func (e *Enforcer) GetPermissionsForUser(user string, domain ...string) ([][]string, error) {
 	return e.GetNamedPermissionsForUser("p", user, domain...)
 }
 
 // GetNamedPermissionsForUser gets permissions for a user or role by named policy.
-func (e *Enforcer) GetNamedPermissionsForUser(ptype string, user string, domain ...string) [][]string {
+func (e *Enforcer) GetNamedPermissionsForUser(ptype string, user string, domain ...string) ([][]string, error) {
 	permission := make([][]string, 0)
 	for pType, assertion := range e.model["p"] {
 		if pType != ptype {
@@ -187,14 +187,14 @@ func (e *Enforcer) GetNamedPermissionsForUser(ptype string, user string, domain 
 		if len(domain) > 0 {
 			index, err := e.GetFieldIndex(ptype, constant.DomainIndex)
 			if err != nil {
-				return permission
+				return permission, err
 			}
 			args[index] = domain[0]
 		}
 		perm := e.GetFilteredNamedPolicy(ptype, 0, args...)
 		permission = append(permission, perm...)
 	}
-	return permission
+	return permission, nil
 }
 
 // HasPermissionForUser determines whether a user has a permission.

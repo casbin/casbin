@@ -124,14 +124,14 @@ func (e *SyncedEnforcer) DeletePermissionsForUser(user string) (bool, error) {
 }
 
 // GetPermissionsForUser gets permissions for a user or role.
-func (e *SyncedEnforcer) GetPermissionsForUser(user string, domain ...string) [][]string {
+func (e *SyncedEnforcer) GetPermissionsForUser(user string, domain ...string) ([][]string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.Enforcer.GetPermissionsForUser(user, domain...)
 }
 
 // GetNamedPermissionsForUser gets permissions for a user or role by named policy.
-func (e *SyncedEnforcer) GetNamedPermissionsForUser(ptype string, user string, domain ...string) [][]string {
+func (e *SyncedEnforcer) GetNamedPermissionsForUser(ptype string, user string, domain ...string) ([][]string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.Enforcer.GetNamedPermissionsForUser(ptype, user, domain...)

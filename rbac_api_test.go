@@ -192,7 +192,10 @@ func TestEnforcer_AddRolesForUser(t *testing.T) {
 
 func testGetPermissions(t *testing.T, e *Enforcer, name string, res [][]string, domain ...string) {
 	t.Helper()
-	myRes := e.GetPermissionsForUser(name, domain...)
+	myRes, err := e.GetPermissionsForUser(name, domain...)
+	if err != nil {
+		t.Error(err.Error())
+	}
 	t.Log("Permissions for ", name, ": ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
@@ -212,7 +215,10 @@ func testHasPermission(t *testing.T, e *Enforcer, name string, permission []stri
 
 func testGetNamedPermissionsForUser(t *testing.T, e *Enforcer, ptype string, name string, res [][]string, domain ...string) {
 	t.Helper()
-	myRes := e.GetNamedPermissionsForUser(ptype, name, domain...)
+	myRes, err := e.GetNamedPermissionsForUser(ptype, name, domain...)
+	if err != nil {
+		t.Error(err.Error())
+	}
 	t.Log("Named permissions for ", name, ": ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
