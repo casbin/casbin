@@ -15,11 +15,12 @@
 package casbin
 
 import (
-	"github.com/casbin/casbin/v2/errors"
-	"github.com/casbin/casbin/v2/util"
 	"sort"
 	"testing"
 	"time"
+
+	"github.com/casbin/casbin/v2/errors"
+	"github.com/casbin/casbin/v2/util"
 )
 
 func testEnforceSync(t *testing.T, e *SyncedEnforcer, sub string, obj interface{}, act string, res bool) {
