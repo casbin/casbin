@@ -200,6 +200,9 @@ func (e *Enforcer) SetLogger(logger log.Logger) {
 	for k := range e.rmMap {
 		e.rmMap[k].SetLogger(e.logger)
 	}
+	for k := range e.condRmMap {
+		e.condRmMap[k].SetLogger(e.logger)
+	}
 }
 
 func (e *Enforcer) initialize() {
@@ -273,12 +276,20 @@ func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 
 // GetRoleManager gets the current role manager.
 func (e *Enforcer) GetRoleManager() rbac.RoleManager {
-	return e.rmMap["g"]
+	if e.rmMap != nil && e.rmMap["g"] != nil {
+		return e.rmMap["g"]
+	} else {
+		return nil
+	}
 }
 
 // GetNamedRoleManager gets the role manager for the named policy.
 func (e *Enforcer) GetNamedRoleManager(ptype string) rbac.RoleManager {
-	return e.rmMap[ptype]
+	if e.rmMap != nil && e.rmMap[ptype] != nil {
+		return e.rmMap[ptype]
+	} else {
+		return nil
+	}
 }
 
 // SetRoleManager sets the current role manager.
@@ -535,6 +546,9 @@ func (e *Enforcer) EnableAcceptJsonRequest(acceptJsonRequest bool) {
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *Enforcer) BuildRoleLinks() error {
+	if e.rmMap == nil {
+		return errors.New("rmMap is nil")
+	}
 	for _, rm := range e.rmMap {
 		err := rm.Clear()
 		if err != nil {

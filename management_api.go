@@ -111,8 +111,15 @@ func (e *Enforcer) GetFilteredNamedPolicyWithMatcher(ptype string, matcher strin
 	functions := e.fm.GetFunctions()
 	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
-			rm := ast.RM
-			functions[key] = util.GenerateGFunction(rm)
+			// g must be a normal role definition (ast.RM != nil)
+			//   or a conditional role definition (ast.CondRM != nil)
+			// ast.RM and ast.CondRM shouldn't be nil at the same time
+			if ast.RM != nil {
+				functions[key] = util.GenerateGFunction(ast.RM)
+			}
+			if ast.CondRM != nil {
+				functions[key] = util.GenerateConditionalGFunction(ast.CondRM)
+			}
 		}
 	}
 

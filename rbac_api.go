@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/casbin/casbin/v2/constant"
@@ -24,13 +25,21 @@ import (
 
 // GetRolesForUser gets the roles that a user has.
 func (e *Enforcer) GetRolesForUser(name string, domain ...string) ([]string, error) {
-	res, err := e.model["g"]["g"].RM.GetRoles(name, domain...)
+	rm := e.GetRoleManager()
+	if rm == nil {
+		return nil, fmt.Errorf("role manager is not initialized")
+	}
+	res, err := rm.GetRoles(name, domain...)
 	return res, err
 }
 
 // GetUsersForRole gets the users that has a role.
 func (e *Enforcer) GetUsersForRole(name string, domain ...string) ([]string, error) {
-	res, err := e.model["g"]["g"].RM.GetUsers(name, domain...)
+	rm := e.GetRoleManager()
+	if rm == nil {
+		return nil, fmt.Errorf("role manager is not initialized")
+	}
+	res, err := rm.GetUsers(name, domain...)
 	return res, err
 }
 
@@ -298,6 +307,9 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string, domain ...string) ([][]string, error) {
 	permission := make([][]string, 0)
 	rm := e.GetRoleManager()
+	if rm == nil {
+		return nil, fmt.Errorf("role manager is not initialized")
+	}
 	domainIndex, _ := e.GetFieldIndex(ptype, constant.DomainIndex)
 	for _, rule := range e.model["p"][ptype].Policy {
 		if len(domain) == 0 {
@@ -483,6 +495,9 @@ func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, err
 	subjectIndex, _ := e.GetFieldIndex("p", "sub")
 	objectIndex, _ := e.GetFieldIndex("p", "obj")
 	rm := e.GetRoleManager()
+	if rm == nil {
+		return nil, fmt.Errorf("role manager is not initialized")
+	}
 
 	isRole := make(map[string]bool)
 	for _, role := range e.GetAllRoles() {
@@ -525,6 +540,9 @@ func (e *Enforcer) GetImplicitUsersForResourceByDomain(resource string, domain s
 	objectIndex, _ := e.GetFieldIndex("p", "obj")
 	domIndex, _ := e.GetFieldIndex("p", "dom")
 	rm := e.GetRoleManager()
+	if rm == nil {
+		return nil, fmt.Errorf("role manager is not initialized")
+	}
 
 	isRole := make(map[string]bool)
 
