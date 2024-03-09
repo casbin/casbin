@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ['1.18', '1.19', '1.20']
+        go: ['1.19', '1.20', '1.21']
     steps:
       - uses: actions/checkout@v2
 
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ['1.18', '1.19', '1.20']
+        go: ['1.19', '1.20', '1.21']
     steps:
       - uses: actions/checkout@v2
 
