@@ -166,7 +166,6 @@ func BenchmarkHasLinkWithDomainPatternLarge(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, _ = rm.HasLink("staffUser1001", "staff001", "/orgs/1/sites/site001")
 	}
-
 }
 
 func BenchmarkHasLinkWithPatternAndDomainPatternLarge(b *testing.B) {

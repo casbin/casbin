@@ -223,7 +223,6 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]str
 	res := []string{}
 
 	for _, rm := range e.rmMap {
-
 		roleSet := make(map[string]bool)
 		roleSet[name] = true
 		q := make([]string, 0)
@@ -255,7 +254,6 @@ func (e *Enforcer) GetImplicitUsersForRole(name string, domain ...string) ([]str
 	res := []string{}
 
 	for _, rm := range e.rmMap {
-
 		roleSet := make(map[string]bool)
 		roleSet[name] = true
 		q := make([]string, 0)
@@ -303,7 +301,7 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 // g, alice, admin
 //
 // GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p"
-// But you can specify the named policy "p2" to get: [["admin", "create"]] by    GetNamedImplicitPermissionsForUser("p2","alice")
+// But you can specify the named policy "p2" to get: [["admin", "create"]] by    GetNamedImplicitPermissionsForUser("p2","alice").
 func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string, domain ...string) ([][]string, error) {
 	permission := make([][]string, 0)
 	rm := e.GetRoleManager()
@@ -370,7 +368,7 @@ func (e *Enforcer) GetImplicitUsersForPermission(permission ...string) ([]string
 	return res, nil
 }
 
-// GetDomainsForUser gets all domains
+// GetDomainsForUser gets all domains.
 func (e *Enforcer) GetDomainsForUser(user string) ([]string, error) {
 	var domains []string
 	for _, rm := range e.rmMap {
@@ -383,7 +381,7 @@ func (e *Enforcer) GetDomainsForUser(user string) ([]string, error) {
 	return domains, nil
 }
 
-// GetImplicitResourcesForUser returns all policies that user obtaining in domain
+// GetImplicitResourcesForUser returns all policies that user obtaining in domain.
 func (e *Enforcer) GetImplicitResourcesForUser(user string, domain ...string) ([][]string, error) {
 	permissions, err := e.GetImplicitPermissionsForUser(user, domain...)
 	if err != nil {
@@ -422,7 +420,7 @@ func (e *Enforcer) GetImplicitResourcesForUser(user string, domain ...string) ([
 	return res, nil
 }
 
-// deepCopyPolicy returns a deepcopy version of the policy to prevent changing policies through returned slice
+// deepCopyPolicy returns a deepcopy version of the policy to prevent changing policies through returned slice.
 func deepCopyPolicy(src []string) []string {
 	newRule := make([]string, len(src))
 	copy(newRule, src)
@@ -533,7 +531,7 @@ func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, err
 }
 
 // GetImplicitUsersForResourceByDomain return implicit user based on resource and domain.
-// Compared to GetImplicitUsersForResource, domain is supported
+// Compared to GetImplicitUsersForResource, domain is supported.
 func (e *Enforcer) GetImplicitUsersForResourceByDomain(resource string, domain string) ([][]string, error) {
 	permissions := make([][]string, 0)
 	subjectIndex, _ := e.GetFieldIndex("p", "sub")

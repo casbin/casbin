@@ -20,7 +20,7 @@ import (
 	"github.com/casbin/casbin/v2/constant"
 )
 
-// GetUsersForRoleInDomain gets the users that has a role inside a domain. Add by Gordon
+// GetUsersForRoleInDomain gets the users that has a role inside a domain. Add by Gordon.
 func (e *Enforcer) GetUsersForRoleInDomain(name string, domain string) []string {
 	if e.GetRoleManager() == nil {
 		return nil

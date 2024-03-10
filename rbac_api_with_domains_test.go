@@ -21,7 +21,7 @@ import (
 	"github.com/casbin/casbin/v2/util"
 )
 
-// testGetUsersInDomain: Add by Gordon
+// testGetUsersInDomain: Add by Gordon.
 func testGetUsersInDomain(t *testing.T, e *Enforcer, name string, domain string, res []string) {
 	t.Helper()
 	myRes := e.GetUsersForRoleInDomain(name, domain)
@@ -52,7 +52,7 @@ func TestGetImplicitRolesForDomainUser(t *testing.T) {
 	testGetImplicitRolesInDomain(t, e, "alice", "domain1", []string{"role:global_admin", "role:reader", "role:writer"})
 }
 
-// TestUserAPIWithDomains: Add by Gordon
+// TestUserAPIWithDomains: Add by Gordon.
 func TestUserAPIWithDomains(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
@@ -164,7 +164,6 @@ func TestRoleAPIWithDomains(t *testing.T) {
 
 	testGetRoles(t, e, []string{}, "non_exist", "domain2")
 	testGetRolesInDomain(t, e, "non_exist", "domain2", []string{})
-
 }
 
 func testGetPermissionsInDomain(t *testing.T, e *Enforcer, name string, domain string, res [][]string) {
@@ -251,7 +250,7 @@ func TestDeleteAllUsersByDomain(t *testing.T) {
 	})
 }
 
-// testGetAllDomains tests GetAllDomains()
+// testGetAllDomains tests GetAllDomains().
 func testGetAllDomains(t *testing.T, e *Enforcer, res []string) {
 	t.Helper()
 	myRes, _ := e.GetAllDomains()
@@ -285,5 +284,4 @@ func TestGetAllRolesByDomain(t *testing.T) {
 	testGetAllRolesByDomain(t, e, "domain1", []string{"admin"})
 	testGetAllRolesByDomain(t, e, "domain2", []string{"admin"})
 	testGetAllRolesByDomain(t, e, "domain3", []string{"user"})
-
 }

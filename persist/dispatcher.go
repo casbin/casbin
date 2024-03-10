@@ -14,7 +14,7 @@
 
 package persist
 
-// Dispatcher is the interface for Casbin dispatcher
+// Dispatcher is the interface for Casbin dispatcher.
 type Dispatcher interface {
 	// AddPolicies adds policies rule to all instance.
 	AddPolicies(sec string, ptype string, rules [][]string) error

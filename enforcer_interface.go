@@ -26,7 +26,7 @@ var _ IEnforcer = &Enforcer{}
 var _ IEnforcer = &SyncedEnforcer{}
 var _ IEnforcer = &CachedEnforcer{}
 
-// IEnforcer is the API interface of Enforcer
+// IEnforcer is the API interface of Enforcer.
 type IEnforcer interface {
 	/* Enforcer API */
 	InitWithFile(modelPath string, policyPath string) error

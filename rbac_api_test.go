@@ -171,7 +171,6 @@ func TestRoleAPI_Domains(t *testing.T) {
 
 	testGetPermissions(t, e, "admin", [][]string{{"admin", "domain1", "data1", "read"}, {"admin", "domain1", "data1", "write"}}, "domain1")
 	testGetPermissions(t, e, "admin", [][]string{{"admin", "domain2", "data2", "read"}, {"admin", "domain2", "data2", "write"}}, "domain2")
-
 }
 
 func TestEnforcer_AddRolesForUser(t *testing.T) {
@@ -316,7 +315,7 @@ func TestImplicitRoleAPI(t *testing.T) {
 	e.GetRoleManager().AddMatchingFunc("matcher", util.KeyMatch)
 	e.AddNamedMatchingFunc("g2", "matcher", util.KeyMatch)
 
-	//testGetImplicitRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin", "/book/*", "book_group"})
+	// testGetImplicitRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin", "/book/*", "book_group"})
 	testGetImplicitRoles(t, e, "cathy", []string{"/book/1/2/3/4/5", "pen_admin"})
 	testGetRoles(t, e, []string{"/book/1/2/3/4/5", "pen_admin"}, "cathy")
 }
@@ -378,7 +377,6 @@ func TestImplicitPermissionAPI(t *testing.T) {
 
 	testGetNamedImplicitPermissions(t, e, "p", "alice", [][]string{{"user", "/data", "GET"}, {"admin", "/data", "POST"}})
 	testGetNamedImplicitPermissions(t, e, "p2", "alice", [][]string{{"user", "view"}, {"admin", "create"}})
-
 }
 
 func TestImplicitPermissionAPIWithDomain(t *testing.T) {

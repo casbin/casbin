@@ -23,7 +23,7 @@ import (
 )
 
 // Assertion represents an expression in a section of the model.
-// For example: r = sub, obj, act
+// For example: r = sub, obj, act.
 type Assertion struct {
 	Key           string
 	Value         string
@@ -147,7 +147,7 @@ func (ast *Assertion) buildConditionalRoleLinks(condRM rbac.ConditionalRoleManag
 	return nil
 }
 
-// addConditionalRoleLinks adds Link to rbac.ConditionalRoleManager and sets the parameters for LinkConditionFunc
+// addConditionalRoleLinks adds Link to rbac.ConditionalRoleManager and sets the parameters for LinkConditionFunc.
 func (ast *Assertion) addConditionalRoleLink(rule []string, domainRule []string) error {
 	var err error
 	if len(domainRule) == 0 {
