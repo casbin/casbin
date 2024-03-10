@@ -58,7 +58,7 @@ type RoleManager interface {
 }
 
 // ConditionalRoleManager provides interface to define the operations for managing roles.
-// Link with conditions is supported
+// Link with conditions is supported.
 type ConditionalRoleManager interface {
 	RoleManager
 

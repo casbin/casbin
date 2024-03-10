@@ -66,7 +66,7 @@ func (e *Enforcer) addPolicyWithoutNotify(sec string, ptype string, rule []strin
 
 // addPoliciesWithoutNotify adds rules to the current policy without notify
 // If autoRemoveRepeat == true, existing rules are automatically filtered
-// Otherwise, false is returned directly
+// Otherwise, false is returned directly.
 func (e *Enforcer) addPoliciesWithoutNotify(sec string, ptype string, rules [][]string, autoRemoveRepeat bool) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
@@ -329,7 +329,7 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 
 // addPolicies adds rules to the current policy.
 // If autoRemoveRepeat == true, existing rules are automatically filtered
-// Otherwise, false is returned directly
+// Otherwise, false is returned directly.
 func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoRemoveRepeat bool) (bool, error) {
 	ok, err := e.addPoliciesWithoutNotify(sec, ptype, rules, autoRemoveRepeat)
 	if !ok || err != nil {
@@ -364,7 +364,6 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 			err = e.watcher.Update()
 		}
 		return true, err
-
 	}
 
 	return true, nil

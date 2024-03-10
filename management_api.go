@@ -216,7 +216,7 @@ func (e *Enforcer) AddPolicies(rules [][]string) (bool, error) {
 
 // AddPoliciesEx adds authorization rules to the current policy.
 // If the rule already exists, the rule will not be added.
-// But unlike AddPolicies, other non-existent rules are added instead of returning false directly
+// But unlike AddPolicies, other non-existent rules are added instead of returning false directly.
 func (e *Enforcer) AddPoliciesEx(rules [][]string) (bool, error) {
 	return e.AddNamedPoliciesEx("p", rules)
 }
@@ -246,7 +246,7 @@ func (e *Enforcer) AddNamedPolicies(ptype string, rules [][]string) (bool, error
 
 // AddNamedPoliciesEx adds authorization rules to the current named policy.
 // If the rule already exists, the rule will not be added.
-// But unlike AddNamedPolicies, other non-existent rules are added instead of returning false directly
+// But unlike AddNamedPolicies, other non-existent rules are added instead of returning false directly.
 func (e *Enforcer) AddNamedPoliciesEx(ptype string, rules [][]string) (bool, error) {
 	return e.addPolicies("p", ptype, rules, true)
 }
@@ -350,7 +350,7 @@ func (e *Enforcer) AddGroupingPolicies(rules [][]string) (bool, error) {
 
 // AddGroupingPoliciesEx adds role inheritance rules to the current policy.
 // If the rule already exists, the rule will not be added.
-// But unlike AddGroupingPolicies, other non-existent rules are added instead of returning false directly
+// But unlike AddGroupingPolicies, other non-existent rules are added instead of returning false directly.
 func (e *Enforcer) AddGroupingPoliciesEx(rules [][]string) (bool, error) {
 	return e.AddNamedGroupingPoliciesEx("g", rules)
 }
@@ -384,7 +384,7 @@ func (e *Enforcer) AddNamedGroupingPolicies(ptype string, rules [][]string) (boo
 
 // AddNamedGroupingPoliciesEx adds named role inheritance rules to the current policy.
 // If the rule already exists, the rule will not be added.
-// But unlike AddNamedGroupingPolicies, other non-existent rules are added instead of returning false directly
+// But unlike AddNamedGroupingPolicies, other non-existent rules are added instead of returning false directly.
 func (e *Enforcer) AddNamedGroupingPoliciesEx(ptype string, rules [][]string) (bool, error) {
 	return e.addPolicies("g", ptype, rules, true)
 }

@@ -57,7 +57,7 @@ type Enforcer struct {
 	logger log.Logger
 }
 
-// EnforceContext is used as the first element of the parameter "rvals" in method "enforce"
+// EnforceContext is used as the first element of the parameter "rvals" in method "enforce".
 type EnforceContext struct {
 	RType string
 	PType string
@@ -539,7 +539,7 @@ func (e *Enforcer) EnableAutoBuildRoleLinks(autoBuildRoleLinks bool) {
 	e.autoBuildRoleLinks = autoBuildRoleLinks
 }
 
-// EnableAcceptJsonRequest controls whether to accept json as a request parameter
+// EnableAcceptJsonRequest controls whether to accept json as a request parameter.
 func (e *Enforcer) EnableAcceptJsonRequest(acceptJsonRequest bool) {
 	e.acceptJsonRequest = acceptJsonRequest
 }
@@ -571,7 +571,7 @@ func (e *Enforcer) BuildIncrementalConditionalRoleLinks(op model.PolicyOp, ptype
 	return e.model.BuildIncrementalConditionalRoleLinks(e.condRmMap, op, "g", ptype, rules)
 }
 
-// NewEnforceContext Create a default structure based on the suffix
+// NewEnforceContext Create a default structure based on the suffix.
 func NewEnforceContext(suffix string) EnforceContext {
 	return EnforceContext{
 		RType: "r" + suffix,
@@ -654,7 +654,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		for i, rval := range rvals {
 			switch rval := rval.(type) {
 			case string:
-				mapValue, err := util.JsonToMap(rval)
+				var mapValue map[string]interface{}
+				mapValue, err = util.JsonToMap(rval)
 				if err == nil {
 					rvals[i] = mapValue
 				}
@@ -757,7 +758,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			}
 		}
 	} else {
-
 		if hasEval && len(e.model["p"][pType].Policy) == 0 {
 			return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
 		}
@@ -836,21 +836,21 @@ func (e *Enforcer) EnforceWithMatcher(matcher string, rvals ...interface{}) (boo
 	return e.enforce(matcher, nil, rvals...)
 }
 
-// EnforceEx explain enforcement by informing matched rules
+// EnforceEx explain enforcement by informing matched rules.
 func (e *Enforcer) EnforceEx(rvals ...interface{}) (bool, []string, error) {
 	explain := []string{}
 	result, err := e.enforce("", &explain, rvals...)
 	return result, explain, err
 }
 
-// EnforceExWithMatcher use a custom matcher and explain enforcement by informing matched rules
+// EnforceExWithMatcher use a custom matcher and explain enforcement by informing matched rules.
 func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error) {
 	explain := []string{}
 	result, err := e.enforce(matcher, &explain, rvals...)
 	return result, explain, err
 }
 
-// BatchEnforce enforce in batches
+// BatchEnforce enforce in batches.
 func (e *Enforcer) BatchEnforce(requests [][]interface{}) ([]bool, error) {
 	var results []bool
 	for _, request := range requests {
@@ -863,7 +863,7 @@ func (e *Enforcer) BatchEnforce(requests [][]interface{}) ([]bool, error) {
 	return results, nil
 }
 
-// BatchEnforceWithMatcher enforce with matcher in batches
+// BatchEnforceWithMatcher enforce with matcher in batches.
 func (e *Enforcer) BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error) {
 	var results []bool
 	for _, request := range requests {
@@ -876,7 +876,7 @@ func (e *Enforcer) BatchEnforceWithMatcher(matcher string, requests [][]interfac
 	return results, nil
 }
 
-// AddNamedMatchingFunc add MatchingFunc by ptype RoleManager
+// AddNamedMatchingFunc add MatchingFunc by ptype RoleManager.
 func (e *Enforcer) AddNamedMatchingFunc(ptype, name string, fn rbac.MatchingFunc) bool {
 	if rm, ok := e.rmMap[ptype]; ok {
 		rm.AddMatchingFunc(name, fn)
@@ -885,7 +885,7 @@ func (e *Enforcer) AddNamedMatchingFunc(ptype, name string, fn rbac.MatchingFunc
 	return false
 }
 
-// AddNamedDomainMatchingFunc add MatchingFunc by ptype to RoleManager
+// AddNamedDomainMatchingFunc add MatchingFunc by ptype to RoleManager.
 func (e *Enforcer) AddNamedDomainMatchingFunc(ptype, name string, fn rbac.MatchingFunc) bool {
 	if rm, ok := e.rmMap[ptype]; ok {
 		rm.AddDomainMatchingFunc(name, fn)
@@ -895,7 +895,7 @@ func (e *Enforcer) AddNamedDomainMatchingFunc(ptype, name string, fn rbac.Matchi
 }
 
 // AddNamedLinkConditionFunc Add condition function fn for Link userName->roleName,
-// when fn returns true, Link is valid, otherwise invalid
+// when fn returns true, Link is valid, otherwise invalid.
 func (e *Enforcer) AddNamedLinkConditionFunc(ptype, user, role string, fn rbac.LinkConditionFunc) bool {
 	if rm, ok := e.condRmMap[ptype]; ok {
 		rm.AddLinkConditionFunc(user, role, fn)
@@ -905,7 +905,7 @@ func (e *Enforcer) AddNamedLinkConditionFunc(ptype, user, role string, fn rbac.L
 }
 
 // AddNamedDomainLinkConditionFunc Add condition function fn for Link userName-> {roleName, domain},
-// when fn returns true, Link is valid, otherwise invalid
+// when fn returns true, Link is valid, otherwise invalid.
 func (e *Enforcer) AddNamedDomainLinkConditionFunc(ptype, user, role string, domain string, fn rbac.LinkConditionFunc) bool {
 	if rm, ok := e.condRmMap[ptype]; ok {
 		rm.AddDomainLinkConditionFunc(user, role, domain, fn)
@@ -914,7 +914,7 @@ func (e *Enforcer) AddNamedDomainLinkConditionFunc(ptype, user, role string, dom
 	return false
 }
 
-// SetNamedLinkConditionFuncParams Sets the parameters of the condition function fn for Link userName->roleName
+// SetNamedLinkConditionFuncParams Sets the parameters of the condition function fn for Link userName->roleName.
 func (e *Enforcer) SetNamedLinkConditionFuncParams(ptype, user, role string, params ...string) bool {
 	if rm, ok := e.condRmMap[ptype]; ok {
 		rm.SetLinkConditionFuncParams(user, role, params...)
@@ -924,7 +924,7 @@ func (e *Enforcer) SetNamedLinkConditionFuncParams(ptype, user, role string, par
 }
 
 // SetNamedDomainLinkConditionFuncParams Sets the parameters of the condition function fn
-// for Link userName->{roleName, domain}
+// for Link userName->{roleName, domain}.
 func (e *Enforcer) SetNamedDomainLinkConditionFuncParams(ptype, user, role, domain string, params ...string) bool {
 	if rm, ok := e.condRmMap[ptype]; ok {
 		rm.SetDomainLinkConditionFuncParams(user, role, domain, params...)
@@ -933,7 +933,7 @@ func (e *Enforcer) SetNamedDomainLinkConditionFuncParams(ptype, user, role, doma
 	return false
 }
 
-// assumes bounds have already been checked
+// assumes bounds have already been checked.
 type enforceParameters struct {
 	rTokens map[string]int
 	rVals   []interface{}
@@ -942,7 +942,7 @@ type enforceParameters struct {
 	pVals   []string
 }
 
-// implements govaluate.Parameters
+// implements govaluate.Parameters.
 func (p enforceParameters) Get(name string) (interface{}, error) {
 	if name == "" {
 		return nil, nil

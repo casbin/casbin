@@ -45,7 +45,7 @@ func TestSetWatcher(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = e.SavePolicy() //calls watcher.Update()
+	err = e.SavePolicy() // calls watcher.Update()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +69,7 @@ func TestSelfModify(t *testing.T) {
 	_ = e.watcher.SetUpdateCallback(func(s string) {
 		called = 1
 	})
-	_, err = e.AddPolicy("eva", "data", "read") //calls watcher.Update()
+	_, err = e.AddPolicy("eva", "data", "read") // calls watcher.Update()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,7 +81,7 @@ func TestSelfModify(t *testing.T) {
 	_ = e.watcher.SetUpdateCallback(func(s string) {
 		called = 1
 	})
-	_, err = e.SelfAddPolicy("p", "p", []string{"eva", "data", "write"}) //calls watcher.Update()
+	_, err = e.SelfAddPolicy("p", "p", []string{"eva", "data", "write"}) // calls watcher.Update()
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -14,7 +14,7 @@
 
 package casbin
 
-// GetUsersForRoleInDomain gets the users that has a role inside a domain. Add by Gordon
+// GetUsersForRoleInDomain gets the users that has a role inside a domain. Add by Gordon.
 func (e *SyncedEnforcer) GetUsersForRoleInDomain(name string, domain string) []string {
 	e.m.RLock()
 	defer e.m.RUnlock()

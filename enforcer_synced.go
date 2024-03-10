@@ -26,7 +26,7 @@ import (
 	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 )
 
-// SyncedEnforcer wraps Enforcer and provides synchronized access
+// SyncedEnforcer wraps Enforcer and provides synchronized access.
 type SyncedEnforcer struct {
 	*Enforcer
 	m               sync.RWMutex
@@ -48,17 +48,17 @@ func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 	return e, nil
 }
 
-// GetLock return the private RWMutex lock
+// GetLock return the private RWMutex lock.
 func (e *SyncedEnforcer) GetLock() *sync.RWMutex {
 	return &e.m
 }
 
-// IsAutoLoadingRunning check if SyncedEnforcer is auto loading policies
+// IsAutoLoadingRunning check if SyncedEnforcer is auto loading policies.
 func (e *SyncedEnforcer) IsAutoLoadingRunning() bool {
 	return atomic.LoadInt32(&(e.autoLoadRunning)) != 0
 }
 
-// StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy
+// StartAutoLoadPolicy starts a go routine that will every specified duration call LoadPolicy.
 func (e *SyncedEnforcer) StartAutoLoadPolicy(d time.Duration) {
 	// Don't start another goroutine if there is already one running
 	if !atomic.CompareAndSwapInt32(&e.autoLoadRunning, 0, 1) {
@@ -204,28 +204,28 @@ func (e *SyncedEnforcer) EnforceWithMatcher(matcher string, rvals ...interface{}
 	return e.Enforcer.EnforceWithMatcher(matcher, rvals...)
 }
 
-// EnforceEx explain enforcement by informing matched rules
+// EnforceEx explain enforcement by informing matched rules.
 func (e *SyncedEnforcer) EnforceEx(rvals ...interface{}) (bool, []string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.Enforcer.EnforceEx(rvals...)
 }
 
-// EnforceExWithMatcher use a custom matcher and explain enforcement by informing matched rules
+// EnforceExWithMatcher use a custom matcher and explain enforcement by informing matched rules.
 func (e *SyncedEnforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.Enforcer.EnforceExWithMatcher(matcher, rvals...)
 }
 
-// BatchEnforce enforce in batches
+// BatchEnforce enforce in batches.
 func (e *SyncedEnforcer) BatchEnforce(requests [][]interface{}) ([]bool, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.Enforcer.BatchEnforce(requests)
 }
 
-// BatchEnforceWithMatcher enforce with matcher in batches
+// BatchEnforceWithMatcher enforce with matcher in batches.
 func (e *SyncedEnforcer) BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
@@ -378,7 +378,7 @@ func (e *SyncedEnforcer) AddPolicies(rules [][]string) (bool, error) {
 
 // AddPoliciesEx adds authorization rules to the current policy.
 // If the rule already exists, the rule will not be added.
-// But unlike AddPolicies, other non-existent rules are added instead of returning false directly
+// But unlike AddPolicies, other non-existent rules are added instead of returning false directly.
 func (e *SyncedEnforcer) AddPoliciesEx(rules [][]string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
@@ -405,7 +405,7 @@ func (e *SyncedEnforcer) AddNamedPolicies(ptype string, rules [][]string) (bool,
 
 // AddNamedPoliciesEx adds authorization rules to the current named policy.
 // If the rule already exists, the rule will not be added.
-// But unlike AddNamedPolicies, other non-existent rules are added instead of returning false directly
+// But unlike AddNamedPolicies, other non-existent rules are added instead of returning false directly.
 func (e *SyncedEnforcer) AddNamedPoliciesEx(ptype string, rules [][]string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
@@ -526,7 +526,7 @@ func (e *SyncedEnforcer) AddGroupingPolicies(rules [][]string) (bool, error) {
 
 // AddGroupingPoliciesEx adds role inheritance rules to the current policy.
 // If the rule already exists, the rule will not be added.
-// But unlike AddGroupingPolicies, other non-existent rules are added instead of returning false directly
+// But unlike AddGroupingPolicies, other non-existent rules are added instead of returning false directly.
 func (e *SyncedEnforcer) AddGroupingPoliciesEx(rules [][]string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()
@@ -553,7 +553,7 @@ func (e *SyncedEnforcer) AddNamedGroupingPolicies(ptype string, rules [][]string
 
 // AddNamedGroupingPoliciesEx adds named role inheritance rules to the current policy.
 // If the rule already exists, the rule will not be added.
-// But unlike AddNamedGroupingPolicies, other non-existent rules are added instead of returning false directly
+// But unlike AddNamedGroupingPolicies, other non-existent rules are added instead of returning false directly.
 func (e *SyncedEnforcer) AddNamedGroupingPoliciesEx(ptype string, rules [][]string) (bool, error) {
 	e.m.Lock()
 	defer e.m.Unlock()

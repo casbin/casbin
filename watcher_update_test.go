@@ -37,5 +37,4 @@ func TestSetWatcherUpdatable(t *testing.T) {
 
 	_ = e.SavePolicy()                                                                            // calls watcherEx.UpdateForSavePolicy()
 	_, _ = e.UpdatePolicy([]string{"admin", "data1", "read"}, []string{"admin", "data2", "read"}) // calls watcherEx.UpdateForUpdatePolicy()
-
 }

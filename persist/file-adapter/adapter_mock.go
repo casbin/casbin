@@ -73,12 +73,12 @@ func (a *AdapterMock) loadPolicyFile(model model.Model, handler func(string, mod
 	}
 }
 
-// SetMockErr sets string to be returned by of the mock during testing
+// SetMockErr sets string to be returned by of the mock during testing.
 func (a *AdapterMock) SetMockErr(errorToSet string) {
 	a.errorValue = errorToSet
 }
 
-// GetMockErr returns a mock error or nil
+// GetMockErr returns a mock error or nil.
 func (a *AdapterMock) GetMockErr() error {
 	var returnError error
 	if a.errorValue != "" {

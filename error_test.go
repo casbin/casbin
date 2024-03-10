@@ -58,7 +58,7 @@ func TestModelError(t *testing.T) {
 	}
 }
 
-//func TestPolicyError(t *testing.T) {
+// func TestPolicyError(t *testing.T) {
 //	_, err := NewEnforcer("examples/basic_model.conf", "examples/error/error_policy.csv")
 //	if err == nil {
 //		t.Errorf("Should be error here.")

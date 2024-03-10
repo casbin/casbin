@@ -46,7 +46,7 @@ var sectionNameMap = map[string]string{
 	"m": "matchers",
 }
 
-// Minimal required sections for a model to be valid
+// Minimal required sections for a model to be valid.
 var requiredSections = []string{"r", "p", "e", "m"}
 
 func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key string) bool {
@@ -56,7 +56,7 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 
 var paramsRegex = regexp.MustCompile(`\((.*?)\)`)
 
-// getParamsToken Get ParamsToken from Assertion.Value
+// getParamsToken Get ParamsToken from Assertion.Value.
 func getParamsToken(value string) []string {
 	paramsString := paramsRegex.FindString(value)
 	if paramsString == "" {

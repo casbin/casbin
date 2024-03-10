@@ -23,7 +23,7 @@ import (
 )
 
 func TestPersist(t *testing.T) {
-	//No tests yet
+	// No tests yet
 }
 
 func testRuleCount(t *testing.T, model model.Model, expected int, sec string, ptype string, tag string) {
@@ -45,7 +45,7 @@ func TestDuplicateRuleInAdapter(t *testing.T) {
 
 	e.ClearPolicy()
 
-	//simulate adapter.LoadPolicy with duplicate rules
+	// simulate adapter.LoadPolicy with duplicate rules
 	_ = persist.LoadPolicyArray([]string{"p", "alice", "data1", "read"}, e.GetModel())
 	_ = persist.LoadPolicyArray([]string{"p", "alice", "data1", "read"}, e.GetModel())
 

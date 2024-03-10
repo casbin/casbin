@@ -181,7 +181,7 @@ func (e *SyncedEnforcer) GetImplicitPermissionsForUser(user string, domain ...st
 // g, alice, admin
 //
 // GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p"
-// But you can specify the named policy "p2" to get: [["admin", "create"]] by    GetNamedImplicitPermissionsForUser("p2","alice")
+// But you can specify the named policy "p2" to get: [["admin", "create"]] by    GetNamedImplicitPermissionsForUser("p2","alice").
 func (e *SyncedEnforcer) GetNamedImplicitPermissionsForUser(ptype string, user string, domain ...string) ([][]string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()

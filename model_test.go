@@ -599,7 +599,7 @@ func CustomFunctionWrapper(args ...interface{}) (interface{}, error) {
 	key1 := args[0].(string)
 	key2 := args[1].(string)
 
-	return bool(CustomFunction(key1, key2)), nil
+	return CustomFunction(key1, key2), nil
 }
 
 func TestKeyMatchCustomModel(t *testing.T) {

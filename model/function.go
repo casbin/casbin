@@ -53,7 +53,7 @@ func LoadFunctionMap() FunctionMap {
 	return *fm
 }
 
-// GetFunctions return a map with all the functions
+// GetFunctions return a map with all the functions.
 func (fm *FunctionMap) GetFunctions() map[string]govaluate.ExpressionFunction {
 	ret := make(map[string]govaluate.ExpressionFunction)
 

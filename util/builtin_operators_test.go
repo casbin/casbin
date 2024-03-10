@@ -479,7 +479,6 @@ func TestKeyMatch4Func(t *testing.T) {
 
 	testKeyMatch4Func(t, true, "", "/parent/123/child/123", "/parent/{id}/child/{another_id}")
 	testKeyMatch4Func(t, true, "", "/parent/123/child/456", "/parent/{id}/child/{another_id}")
-
 }
 
 func TestKeyMatch5Func(t *testing.T) {
@@ -522,7 +521,6 @@ func TestKeyMatch5Func(t *testing.T) {
 	testKeyMatch5Func(t, true, "", "/proxy/myid/res/res2?status=1&type=2", "/proxy/{id}/*")
 	testKeyMatch5Func(t, true, "", "/proxy/myid/res/res2/res3?status=1&type=2", "/proxy/{id}/*")
 	testKeyMatch5Func(t, false, "", "/proxy/", "/proxy/{id}/*")
-
 }
 
 func TestIPMatchFunc(t *testing.T) {

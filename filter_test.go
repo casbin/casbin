@@ -133,7 +133,7 @@ func TestAppendFilteredPolicy(t *testing.T) {
 	testHasPolicy(t, e, []string{"admin", "domain1", "data1", "read"}, true)
 	testHasPolicy(t, e, []string{"admin", "domain2", "data2", "read"}, false)
 
-	//disable clear policy and load second domain
+	// disable clear policy and load second domain
 	if err := e.LoadIncrementalFilteredPolicy(&fileadapter.Filter{
 		P: []string{"", "domain2"},
 		G: []string{"", "", "domain2"},
@@ -141,7 +141,7 @@ func TestAppendFilteredPolicy(t *testing.T) {
 		t.Errorf("unexpected error in LoadFilteredPolicy: %v", err)
 	}
 
-	//both domain policies should be loaded
+	// both domain policies should be loaded
 	testHasPolicy(t, e, []string{"admin", "domain1", "data1", "read"}, true)
 	testHasPolicy(t, e, []string{"admin", "domain2", "data2", "read"}, true)
 }
