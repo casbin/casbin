@@ -147,7 +147,7 @@ func (ast *Assertion) buildConditionalRoleLinks(condRM rbac.ConditionalRoleManag
 	return nil
 }
 
-// addConditionalRoleLinks adds Link to rbac.ConditionalRoleManager and sets the parameters for LinkConditionFunc.
+// addConditionalRoleLink adds Link to rbac.ConditionalRoleManager and sets the parameters for LinkConditionFunc.
 func (ast *Assertion) addConditionalRoleLink(rule []string, domainRule []string) error {
 	var err error
 	if len(domainRule) == 0 {
