@@ -159,7 +159,7 @@ func SetEquals(a []string, b []string) bool {
 	return true
 }
 
-// SetEquals determines whether two string sets are identical.
+// SetEquals determines whether two int sets are identical.
 func SetEqualsInt(a []int, b []int) bool {
 	if len(a) != len(b) {
 		return false
@@ -176,7 +176,7 @@ func SetEqualsInt(a []int, b []int) bool {
 	return true
 }
 
-// SetEquals determines whether two string sets are identical.
+// Set2DEquals determines whether two string slice sets are identical.
 func Set2DEquals(a [][]string, b [][]string) bool {
 	if len(a) != len(b) {
 		return false
