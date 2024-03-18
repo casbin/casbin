@@ -315,20 +315,21 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string,
 			if matched {
 				permission = append(permission, deepCopyPolicy(rule))
 			}
-		} else if len(domain) > 1 {
+			continue
+		}
+		if len(domain) > 1 {
 			return nil, errors.ErrDomainParameter
-		} else {
-			d := domain[0]
-			matched := rm.Match(d, rule[domainIndex])
-			if !matched {
-				continue
-			}
-			matched, _ = rm.HasLink(user, rule[0], d)
-			if matched {
-				newRule := deepCopyPolicy(rule)
-				newRule[domainIndex] = d
-				permission = append(permission, newRule)
-			}
+		}
+		d := domain[0]
+		matched := rm.Match(d, rule[domainIndex])
+		if !matched {
+			continue
+		}
+		matched, _ = rm.HasLink(user, rule[0], d)
+		if matched {
+			newRule := deepCopyPolicy(rule)
+			newRule[domainIndex] = d
+			permission = append(permission, newRule)
 		}
 	}
 	return permission, nil

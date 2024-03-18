@@ -218,7 +218,7 @@ linters:
     - asciicheck # checks that your code does not contain non-ASCII identifiers
     - bidichk # checks for dangerous unicode character sequences
     - bodyclose # checks whether HTTP response body is closed successfully
-    #- cyclop # checks function and package cyclomatic complexity
+    - cyclop # checks function and package cyclomatic complexity
     - dupl # tool for code clone detection
     - durationcheck # checks for two durations multiplied together
     - errname # checks that sentinel errors are prefixed with the Err and error types are suffixed with the Error
@@ -227,7 +227,7 @@ linters:
     - exhaustive # checks exhaustiveness of enum switch statements
     - exportloopref # checks for pointers to enclosing loop variables
     #- forbidigo # forbids identifiers
-    #- funlen # tool for detection of long functions
+    - funlen # tool for detection of long functions
     - gocheckcompilerdirectives # validates go compiler directive comments (//go:)
     #- gochecknoglobals # checks that no global variables exist
     - gochecknoinits # checks that no init functions are present in Go code
@@ -235,7 +235,7 @@ linters:
     #- gocognit # computes and checks the cognitive complexity of functions
     - goconst # finds repeated strings that could be replaced by a constant
     #- gocritic # provides diagnostics that check for bugs, performance and style issues
-    #- gocyclo # computes and checks the cyclomatic complexity of functions
+    - gocyclo # computes and checks the cyclomatic complexity of functions
     - godot # checks if comments end in a period
     - goimports # in addition to fixing imports, goimports also formats your code in the same style as gofmt
     #- gomnd # detects magic numbers
@@ -249,7 +249,7 @@ linters:
     - mirror # reports wrong mirror patterns of bytes/strings usage
     - musttag # enforces field tags in (un)marshaled structs
     - nakedret # finds naked returns in functions greater than a specified function length
-    #- nestif # reports deeply nested if statements
+    - nestif # reports deeply nested if statements
     - nilerr # finds the code that returns nil even if it checks that the error is not nil
     #- nilnil # checks that there is no simultaneous return of nil error and an invalid value
     - noctx # finds sending http request without context.Context
