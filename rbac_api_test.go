@@ -40,10 +40,10 @@ func testGetRoles(t *testing.T, e *Enforcer, res []string, name string, domain .
 func testGetUsers(t *testing.T, e *Enforcer, res []string, name string, domain ...string) {
 	t.Helper()
 	myRes, err := e.GetUsersForRole(name, domain...)
-	switch err {
-	case nil:
+	switch {
+	case err == nil:
 		break
-	case errors.ErrNameNotFound:
+	case errors.Is(err, errors.ErrNameNotFound):
 		t.Log("No name found")
 	default:
 		t.Error("Users for ", name, " could not be fetched: ", err.Error())
@@ -551,7 +551,7 @@ func TestCustomizedFieldIndex(t *testing.T) {
 func testGetAllowedObjectConditions(t *testing.T, e *Enforcer, user string, act string, prefix string, res []string, expectedErr error) {
 	myRes, actualErr := e.GetAllowedObjectConditions(user, act, prefix)
 
-	if actualErr != expectedErr {
+	if !errors.Is(actualErr, expectedErr) {
 		t.Error("actual Err: ", actualErr, ", supposed to be ", expectedErr)
 	}
 	if actualErr == nil {

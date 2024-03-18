@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"errors"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -69,7 +70,7 @@ func (e *SyncedCachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 
 	if res, err := e.getCachedResult(key); err == nil {
 		return res, nil
-	} else if err != cache.ErrNoSuchKey {
+	} else if !errors.Is(err, cache.ErrNoSuchKey) {
 		return res, err
 	}
 
@@ -153,7 +154,7 @@ func (e *SyncedCachedEnforcer) checkOneAndRemoveCache(params ...interface{}) (bo
 	if atomic.LoadInt32(&e.enableCache) != 0 {
 		key, ok := e.getKey(params...)
 		if ok {
-			if err := e.cache.Delete(key); err != nil && err != cache.ErrNoSuchKey {
+			if err := e.cache.Delete(key); err != nil && !errors.Is(err, cache.ErrNoSuchKey) {
 				return false, err
 			}
 		}
@@ -170,7 +171,7 @@ func (e *SyncedCachedEnforcer) checkManyAndRemoveCache(rules [][]string) (bool, 
 					irule[i] = param
 				}
 				key, _ := e.getKey(irule...)
-				if err := e.cache.Delete(key); err != nil && err != cache.ErrNoSuchKey {
+				if err := e.cache.Delete(key); err != nil && !errors.Is(err, cache.ErrNoSuchKey) {
 					return false, err
 				}
 			}
