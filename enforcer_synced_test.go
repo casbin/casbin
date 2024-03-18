@@ -475,10 +475,10 @@ func testSyncedEnforcerGetUsers(t *testing.T, e *SyncedEnforcer, res []string, n
 	copy(myResCopy, myRes)
 	sort.Strings(myRes)
 	sort.Strings(res)
-	switch {
-	case err == nil:
+	switch err {
+	case nil:
 		break
-	case errors.Is(err, errors.ErrNameNotFound):
+	case errors.ErrNameNotFound:
 		t.Log("No name found")
 	default:
 		t.Error("Users for ", name, " could not be fetched: ", err.Error())

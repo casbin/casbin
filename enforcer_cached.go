@@ -20,8 +20,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/casbin/casbin/v2/errors"
-
 	"github.com/casbin/casbin/v2/persist/cache"
 )
 
@@ -76,7 +74,7 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 
 	if res, err := e.getCachedResult(key); err == nil {
 		return res, nil
-	} else if !errors.Is(err, cache.ErrNoSuchKey) {
+	} else if err != cache.ErrNoSuchKey {
 		return res, err
 	}
 
@@ -102,7 +100,7 @@ func (e *CachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
 	if atomic.LoadInt32(&e.enableCache) != 0 {
 		key, ok := e.getKey(params...)
 		if ok {
-			if err := e.cache.Delete(key); err != nil && !errors.Is(err, cache.ErrNoSuchKey) {
+			if err := e.cache.Delete(key); err != nil && err != cache.ErrNoSuchKey {
 				return false, err
 			}
 		}
@@ -119,7 +117,7 @@ func (e *CachedEnforcer) RemovePolicies(rules [][]string) (bool, error) {
 					irule[i] = param
 				}
 				key, _ := e.getKey(irule...)
-				if err := e.cache.Delete(key); err != nil && !errors.Is(err, cache.ErrNoSuchKey) {
+				if err := e.cache.Delete(key); err != nil && err != cache.ErrNoSuchKey {
 					return false, err
 				}
 			}

@@ -113,7 +113,7 @@ func (c *Config) parseBuffer(buf *bufio.Reader) error {
 		}
 		lineNum++
 		line, _, err := buf.ReadLine()
-		if errors.Is(err, io.EOF) {
+		if err == io.EOF {
 			// force write when buffer is not flushed yet
 			if buffer.Len() > 0 {
 				if err = c.write(section, lineNum, &buffer); err != nil {
