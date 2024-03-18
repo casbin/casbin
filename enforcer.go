@@ -22,7 +22,6 @@ import (
 	"sync"
 
 	"github.com/casbin/casbin/v2/effector"
-	casbinerrors "github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
@@ -30,6 +29,7 @@ import (
 	"github.com/casbin/casbin/v2/rbac"
 	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
+
 	"github.com/casbin/govaluate"
 )
 
@@ -338,7 +338,7 @@ func (e *Enforcer) LoadPolicy() error {
 		}
 	}()
 
-	if err = e.adapter.LoadPolicy(newModel); err != nil && !errors.Is(err, casbinerrors.ErrInvalidFilePath) {
+	if err = e.adapter.LoadPolicy(newModel); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
 		return err
 	}
 
@@ -411,7 +411,7 @@ func (e *Enforcer) loadFilteredPolicy(filter interface{}) error {
 	default:
 		return errors.New("filtered policies are not supported by this adapter")
 	}
-	if err := filteredAdapter.LoadFilteredPolicy(e.model, filter); err != nil && !errors.Is(err, casbinerrors.ErrInvalidFilePath) {
+	if err := filteredAdapter.LoadFilteredPolicy(e.model, filter); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
 		return err
 	}
 
@@ -949,23 +949,21 @@ func (p enforceParameters) Get(name string) (interface{}, error) {
 		return nil, nil
 	}
 
-	err := errors.New("No parameter '" + name + "' found.")
-
 	switch name[0] {
 	case 'p':
 		i, ok := p.pTokens[name]
 		if !ok {
-			return nil, err
+			return nil, errors.New("No parameter '" + name + "' found.")
 		}
 		return p.pVals[i], nil
 	case 'r':
 		i, ok := p.rTokens[name]
 		if !ok {
-			return nil, err
+			return nil, errors.New("No parameter '" + name + "' found.")
 		}
 		return p.rVals[i], nil
 	default:
-		return nil, err
+		return nil, errors.New("No parameter '" + name + "' found.")
 	}
 }
 

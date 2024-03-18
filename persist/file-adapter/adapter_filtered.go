@@ -20,7 +20,6 @@ import (
 	"os"
 	"strings"
 
-	casbinerrors "github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 )
@@ -64,7 +63,7 @@ func (a *FilteredAdapter) LoadFilteredPolicy(model model.Model, filter interface
 		return a.LoadPolicy(model)
 	}
 	if a.filePath == "" {
-		return casbinerrors.ErrInvalidFilePath
+		return errors.New("invalid file path, file path cannot be empty")
 	}
 
 	filterValue, ok := filter.(*Filter)
