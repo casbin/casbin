@@ -233,7 +233,7 @@ linters:
     - gochecknoinits # checks that no init functions are present in Go code
     - gochecksumtype # checks exhaustiveness on Go "sum types"
     #- gocognit # computes and checks the cognitive complexity of functions
-    #- goconst # finds repeated strings that could be replaced by a constant
+    - goconst # finds repeated strings that could be replaced by a constant
     #- gocritic # provides diagnostics that check for bugs, performance and style issues
     #- gocyclo # computes and checks the cyclomatic complexity of functions
     - godot # checks if comments end in a period

@@ -28,7 +28,3 @@ var (
 	ErrObjCondition   = errors.New("need to meet the prefix required by the object condition")
 	ErrEmptyCondition = errors.New("GetAllowedObjectConditions have an empty condition")
 )
-
-func Is(err, target error) bool {
-	return errors.Is(err, target)
-}

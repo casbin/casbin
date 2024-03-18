@@ -21,6 +21,7 @@ import (
 	"os"
 	"strings"
 
+	casbinerrors "github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 	"github.com/casbin/casbin/v2/util"
@@ -52,7 +53,7 @@ func NewAdapter(filePath string) *Adapter {
 // LoadPolicy loads all policy rules from the storage.
 func (a *Adapter) LoadPolicy(model model.Model) error {
 	if a.filePath == "" {
-		return errors.New("invalid file path, file path cannot be empty")
+		return casbinerrors.ErrInvalidFilePath
 	}
 
 	return a.loadPolicyFile(model, persist.LoadPolicyLine)
@@ -61,7 +62,7 @@ func (a *Adapter) LoadPolicy(model model.Model) error {
 // SavePolicy saves all policy rules to the storage.
 func (a *Adapter) SavePolicy(model model.Model) error {
 	if a.filePath == "" {
-		return errors.New("invalid file path, file path cannot be empty")
+		return casbinerrors.ErrInvalidFilePath
 	}
 
 	var tmp bytes.Buffer

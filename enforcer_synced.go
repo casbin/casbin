@@ -15,9 +15,12 @@
 package casbin
 
 import (
+	"errors"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	casbinerrors "github.com/casbin/casbin/v2/errors"
 
 	"github.com/casbin/govaluate"
 
@@ -132,7 +135,7 @@ func (e *SyncedEnforcer) LoadPolicyFast() error {
 	newRmMap := map[string]rbac.RoleManager{}
 	var err error
 
-	if err = e.adapter.LoadPolicy(newModel); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
+	if err = e.adapter.LoadPolicy(newModel); err != nil && !errors.Is(err, casbinerrors.ErrInvalidFilePath) {
 		return err
 	}
 
