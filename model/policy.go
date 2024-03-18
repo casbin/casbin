@@ -207,15 +207,11 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) {
 			i := len(assertion.Policy) - 1
 			for ; i > 0; i-- {
 				idx, err := strconv.Atoi(assertion.Policy[i-1][assertion.FieldIndexMap[constant.PriorityIndex]])
-				if err != nil {
+				if err != nil || idx <= idxInsert {
 					break
 				}
-				if idx > idxInsert {
-					assertion.Policy[i] = assertion.Policy[i-1]
-					assertion.PolicyMap[strings.Join(assertion.Policy[i-1], DefaultSep)]++
-				} else {
-					break
-				}
+				assertion.Policy[i] = assertion.Policy[i-1]
+				assertion.PolicyMap[strings.Join(assertion.Policy[i-1], DefaultSep)]++
 			}
 			assertion.Policy[i] = rule
 			assertion.PolicyMap[strings.Join(rule, DefaultSep)] = i

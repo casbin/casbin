@@ -33,14 +33,14 @@ func TestCasbinJsGetPermissionForUserOld(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	target_str, _ := CasbinJsGetPermissionForUserOld(e, "alice")
-	t.Log("GetPermissionForUser Alice", string(target_str))
-	alice_target := make(map[string][]string)
-	err = json.Unmarshal(target_str, &alice_target)
+	targetStr, _ := CasbinJsGetPermissionForUserOld(e, "alice")
+	t.Log("GetPermissionForUser Alice", string(targetStr))
+	aliceTarget := make(map[string][]string)
+	err = json.Unmarshal(targetStr, &aliceTarget)
 	if err != nil {
 		t.Errorf("Test error: %s", err)
 	}
-	perm, ok := alice_target["read"]
+	perm, ok := aliceTarget["read"]
 	if !ok {
 		t.Errorf("Test error: Alice doesn't have read permission")
 	}
@@ -50,7 +50,7 @@ func TestCasbinJsGetPermissionForUserOld(t *testing.T) {
 	if !contains(perm, "data2") {
 		t.Errorf("Test error: Alice cannot read data2")
 	}
-	perm, ok = alice_target["write"]
+	perm, ok = aliceTarget["write"]
 	if !ok {
 		t.Errorf("Test error: Alice doesn't have write permission")
 	}
@@ -61,18 +61,18 @@ func TestCasbinJsGetPermissionForUserOld(t *testing.T) {
 		t.Errorf("Test error: Alice cannot write data2")
 	}
 
-	target_str, _ = CasbinJsGetPermissionForUserOld(e, "bob")
-	t.Log("GetPermissionForUser Bob", string(target_str))
-	bob_target := make(map[string][]string)
-	err = json.Unmarshal(target_str, &bob_target)
+	targetStr, _ = CasbinJsGetPermissionForUserOld(e, "bob")
+	t.Log("GetPermissionForUser Bob", string(targetStr))
+	bobTarget := make(map[string][]string)
+	err = json.Unmarshal(targetStr, &bobTarget)
 	if err != nil {
 		t.Errorf("Test error: %s", err)
 	}
-	_, ok = bob_target["read"]
+	_, ok = bobTarget["read"]
 	if ok {
 		t.Errorf("Test error: Bob has read permission")
 	}
-	perm, ok = bob_target["write"]
+	perm, ok = bobTarget["write"]
 	if !ok {
 		t.Errorf("Test error: Bob doesn't have permission")
 	}
@@ -86,7 +86,7 @@ func TestCasbinJsGetPermissionForUserOld(t *testing.T) {
 		t.Errorf("Test error: Bob can access a non-existing data")
 	}
 
-	_, ok = bob_target["rm_rf"]
+	_, ok = bobTarget["rm_rf"]
 	if ok {
 		t.Errorf("Someone can have a non-existing action (rm -rf)")
 	}

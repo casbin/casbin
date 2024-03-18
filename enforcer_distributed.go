@@ -22,8 +22,8 @@ func NewDistributedEnforcer(params ...interface{}) (*DistributedEnforcer, error)
 }
 
 // SetDispatcher sets the current dispatcher.
-func (e *DistributedEnforcer) SetDispatcher(dispatcher persist.Dispatcher) {
-	e.dispatcher = dispatcher
+func (d *DistributedEnforcer) SetDispatcher(dispatcher persist.Dispatcher) {
+	d.dispatcher = dispatcher
 }
 
 // AddPoliciesSelf provides a method for dispatcher to add authorization rules to the current policy.

@@ -100,7 +100,8 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 		}
 	}
 
-	if paramLen-parsedParamLen == 2 {
+	switch paramLen - parsedParamLen {
+	case 2:
 		switch p0 := params[0].(type) {
 		case string:
 			switch p1 := params[1].(type) {
@@ -126,7 +127,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 				}
 			}
 		}
-	} else if paramLen-parsedParamLen == 1 {
+	case 1:
 		switch p0 := params[0].(type) {
 		case string:
 			err := e.InitWithFile(p0, "")
@@ -139,9 +140,9 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 				return nil, err
 			}
 		}
-	} else if paramLen-parsedParamLen == 0 {
+	case 0:
 		return e, nil
-	} else {
+	default:
 		return nil, errors.New("invalid parameters for enforcer")
 	}
 
@@ -586,7 +587,7 @@ func (e *Enforcer) invalidateMatcherMap() {
 }
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
-func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) {
+func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
@@ -694,7 +695,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	var effect effector.Effect
 	var explainIndex int
 
-	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") {
+	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") { //nolint:nestif // TODO: reduce function complexity
 		policyEffects = make([]effector.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
 
