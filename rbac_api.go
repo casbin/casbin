@@ -123,7 +123,12 @@ func (e *Enforcer) DeleteUser(user string) (bool, error) {
 // Returns false if the role does not exist (aka not affected).
 func (e *Enforcer) DeleteRole(role string) (bool, error) {
 	var err error
-	res1, err := e.RemoveFilteredGroupingPolicy(1, role)
+	res1, err := e.RemoveFilteredGroupingPolicy(0, role)
+	if err != nil {
+		return res1, err
+	}
+
+	res2, err := e.RemoveFilteredGroupingPolicy(1, role)
 	if err != nil {
 		return res1, err
 	}
@@ -132,8 +137,8 @@ func (e *Enforcer) DeleteRole(role string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	res2, err := e.RemoveFilteredPolicy(subIndex, role)
-	return res1 || res2, err
+	res3, err := e.RemoveFilteredPolicy(subIndex, role)
+	return res1 || res2 || res3, err
 }
 
 // DeletePermission deletes a permission.
