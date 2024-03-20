@@ -157,6 +157,7 @@ func (e *SyncedEnforcer) LoadPolicyFast() error {
 	// reduce the lock range
 	e.m.Lock()
 	defer e.m.Unlock()
+	e.invalidateMatcherMap()
 	e.model = newModel
 	e.rmMap = newRmMap
 	return nil
