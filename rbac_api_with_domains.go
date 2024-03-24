@@ -100,7 +100,9 @@ func (e *Enforcer) GetAllUsersByDomain(domain string) []string {
 		return res
 	}
 
-	users = append(users, getUser(2, g.Policy, domain, m)...)
+	if g != nil {
+		users = append(users, getUser(2, g.Policy, domain, m)...)
+	}
 	users = append(users, getUser(index, p.Policy, domain, m)...)
 	return users
 }
@@ -127,13 +129,15 @@ func (e *Enforcer) DeleteAllUsersByDomain(domain string) (bool, error) {
 		return res
 	}
 
-	users := getUser(2, g.Policy, domain)
-	if _, err := e.RemoveGroupingPolicies(users); err != nil {
-		return false, err
-	}
-	users = getUser(index, p.Policy, domain)
+	users := getUser(index, p.Policy, domain)
 	if _, err := e.RemovePolicies(users); err != nil {
 		return false, err
+	}
+	if g != nil {
+		users = getUser(2, g.Policy, domain)
+		if _, err := e.RemoveGroupingPolicies(users); err != nil {
+			return false, err
+		}
 	}
 	return true, nil
 }
@@ -165,6 +169,9 @@ func (e *Enforcer) GetAllDomains() ([]string, error) {
 // note: Not applicable to Domains with inheritance relationship  (implicit roles)
 func (e *Enforcer) GetAllRolesByDomain(domain string) []string {
 	g := e.model["g"]["g"]
+	if g == nil {
+		return []string{}
+	}
 	policies := g.Policy
 	roles := make([]string, 0)
 	existMap := make(map[string]bool) // remove duplicates
