@@ -246,13 +246,10 @@ func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
 	if !ok {
 		return false
 	}
-
-	if index < len(model[sec][ptype].Policy)-1 {
-		copy(model[sec][ptype].Policy[index:], model[sec][ptype].Policy[index+1:])
+	if index >= len(model[sec][ptype].Policy) {
+		return false
 	}
-	model[sec][ptype].Policy = model[sec][ptype].Policy[:len(model[sec][ptype].Policy)-1]
-
-	//model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
+	model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
 	delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
 	for i := index; i < len(model[sec][ptype].Policy); i++ {
 		model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
