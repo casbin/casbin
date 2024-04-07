@@ -67,7 +67,7 @@ func TestNewModelFromString(t *testing.T) {
 	modelString := string(modelBytes)
 	m, err := NewModelFromString(modelString)
 	if err != nil {
-		t.Errorf("model faild to load from string: %s", err)
+		t.Errorf("model failed to load from string: %s", err)
 	}
 	if m == nil {
 		t.Error("model should not be nil")
