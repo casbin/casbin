@@ -323,8 +323,6 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
-	e.invalidateMatcherMap()
-
 	needToRebuild := false
 	newModel := e.model.Copy()
 	newModel.ClearPolicy()
@@ -361,6 +359,7 @@ func (e *Enforcer) LoadPolicy() error {
 		}
 	}
 	e.model = newModel
+	e.invalidateMatcherMap()
 	return nil
 }
 
