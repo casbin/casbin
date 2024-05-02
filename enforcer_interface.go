@@ -86,12 +86,12 @@ type IEnforcer interface {
 	GetPermissionsForUserInDomain(user string, domain string) [][]string
 	AddRoleForUserInDomain(user string, role string, domain string) (bool, error)
 	DeleteRoleForUserInDomain(user string, role string, domain string) (bool, error)
-	GetAllUsersByDomain(domain string) []string
+	GetAllUsersByDomain(domain string) ([]string, error)
 	DeleteRolesForUserInDomain(user string, domain string) (bool, error)
 	DeleteAllUsersByDomain(domain string) (bool, error)
 	DeleteDomains(domains ...string) (bool, error)
 	GetAllDomains() ([]string, error)
-	GetAllRolesByDomain(domain string) []string
+	GetAllRolesByDomain(domain string) ([]string, error)
 
 	/* Management API */
 	GetAllSubjects() []string

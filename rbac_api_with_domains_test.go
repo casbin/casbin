@@ -211,8 +211,9 @@ func TestGetDomainsForUser(t *testing.T) {
 }
 
 func testGetAllUsersByDomain(t *testing.T, e *Enforcer, domain string, expected []string) {
-	if !util.SetEquals(e.GetAllUsersByDomain(domain), expected) {
-		t.Errorf("users in %s: %v, supposed to be %v\n", domain, e.GetAllUsersByDomain(domain), expected)
+	users, _ := e.GetAllUsersByDomain(domain)
+	if !util.SetEquals(users, expected) {
+		t.Errorf("users in %s: %v, supposed to be %v\n", domain, users, expected)
 	}
 }
 
@@ -268,8 +269,9 @@ func TestGetAllDomains(t *testing.T) {
 }
 
 func testGetAllRolesByDomain(t *testing.T, e *Enforcer, domain string, expected []string) {
-	if !util.SetEquals(e.GetAllRolesByDomain(domain), expected) {
-		t.Errorf("roles in %s: %v, supposed to be %v\n", domain, e.GetAllRolesByDomain(domain), expected)
+	roles, _ := e.GetAllRolesByDomain(domain)
+	if !util.SetEquals(roles, expected) {
+		t.Errorf("roles in %s: %v, supposed to be %v\n", domain, roles, expected)
 	}
 }
 

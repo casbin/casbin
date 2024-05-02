@@ -236,6 +236,9 @@ func (model Model) SortPoliciesBySubjectHierarchy() error {
 	if model["e"]["e"].Value != constant.SubjectPriorityEffect {
 		return nil
 	}
+	if model["g"] == nil || model["g"]["g"] == nil {
+		return errors.New("role definition is not initialized")
+	}
 	subIndex := 0
 	for ptype, assertion := range model["p"] {
 		domainIndex, err := model.GetFieldIndex(ptype, constant.DomainIndex)

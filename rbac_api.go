@@ -550,8 +550,12 @@ func (e *Enforcer) GetImplicitUsersForResourceByDomain(resource string, domain s
 
 	isRole := make(map[string]bool)
 
-	for _, role := range e.GetAllRolesByDomain(domain) {
-		isRole[role] = true
+	if roles, err := e.GetAllRolesByDomain(domain); err != nil {
+		return nil, err
+	} else {
+		for _, role := range roles {
+			isRole[role] = true
+		}
 	}
 
 	for _, rule := range e.model["p"]["p"].Policy {

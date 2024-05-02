@@ -37,7 +37,7 @@ const DefaultSep = ","
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
 func (model Model) BuildIncrementalRoleLinks(rmMap map[string]rbac.RoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
-	if sec == "g" && rmMap[ptype] != nil {
+	if sec == "g" && rmMap[ptype] != nil && model[sec] != nil && model[sec][ptype] != nil {
 		return model[sec][ptype].buildIncrementalRoleLinks(rmMap[ptype], op, rules)
 	}
 	return nil
@@ -60,7 +60,7 @@ func (model Model) BuildRoleLinks(rmMap map[string]rbac.RoleManager) error {
 
 // BuildIncrementalConditionalRoleLinks provides incremental build the role inheritance relations.
 func (model Model) BuildIncrementalConditionalRoleLinks(condRmMap map[string]rbac.ConditionalRoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
-	if sec == "g" && condRmMap[ptype] != nil {
+	if sec == "g" && condRmMap[ptype] != nil && model[sec] != nil && model[sec][ptype] != nil {
 		return model[sec][ptype].buildIncrementalConditionalRoleLinks(condRmMap[ptype], op, rules)
 	}
 	return nil
@@ -127,11 +127,17 @@ func (model Model) ClearPolicy() {
 
 // GetPolicy gets all rules in a policy.
 func (model Model) GetPolicy(sec string, ptype string) [][]string {
+	if model[sec] == nil || model[sec][ptype] == nil {
+		return [][]string{}
+	}
 	return model[sec][ptype].Policy
 }
 
 // GetFilteredPolicy gets rules based on field filters from a policy.
 func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) [][]string {
+	if model[sec] == nil || model[sec][ptype] == nil {
+		return [][]string{}
+	}
 	res := [][]string{}
 
 	for _, rule := range model[sec][ptype].Policy {
@@ -153,6 +159,9 @@ func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, f
 
 // HasPolicyEx determines whether a model has the specified policy rule with error.
 func (model Model) HasPolicyEx(sec string, ptype string, rule []string) (bool, error) {
+	if model[sec] == nil || model[sec][ptype] == nil {
+		return false, fmt.Errorf("model do not have policy: %s, %s", sec, ptype)
+	}
 	assertion := model[sec][ptype]
 	switch sec {
 	case "p":
@@ -177,6 +186,9 @@ func (model Model) HasPolicyEx(sec string, ptype string, rule []string) (bool, e
 
 // HasPolicy determines whether a model has the specified policy rule.
 func (model Model) HasPolicy(sec string, ptype string, rule []string) bool {
+	if model[sec] == nil || model[sec][ptype] == nil {
+		return false
+	}
 	_, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
 	return ok
 }
@@ -194,6 +206,9 @@ func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool 
 
 // AddPolicy adds a policy rule to the model.
 func (model Model) AddPolicy(sec string, ptype string, rule []string) {
+	if model[sec] == nil || model[sec][ptype] == nil {
+		return
+	}
 	assertion := model[sec][ptype]
 	assertion.Policy = append(assertion.Policy, rule)
 	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
@@ -226,6 +241,9 @@ func (model Model) AddPolicies(sec string, ptype string, rules [][]string) {
 
 // AddPoliciesWithAffected adds policy rules to the model, and returns affected rules.
 func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]string) [][]string {
+	if model[sec] == nil || model[sec][ptype] == nil {
+		return [][]string{}
+	}
 	var affected [][]string
 	for _, rule := range rules {
 		hashKey := strings.Join(rule, DefaultSep)
@@ -242,6 +260,9 @@ func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]s
 // RemovePolicy removes a policy rule from the model.
 // Deprecated: Using AddPoliciesWithAffected instead.
 func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
+	if model[sec] == nil || model[sec][ptype] == nil {
+		return false
+	}
 	index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
 	if !ok {
 		return false
@@ -258,6 +279,9 @@ func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
 
 // UpdatePolicy updates a policy rule from the model.
 func (model Model) UpdatePolicy(sec string, ptype string, oldRule []string, newRule []string) bool {
+	if model[sec] == nil || model[sec][ptype] == nil {
+		return false
+	}
 	oldPolicy := strings.Join(oldRule, DefaultSep)
 	index, ok := model[sec][ptype].PolicyMap[oldPolicy]
 	if !ok {
@@ -273,6 +297,9 @@ func (model Model) UpdatePolicy(sec string, ptype string, oldRule []string, newR
 
 // UpdatePolicies updates a policy rule from the model.
 func (model Model) UpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) bool {
+	if model[sec] == nil || model[sec][ptype] == nil {
+		return false
+	}
 	rollbackFlag := false
 	// index -> []{oldIndex, newIndex}
 	modifiedRuleIndex := make(map[int][]int)
@@ -316,6 +343,9 @@ func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bo
 
 // RemovePoliciesWithAffected removes policy rules from the model, and returns affected rules.
 func (model Model) RemovePoliciesWithAffected(sec string, ptype string, rules [][]string) [][]string {
+	if model[sec] == nil || model[sec][ptype] == nil {
+		return [][]string{}
+	}
 	var affected [][]string
 	for _, rule := range rules {
 		index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
@@ -335,6 +365,9 @@ func (model Model) RemovePoliciesWithAffected(sec string, ptype string, rules []
 
 // RemoveFilteredPolicy removes policy rules based on field filters from the model.
 func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, [][]string) {
+	if model[sec] == nil || model[sec][ptype] == nil {
+		return false, [][]string{}
+	}
 	var tmp [][]string
 	var effects [][]string
 	res := false
@@ -369,8 +402,10 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 func (model Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldIndex int) []string {
 	values := []string{}
 
-	for _, rule := range model[sec][ptype].Policy {
-		values = append(values, rule[fieldIndex])
+	if model[sec] != nil && model[sec][ptype] != nil {
+		for _, rule := range model[sec][ptype].Policy {
+			values = append(values, rule[fieldIndex])
+		}
 	}
 
 	util.ArrayRemoveDuplicates(&values)
