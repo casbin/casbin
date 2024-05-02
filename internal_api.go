@@ -268,18 +268,20 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 		err      error
 	)
 
+	if e.model[sec] == nil || e.model[sec][ptype] == nil {
+		return nil, fmt.Errorf("invalid sec: %s, ptype: %s", sec, ptype)
+	}
+
 	if e.shouldPersist() {
 		if oldRules, err = e.adapter.(persist.UpdatableAdapter).UpdateFilteredPolicies(sec, ptype, newRules, fieldIndex, fieldValues...); err != nil {
 			if err.Error() != notImplemented {
 				return nil, err
 			}
 		}
-		if e.model[sec] != nil && e.model[sec][ptype] != nil {
-			// For compatibility, because some adapters return oldRules containing ptype, see https://github.com/casbin/xorm-adapter/issues/49
-			for i, oldRule := range oldRules {
-				if len(oldRules[i]) == len(e.model[sec][ptype].Tokens)+1 {
-					oldRules[i] = oldRule[1:]
-				}
+		// For compatibility, because some adapters return oldRules containing ptype, see https://github.com/casbin/xorm-adapter/issues/49
+		for i, oldRule := range oldRules {
+			if len(oldRules[i]) == len(e.model[sec][ptype].Tokens)+1 {
+				oldRules[i] = oldRule[1:]
 			}
 		}
 	}
