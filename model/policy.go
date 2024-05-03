@@ -37,7 +37,11 @@ const DefaultSep = ","
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
 func (model Model) BuildIncrementalRoleLinks(rmMap map[string]rbac.RoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
-	if sec == "g" && rmMap[ptype] != nil && model[sec] != nil && model[sec][ptype] != nil {
+	if sec == "g" && rmMap[ptype] != nil {
+		_, err := model.GetAssertion(sec, ptype)
+		if err != nil {
+			return err
+		}
 		return model[sec][ptype].buildIncrementalRoleLinks(rmMap[ptype], op, rules)
 	}
 	return nil
@@ -60,7 +64,11 @@ func (model Model) BuildRoleLinks(rmMap map[string]rbac.RoleManager) error {
 
 // BuildIncrementalConditionalRoleLinks provides incremental build the role inheritance relations.
 func (model Model) BuildIncrementalConditionalRoleLinks(condRmMap map[string]rbac.ConditionalRoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
-	if sec == "g" && condRmMap[ptype] != nil && model[sec] != nil && model[sec][ptype] != nil {
+	if sec == "g" && condRmMap[ptype] != nil {
+		_, err := model.GetAssertion(sec, ptype)
+		if err != nil {
+			return err
+		}
 		return model[sec][ptype].buildIncrementalConditionalRoleLinks(condRmMap[ptype], op, rules)
 	}
 	return nil
@@ -126,17 +134,19 @@ func (model Model) ClearPolicy() {
 }
 
 // GetPolicy gets all rules in a policy.
-func (model Model) GetPolicy(sec string, ptype string) [][]string {
-	if model[sec] == nil || model[sec][ptype] == nil {
-		return [][]string{}
+func (model Model) GetPolicy(sec string, ptype string) ([][]string, error) {
+	_, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return [][]string{}, err
 	}
-	return model[sec][ptype].Policy
+	return model[sec][ptype].Policy, nil
 }
 
 // GetFilteredPolicy gets rules based on field filters from a policy.
-func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) [][]string {
-	if model[sec] == nil || model[sec][ptype] == nil {
-		return [][]string{}
+func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) ([][]string, error) {
+	_, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return [][]string{}, err
 	}
 	res := [][]string{}
 
@@ -154,15 +164,15 @@ func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, f
 		}
 	}
 
-	return res
+	return res, nil
 }
 
 // HasPolicyEx determines whether a model has the specified policy rule with error.
 func (model Model) HasPolicyEx(sec string, ptype string, rule []string) (bool, error) {
-	if model[sec] == nil || model[sec][ptype] == nil {
-		return false, fmt.Errorf("model do not have policy: %s, %s", sec, ptype)
+	assertion, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return false, err
 	}
-	assertion := model[sec][ptype]
 	switch sec {
 	case "p":
 		if len(rule) != len(assertion.Tokens) {
@@ -181,35 +191,40 @@ func (model Model) HasPolicyEx(sec string, ptype string, rule []string) (bool, e
 				rule)
 		}
 	}
-	return model.HasPolicy(sec, ptype, rule), nil
+	return model.HasPolicy(sec, ptype, rule)
 }
 
 // HasPolicy determines whether a model has the specified policy rule.
-func (model Model) HasPolicy(sec string, ptype string, rule []string) bool {
-	if model[sec] == nil || model[sec][ptype] == nil {
-		return false
+func (model Model) HasPolicy(sec string, ptype string, rule []string) (bool, error) {
+	_, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return false, err
 	}
 	_, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
-	return ok
+	return ok, nil
 }
 
 // HasPolicies determines whether a model has any of the specified policies. If one is found we return true.
-func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool {
+func (model Model) HasPolicies(sec string, ptype string, rules [][]string) (bool, error) {
 	for i := 0; i < len(rules); i++ {
-		if model.HasPolicy(sec, ptype, rules[i]) {
-			return true
+		ok, err := model.HasPolicy(sec, ptype, rules[i])
+		if err != nil {
+			return false, err
+		}
+		if ok {
+			return true, nil
 		}
 	}
 
-	return false
+	return false, nil
 }
 
 // AddPolicy adds a policy rule to the model.
-func (model Model) AddPolicy(sec string, ptype string, rule []string) {
-	if model[sec] == nil || model[sec][ptype] == nil {
-		return
+func (model Model) AddPolicy(sec string, ptype string, rule []string) error {
+	assertion, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return err
 	}
-	assertion := model[sec][ptype]
 	assertion.Policy = append(assertion.Policy, rule)
 	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
 
@@ -232,17 +247,20 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) {
 			assertion.PolicyMap[strings.Join(rule, DefaultSep)] = i
 		}
 	}
+	return nil
 }
 
 // AddPolicies adds policy rules to the model.
-func (model Model) AddPolicies(sec string, ptype string, rules [][]string) {
-	_ = model.AddPoliciesWithAffected(sec, ptype, rules)
+func (model Model) AddPolicies(sec string, ptype string, rules [][]string) error {
+	_, err := model.AddPoliciesWithAffected(sec, ptype, rules)
+	return err
 }
 
 // AddPoliciesWithAffected adds policy rules to the model, and returns affected rules.
-func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]string) [][]string {
-	if model[sec] == nil || model[sec][ptype] == nil {
-		return [][]string{}
+func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]string) ([][]string, error) {
+	_, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return [][]string{}, err
 	}
 	var affected [][]string
 	for _, rule := range rules {
@@ -252,20 +270,24 @@ func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]s
 			continue
 		}
 		affected = append(affected, rule)
-		model.AddPolicy(sec, ptype, rule)
+		err = model.AddPolicy(sec, ptype, rule)
+		if err != nil {
+			break
+		}
 	}
-	return affected
+	return affected, err
 }
 
 // RemovePolicy removes a policy rule from the model.
 // Deprecated: Using AddPoliciesWithAffected instead.
-func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
-	if model[sec] == nil || model[sec][ptype] == nil {
-		return false
+func (model Model) RemovePolicy(sec string, ptype string, rule []string) (bool, error) {
+	_, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return false, err
 	}
 	index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
 	if !ok {
-		return false
+		return false, err
 	}
 
 	model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
@@ -274,31 +296,33 @@ func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
 		model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
 	}
 
-	return true
+	return true, err
 }
 
 // UpdatePolicy updates a policy rule from the model.
-func (model Model) UpdatePolicy(sec string, ptype string, oldRule []string, newRule []string) bool {
-	if model[sec] == nil || model[sec][ptype] == nil {
-		return false
+func (model Model) UpdatePolicy(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
+	_, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return false, err
 	}
 	oldPolicy := strings.Join(oldRule, DefaultSep)
 	index, ok := model[sec][ptype].PolicyMap[oldPolicy]
 	if !ok {
-		return false
+		return false, nil
 	}
 
 	model[sec][ptype].Policy[index] = newRule
 	delete(model[sec][ptype].PolicyMap, oldPolicy)
 	model[sec][ptype].PolicyMap[strings.Join(newRule, DefaultSep)] = index
 
-	return true
+	return true, nil
 }
 
 // UpdatePolicies updates a policy rule from the model.
-func (model Model) UpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) bool {
-	if model[sec] == nil || model[sec][ptype] == nil {
-		return false
+func (model Model) UpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) (bool, error) {
+	_, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return false, err
 	}
 	rollbackFlag := false
 	// index -> []{oldIndex, newIndex}
@@ -322,7 +346,7 @@ func (model Model) UpdatePolicies(sec string, ptype string, oldRules, newRules [
 		index, ok := model[sec][ptype].PolicyMap[oldPolicy]
 		if !ok {
 			rollbackFlag = true
-			return false
+			return false, nil
 		}
 
 		model[sec][ptype].Policy[index] = newRules[newIndex]
@@ -332,19 +356,20 @@ func (model Model) UpdatePolicies(sec string, ptype string, oldRules, newRules [
 		newIndex++
 	}
 
-	return true
+	return true, nil
 }
 
 // RemovePolicies removes policy rules from the model.
-func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
-	affected := model.RemovePoliciesWithAffected(sec, ptype, rules)
-	return len(affected) != 0
+func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) (bool, error) {
+	affected, err := model.RemovePoliciesWithAffected(sec, ptype, rules)
+	return len(affected) != 0, err
 }
 
 // RemovePoliciesWithAffected removes policy rules from the model, and returns affected rules.
-func (model Model) RemovePoliciesWithAffected(sec string, ptype string, rules [][]string) [][]string {
-	if model[sec] == nil || model[sec][ptype] == nil {
-		return [][]string{}
+func (model Model) RemovePoliciesWithAffected(sec string, ptype string, rules [][]string) ([][]string, error) {
+	_, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return nil, err
 	}
 	var affected [][]string
 	for _, rule := range rules {
@@ -360,13 +385,14 @@ func (model Model) RemovePoliciesWithAffected(sec string, ptype string, rules []
 			model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
 		}
 	}
-	return affected
+	return affected, nil
 }
 
 // RemoveFilteredPolicy removes policy rules based on field filters from the model.
-func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, [][]string) {
-	if model[sec] == nil || model[sec][ptype] == nil {
-		return false, [][]string{}
+func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, [][]string, error) {
+	_, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return false, [][]string{}, err
 	}
 	var tmp [][]string
 	var effects [][]string
@@ -395,33 +421,40 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 		res = true
 	}
 
-	return res, effects
+	return res, effects, nil
 }
 
 // GetValuesForFieldInPolicy gets all values for a field for all rules in a policy, duplicated values are removed.
-func (model Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldIndex int) []string {
+func (model Model) GetValuesForFieldInPolicy(sec string, ptype string, fieldIndex int) ([]string, error) {
 	values := []string{}
 
-	if model[sec] != nil && model[sec][ptype] != nil {
-		for _, rule := range model[sec][ptype].Policy {
-			values = append(values, rule[fieldIndex])
-		}
+	_, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, rule := range model[sec][ptype].Policy {
+		values = append(values, rule[fieldIndex])
 	}
 
 	util.ArrayRemoveDuplicates(&values)
 
-	return values
+	return values, nil
 }
 
 // GetValuesForFieldInPolicyAllTypes gets all values for a field for all rules in a policy of all ptypes, duplicated values are removed.
-func (model Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int) []string {
+func (model Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int) ([]string, error) {
 	values := []string{}
 
 	for ptype := range model[sec] {
-		values = append(values, model.GetValuesForFieldInPolicy(sec, ptype, fieldIndex)...)
+		v, err := model.GetValuesForFieldInPolicy(sec, ptype, fieldIndex)
+		if err != nil {
+			return nil, err
+		}
+		values = append(values, v...)
 	}
 
 	util.ArrayRemoveDuplicates(&values)
 
-	return values
+	return values, nil
 }

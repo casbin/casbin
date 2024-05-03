@@ -73,7 +73,10 @@ func TestStopAutoLoadPolicy(t *testing.T) {
 
 func testSyncedEnforcerGetPolicy(t *testing.T, e *SyncedEnforcer, res [][]string) {
 	t.Helper()
-	myRes := e.GetPolicy()
+	myRes, err := e.GetPolicy()
+	if err != nil {
+		t.Error(err)
+	}
 
 	if !util.SortedArray2DEquals(res, myRes) {
 		t.Error("Policy: ", myRes, ", supposed to be ", res)

@@ -27,7 +27,10 @@ func CasbinJsGetPermissionForUser(e IEnforcer, user string) (string, error) {
 
 	pRules := [][]string{}
 	for ptype := range model["p"] {
-		policies := model.GetPolicy("p", ptype)
+		policies, err := model.GetPolicy("p", ptype)
+		if err != nil {
+			return "", err
+		}
 		for _, rules := range policies {
 			pRules = append(pRules, append([]string{ptype}, rules...))
 		}
@@ -36,7 +39,10 @@ func CasbinJsGetPermissionForUser(e IEnforcer, user string) (string, error) {
 
 	gRules := [][]string{}
 	for ptype := range model["g"] {
-		policies := model.GetPolicy("g", ptype)
+		policies, err := model.GetPolicy("g", ptype)
+		if err != nil {
+			return "", err
+		}
 		for _, rules := range policies {
 			gRules = append(gRules, append([]string{ptype}, rules...))
 		}

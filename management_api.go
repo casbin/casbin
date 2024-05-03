@@ -24,82 +24,82 @@ import (
 )
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
-func (e *Enforcer) GetAllSubjects() []string {
+func (e *Enforcer) GetAllSubjects() ([]string, error) {
 	return e.model.GetValuesForFieldInPolicyAllTypes("p", 0)
 }
 
 // GetAllNamedSubjects gets the list of subjects that show up in the current named policy.
-func (e *Enforcer) GetAllNamedSubjects(ptype string) []string {
+func (e *Enforcer) GetAllNamedSubjects(ptype string) ([]string, error) {
 	return e.model.GetValuesForFieldInPolicy("p", ptype, 0)
 }
 
 // GetAllObjects gets the list of objects that show up in the current policy.
-func (e *Enforcer) GetAllObjects() []string {
+func (e *Enforcer) GetAllObjects() ([]string, error) {
 	return e.model.GetValuesForFieldInPolicyAllTypes("p", 1)
 }
 
 // GetAllNamedObjects gets the list of objects that show up in the current named policy.
-func (e *Enforcer) GetAllNamedObjects(ptype string) []string {
+func (e *Enforcer) GetAllNamedObjects(ptype string) ([]string, error) {
 	return e.model.GetValuesForFieldInPolicy("p", ptype, 1)
 }
 
 // GetAllActions gets the list of actions that show up in the current policy.
-func (e *Enforcer) GetAllActions() []string {
+func (e *Enforcer) GetAllActions() ([]string, error) {
 	return e.model.GetValuesForFieldInPolicyAllTypes("p", 2)
 }
 
 // GetAllNamedActions gets the list of actions that show up in the current named policy.
-func (e *Enforcer) GetAllNamedActions(ptype string) []string {
+func (e *Enforcer) GetAllNamedActions(ptype string) ([]string, error) {
 	return e.model.GetValuesForFieldInPolicy("p", ptype, 2)
 }
 
 // GetAllRoles gets the list of roles that show up in the current policy.
-func (e *Enforcer) GetAllRoles() []string {
+func (e *Enforcer) GetAllRoles() ([]string, error) {
 	return e.model.GetValuesForFieldInPolicyAllTypes("g", 1)
 }
 
 // GetAllNamedRoles gets the list of roles that show up in the current named policy.
-func (e *Enforcer) GetAllNamedRoles(ptype string) []string {
+func (e *Enforcer) GetAllNamedRoles(ptype string) ([]string, error) {
 	return e.model.GetValuesForFieldInPolicy("g", ptype, 1)
 }
 
 // GetPolicy gets all the authorization rules in the policy.
-func (e *Enforcer) GetPolicy() [][]string {
+func (e *Enforcer) GetPolicy() ([][]string, error) {
 	return e.GetNamedPolicy("p")
 }
 
 // GetFilteredPolicy gets all the authorization rules in the policy, field filters can be specified.
-func (e *Enforcer) GetFilteredPolicy(fieldIndex int, fieldValues ...string) [][]string {
+func (e *Enforcer) GetFilteredPolicy(fieldIndex int, fieldValues ...string) ([][]string, error) {
 	return e.GetFilteredNamedPolicy("p", fieldIndex, fieldValues...)
 }
 
 // GetNamedPolicy gets all the authorization rules in the named policy.
-func (e *Enforcer) GetNamedPolicy(ptype string) [][]string {
+func (e *Enforcer) GetNamedPolicy(ptype string) ([][]string, error) {
 	return e.model.GetPolicy("p", ptype)
 }
 
 // GetFilteredNamedPolicy gets all the authorization rules in the named policy, field filters can be specified.
-func (e *Enforcer) GetFilteredNamedPolicy(ptype string, fieldIndex int, fieldValues ...string) [][]string {
+func (e *Enforcer) GetFilteredNamedPolicy(ptype string, fieldIndex int, fieldValues ...string) ([][]string, error) {
 	return e.model.GetFilteredPolicy("p", ptype, fieldIndex, fieldValues...)
 }
 
 // GetGroupingPolicy gets all the role inheritance rules in the policy.
-func (e *Enforcer) GetGroupingPolicy() [][]string {
+func (e *Enforcer) GetGroupingPolicy() ([][]string, error) {
 	return e.GetNamedGroupingPolicy("g")
 }
 
 // GetFilteredGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
-func (e *Enforcer) GetFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) [][]string {
+func (e *Enforcer) GetFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) ([][]string, error) {
 	return e.GetFilteredNamedGroupingPolicy("g", fieldIndex, fieldValues...)
 }
 
 // GetNamedGroupingPolicy gets all the role inheritance rules in the policy.
-func (e *Enforcer) GetNamedGroupingPolicy(ptype string) [][]string {
+func (e *Enforcer) GetNamedGroupingPolicy(ptype string) ([][]string, error) {
 	return e.model.GetPolicy("g", ptype)
 }
 
 // GetFilteredNamedGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
-func (e *Enforcer) GetFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) [][]string {
+func (e *Enforcer) GetFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) ([][]string, error) {
 	return e.model.GetFilteredPolicy("g", ptype, fieldIndex, fieldValues...)
 }
 
@@ -182,12 +182,12 @@ func (e *Enforcer) GetFilteredNamedPolicyWithMatcher(ptype string, matcher strin
 }
 
 // HasPolicy determines whether an authorization rule exists.
-func (e *Enforcer) HasPolicy(params ...interface{}) bool {
+func (e *Enforcer) HasPolicy(params ...interface{}) (bool, error) {
 	return e.HasNamedPolicy("p", params...)
 }
 
 // HasNamedPolicy determines whether a named authorization rule exists.
-func (e *Enforcer) HasNamedPolicy(ptype string, params ...interface{}) bool {
+func (e *Enforcer) HasNamedPolicy(ptype string, params ...interface{}) (bool, error) {
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
 		return e.model.HasPolicy("p", ptype, strSlice)
 	}
@@ -316,12 +316,12 @@ func (e *Enforcer) RemoveFilteredNamedPolicy(ptype string, fieldIndex int, field
 }
 
 // HasGroupingPolicy determines whether a role inheritance rule exists.
-func (e *Enforcer) HasGroupingPolicy(params ...interface{}) bool {
+func (e *Enforcer) HasGroupingPolicy(params ...interface{}) (bool, error) {
 	return e.HasNamedGroupingPolicy("g", params...)
 }
 
 // HasNamedGroupingPolicy determines whether a named role inheritance rule exists.
-func (e *Enforcer) HasNamedGroupingPolicy(ptype string, params ...interface{}) bool {
+func (e *Enforcer) HasNamedGroupingPolicy(ptype string, params ...interface{}) (bool, error) {
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
 		return e.model.HasPolicy("g", ptype, strSlice)
 	}

@@ -334,7 +334,10 @@ func TestRBACModelWithPattern(t *testing.T) {
 func TestRBACModelWithDifferentTypesOfRoles(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_different_types_of_roles_model.conf", "examples/rbac_with_different_types_of_roles_policy.csv")
 
-	g := e.GetNamedGroupingPolicy("g")
+	g, err := e.GetNamedGroupingPolicy("g")
+	if err != nil {
+		t.Error(err)
+	}
 	for _, gp := range g {
 		if len(gp) != 5 {
 			t.Error("g parameters' num isn't 5")

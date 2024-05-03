@@ -228,11 +228,19 @@ func testDeleteAllUsersByDomain(t *testing.T, domain string, expectedPolicy, exp
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	_, _ = e.DeleteAllUsersByDomain(domain)
-	if !util.Array2DEquals(e.GetPolicy(), expectedPolicy) {
-		t.Errorf("policy in %s: %v, supposed to be %v\n", domain, e.GetPolicy(), expectedPolicy)
+	policy, err := e.GetPolicy()
+	if err != nil {
+		t.Error(err)
 	}
-	if !util.Array2DEquals(e.GetGroupingPolicy(), expectedGroupingPolicy) {
-		t.Errorf("grouping policy in %s: %v, supposed to be %v\n", domain, e.GetGroupingPolicy(), expectedGroupingPolicy)
+	if !util.Array2DEquals(policy, expectedPolicy) {
+		t.Errorf("policy in %s: %v, supposed to be %v\n", domain, policy, expectedPolicy)
+	}
+	policies, err := e.GetGroupingPolicy()
+	if err != nil {
+		t.Error(err)
+	}
+	if !util.Array2DEquals(policies, expectedGroupingPolicy) {
+		t.Errorf("grouping policy in %s: %v, supposed to be %v\n", domain, policies, expectedGroupingPolicy)
 	}
 }
 
