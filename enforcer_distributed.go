@@ -34,7 +34,8 @@ func (d *DistributedEnforcer) AddPoliciesSelf(shouldPersist func() bool, sec str
 	if shouldPersist != nil && shouldPersist() {
 		var noExistsPolicy [][]string
 		for _, rule := range rules {
-			hasPolicy, err := d.model.HasPolicy(sec, ptype, rule)
+			var hasPolicy bool
+			hasPolicy, err = d.model.HasPolicy(sec, ptype, rule)
 			if err != nil {
 				return nil, err
 			}
@@ -43,10 +44,8 @@ func (d *DistributedEnforcer) AddPoliciesSelf(shouldPersist func() bool, sec str
 			}
 		}
 
-		if err := d.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, noExistsPolicy); err != nil {
-			if err.Error() != notImplemented {
-				return nil, err
-			}
+		if err = d.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, noExistsPolicy); err != nil && err.Error() != notImplemented {
+			return nil, err
 		}
 	}
 
@@ -99,7 +98,7 @@ func (d *DistributedEnforcer) RemoveFilteredPolicySelf(shouldPersist func() bool
 	d.m.Lock()
 	defer d.m.Unlock()
 	if shouldPersist != nil && shouldPersist() {
-		if err := d.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
+		if err = d.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
 			if err.Error() != notImplemented {
 				return nil, err
 			}
@@ -142,7 +141,7 @@ func (d *DistributedEnforcer) UpdatePolicySelf(shouldPersist func() bool, sec st
 	d.m.Lock()
 	defer d.m.Unlock()
 	if shouldPersist != nil && shouldPersist() {
-		err := d.adapter.(persist.UpdatableAdapter).UpdatePolicy(sec, ptype, oldRule, newRule)
+		err = d.adapter.(persist.UpdatableAdapter).UpdatePolicy(sec, ptype, oldRule, newRule)
 		if err != nil {
 			return false, err
 		}
@@ -172,7 +171,7 @@ func (d *DistributedEnforcer) UpdatePoliciesSelf(shouldPersist func() bool, sec 
 	d.m.Lock()
 	defer d.m.Unlock()
 	if shouldPersist != nil && shouldPersist() {
-		err := d.adapter.(persist.UpdatableAdapter).UpdatePolicies(sec, ptype, oldRules, newRules)
+		err = d.adapter.(persist.UpdatableAdapter).UpdatePolicies(sec, ptype, oldRules, newRules)
 		if err != nil {
 			return false, err
 		}

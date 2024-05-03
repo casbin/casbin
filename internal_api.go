@@ -46,7 +46,7 @@ func (e *Enforcer) addPolicyWithoutNotify(sec string, ptype string, rule []strin
 	}
 
 	if e.shouldPersist() {
-		if err := e.adapter.AddPolicy(sec, ptype, rule); err != nil {
+		if err = e.adapter.AddPolicy(sec, ptype, rule); err != nil {
 			if err.Error() != notImplemented {
 				return false, err
 			}
@@ -79,7 +79,7 @@ func (e *Enforcer) addPoliciesWithoutNotify(sec string, ptype string, rules [][]
 	if !autoRemoveRepeat {
 		hasPolicies, err := e.model.HasPolicies(sec, ptype, rules)
 		if !hasPolicies || err != nil {
-			return false, nil
+			return false, err
 		}
 	}
 

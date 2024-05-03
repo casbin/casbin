@@ -199,7 +199,8 @@ func (e *Enforcer) GetNamedPermissionsForUser(ptype string, user string, domain 
 		args[subIndex] = user
 
 		if len(domain) > 0 {
-			index, err := e.GetFieldIndex(ptype, constant.DomainIndex)
+			var index int
+			index, err = e.GetFieldIndex(ptype, constant.DomainIndex)
 			if err != nil {
 				return permission, err
 			}
