@@ -137,7 +137,7 @@ func (model Model) ClearPolicy() {
 func (model Model) GetPolicy(sec string, ptype string) ([][]string, error) {
 	_, err := model.GetAssertion(sec, ptype)
 	if err != nil {
-		return [][]string{}, err
+		return nil, err
 	}
 	return model[sec][ptype].Policy, nil
 }
@@ -146,7 +146,7 @@ func (model Model) GetPolicy(sec string, ptype string) ([][]string, error) {
 func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) ([][]string, error) {
 	_, err := model.GetAssertion(sec, ptype)
 	if err != nil {
-		return [][]string{}, err
+		return nil, err
 	}
 	res := [][]string{}
 
@@ -260,7 +260,7 @@ func (model Model) AddPolicies(sec string, ptype string, rules [][]string) error
 func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]string) ([][]string, error) {
 	_, err := model.GetAssertion(sec, ptype)
 	if err != nil {
-		return [][]string{}, err
+		return nil, err
 	}
 	var affected [][]string
 	for _, rule := range rules {
@@ -272,7 +272,7 @@ func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]s
 		affected = append(affected, rule)
 		err = model.AddPolicy(sec, ptype, rule)
 		if err != nil {
-			break
+			return affected, err
 		}
 	}
 	return affected, err
@@ -392,7 +392,7 @@ func (model Model) RemovePoliciesWithAffected(sec string, ptype string, rules []
 func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, [][]string, error) {
 	_, err := model.GetAssertion(sec, ptype)
 	if err != nil {
-		return false, [][]string{}, err
+		return false, nil, err
 	}
 	var tmp [][]string
 	var effects [][]string

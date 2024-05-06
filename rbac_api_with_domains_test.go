@@ -235,6 +235,7 @@ func testDeleteAllUsersByDomain(t *testing.T, domain string, expectedPolicy, exp
 	if !util.Array2DEquals(policy, expectedPolicy) {
 		t.Errorf("policy in %s: %v, supposed to be %v\n", domain, policy, expectedPolicy)
 	}
+
 	policies, err := e.GetGroupingPolicy()
 	if err != nil {
 		t.Error(err)

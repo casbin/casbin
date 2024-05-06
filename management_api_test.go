@@ -26,6 +26,7 @@ func testStringList(t *testing.T, title string, f func() ([]string, error), res 
 	if err != nil {
 		t.Error(err)
 	}
+
 	t.Log(title+": ", myRes)
 
 	if !util.ArrayEquals(res, myRes) {
@@ -48,6 +49,7 @@ func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	if err != nil {
 		t.Error(err)
 	}
+
 	t.Log("Policy: ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
@@ -61,6 +63,7 @@ func testGetFilteredPolicy(t *testing.T, e *Enforcer, fieldIndex int, res [][]st
 	if err != nil {
 		t.Error(err)
 	}
+
 	t.Log("Policy for ", util.ParamsToString(fieldValues...), ": ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
@@ -88,6 +91,7 @@ func testGetGroupingPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	if err != nil {
 		t.Error(err)
 	}
+
 	t.Log("Grouping policy: ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
@@ -101,6 +105,7 @@ func testGetFilteredGroupingPolicy(t *testing.T, e *Enforcer, fieldIndex int, re
 	if err != nil {
 		t.Error(err)
 	}
+
 	t.Log("Grouping policy for ", util.ParamsToString(fieldValues...), ": ", myRes)
 
 	if !util.Array2DEquals(res, myRes) {
@@ -114,6 +119,7 @@ func testHasPolicy(t *testing.T, e *Enforcer, policy []string, res bool) {
 	if err != nil {
 		t.Error(err)
 	}
+
 	t.Log("Has policy ", util.ArrayToString(policy), ": ", myRes)
 
 	if res != myRes {
@@ -127,6 +133,7 @@ func testHasGroupingPolicy(t *testing.T, e *Enforcer, policy []string, res bool)
 	if err != nil {
 		t.Error(err)
 	}
+
 	t.Log("Has grouping policy ", util.ArrayToString(policy), ": ", myRes)
 
 	if res != myRes {

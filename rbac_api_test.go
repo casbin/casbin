@@ -208,6 +208,7 @@ func testHasPermission(t *testing.T, e *Enforcer, name string, permission []stri
 	if err != nil {
 		t.Error(err.Error())
 	}
+
 	t.Log(name, " has permission ", util.ArrayToString(permission), ": ", myRes)
 
 	if res != myRes {

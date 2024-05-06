@@ -338,6 +338,7 @@ func TestRBACModelWithDifferentTypesOfRoles(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
 	for _, gp := range g {
 		if len(gp) != 5 {
 			t.Error("g parameters' num isn't 5")
