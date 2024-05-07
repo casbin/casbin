@@ -138,7 +138,7 @@ func (e *SyncedEnforcer) GetNamedPermissionsForUser(ptype string, user string, d
 }
 
 // HasPermissionForUser determines whether a user has a permission.
-func (e *SyncedEnforcer) HasPermissionForUser(user string, permission ...string) bool {
+func (e *SyncedEnforcer) HasPermissionForUser(user string, permission ...string) (bool, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.Enforcer.HasPermissionForUser(user, permission...)

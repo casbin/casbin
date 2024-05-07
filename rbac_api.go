@@ -199,20 +199,24 @@ func (e *Enforcer) GetNamedPermissionsForUser(ptype string, user string, domain 
 		args[subIndex] = user
 
 		if len(domain) > 0 {
-			index, err := e.GetFieldIndex(ptype, constant.DomainIndex)
+			var index int
+			index, err = e.GetFieldIndex(ptype, constant.DomainIndex)
 			if err != nil {
 				return permission, err
 			}
 			args[index] = domain[0]
 		}
-		perm := e.GetFilteredNamedPolicy(ptype, 0, args...)
+		perm, err := e.GetFilteredNamedPolicy(ptype, 0, args...)
+		if err != nil {
+			return permission, err
+		}
 		permission = append(permission, perm...)
 	}
 	return permission, nil
 }
 
 // HasPermissionForUser determines whether a user has a permission.
-func (e *Enforcer) HasPermissionForUser(user string, permission ...string) bool {
+func (e *Enforcer) HasPermissionForUser(user string, permission ...string) (bool, error) {
 	return e.HasPolicy(util.JoinSlice(user, permission...))
 }
 
@@ -349,9 +353,18 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string,
 // GetImplicitUsersForPermission("data1", "read") will get: ["alice", "bob"].
 // Note: only users will be returned, roles (2nd arg in "g") will be excluded.
 func (e *Enforcer) GetImplicitUsersForPermission(permission ...string) ([]string, error) {
-	pSubjects := e.GetAllSubjects()
-	gInherit := e.model.GetValuesForFieldInPolicyAllTypes("g", 1)
-	gSubjects := e.model.GetValuesForFieldInPolicyAllTypes("g", 0)
+	pSubjects, err := e.GetAllSubjects()
+	if err != nil {
+		return nil, err
+	}
+	gInherit, err := e.model.GetValuesForFieldInPolicyAllTypes("g", 1)
+	if err != nil {
+		return nil, err
+	}
+	gSubjects, err := e.model.GetValuesForFieldInPolicyAllTypes("g", 0)
+	if err != nil {
+		return nil, err
+	}
 
 	subjects := append(pSubjects, gSubjects...)
 	util.ArrayRemoveDuplicates(&subjects)
@@ -504,7 +517,11 @@ func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, err
 	}
 
 	isRole := make(map[string]bool)
-	for _, role := range e.GetAllRoles() {
+	roles, err := e.GetAllRoles()
+	if err != nil {
+		return nil, err
+	}
+	for _, role := range roles {
 		isRole[role] = true
 	}
 
@@ -550,8 +567,12 @@ func (e *Enforcer) GetImplicitUsersForResourceByDomain(resource string, domain s
 
 	isRole := make(map[string]bool)
 
-	for _, role := range e.GetAllRolesByDomain(domain) {
-		isRole[role] = true
+	if roles, err := e.GetAllRolesByDomain(domain); err != nil {
+		return nil, err
+	} else {
+		for _, role := range roles {
+			isRole[role] = true
+		}
 	}
 
 	for _, rule := range e.model["p"]["p"].Policy {

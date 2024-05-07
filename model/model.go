@@ -212,6 +212,16 @@ func (model Model) hasSection(sec string) bool {
 	return section != nil
 }
 
+func (model Model) GetAssertion(sec string, ptype string) (*Assertion, error) {
+	if model[sec] == nil {
+		return nil, fmt.Errorf("missing required section %s", sec)
+	}
+	if model[sec][ptype] == nil {
+		return nil, fmt.Errorf("missiong required definition %s in section %s", ptype, sec)
+	}
+	return model[sec][ptype], nil
+}
+
 // PrintModel prints the model to the log.
 func (model Model) PrintModel() {
 	if !model.GetLogger().IsEnabled() {
@@ -236,6 +246,10 @@ func (model Model) SortPoliciesBySubjectHierarchy() error {
 	if model["e"]["e"].Value != constant.SubjectPriorityEffect {
 		return nil
 	}
+	g, err := model.GetAssertion("g", "g")
+	if err != nil {
+		return err
+	}
 	subIndex := 0
 	for ptype, assertion := range model["p"] {
 		domainIndex, err := model.GetFieldIndex(ptype, constant.DomainIndex)
@@ -243,7 +257,7 @@ func (model Model) SortPoliciesBySubjectHierarchy() error {
 			domainIndex = -1
 		}
 		policies := assertion.Policy
-		subjectHierarchyMap, err := getSubjectHierarchyMap(model["g"]["g"].Policy)
+		subjectHierarchyMap, err := getSubjectHierarchyMap(g.Policy)
 		if err != nil {
 			return err
 		}

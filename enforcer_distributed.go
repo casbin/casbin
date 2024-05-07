@@ -34,19 +34,25 @@ func (d *DistributedEnforcer) AddPoliciesSelf(shouldPersist func() bool, sec str
 	if shouldPersist != nil && shouldPersist() {
 		var noExistsPolicy [][]string
 		for _, rule := range rules {
-			if !d.model.HasPolicy(sec, ptype, rule) {
+			var hasPolicy bool
+			hasPolicy, err = d.model.HasPolicy(sec, ptype, rule)
+			if err != nil {
+				return nil, err
+			}
+			if !hasPolicy {
 				noExistsPolicy = append(noExistsPolicy, rule)
 			}
 		}
 
-		if err := d.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, noExistsPolicy); err != nil {
-			if err.Error() != notImplemented {
-				return nil, err
-			}
+		if err = d.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, noExistsPolicy); err != nil && err.Error() != notImplemented {
+			return nil, err
 		}
 	}
 
-	affected = d.model.AddPoliciesWithAffected(sec, ptype, rules)
+	affected, err = d.model.AddPoliciesWithAffected(sec, ptype, rules)
+	if err != nil {
+		return affected, err
+	}
 
 	if sec == "g" {
 		err := d.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, affected)
@@ -71,7 +77,10 @@ func (d *DistributedEnforcer) RemovePoliciesSelf(shouldPersist func() bool, sec 
 		}
 	}
 
-	affected = d.model.RemovePoliciesWithAffected(sec, ptype, rules)
+	affected, err = d.model.RemovePoliciesWithAffected(sec, ptype, rules)
+	if err != nil {
+		return affected, err
+	}
 
 	if sec == "g" {
 		err = d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, affected)
@@ -89,14 +98,17 @@ func (d *DistributedEnforcer) RemoveFilteredPolicySelf(shouldPersist func() bool
 	d.m.Lock()
 	defer d.m.Unlock()
 	if shouldPersist != nil && shouldPersist() {
-		if err := d.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
+		if err = d.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
 			if err.Error() != notImplemented {
 				return nil, err
 			}
 		}
 	}
 
-	_, affected = d.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	_, affected, err = d.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	if err != nil {
+		return affected, err
+	}
 
 	if sec == "g" {
 		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, affected)
@@ -129,15 +141,15 @@ func (d *DistributedEnforcer) UpdatePolicySelf(shouldPersist func() bool, sec st
 	d.m.Lock()
 	defer d.m.Unlock()
 	if shouldPersist != nil && shouldPersist() {
-		err := d.adapter.(persist.UpdatableAdapter).UpdatePolicy(sec, ptype, oldRule, newRule)
+		err = d.adapter.(persist.UpdatableAdapter).UpdatePolicy(sec, ptype, oldRule, newRule)
 		if err != nil {
 			return false, err
 		}
 	}
 
-	ruleUpdated := d.model.UpdatePolicy(sec, ptype, oldRule, newRule)
-	if !ruleUpdated {
-		return ruleUpdated, nil
+	ruleUpdated, err := d.model.UpdatePolicy(sec, ptype, oldRule, newRule)
+	if !ruleUpdated || err != nil {
+		return ruleUpdated, err
 	}
 
 	if sec == "g" {
@@ -159,15 +171,15 @@ func (d *DistributedEnforcer) UpdatePoliciesSelf(shouldPersist func() bool, sec 
 	d.m.Lock()
 	defer d.m.Unlock()
 	if shouldPersist != nil && shouldPersist() {
-		err := d.adapter.(persist.UpdatableAdapter).UpdatePolicies(sec, ptype, oldRules, newRules)
+		err = d.adapter.(persist.UpdatableAdapter).UpdatePolicies(sec, ptype, oldRules, newRules)
 		if err != nil {
 			return false, err
 		}
 	}
 
-	ruleUpdated := d.model.UpdatePolicies(sec, ptype, oldRules, newRules)
-	if !ruleUpdated {
-		return ruleUpdated, nil
+	ruleUpdated, err := d.model.UpdatePolicies(sec, ptype, oldRules, newRules)
+	if !ruleUpdated || err != nil {
+		return ruleUpdated, err
 	}
 
 	if sec == "g" {
@@ -199,8 +211,14 @@ func (d *DistributedEnforcer) UpdateFilteredPoliciesSelf(shouldPersist func() bo
 		}
 	}
 
-	ruleChanged := !d.model.RemovePolicies(sec, ptype, oldRules)
-	d.model.AddPolicies(sec, ptype, newRules)
+	ruleChanged, err := d.model.RemovePolicies(sec, ptype, oldRules)
+	if err != nil {
+		return ruleChanged, err
+	}
+	err = d.model.AddPolicies(sec, ptype, newRules)
+	if err != nil {
+		return ruleChanged, err
+	}
 	ruleChanged = ruleChanged && len(newRules) != 0
 	if !ruleChanged {
 		return ruleChanged, nil

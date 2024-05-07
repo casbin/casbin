@@ -211,8 +211,9 @@ func TestGetDomainsForUser(t *testing.T) {
 }
 
 func testGetAllUsersByDomain(t *testing.T, e *Enforcer, domain string, expected []string) {
-	if !util.SetEquals(e.GetAllUsersByDomain(domain), expected) {
-		t.Errorf("users in %s: %v, supposed to be %v\n", domain, e.GetAllUsersByDomain(domain), expected)
+	users, _ := e.GetAllUsersByDomain(domain)
+	if !util.SetEquals(users, expected) {
+		t.Errorf("users in %s: %v, supposed to be %v\n", domain, users, expected)
 	}
 }
 
@@ -227,11 +228,20 @@ func testDeleteAllUsersByDomain(t *testing.T, domain string, expectedPolicy, exp
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	_, _ = e.DeleteAllUsersByDomain(domain)
-	if !util.Array2DEquals(e.GetPolicy(), expectedPolicy) {
-		t.Errorf("policy in %s: %v, supposed to be %v\n", domain, e.GetPolicy(), expectedPolicy)
+	policy, err := e.GetPolicy()
+	if err != nil {
+		t.Error(err)
 	}
-	if !util.Array2DEquals(e.GetGroupingPolicy(), expectedGroupingPolicy) {
-		t.Errorf("grouping policy in %s: %v, supposed to be %v\n", domain, e.GetGroupingPolicy(), expectedGroupingPolicy)
+	if !util.Array2DEquals(policy, expectedPolicy) {
+		t.Errorf("policy in %s: %v, supposed to be %v\n", domain, policy, expectedPolicy)
+	}
+
+	policies, err := e.GetGroupingPolicy()
+	if err != nil {
+		t.Error(err)
+	}
+	if !util.Array2DEquals(policies, expectedGroupingPolicy) {
+		t.Errorf("grouping policy in %s: %v, supposed to be %v\n", domain, policies, expectedGroupingPolicy)
 	}
 }
 
@@ -268,8 +278,9 @@ func TestGetAllDomains(t *testing.T) {
 }
 
 func testGetAllRolesByDomain(t *testing.T, e *Enforcer, domain string, expected []string) {
-	if !util.SetEquals(e.GetAllRolesByDomain(domain), expected) {
-		t.Errorf("roles in %s: %v, supposed to be %v\n", domain, e.GetAllRolesByDomain(domain), expected)
+	roles, _ := e.GetAllRolesByDomain(domain)
+	if !util.SetEquals(roles, expected) {
+		t.Errorf("roles in %s: %v, supposed to be %v\n", domain, roles, expected)
 	}
 }
 
