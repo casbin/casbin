@@ -22,8 +22,6 @@ import (
 	"github.com/casbin/govaluate"
 
 	"github.com/casbin/casbin/v2/persist"
-	"github.com/casbin/casbin/v2/rbac"
-	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 )
 
 // SyncedEnforcer wraps Enforcer and provides synchronized access.
@@ -117,48 +115,18 @@ func (e *SyncedEnforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *SyncedEnforcer) LoadPolicy() error {
-	e.m.Lock()
-	defer e.m.Unlock()
-	return e.Enforcer.LoadPolicy()
-}
-
-// LoadPolicyFast is not blocked when adapter calls LoadPolicy.
-func (e *SyncedEnforcer) LoadPolicyFast() error {
 	e.m.RLock()
-	newModel := e.model.Copy()
+	newModel, err := e.loadPolicyFromAdapter(e.model)
 	e.m.RUnlock()
-
-	newModel.ClearPolicy()
-	newRmMap := map[string]rbac.RoleManager{}
-	var err error
-
-	if err = e.adapter.LoadPolicy(newModel); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
+	if err != nil {
 		return err
 	}
-
-	if err = newModel.SortPoliciesBySubjectHierarchy(); err != nil {
-		return err
-	}
-
-	if err = newModel.SortPoliciesByPriority(); err != nil {
-		return err
-	}
-
-	if e.autoBuildRoleLinks {
-		for ptype := range newModel["g"] {
-			newRmMap[ptype] = defaultrolemanager.NewRoleManager(10)
-		}
-		err = newModel.BuildRoleLinks(newRmMap)
-		if err != nil {
-			return err
-		}
-	}
-
-	// reduce the lock range
 	e.m.Lock()
-	defer e.m.Unlock()
-	e.model = newModel
-	e.rmMap = newRmMap
+	err = e.applyModifiedModel(newModel)
+	e.m.Unlock()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
