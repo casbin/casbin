@@ -354,7 +354,19 @@ func (e *Enforcer) loadPolicyFromAdapter(baseModel model.Model) (model.Model, er
 }
 
 func (e *Enforcer) applyModifiedModel(newModel model.Model) error {
+	var err error
+	needToRebuild := false
+	defer func() {
+		if err != nil {
+			if e.autoBuildRoleLinks && needToRebuild {
+				_ = e.BuildRoleLinks()
+			}
+		}
+	}()
+
 	if e.autoBuildRoleLinks {
+		needToRebuild = true
+
 		if err := e.rebuildRoleLinks(newModel); err != nil {
 			return err
 		}
@@ -362,8 +374,6 @@ func (e *Enforcer) applyModifiedModel(newModel model.Model) error {
 		if err := e.rebuildConditionalRoleLinks(newModel); err != nil {
 			return err
 		}
-
-		_ = e.BuildRoleLinks()
 	}
 
 	e.model = newModel
