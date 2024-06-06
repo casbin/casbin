@@ -323,33 +323,38 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
-	needToRebuild := false
-	newModel := e.model.Copy()
+	newModel, err := e.loadPolicyFromAdapter(e.model)
+	if err != nil {
+		return err
+	}
+	err = e.applyModifiedModel(newModel)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *Enforcer) loadPolicyFromAdapter(baseModel model.Model) (model.Model, error) {
+	newModel := baseModel.Copy()
 	newModel.ClearPolicy()
 
-	var err error
-	defer func() {
-		if err != nil {
-			if e.autoBuildRoleLinks && needToRebuild {
-				_ = e.BuildRoleLinks()
-			}
-		}
-	}()
-
-	if err = e.adapter.LoadPolicy(newModel); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
-		return err
+	if err := e.adapter.LoadPolicy(newModel); err != nil && err.Error() != "invalid file path, file path cannot be empty" {
+		return nil, err
 	}
 
-	if err = newModel.SortPoliciesBySubjectHierarchy(); err != nil {
-		return err
+	if err := newModel.SortPoliciesBySubjectHierarchy(); err != nil {
+		return nil, err
 	}
 
-	if err = newModel.SortPoliciesByPriority(); err != nil {
-		return err
+	if err := newModel.SortPoliciesByPriority(); err != nil {
+		return nil, err
 	}
 
+	return newModel, nil
+}
+
+func (e *Enforcer) applyModifiedModel(newModel model.Model) error {
 	if e.autoBuildRoleLinks {
-		needToRebuild = true
 		if err := e.rebuildRoleLinks(newModel); err != nil {
 			return err
 		}
@@ -357,7 +362,10 @@ func (e *Enforcer) LoadPolicy() error {
 		if err := e.rebuildConditionalRoleLinks(newModel); err != nil {
 			return err
 		}
+
+		_ = e.BuildRoleLinks()
 	}
+
 	e.model = newModel
 	e.invalidateMatcherMap()
 	return nil
