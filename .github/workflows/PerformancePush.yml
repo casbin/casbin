@@ -14,11 +14,11 @@ jobs:
     name: Performance regression check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
       # Run benchmark with `go test -bench` and stores the output to a file
       - name: Run benchmark
-        run: go test -bench '.' -benchmem ./... | tee output.txt
+        run: go test -bench '.' -benchtime=2s -benchmem ./... | tee output.txt
       # Run `github-action-benchmark` action
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
