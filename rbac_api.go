@@ -317,11 +317,21 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string,
 	if rm == nil {
 		return nil, fmt.Errorf("role manager is not initialized")
 	}
+
+	roles, err := e.GetImplicitRolesForUser(user, domain...)
+	if err != nil {
+		return nil, err
+	}
+	policyRoles := make(map[string]struct{}, len(roles)+1)
+	policyRoles[user] = struct{}{}
+	for _, r := range roles {
+		policyRoles[r] = struct{}{}
+	}
+
 	domainIndex, err := e.GetFieldIndex(ptype, constant.DomainIndex)
 	for _, rule := range e.model["p"][ptype].Policy {
 		if len(domain) == 0 {
-			matched, _ := rm.HasLink(user, rule[0])
-			if matched {
+			if _, ok := policyRoles[rule[0]]; ok {
 				permission = append(permission, deepCopyPolicy(rule))
 			}
 			continue
@@ -337,8 +347,7 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string,
 		if !matched {
 			continue
 		}
-		matched, _ = rm.HasLink(user, rule[0], d)
-		if matched {
+		if _, ok := policyRoles[rule[0]]; ok {
 			newRule := deepCopyPolicy(rule)
 			newRule[domainIndex] = d
 			permission = append(permission, newRule)
