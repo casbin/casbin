@@ -229,28 +229,53 @@ func (e *Enforcer) HasPermissionForUser(user string, permission ...string) (bool
 // GetRolesForUser("alice") can only get: ["role:admin"].
 // But GetImplicitRolesForUser("alice") will get: ["role:admin", "role:user"].
 func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]string, error) {
-	res := []string{}
+	var res []string
 
-	for _, rm := range e.rmMap {
-		roleSet := make(map[string]bool)
-		roleSet[name] = true
-		q := make([]string, 0)
-		q = append(q, name)
+	for v := range e.rmMap {
+		roles, err := e.GetNamedImplicitRolesForUser(v, name, domain...)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, roles...)
+	}
 
-		for len(q) > 0 {
-			name := q[0]
-			q = q[1:]
+	return res, nil
+}
 
-			roles, err := rm.GetRoles(name, domain...)
-			if err != nil {
-				return nil, err
-			}
-			for _, r := range roles {
-				if _, ok := roleSet[r]; !ok {
-					res = append(res, r)
-					q = append(q, r)
-					roleSet[r] = true
-				}
+// GetNamedImplicitRolesForUser gets implicit roles that a user has by named role definition.
+// Compared to GetImplicitRolesForUser(), this function retrieves indirect roles besides direct roles.
+// For example:
+// g, alice, role:admin
+// g, role:admin, role:user
+// g2, alice, role:admin2
+//
+// GetImplicitRolesForUser("alice") can only get: ["role:admin", "role:user"].
+// But GetNamedImplicitRolesForUser("g2", "alice") will get: ["role:admin2"].
+func (e *Enforcer) GetNamedImplicitRolesForUser(ptype string, name string, domain ...string) ([]string, error) {
+	var res []string
+
+	rm := e.GetNamedRoleManager(ptype)
+	if rm == nil {
+		return nil, fmt.Errorf("role manager %s is not initialized", ptype)
+	}
+	roleSet := make(map[string]bool)
+	roleSet[name] = true
+	q := make([]string, 0)
+	q = append(q, name)
+
+	for len(q) > 0 {
+		name := q[0]
+		q = q[1:]
+
+		roles, err := rm.GetRoles(name, domain...)
+		if err != nil {
+			return nil, err
+		}
+		for _, r := range roles {
+			if _, ok := roleSet[r]; !ok {
+				res = append(res, r)
+				q = append(q, r)
+				roleSet[r] = true
 			}
 		}
 	}
@@ -299,7 +324,7 @@ func (e *Enforcer) GetImplicitUsersForRole(name string, domain ...string) ([]str
 // GetPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
 // But GetImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
 func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) ([][]string, error) {
-	return e.GetNamedImplicitPermissionsForUser("p", user, domain...)
+	return e.GetNamedImplicitPermissionsForUser("p", "g", user, domain...)
 }
 
 // GetNamedImplicitPermissionsForUser gets implicit permissions for a user or role by named policy.
@@ -311,14 +336,14 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 //
 // GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p"
 // But you can specify the named policy "p2" to get: [["admin", "create"]] by    GetNamedImplicitPermissionsForUser("p2","alice").
-func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, user string, domain ...string) ([][]string, error) {
+func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, gtype string, user string, domain ...string) ([][]string, error) {
 	permission := make([][]string, 0)
-	rm := e.GetRoleManager()
+	rm := e.GetNamedRoleManager(gtype)
 	if rm == nil {
-		return nil, fmt.Errorf("role manager is not initialized")
+		return nil, fmt.Errorf("role manager %s is not initialized", gtype)
 	}
 
-	roles, err := e.GetImplicitRolesForUser(user, domain...)
+	roles, err := e.GetNamedImplicitRolesForUser(gtype, user, domain...)
 	if err != nil {
 		return nil, err
 	}

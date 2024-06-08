@@ -6,3 +6,4 @@ p2, admin, create
 
 g, admin, user
 g, alice, admin
+g2, alice, user
