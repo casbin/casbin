@@ -344,9 +344,9 @@ func testGetImplicitPermissionsWithDomain(t *testing.T, e *Enforcer, name string
 	}
 }
 
-func testGetNamedImplicitPermissions(t *testing.T, e *Enforcer, ptype string, name string, res [][]string) {
+func testGetNamedImplicitPermissions(t *testing.T, e *Enforcer, ptype string, gtype string, name string, res [][]string) {
 	t.Helper()
-	myRes, _ := e.GetNamedImplicitPermissionsForUser(ptype, name)
+	myRes, _ := e.GetNamedImplicitPermissionsForUser(ptype, gtype, name)
 	t.Log("Named implicit permissions for ", name, ": ", myRes)
 
 	if !util.Set2DEquals(res, myRes) {
@@ -379,8 +379,11 @@ func TestImplicitPermissionAPI(t *testing.T) {
 
 	e, _ = NewEnforcer("examples/rbac_with_multiple_policy_model.conf", "examples/rbac_with_multiple_policy_policy.csv")
 
-	testGetNamedImplicitPermissions(t, e, "p", "alice", [][]string{{"user", "/data", "GET"}, {"admin", "/data", "POST"}})
-	testGetNamedImplicitPermissions(t, e, "p2", "alice", [][]string{{"user", "view"}, {"admin", "create"}})
+	testGetNamedImplicitPermissions(t, e, "p", "g", "alice", [][]string{{"user", "/data", "GET"}, {"admin", "/data", "POST"}})
+	testGetNamedImplicitPermissions(t, e, "p2", "g", "alice", [][]string{{"user", "view"}, {"admin", "create"}})
+
+	testGetNamedImplicitPermissions(t, e, "p", "g2", "alice", [][]string{{"user", "/data", "GET"}})
+	testGetNamedImplicitPermissions(t, e, "p2", "g2", "alice", [][]string{{"user", "view"}})
 }
 
 func TestImplicitPermissionAPIWithDomain(t *testing.T) {
