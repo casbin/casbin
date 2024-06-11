@@ -19,38 +19,63 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/util"
 	"github.com/casbin/govaluate"
 )
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() ([]string, error) {
-	return e.model.GetValuesForFieldInPolicyAllTypes("p", 0)
+	index, err := e.model.GetFieldIndex("p", constant.SubjectIndex)
+	if err != nil {
+		return nil, err
+	}
+	return e.model.GetValuesForFieldInPolicyAllTypes("p", index)
 }
 
 // GetAllNamedSubjects gets the list of subjects that show up in the current named policy.
 func (e *Enforcer) GetAllNamedSubjects(ptype string) ([]string, error) {
-	return e.model.GetValuesForFieldInPolicy("p", ptype, 0)
+	index, err := e.model.GetFieldIndex(ptype, constant.SubjectIndex)
+	if err != nil {
+		return nil, err
+	}
+	return e.model.GetValuesForFieldInPolicy("p", ptype, index)
 }
 
 // GetAllObjects gets the list of objects that show up in the current policy.
 func (e *Enforcer) GetAllObjects() ([]string, error) {
-	return e.model.GetValuesForFieldInPolicyAllTypes("p", 1)
+	index, err := e.model.GetFieldIndex("p", constant.ObjectIndex)
+	if err != nil {
+		return nil, err
+	}
+	return e.model.GetValuesForFieldInPolicyAllTypes("p", index)
 }
 
 // GetAllNamedObjects gets the list of objects that show up in the current named policy.
 func (e *Enforcer) GetAllNamedObjects(ptype string) ([]string, error) {
-	return e.model.GetValuesForFieldInPolicy("p", ptype, 1)
+	index, err := e.model.GetFieldIndex(ptype, constant.ObjectIndex)
+	if err != nil {
+		return nil, err
+	}
+	return e.model.GetValuesForFieldInPolicy("p", ptype, index)
 }
 
 // GetAllActions gets the list of actions that show up in the current policy.
 func (e *Enforcer) GetAllActions() ([]string, error) {
-	return e.model.GetValuesForFieldInPolicyAllTypes("p", 2)
+	index, err := e.model.GetFieldIndex("p", constant.ActionIndex)
+	if err != nil {
+		return nil, err
+	}
+	return e.model.GetValuesForFieldInPolicyAllTypes("p", index)
 }
 
 // GetAllNamedActions gets the list of actions that show up in the current named policy.
 func (e *Enforcer) GetAllNamedActions(ptype string) ([]string, error) {
-	return e.model.GetValuesForFieldInPolicy("p", ptype, 2)
+	index, err := e.model.GetFieldIndex(ptype, constant.ActionIndex)
+	if err != nil {
+		return nil, err
+	}
+	return e.model.GetValuesForFieldInPolicy("p", ptype, index)
 }
 
 // GetAllRoles gets the list of roles that show up in the current policy.
