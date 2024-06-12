@@ -458,3 +458,25 @@ func (model Model) GetValuesForFieldInPolicyAllTypes(sec string, fieldIndex int)
 
 	return values, nil
 }
+
+// GetValuesForFieldInPolicyAllTypesByName gets all values for a field for all rules in a policy of all ptypes, duplicated values are removed.
+func (model Model) GetValuesForFieldInPolicyAllTypesByName(sec string, field string) ([]string, error) {
+	values := []string{}
+
+	for ptype := range model[sec] {
+		// GetFieldIndex will return (-1, err) if field is not found, ignore it
+		index, err := model.GetFieldIndex(ptype, field)
+		if err != nil {
+			continue
+		}
+		v, err := model.GetValuesForFieldInPolicy(sec, ptype, index)
+		if err != nil {
+			return nil, err
+		}
+		values = append(values, v...)
+	}
+
+	util.ArrayRemoveDuplicates(&values)
+
+	return values, nil
+}

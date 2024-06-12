@@ -15,6 +15,7 @@
 package constant
 
 const (
+	ActionIndex   = "act"
 	DomainIndex   = "dom"
 	SubjectIndex  = "sub"
 	ObjectIndex   = "obj"
