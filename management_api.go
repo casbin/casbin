@@ -19,38 +19,51 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/util"
 	"github.com/casbin/govaluate"
 )
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() ([]string, error) {
-	return e.model.GetValuesForFieldInPolicyAllTypes("p", 0)
+	return e.model.GetValuesForFieldInPolicyAllTypesByName("p", constant.SubjectIndex)
 }
 
 // GetAllNamedSubjects gets the list of subjects that show up in the current named policy.
 func (e *Enforcer) GetAllNamedSubjects(ptype string) ([]string, error) {
-	return e.model.GetValuesForFieldInPolicy("p", ptype, 0)
+	fieldIndex, err := e.model.GetFieldIndex(ptype, constant.SubjectIndex)
+	if err != nil {
+		return nil, err
+	}
+	return e.model.GetValuesForFieldInPolicy("p", ptype, fieldIndex)
 }
 
 // GetAllObjects gets the list of objects that show up in the current policy.
 func (e *Enforcer) GetAllObjects() ([]string, error) {
-	return e.model.GetValuesForFieldInPolicyAllTypes("p", 1)
+	return e.model.GetValuesForFieldInPolicyAllTypesByName("p", constant.ObjectIndex)
 }
 
 // GetAllNamedObjects gets the list of objects that show up in the current named policy.
 func (e *Enforcer) GetAllNamedObjects(ptype string) ([]string, error) {
-	return e.model.GetValuesForFieldInPolicy("p", ptype, 1)
+	fieldIndex, err := e.model.GetFieldIndex(ptype, constant.ObjectIndex)
+	if err != nil {
+		return nil, err
+	}
+	return e.model.GetValuesForFieldInPolicy("p", ptype, fieldIndex)
 }
 
 // GetAllActions gets the list of actions that show up in the current policy.
 func (e *Enforcer) GetAllActions() ([]string, error) {
-	return e.model.GetValuesForFieldInPolicyAllTypes("p", 2)
+	return e.model.GetValuesForFieldInPolicyAllTypesByName("p", constant.ActionIndex)
 }
 
 // GetAllNamedActions gets the list of actions that show up in the current named policy.
 func (e *Enforcer) GetAllNamedActions(ptype string) ([]string, error) {
-	return e.model.GetValuesForFieldInPolicy("p", ptype, 2)
+	fieldIndex, err := e.model.GetFieldIndex(ptype, constant.ActionIndex)
+	if err != nil {
+		return nil, err
+	}
+	return e.model.GetValuesForFieldInPolicy("p", ptype, fieldIndex)
 }
 
 // GetAllRoles gets the list of roles that show up in the current policy.

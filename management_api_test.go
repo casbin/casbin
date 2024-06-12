@@ -43,6 +43,15 @@ func TestGetList(t *testing.T) {
 	testStringList(t, "Roles", e.GetAllRoles, []string{"data2_admin"})
 }
 
+func TestGetListWithDomains(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+
+	testStringList(t, "Subjects", e.GetAllSubjects, []string{"admin"})
+	testStringList(t, "Objects", e.GetAllObjects, []string{"data1", "data2"})
+	testStringList(t, "Actions", e.GetAllActions, []string{"read", "write"})
+	testStringList(t, "Roles", e.GetAllRoles, []string{"admin"})
+}
+
 func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
 	t.Helper()
 	myRes, err := e.GetPolicy()
