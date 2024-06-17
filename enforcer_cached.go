@@ -182,5 +182,4 @@ func (e *CachedEnforcer) ClearPolicy() {
 		}
 	}
 	e.Enforcer.ClearPolicy()
-	return
 }
