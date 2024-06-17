@@ -57,4 +57,17 @@ func TestCache(t *testing.T) {
 	testEnforceCache(t, e, "bob", "data2", "write", false)
 	testEnforceCache(t, e, "alice", "data2", "read", true)
 	testEnforceCache(t, e, "alice", "data2", "write", true)
+
+	e, _ = NewCachedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	testEnforceCache(t, e, "alice", "data1", "read", true)
+	testEnforceCache(t, e, "bob", "data2", "write", true)
+	testEnforceCache(t, e, "alice", "data2", "read", true)
+	testEnforceCache(t, e, "alice", "data2", "write", true)
+
+	e.ClearPolicy()
+
+	testEnforceCache(t, e, "alice", "data1", "read", false)
+	testEnforceCache(t, e, "bob", "data2", "write", false)
+	testEnforceCache(t, e, "alice", "data2", "read", false)
+	testEnforceCache(t, e, "alice", "data2", "write", false)
 }

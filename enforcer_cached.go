@@ -172,3 +172,14 @@ func GetCacheKey(params ...interface{}) (string, bool) {
 	}
 	return key.String(), true
 }
+
+// ClearPolicy clears all policy.
+func (e *CachedEnforcer) ClearPolicy() {
+	if atomic.LoadInt32(&e.enableCache) != 0 {
+		if err := e.cache.Clear(); err != nil {
+			e.logger.LogError(err, "clear cache failed")
+			return
+		}
+	}
+	e.Enforcer.ClearPolicy()
+}
