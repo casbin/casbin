@@ -13,6 +13,4 @@ lint:
 	golangci-lint run --verbose
 
 release:
-	yarn global add semantic-release@17.2.4
-	semantic-release
-
+	npx semantic-release@v19.0.2
