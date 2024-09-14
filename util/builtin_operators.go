@@ -37,7 +37,24 @@ var (
 	keyMatch5Re = regexp.MustCompile(`\{[^/]+\}`)
 	keyGet2Re1  = regexp.MustCompile(`:[^/]+`)
 	keyGet3Re1  = regexp.MustCompile(`\{[^/]+?\}`) // non-greedy match of `{...}` to support multiple {} in `/.../`
+	reCache     = map[string]*regexp.Regexp{}
+	reCacheMu   = sync.RWMutex{}
 )
+
+func mustCompileOrGet(key string) *regexp.Regexp {
+	reCacheMu.RLock()
+	re, ok := reCache[key]
+	reCacheMu.RUnlock()
+
+	if !ok {
+		re = regexp.MustCompile(key)
+		reCacheMu.Lock()
+		reCache[key] = re
+		reCacheMu.Unlock()
+	}
+
+	return re
+}
 
 // validate the variadic parameter size and type as string.
 func validateVariadicArgs(expectedLen int, args ...interface{}) error {
@@ -147,8 +164,9 @@ func KeyGet2(key1, key2 string, pathVar string) string {
 	keys := keyGet2Re1.FindAllString(key2, -1)
 	key2 = keyGet2Re1.ReplaceAllString(key2, "$1([^/]+)$2")
 	key2 = "^" + key2 + "$"
-	re2 := regexp.MustCompile(key2)
-	values := re2.FindAllStringSubmatch(key1, -1)
+
+	re := mustCompileOrGet(key2)
+	values := re.FindAllStringSubmatch(key1, -1)
 	if len(values) == 0 {
 		return ""
 	}
@@ -203,8 +221,8 @@ func KeyGet3(key1, key2 string, pathVar string) string {
 	keys := keyGet3Re1.FindAllString(key2, -1)
 	key2 = keyGet3Re1.ReplaceAllString(key2, "$1([^/]+?)$2")
 	key2 = "^" + key2 + "$"
-	re2 := regexp.MustCompile(key2)
-	values := re2.FindAllStringSubmatch(key1, -1)
+	re := mustCompileOrGet(key2)
+	values := re.FindAllStringSubmatch(key1, -1)
 	if len(values) == 0 {
 		return ""
 	}
@@ -245,7 +263,7 @@ func KeyMatch4(key1 string, key2 string) bool {
 		return "([^/]+)"
 	})
 
-	re = regexp.MustCompile("^" + key2 + "$")
+	re = mustCompileOrGet("^" + key2 + "$")
 	matches := re.FindStringSubmatch(key1)
 	if matches == nil {
 		return false
