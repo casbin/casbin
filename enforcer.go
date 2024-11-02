@@ -586,6 +586,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	}
 
 	functions := e.fm.GetFunctions()
+	fmt.Println(functions)
 	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
 			// g must be a normal role definition (ast.RM != nil)
@@ -626,8 +627,10 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	} else {
 		expString = util.RemoveComments(util.EscapeAssertion(matcher))
 	}
+	fmt.Println(expString)
 
 	rTokens := make(map[string]int, len(e.model["r"][rType].Tokens))
+	fmt.Println(rTokens)
 	for i, token := range e.model["r"][rType].Tokens {
 		rTokens[token] = i
 	}
