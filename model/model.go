@@ -217,7 +217,7 @@ func (model Model) GetAssertion(sec string, ptype string) (*Assertion, error) {
 		return nil, fmt.Errorf("missing required section %s", sec)
 	}
 	if model[sec][ptype] == nil {
-		return nil, fmt.Errorf("missiong required definition %s in section %s", ptype, sec)
+		return nil, fmt.Errorf("missing required definition %s in section %s", ptype, sec)
 	}
 	return model[sec][ptype], nil
 }
