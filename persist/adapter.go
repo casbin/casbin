@@ -51,7 +51,12 @@ func LoadPolicyArray(rule []string, m model.Model) error {
 	if ok {
 		return nil // skip duplicated policy
 	}
-	m.AddPolicy(sec, key, rule[1:])
+
+	err = m.AddPolicy(sec, key, rule[1:])
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
