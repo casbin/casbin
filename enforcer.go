@@ -69,6 +69,59 @@ func (e EnforceContext) GetCacheKey() string {
 	return "EnforceContext{" + e.RType + "-" + e.PType + "-" + e.EType + "-" + e.MType + "}"
 }
 
+type EnforcerConfig struct {
+	ModelPath  string
+	Model      model.Model
+	PolicyPath string
+	Adapter    persist.Adapter
+	Logger     log.Logger
+	EnableLog  bool
+}
+
+// NewEnforcerWithConfig creates an enforcer via file or DB with a configuration.
+// Specifying a Model will override the ModelPath.
+//
+// File:
+//
+//	e := casbin.NewEnforcerWithConfig(casbin.EnforcerConfig{ModelPath: "path/to/basic_model.conf", PolicyPath: "path/to/basic_policy.csv"})
+//
+// MySQL DB:
+//
+//	a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
+//	e := casbin.NewEnforcerWithConfig(casbin.EnforcerConfig{ModelPath:"path/to/basic_model.conf", Adapter: a})
+func NewEnforcerWithConfig(config EnforcerConfig) (*Enforcer, error) {
+	e := &Enforcer{logger: log.NewDefaultLogger(nil)}
+
+	if config.Logger != nil {
+		e.logger = config.Logger
+	}
+
+	if config.EnableLog {
+		e.EnableLog(config.EnableLog)
+	}
+
+	if config.Model != nil {
+		err := e.InitWithModelAndAdapter(config.Model, config.Adapter)
+		if err != nil {
+			return nil, err
+		}
+	} else if config.ModelPath != "" {
+		if config.Adapter != nil {
+			err := e.InitWithAdapter(config.ModelPath, config.Adapter)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			err := e.InitWithFile(config.ModelPath, config.PolicyPath)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return e, nil
+}
+
 // NewEnforcer creates an enforcer via file or DB.
 //
 // File:
@@ -79,15 +132,17 @@ func (e EnforceContext) GetCacheKey() string {
 //
 //	a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
 //	e := casbin.NewEnforcer("path/to/basic_model.conf", a)
+//
+// Deprecated: use NewEnforcerWithConfig instead.
 func NewEnforcer(params ...interface{}) (*Enforcer, error) {
-	e := &Enforcer{logger: &log.DefaultLogger{}}
+	config := EnforcerConfig{}
 
 	parsedParamLen := 0
 	paramLen := len(params)
 	if paramLen >= 1 {
 		enableLog, ok := params[paramLen-1].(bool)
 		if ok {
-			e.EnableLog(enableLog)
+			config.EnableLog = enableLog
 			parsedParamLen++
 		}
 	}
@@ -95,7 +150,7 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 	if paramLen-parsedParamLen >= 1 {
 		logger, ok := params[paramLen-parsedParamLen-1].(log.Logger)
 		if ok {
-			e.logger = logger
+			config.Logger = logger
 			parsedParamLen++
 		}
 	}
@@ -106,47 +161,38 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 		case string:
 			switch p1 := params[1].(type) {
 			case string:
-				err := e.InitWithFile(p0, p1)
-				if err != nil {
-					return nil, err
-				}
+				config.ModelPath = p0
+				config.PolicyPath = p1
+				return NewEnforcerWithConfig(config)
 			default:
-				err := e.InitWithAdapter(p0, p1.(persist.Adapter))
-				if err != nil {
-					return nil, err
-				}
+				config.ModelPath = p0
+				config.Adapter = p1.(persist.Adapter)
+				return NewEnforcerWithConfig(config)
 			}
 		default:
 			switch params[1].(type) {
 			case string:
 				return nil, errors.New("invalid parameters for enforcer")
 			default:
-				err := e.InitWithModelAndAdapter(p0.(model.Model), params[1].(persist.Adapter))
-				if err != nil {
-					return nil, err
-				}
+				config.Model = p0.(model.Model)
+				config.Adapter = params[1].(persist.Adapter)
+				return NewEnforcerWithConfig(config)
 			}
 		}
 	case 1:
 		switch p0 := params[0].(type) {
 		case string:
-			err := e.InitWithFile(p0, "")
-			if err != nil {
-				return nil, err
-			}
+			config.ModelPath = p0
+			return NewEnforcerWithConfig(config)
 		default:
-			err := e.InitWithModelAndAdapter(p0.(model.Model), nil)
-			if err != nil {
-				return nil, err
-			}
+			config.Model = p0.(model.Model)
+			return NewEnforcerWithConfig(config)
 		}
 	case 0:
-		return e, nil
+		return NewEnforcerWithConfig(config)
 	default:
 		return nil, errors.New("invalid parameters for enforcer")
 	}
-
-	return e, nil
 }
 
 // InitWithFile initializes an enforcer with a model file and a policy file.

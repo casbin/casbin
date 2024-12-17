@@ -21,7 +21,7 @@ type Logger interface {
 	// EnableLog controls whether print the message.
 	EnableLog(bool)
 
-	// IsEnabled returns if logger is enabled.
+	// IsEnabled returns if Logger is enabled.
 	IsEnabled() bool
 
 	// LogModel log info related to model.

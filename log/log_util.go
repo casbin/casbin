@@ -14,14 +14,14 @@
 
 package log
 
-var logger Logger = &DefaultLogger{}
+var logger Logger = NewDefaultLogger(nil)
 
-// SetLogger sets the current logger.
+// SetLogger sets the current Logger.
 func SetLogger(l Logger) {
 	logger = l
 }
 
-// GetLogger returns the current logger.
+// GetLogger returns the current Logger.
 func GetLogger() Logger {
 	return logger
 }

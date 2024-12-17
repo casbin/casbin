@@ -211,7 +211,7 @@ func NewRoleManagerImpl(maxHierarchyLevel int) *RoleManagerImpl {
 	rm := RoleManagerImpl{}
 	_ = rm.Clear() // init allRoles and matchingFuncCache
 	rm.maxHierarchyLevel = maxHierarchyLevel
-	rm.SetLogger(&log.DefaultLogger{})
+	rm.SetLogger(log.NewDefaultLogger(nil))
 	return &rm
 }
 
@@ -746,7 +746,7 @@ func NewConditionalRoleManager(maxHierarchyLevel int) *ConditionalRoleManager {
 	rm := ConditionalRoleManager{}
 	_ = rm.Clear() // init allRoles and matchingFuncCache
 	rm.maxHierarchyLevel = maxHierarchyLevel
-	rm.SetLogger(&log.DefaultLogger{})
+	rm.SetLogger(log.NewDefaultLogger(nil))
 	return &rm
 }
 
@@ -904,7 +904,7 @@ func NewConditionalDomainManager(maxHierarchyLevel int) *ConditionalDomainManage
 	rm := ConditionalDomainManager{}
 	_ = rm.Clear() // init allRoles and matchingFuncCache
 	rm.maxHierarchyLevel = maxHierarchyLevel
-	rm.SetLogger(&log.DefaultLogger{})
+	rm.SetLogger(log.NewDefaultLogger(nil))
 	return &rm
 }
 

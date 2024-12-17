@@ -23,6 +23,19 @@ import (
 // DefaultLogger is the implementation for a Logger using golang log.
 type DefaultLogger struct {
 	enabled bool
+	Logger  *log.Logger
+}
+
+// NewDefaultLogger creates a new DefaultLogger.
+// If the logger parameter is nil, it will use log.Default().
+func NewDefaultLogger(logger *log.Logger) Logger {
+	if logger == nil {
+		logger = log.Default()
+	}
+	return &DefaultLogger{
+		enabled: false,
+		Logger:  logger,
+	}
 }
 
 func (l *DefaultLogger) EnableLog(enable bool) {
@@ -43,7 +56,7 @@ func (l *DefaultLogger) LogModel(model [][]string) {
 		str.WriteString(fmt.Sprintf("%v\n", v))
 	}
 
-	log.Println(str.String())
+	l.Logger.Println(str.String())
 }
 
 func (l *DefaultLogger) LogEnforce(matcher string, request []interface{}, result bool, explains [][]string) {
@@ -71,7 +84,7 @@ func (l *DefaultLogger) LogEnforce(matcher string, request []interface{}, result
 		}
 	}
 
-	log.Println(reqStr.String())
+	l.Logger.Println(reqStr.String())
 }
 
 func (l *DefaultLogger) LogPolicy(policy map[string][][]string) {
@@ -85,7 +98,7 @@ func (l *DefaultLogger) LogPolicy(policy map[string][][]string) {
 		str.WriteString(fmt.Sprintf("%s : %v\n", k, v))
 	}
 
-	log.Println(str.String())
+	l.Logger.Println(str.String())
 }
 
 func (l *DefaultLogger) LogRole(roles []string) {
@@ -93,12 +106,12 @@ func (l *DefaultLogger) LogRole(roles []string) {
 		return
 	}
 
-	log.Println("Roles: ", strings.Join(roles, "\n"))
+	l.Logger.Println("Roles: ", strings.Join(roles, "\n"))
 }
 
 func (l *DefaultLogger) LogError(err error, msg ...string) {
 	if !l.enabled {
 		return
 	}
-	log.Println(msg, err)
+	l.Logger.Println(msg, err)
 }

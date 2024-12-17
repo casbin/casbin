@@ -142,7 +142,7 @@ func (model Model) GetLogger() log.Logger {
 // NewModel creates an empty model.
 func NewModel() Model {
 	m := make(Model)
-	m.SetLogger(&log.DefaultLogger{})
+	m.SetLogger(log.NewDefaultLogger(nil))
 
 	return m
 }
