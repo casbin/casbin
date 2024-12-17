@@ -78,64 +78,9 @@ type EnforcerConfig struct {
 	EnableLog  bool
 }
 
-// NewEnforcerWithConfig creates an enforcer via file or DB with a configuration.
-// Specifying a Model will override the ModelPath.
-//
-// File:
-//
-//	e := casbin.NewEnforcerWithConfig(casbin.EnforcerConfig{ModelPath: "path/to/basic_model.conf", PolicyPath: "path/to/basic_policy.csv"})
-//
-// MySQL DB:
-//
-//	a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
-//	e := casbin.NewEnforcerWithConfig(casbin.EnforcerConfig{ModelPath:"path/to/basic_model.conf", Adapter: a})
-func NewEnforcerWithConfig(config EnforcerConfig) (*Enforcer, error) {
-	e := &Enforcer{logger: log.NewDefaultLogger(nil)}
-
-	if config.Logger != nil {
-		e.logger = config.Logger
-	}
-
-	if config.EnableLog {
-		e.EnableLog(config.EnableLog)
-	}
-
-	if config.Model != nil {
-		err := e.InitWithModelAndAdapter(config.Model, config.Adapter)
-		if err != nil {
-			return nil, err
-		}
-	} else if config.ModelPath != "" {
-		if config.Adapter != nil {
-			err := e.InitWithAdapter(config.ModelPath, config.Adapter)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			err := e.InitWithFile(config.ModelPath, config.PolicyPath)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	return e, nil
-}
-
-// NewEnforcer creates an enforcer via file or DB.
-//
-// File:
-//
-//	e := casbin.NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.csv")
-//
-// MySQL DB:
-//
-//	a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
-//	e := casbin.NewEnforcer("path/to/basic_model.conf", a)
-//
-// Deprecated: use NewEnforcerWithConfig instead.
-func NewEnforcer(params ...interface{}) (*Enforcer, error) {
-	config := EnforcerConfig{}
+// ParseEnforcerConfig parses the old parameters of NewEnforcer to a struct of EnforcerConfig.
+func ParseEnforcerConfig(params ...interface{}) (*EnforcerConfig, error) {
+	config := &EnforcerConfig{}
 
 	parsedParamLen := 0
 	paramLen := len(params)
@@ -163,11 +108,9 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 			case string:
 				config.ModelPath = p0
 				config.PolicyPath = p1
-				return NewEnforcerWithConfig(config)
 			default:
 				config.ModelPath = p0
 				config.Adapter = p1.(persist.Adapter)
-				return NewEnforcerWithConfig(config)
 			}
 		default:
 			switch params[1].(type) {
@@ -176,23 +119,89 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 			default:
 				config.Model = p0.(model.Model)
 				config.Adapter = params[1].(persist.Adapter)
-				return NewEnforcerWithConfig(config)
 			}
 		}
 	case 1:
 		switch p0 := params[0].(type) {
 		case string:
 			config.ModelPath = p0
-			return NewEnforcerWithConfig(config)
 		default:
 			config.Model = p0.(model.Model)
-			return NewEnforcerWithConfig(config)
 		}
 	case 0:
-		return NewEnforcerWithConfig(config)
 	default:
 		return nil, errors.New("invalid parameters for enforcer")
 	}
+	return config, nil
+}
+
+// NewEnforcerWithConfig creates an enforcer via file or DB with a configuration.
+// Specifying a Model will override the ModelPath.
+//
+// File:
+//
+//	e := casbin.NewEnforcerWithConfig(casbin.EnforcerConfig{ModelPath: "path/to/basic_model.conf", PolicyPath: "path/to/basic_policy.csv"})
+//
+// MySQL DB:
+//
+//	a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
+//	e := casbin.NewEnforcerWithConfig(casbin.EnforcerConfig{ModelPath:"path/to/basic_model.conf", Adapter: a})
+func NewEnforcerWithConfig(config *EnforcerConfig) (*Enforcer, error) {
+	e := &Enforcer{logger: log.NewDefaultLogger(nil)}
+
+	if config.Logger != nil {
+		e.logger = config.Logger
+	}
+
+	if config.EnableLog {
+		e.EnableLog(config.EnableLog)
+	}
+
+	if config.Model != nil {
+		err := e.InitWithModelAndAdapter(config.Model, config.Adapter)
+		if err != nil {
+			return nil, err
+		}
+		return e, nil
+	}
+
+	if config.ModelPath == "" {
+		return e, nil
+	}
+
+	if config.Adapter != nil {
+		err := e.InitWithAdapter(config.ModelPath, config.Adapter)
+		if err != nil {
+			return nil, err
+		}
+		return e, nil
+	}
+
+	err := e.InitWithFile(config.ModelPath, config.PolicyPath)
+	if err != nil {
+		return nil, err
+	}
+	return e, nil
+}
+
+// NewEnforcer creates an enforcer via file or DB.
+//
+// File:
+//
+//	e := casbin.NewEnforcer("path/to/basic_model.conf", "path/to/basic_policy.csv")
+//
+// MySQL DB:
+//
+//	a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
+//	e := casbin.NewEnforcer("path/to/basic_model.conf", a)
+//
+// Deprecated: use NewEnforcerWithConfig instead.
+func NewEnforcer(params ...interface{}) (*Enforcer, error) {
+	config, err := ParseEnforcerConfig(params...)
+	if err != nil {
+		return nil, err
+	}
+	return NewEnforcerWithConfig(config)
 }
 
 // InitWithFile initializes an enforcer with a model file and a policy file.

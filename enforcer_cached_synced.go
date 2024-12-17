@@ -31,7 +31,23 @@ type SyncedCachedEnforcer struct {
 	locker      *sync.RWMutex
 }
 
+// NewSyncedCachedEnforcerWithConfig creates a sync cached enforcer via file or DB.
+func NewSyncedCachedEnforcerWithConfig(config *EnforcerConfig) (*SyncedCachedEnforcer, error) {
+	e := &SyncedCachedEnforcer{}
+	var err error
+	e.SyncedEnforcer, err = NewSyncedEnforcerWithConfig(config)
+	if err != nil {
+		return nil, err
+	}
+
+	e.enableCache = 1
+	e.cache, _ = cache.NewSyncCache()
+	e.locker = new(sync.RWMutex)
+	return e, nil
+}
+
 // NewSyncedCachedEnforcer creates a sync cached enforcer via file or DB.
+// Deprecated: use NewSyncedCachedEnforcerWithConfig instead.
 func NewSyncedCachedEnforcer(params ...interface{}) (*SyncedCachedEnforcer, error) {
 	e := &SyncedCachedEnforcer{}
 	var err error

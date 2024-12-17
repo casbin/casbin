@@ -10,6 +10,19 @@ type DistributedEnforcer struct {
 	*SyncedEnforcer
 }
 
+// NewDistributedEnforcerWithConfig creates a new DistributedEnforcer instance with a config file.
+func NewDistributedEnforcerWithConfig(config *EnforcerConfig) (*DistributedEnforcer, error) {
+	e := &DistributedEnforcer{}
+	var err error
+	e.SyncedEnforcer, err = NewSyncedEnforcerWithConfig(config)
+	if err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
+// Deprecated: use NewDistributedEnforcerWithConfig instead.
 func NewDistributedEnforcer(params ...interface{}) (*DistributedEnforcer, error) {
 	e := &DistributedEnforcer{}
 	var err error

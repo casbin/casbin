@@ -32,7 +32,22 @@ type SyncedEnforcer struct {
 	autoLoadRunning int32
 }
 
+// NewSyncedEnforcerWithConfig creates a synchronized enforcer via file or DB.
+func NewSyncedEnforcerWithConfig(config *EnforcerConfig) (*SyncedEnforcer, error) {
+	e := &SyncedEnforcer{}
+	var err error
+	e.Enforcer, err = NewEnforcerWithConfig(config)
+	if err != nil {
+		return nil, err
+	}
+
+	e.stopAutoLoad = make(chan struct{}, 1)
+	e.autoLoadRunning = 0
+	return e, nil
+}
+
 // NewSyncedEnforcer creates a synchronized enforcer via file or DB.
+// Deprecated: use NewSyncedEnforcerWithConfig instead.
 func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 	e := &SyncedEnforcer{}
 	var err error

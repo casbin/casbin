@@ -36,7 +36,23 @@ type CacheableParam interface {
 	GetCacheKey() string
 }
 
+// NewCachedEnforcerWithConfig creates a cached enforcer via file or DB.
+func NewCachedEnforcerWithConfig(config *EnforcerConfig) (*CachedEnforcer, error) {
+	e := &CachedEnforcer{}
+	var err error
+	e.Enforcer, err = NewEnforcerWithConfig(config)
+	if err != nil {
+		return nil, err
+	}
+
+	e.enableCache = 1
+	e.cache, _ = cache.NewDefaultCache()
+	e.locker = new(sync.RWMutex)
+	return e, nil
+}
+
 // NewCachedEnforcer creates a cached enforcer via file or DB.
+// Deprecated: use NewCachedEnforcerWithConfig instead.
 func NewCachedEnforcer(params ...interface{}) (*CachedEnforcer, error) {
 	e := &CachedEnforcer{}
 	var err error
