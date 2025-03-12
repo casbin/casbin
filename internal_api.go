@@ -42,7 +42,7 @@ func (e *Enforcer) addPolicyWithoutNotify(sec string, ptype string, rule []strin
 
 	hasPolicy, err := e.model.HasPolicy(sec, ptype, rule)
 	if hasPolicy || err != nil {
-		return hasPolicy, err
+		return false, err
 	}
 
 	if e.shouldPersist() {
