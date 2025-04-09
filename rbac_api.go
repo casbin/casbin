@@ -324,7 +324,17 @@ func (e *Enforcer) GetImplicitUsersForRole(name string, domain ...string) ([]str
 // GetPermissionsForUser("alice") can only get: [["alice", "data2", "read"]].
 // But GetImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
 func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) ([][]string, error) {
-	return e.GetNamedImplicitPermissionsForUser("p", "g", user, domain...)
+	var res [][]string
+
+	for v := range e.rmMap {
+		perms, err := e.GetNamedImplicitPermissionsForUser("p", v, user, domain...)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, perms...)
+	}
+
+	return res, nil
 }
 
 // GetNamedImplicitPermissionsForUser gets implicit permissions for a user or role by named policy.
