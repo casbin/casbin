@@ -195,6 +195,11 @@ func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	for s := range sectionNameMap {
 		loadSection(model, cfg, s)
 	}
+
+	if model.hasSection("g") {
+		model.AddDef("g", "*", "_, _")
+	}
+
 	ms := make([]string, 0)
 	for _, rs := range requiredSections {
 		if !model.hasSection(rs) {
