@@ -334,7 +334,7 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 		res = append(res, perms...)
 	}
 
-	return res, nil
+	return removeDuplicatePermissions(res), nil
 }
 
 // GetNamedImplicitPermissionsForUser gets implicit permissions for a user or role by named policy.
