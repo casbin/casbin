@@ -219,6 +219,10 @@ func (e *Enforcer) initialize() {
 	e.autoNotifyWatcher = true
 	e.autoNotifyDispatcher = true
 	e.initRmMap()
+
+	if e.model["g"] != nil {
+		e.model.AddDef("g", "*", "_, _")
+	}
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -477,6 +481,11 @@ func (e *Enforcer) SavePolicy() error {
 	if e.IsFiltered() {
 		return errors.New("cannot save a filtered policy")
 	}
+
+	if e.model["g"] != nil && e.model["g"]["*"] != nil {
+		delete(e.model["g"], "*")
+	}
+
 	if err := e.adapter.SavePolicy(e.model); err != nil {
 		return err
 	}
