@@ -229,12 +229,12 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) error {
 	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
 
 	if sec == "g" {
-		assertion, err := model.GetAssertion(sec, "*")
+		assert, err := model.GetAssertion(sec, "*")
 		if err != nil {
 			return err
 		} else {
-			assertion.Policy = append(assertion.Policy, rule)
-			assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec]["*"].Policy) - 1
+			assert.Policy = append(assert.Policy, rule)
+			assert.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec]["*"].Policy) - 1
 		}
 	}
 
