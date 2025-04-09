@@ -175,6 +175,9 @@ func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) er
 func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error {
 	e.adapter = adapter
 
+	// Global g* asserter
+	m.AddDef("g", "*", "_, _")
+	
 	e.model = m
 	m.SetLogger(e.logger)
 	e.model.PrintModel()
