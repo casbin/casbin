@@ -218,11 +218,12 @@ func (e *Enforcer) initialize() {
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
 	e.autoNotifyDispatcher = true
-	e.initRmMap()
 
 	if e.model["g"] != nil {
 		e.model.AddDef("g", "*", "_, _")
 	}
+
+	e.initRmMap()
 }
 
 // LoadModel reloads the model from the model CONF file.
