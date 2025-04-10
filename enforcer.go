@@ -219,7 +219,7 @@ func (e *Enforcer) initialize() {
 	e.autoNotifyWatcher = true
 	e.autoNotifyDispatcher = true
 
-	if e.model["g"] != nil {
+	if e.model["g"] != nil && len(e.model["g"]) > 1 {
 		e.model.AddDef("g", "*", "_, _")
 	}
 
