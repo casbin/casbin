@@ -82,19 +82,21 @@ func Array2DEquals(a [][]string, b [][]string) bool {
 
 // SortArray2D  Sorts the two-dimensional string array.
 func SortArray2D(arr [][]string) {
-	if len(arr) != 0 {
-		sort.Slice(arr, func(i, j int) bool {
-			elementLen := len(arr[0])
-			for k := 0; k < elementLen; k++ {
-				if arr[i][k] < arr[j][k] {
-					return true
-				} else if arr[i][k] > arr[j][k] {
-					return false
-				}
-			}
-			return true
-		})
+	if len(arr) == 0 {
+		return
 	}
+	sort.Slice(arr, func(i, j int) bool {
+		minArrLen := len(arr[i])
+		if len(arr[j]) < minArrLen {
+			minArrLen = len(arr[j])
+		}
+		for k := 0; k < minArrLen; k++ {
+			if arr[i][k] != arr[j][k] {
+				return arr[i][k] < arr[j][k]
+			}
+		}
+		return len(arr[i]) < len(arr[j])
+	})
 }
 
 // SortedArray2DEquals determines whether two 2-dimensional string arrays are identical.
