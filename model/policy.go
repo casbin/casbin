@@ -281,22 +281,25 @@ func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]s
 // RemovePolicy removes a policy rule from the model.
 // Deprecated: Using AddPoliciesWithAffected instead.
 func (model Model) RemovePolicy(sec string, ptype string, rule []string) (bool, error) {
-	_, err := model.GetAssertion(sec, ptype)
+	ast, err := model.GetAssertion(sec, ptype)
 	if err != nil {
 		return false, err
 	}
-	index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
+	key := strings.Join(rule, DefaultSep)
+	index, ok := ast.PolicyMap[key]
 	if !ok {
-		return false, err
+		return false, nil
 	}
 
-	model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
-	delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
-	for i := index; i < len(model[sec][ptype].Policy); i++ {
-		model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
+	lastIdx := len(ast.Policy) - 1
+	if index != lastIdx {
+		ast.Policy[index] = ast.Policy[lastIdx]
+		lastPolicyKey := strings.Join(ast.Policy[index], DefaultSep)
+		ast.PolicyMap[lastPolicyKey] = index
 	}
-
-	return true, err
+	ast.Policy = ast.Policy[:lastIdx]
+	delete(ast.PolicyMap, key)
+	return true, nil
 }
 
 // UpdatePolicy updates a policy rule from the model.
