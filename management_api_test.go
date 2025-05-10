@@ -61,7 +61,7 @@ func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
 
 	t.Log("Policy: ", myRes)
 
-	if !util.Array2DEquals(res, myRes) {
+	if !util.SortedArray2DEquals(res, myRes) {
 		t.Error("Policy: ", myRes, ", supposed to be ", res)
 	}
 }
