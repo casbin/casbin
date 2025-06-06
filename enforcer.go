@@ -676,6 +676,12 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				mapValue, err = util.JsonToMap(rval)
 				if err == nil {
 					rvals[i] = mapValue
+					continue
+				}
+				var arrayValue []interface{}
+				arrayValue, err = util.JsonToArray(rval)
+				if err == nil {
+					rvals[i] = arrayValue
 				}
 			}
 		}
