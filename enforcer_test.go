@@ -734,7 +734,7 @@ func TestLinkConditionFunc(t *testing.T) {
 	testDomainEnforce(t, e, "alice", "domain5", "data5", "write", false)
 }
 
-func TestABACWithJsonArray(t *testing.T){
+func TestABACWithJsonArray(t *testing.T) {
 	modelContent := `
 		[request_definition]
 		r = sub, obj, act
@@ -748,13 +748,13 @@ func TestABACWithJsonArray(t *testing.T){
 		 [matchers]
 		  m = r.sub == p.sub && (r.obj[0] == p.obj || r.obj[1] == p.obj) && r.act == p.act
     `
-    m, err := model.NewModelFromString(modelContent)
-    if err != nil {
-	    t.Fatalf("Failed to create model: %v", err)
-    }
-    e, err := NewEnforcer(m)
-    if err != nil {
-	    t.Fatalf("Failed to create enforcer: %v", err)
-    }
-    e.EnableAcceptJsonRequest(true)
-    }
+	m, err := model.NewModelFromString(modelContent)
+	if err != nil {
+		t.Fatalf("Failed to create model: %v", err)
+	}
+	e, err := NewEnforcer(m)
+	if err != nil {
+		t.Fatalf("Failed to create enforcer: %v", err)
+	}
+	e.EnableAcceptJsonRequest(true)
+}

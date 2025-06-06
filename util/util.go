@@ -43,6 +43,7 @@ func JsonToArray(jsonStr string) ([]interface{}, error) {
 	}
 	return arr, nil
 }
+
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
 func EscapeAssertion(s string) string {
 	s = escapeAssertionRegex.ReplaceAllStringFunc(s, func(m string) string {
