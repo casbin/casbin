@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -195,4 +196,26 @@ func TestABACPolicy(t *testing.T) {
 	testEnforce(t, e, sub3, "/data2", "read", false)
 	testEnforce(t, e, sub3, "/data1", "write", false)
 	testEnforce(t, e, sub3, "/data2", "write", false)
+}
+
+func TestABACWithJsonArray(t *testing.T) {
+	modelContent := `
+		[request_definition]
+		r = sub, obj, act
+		[policy_definition]
+		p = sub, obj, act
+		[policy_effect]
+		e = some(where (p.eft == allow))
+		 [matchers]
+		  m = r.sub == p.sub && (r.obj[0] == p.obj || r.obj[1] == p.obj) && r.act == p.act
+    `
+	m, err := model.NewModelFromString(modelContent)
+	if err != nil {
+		t.Fatalf("Failed to create model: %v", err)
+	}
+	e, err := NewEnforcer(m)
+	if err != nil {
+		t.Fatalf("Failed to create enforcer: %v", err)
+	}
+	e.EnableAcceptJsonRequest(true)
 }
