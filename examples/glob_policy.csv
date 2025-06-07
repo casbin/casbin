@@ -1,0 +1,4 @@
+p, u1, /foo/*, read
+p, u2, /foo*, read
+p, u3, /*/foo/*, read
+p, u4, *, read

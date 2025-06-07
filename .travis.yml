@@ -1,0 +1,15 @@
+language: go
+
+sudo: false
+
+env:
+  - GO111MODULE=on
+
+go:
+  - "1.11.13"
+  - "1.12"
+  - "1.13"
+  - "1.14"
+
+script:
+  - make test

@@ -1,0 +1,3768 @@
+# 132 policies / 3000 grouping policies / 300 subjuects / 6 roles
+# Policy - staff001
+p, staff001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1001
+p, staff001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1002
+p, staff001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1003
+p, staff001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1004
+p, staff001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1005
+p, staff001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2001
+p, staff001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2002
+p, staff001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2003
+p, staff001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2004
+p, staff001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2005
+
+p, staff001,             /orgs/{orgID}/sites,          App001.Module002.Action1006
+p, staff001,             /orgs/{orgID}/sites,          App001.Module002.Action1007
+p, staff001,             /orgs/{orgID}/sites,          App001.Module002.Action1008
+p, staff001,             /orgs/{orgID}/sites,          App001.Module002.Action1009
+p, staff001,             /orgs/{orgID}/sites,          App001.Module002.Action1010
+p, staff001,             /orgs/{orgID}/sites,          App003.*.Action3001
+p, staff001,             /orgs/{orgID}/sites,          App003.*.Action3002
+p, staff001,             /orgs/{orgID}/sites,          App003.*.Action3003
+p, staff001,             /orgs/{orgID}/sites,          App003.*.Action3004
+p, staff001,             /orgs/{orgID}/sites,          App003.*.Action3005
+
+p, staff001,             /orgs/{orgID},                App004.*
+p, staff001,             /orgs,                        App005.*
+
+# Policy - staff002
+p, staff002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1001
+p, staff002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1002
+p, staff002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1003
+p, staff002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1004
+p, staff002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1005
+p, staff002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2001
+p, staff002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2002
+p, staff002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2003
+p, staff002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2004
+p, staff002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2005
+
+p, staff002,             /orgs/{orgID}/sites,          App001.Module002.Action1006
+p, staff002,             /orgs/{orgID}/sites,          App001.Module002.Action1007
+p, staff002,             /orgs/{orgID}/sites,          App001.Module002.Action1008
+p, staff002,             /orgs/{orgID}/sites,          App001.Module002.Action1009
+p, staff002,             /orgs/{orgID}/sites,          App001.Module002.Action1010
+p, staff002,             /orgs/{orgID}/sites,          App003.*.Action3001
+p, staff002,             /orgs/{orgID}/sites,          App003.*.Action3002
+p, staff002,             /orgs/{orgID}/sites,          App003.*.Action3003
+p, staff002,             /orgs/{orgID}/sites,          App003.*.Action3004
+p, staff002,             /orgs/{orgID}/sites,          App003.*.Action3005
+
+p, staff002,             /orgs/{orgID},                App004.*
+p, staff002,             /orgs,                        App005.*
+
+# Policy - manager001
+p, manager001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1001
+p, manager001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1002
+p, manager001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1003
+p, manager001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1004
+p, manager001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1005
+p, manager001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2001
+p, manager001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2002
+p, manager001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2003
+p, manager001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2004
+p, manager001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2005
+
+p, manager001,             /orgs/{orgID}/sites,          App001.Module002.Action1006
+p, manager001,             /orgs/{orgID}/sites,          App001.Module002.Action1007
+p, manager001,             /orgs/{orgID}/sites,          App001.Module002.Action1008
+p, manager001,             /orgs/{orgID}/sites,          App001.Module002.Action1009
+p, manager001,             /orgs/{orgID}/sites,          App001.Module002.Action1010
+p, manager001,             /orgs/{orgID}/sites,          App003.*.Action3001
+p, manager001,             /orgs/{orgID}/sites,          App003.*.Action3002
+p, manager001,             /orgs/{orgID}/sites,          App003.*.Action3003
+p, manager001,             /orgs/{orgID}/sites,          App003.*.Action3004
+p, manager001,             /orgs/{orgID}/sites,          App003.*.Action3005
+
+p, manager001,             /orgs/{orgID},                App004.*
+p, manager001,             /orgs,                        App005.*
+
+# Policy - manager002
+p, manager002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1001
+p, manager002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1002
+p, manager002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1003
+p, manager002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1004
+p, manager002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1005
+p, manager002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2001
+p, manager002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2002
+p, manager002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2003
+p, manager002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2004
+p, manager002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2005
+
+p, manager002,             /orgs/{orgID}/sites,          App001.Module002.Action1006
+p, manager002,             /orgs/{orgID}/sites,          App001.Module002.Action1007
+p, manager002,             /orgs/{orgID}/sites,          App001.Module002.Action1008
+p, manager002,             /orgs/{orgID}/sites,          App001.Module002.Action1009
+p, manager002,             /orgs/{orgID}/sites,          App001.Module002.Action1010
+p, manager002,             /orgs/{orgID}/sites,          App003.*.Action3001
+p, manager002,             /orgs/{orgID}/sites,          App003.*.Action3002
+p, manager002,             /orgs/{orgID}/sites,          App003.*.Action3003
+p, manager002,             /orgs/{orgID}/sites,          App003.*.Action3004
+p, manager002,             /orgs/{orgID}/sites,          App003.*.Action3005
+
+p, manager002,             /orgs/{orgID},                App004.*
+p, manager002,             /orgs,                        App005.*
+
+# Policy - customer001
+p, customer001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1001
+p, customer001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1002
+p, customer001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1003
+p, customer001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1004
+p, customer001,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1005
+p, customer001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2001
+p, customer001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2002
+p, customer001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2003
+p, customer001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2004
+p, customer001,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2005
+
+p, customer001,             /orgs/{orgID}/sites,          App001.Module002.Action1006
+p, customer001,             /orgs/{orgID}/sites,          App001.Module002.Action1007
+p, customer001,             /orgs/{orgID}/sites,          App001.Module002.Action1008
+p, customer001,             /orgs/{orgID}/sites,          App001.Module002.Action1009
+p, customer001,             /orgs/{orgID}/sites,          App001.Module002.Action1010
+p, customer001,             /orgs/{orgID}/sites,          App003.*.Action3001
+p, customer001,             /orgs/{orgID}/sites,          App003.*.Action3002
+p, customer001,             /orgs/{orgID}/sites,          App003.*.Action3003
+p, customer001,             /orgs/{orgID}/sites,          App003.*.Action3004
+p, customer001,             /orgs/{orgID}/sites,          App003.*.Action3005
+
+p, customer001,             /orgs/{orgID},                App004.*
+p, customer001,             /orgs,                        App005.*
+
+# Policy - customer002
+p, customer002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1001
+p, customer002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1002
+p, customer002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1003
+p, customer002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1004
+p, customer002,             /orgs/{orgID}/sites/{siteID}, App001.Module001.Action1005
+p, customer002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2001
+p, customer002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2002
+p, customer002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2003
+p, customer002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2004
+p, customer002,             /orgs/{orgID}/sites/{siteID}, App002.*.Action2005
+
+p, customer002,             /orgs/{orgID}/sites,          App001.Module002.Action1006
+p, customer002,             /orgs/{orgID}/sites,          App001.Module002.Action1007
+p, customer002,             /orgs/{orgID}/sites,          App001.Module002.Action1008
+p, customer002,             /orgs/{orgID}/sites,          App001.Module002.Action1009
+p, customer002,             /orgs/{orgID}/sites,          App001.Module002.Action1010
+p, customer002,             /orgs/{orgID}/sites,          App003.*.Action3001
+p, customer002,             /orgs/{orgID}/sites,          App003.*.Action3002
+p, customer002,             /orgs/{orgID}/sites,          App003.*.Action3003
+p, customer002,             /orgs/{orgID}/sites,          App003.*.Action3004
+p, customer002,             /orgs/{orgID}/sites,          App003.*.Action3005
+
+p, customer002,             /orgs/{orgID},                App004.*
+p, customer002,             /orgs,                        App005.*
+
+# Group - staff001,  / org1
+g, staffUser1001, staff001, /orgs/1/sites/site001
+g, staffUser1001, staff001, /orgs/1/sites/site002
+g, staffUser1001, staff001, /orgs/1/sites/site003
+g, staffUser1001, staff001, /orgs/1/sites/site004
+g, staffUser1001, staff001, /orgs/1/sites/site005
+
+g, staffUser1001, staff001, /orgs/1/sites/site001
+g, staffUser1001, staff001, /orgs/1/sites/site002
+g, staffUser1001, staff001, /orgs/1/sites/site003
+g, staffUser1001, staff001, /orgs/1/sites/site004
+g, staffUser1001, staff001, /orgs/1/sites/site005
+
+g, staffUser1003, staff001, /orgs/1/sites/site001
+g, staffUser1003, staff001, /orgs/1/sites/site002
+g, staffUser1003, staff001, /orgs/1/sites/site003
+g, staffUser1003, staff001, /orgs/1/sites/site004
+g, staffUser1003, staff001, /orgs/1/sites/site005
+
+g, staffUser1004, staff001, /orgs/1/sites/site001
+g, staffUser1004, staff001, /orgs/1/sites/site002
+g, staffUser1004, staff001, /orgs/1/sites/site003
+g, staffUser1004, staff001, /orgs/1/sites/site004
+g, staffUser1004, staff001, /orgs/1/sites/site005
+
+g, staffUser1005, staff001, /orgs/1/sites/site001
+g, staffUser1005, staff001, /orgs/1/sites/site002
+g, staffUser1005, staff001, /orgs/1/sites/site003
+g, staffUser1005, staff001, /orgs/1/sites/site004
+g, staffUser1005, staff001, /orgs/1/sites/site005
+
+g, staffUser1006, staff001, /orgs/1/sites/site001
+g, staffUser1006, staff001, /orgs/1/sites/site002
+g, staffUser1006, staff001, /orgs/1/sites/site003
+g, staffUser1006, staff001, /orgs/1/sites/site004
+g, staffUser1006, staff001, /orgs/1/sites/site005
+
+g, staffUser1007, staff001, /orgs/1/sites/site001
+g, staffUser1007, staff001, /orgs/1/sites/site002
+g, staffUser1007, staff001, /orgs/1/sites/site003
+g, staffUser1007, staff001, /orgs/1/sites/site004
+g, staffUser1007, staff001, /orgs/1/sites/site005
+
+g, staffUser1008,  staff001, /orgs/1/sites/site001
+g, staffUser1008,  staff001, /orgs/1/sites/site002
+g, staffUser1008,  staff001, /orgs/1/sites/site003
+g, staffUser1008,  staff001, /orgs/1/sites/site004
+g, staffUser1008,  staff001, /orgs/1/sites/site005
+
+g, staffUser1009,  staff001, /orgs/1/sites/site001
+g, staffUser1009,  staff001, /orgs/1/sites/site002
+g, staffUser1009,  staff001, /orgs/1/sites/site003
+g, staffUser1009,  staff001, /orgs/1/sites/site004
+g, staffUser1009,  staff001, /orgs/1/sites/site005
+
+g, staffUser1010,  staff001, /orgs/1/sites/site001
+g, staffUser1010,  staff001, /orgs/1/sites/site002
+g, staffUser1010,  staff001, /orgs/1/sites/site003
+g, staffUser1010,  staff001, /orgs/1/sites/site004
+g, staffUser1010,  staff001, /orgs/1/sites/site005
+
+g, staffUser1011,  staff001, /orgs/1/sites/site001
+g, staffUser1011,  staff001, /orgs/1/sites/site002
+g, staffUser1011,  staff001, /orgs/1/sites/site003
+g, staffUser1011,  staff001, /orgs/1/sites/site004
+g, staffUser1011,  staff001, /orgs/1/sites/site005
+
+g, staffUser1012,  staff001, /orgs/1/sites/site001
+g, staffUser1012,  staff001, /orgs/1/sites/site002
+g, staffUser1012,  staff001, /orgs/1/sites/site003
+g, staffUser1012,  staff001, /orgs/1/sites/site004
+g, staffUser1012,  staff001, /orgs/1/sites/site005
+
+g, staffUser1013, staff001, /orgs/1/sites/site001
+g, staffUser1013, staff001, /orgs/1/sites/site002
+g, staffUser1013, staff001, /orgs/1/sites/site003
+g, staffUser1013, staff001, /orgs/1/sites/site004
+g, staffUser1013, staff001, /orgs/1/sites/site005
+
+g, staffUser1014, staff001, /orgs/1/sites/site001
+g, staffUser1014, staff001, /orgs/1/sites/site002
+g, staffUser1014, staff001, /orgs/1/sites/site003
+g, staffUser1014, staff001, /orgs/1/sites/site004
+g, staffUser1014, staff001, /orgs/1/sites/site005
+
+g, staffUser1015, staff001, /orgs/1/sites/site001
+g, staffUser1015, staff001, /orgs/1/sites/site002
+g, staffUser1015, staff001, /orgs/1/sites/site003
+g, staffUser1015, staff001, /orgs/1/sites/site004
+g, staffUser1015, staff001, /orgs/1/sites/site005
+
+g, staffUser1016, staff001, /orgs/1/sites/site001
+g, staffUser1016, staff001, /orgs/1/sites/site002
+g, staffUser1016, staff001, /orgs/1/sites/site003
+g, staffUser1016, staff001, /orgs/1/sites/site004
+g, staffUser1016, staff001, /orgs/1/sites/site005
+
+g, staffUser1017, staff001, /orgs/1/sites/site001
+g, staffUser1017, staff001, /orgs/1/sites/site002
+g, staffUser1017, staff001, /orgs/1/sites/site003
+g, staffUser1017, staff001, /orgs/1/sites/site004
+g, staffUser1017, staff001, /orgs/1/sites/site005
+
+g, staffUser1018,  staff001, /orgs/1/sites/site001
+g, staffUser1018,  staff001, /orgs/1/sites/site002
+g, staffUser1018,  staff001, /orgs/1/sites/site003
+g, staffUser1018,  staff001, /orgs/1/sites/site004
+g, staffUser1018,  staff001, /orgs/1/sites/site005
+
+g, staffUser1019,  staff001, /orgs/1/sites/site001
+g, staffUser1019,  staff001, /orgs/1/sites/site002
+g, staffUser1019,  staff001, /orgs/1/sites/site003
+g, staffUser1019,  staff001, /orgs/1/sites/site004
+g, staffUser1019,  staff001, /orgs/1/sites/site005
+
+g, staffUser1020,  staff001, /orgs/1/sites/site001
+g, staffUser1020,  staff001, /orgs/1/sites/site002
+g, staffUser1020,  staff001, /orgs/1/sites/site003
+g, staffUser1020,  staff001, /orgs/1/sites/site004
+g, staffUser1020,  staff001, /orgs/1/sites/site005
+
+g, staffUser1021,  staff001, /orgs/1/sites/site001
+g, staffUser1021,  staff001, /orgs/1/sites/site002
+g, staffUser1021,  staff001, /orgs/1/sites/site003
+g, staffUser1021,  staff001, /orgs/1/sites/site004
+g, staffUser1021,  staff001, /orgs/1/sites/site005
+
+g, staffUser1022,  staff001, /orgs/1/sites/site001
+g, staffUser1022,  staff001, /orgs/1/sites/site002
+g, staffUser1022,  staff001, /orgs/1/sites/site003
+g, staffUser1022,  staff001, /orgs/1/sites/site004
+g, staffUser1022,  staff001, /orgs/1/sites/site005
+
+g, staffUser1023, staff001, /orgs/1/sites/site001
+g, staffUser1023, staff001, /orgs/1/sites/site002
+g, staffUser1023, staff001, /orgs/1/sites/site003
+g, staffUser1023, staff001, /orgs/1/sites/site004
+g, staffUser1023, staff001, /orgs/1/sites/site005
+
+g, staffUser1024, staff001, /orgs/1/sites/site001
+g, staffUser1024, staff001, /orgs/1/sites/site002
+g, staffUser1024, staff001, /orgs/1/sites/site003
+g, staffUser1024, staff001, /orgs/1/sites/site004
+g, staffUser1024, staff001, /orgs/1/sites/site005
+
+g, staffUser1025, staff001, /orgs/1/sites/site001
+g, staffUser1025, staff001, /orgs/1/sites/site002
+g, staffUser1025, staff001, /orgs/1/sites/site003
+g, staffUser1025, staff001, /orgs/1/sites/site004
+g, staffUser1025, staff001, /orgs/1/sites/site005
+
+g, staffUser1026, staff001, /orgs/1/sites/site001
+g, staffUser1026, staff001, /orgs/1/sites/site002
+g, staffUser1026, staff001, /orgs/1/sites/site003
+g, staffUser1026, staff001, /orgs/1/sites/site004
+g, staffUser1026, staff001, /orgs/1/sites/site005
+
+g, staffUser1027, staff001, /orgs/1/sites/site001
+g, staffUser1027, staff001, /orgs/1/sites/site002
+g, staffUser1027, staff001, /orgs/1/sites/site003
+g, staffUser1027, staff001, /orgs/1/sites/site004
+g, staffUser1027, staff001, /orgs/1/sites/site005
+
+g, staffUser1028,  staff001, /orgs/1/sites/site001
+g, staffUser1028,  staff001, /orgs/1/sites/site002
+g, staffUser1028,  staff001, /orgs/1/sites/site003
+g, staffUser1028,  staff001, /orgs/1/sites/site004
+g, staffUser1028,  staff001, /orgs/1/sites/site005
+
+g, staffUser1029,  staff001, /orgs/1/sites/site001
+g, staffUser1029,  staff001, /orgs/1/sites/site002
+g, staffUser1029,  staff001, /orgs/1/sites/site003
+g, staffUser1029,  staff001, /orgs/1/sites/site004
+g, staffUser1029,  staff001, /orgs/1/sites/site005
+
+g, staffUser1030,  staff001, /orgs/1/sites/site001
+g, staffUser1030,  staff001, /orgs/1/sites/site002
+g, staffUser1030,  staff001, /orgs/1/sites/site003
+g, staffUser1030,  staff001, /orgs/1/sites/site004
+g, staffUser1030,  staff001, /orgs/1/sites/site005
+
+g, staffUser1031,  staff001, /orgs/1/sites/site001
+g, staffUser1031,  staff001, /orgs/1/sites/site002
+g, staffUser1031,  staff001, /orgs/1/sites/site003
+g, staffUser1031,  staff001, /orgs/1/sites/site004
+g, staffUser1031,  staff001, /orgs/1/sites/site005
+
+g, staffUser1032,  staff001, /orgs/1/sites/site001
+g, staffUser1032,  staff001, /orgs/1/sites/site002
+g, staffUser1032,  staff001, /orgs/1/sites/site003
+g, staffUser1032,  staff001, /orgs/1/sites/site004
+g, staffUser1032,  staff001, /orgs/1/sites/site005
+
+g, staffUser1033, staff001, /orgs/1/sites/site001
+g, staffUser1033, staff001, /orgs/1/sites/site002
+g, staffUser1033, staff001, /orgs/1/sites/site003
+g, staffUser1033, staff001, /orgs/1/sites/site004
+g, staffUser1033, staff001, /orgs/1/sites/site005
+
+g, staffUser1034, staff001, /orgs/1/sites/site001
+g, staffUser1034, staff001, /orgs/1/sites/site002
+g, staffUser1034, staff001, /orgs/1/sites/site003
+g, staffUser1034, staff001, /orgs/1/sites/site004
+g, staffUser1034, staff001, /orgs/1/sites/site005
+
+g, staffUser1035, staff001, /orgs/1/sites/site001
+g, staffUser1035, staff001, /orgs/1/sites/site002
+g, staffUser1035, staff001, /orgs/1/sites/site003
+g, staffUser1035, staff001, /orgs/1/sites/site004
+g, staffUser1035, staff001, /orgs/1/sites/site005
+
+g, staffUser1036, staff001, /orgs/1/sites/site001
+g, staffUser1036, staff001, /orgs/1/sites/site002
+g, staffUser1036, staff001, /orgs/1/sites/site003
+g, staffUser1036, staff001, /orgs/1/sites/site004
+g, staffUser1036, staff001, /orgs/1/sites/site005
+
+g, staffUser1037, staff001, /orgs/1/sites/site001
+g, staffUser1037, staff001, /orgs/1/sites/site002
+g, staffUser1037, staff001, /orgs/1/sites/site003
+g, staffUser1037, staff001, /orgs/1/sites/site004
+g, staffUser1037, staff001, /orgs/1/sites/site005
+
+g, staffUser1038,  staff001, /orgs/1/sites/site001
+g, staffUser1038,  staff001, /orgs/1/sites/site002
+g, staffUser1038,  staff001, /orgs/1/sites/site003
+g, staffUser1038,  staff001, /orgs/1/sites/site004
+g, staffUser1038,  staff001, /orgs/1/sites/site005
+
+g, staffUser1039,  staff001, /orgs/1/sites/site001
+g, staffUser1039,  staff001, /orgs/1/sites/site002
+g, staffUser1039,  staff001, /orgs/1/sites/site003
+g, staffUser1039,  staff001, /orgs/1/sites/site004
+g, staffUser1039,  staff001, /orgs/1/sites/site005
+
+g, staffUser1040,  staff001, /orgs/1/sites/site001
+g, staffUser1040,  staff001, /orgs/1/sites/site002
+g, staffUser1040,  staff001, /orgs/1/sites/site003
+g, staffUser1040,  staff001, /orgs/1/sites/site004
+g, staffUser1040,  staff001, /orgs/1/sites/site005
+
+g, staffUser1041,  staff001, /orgs/1/sites/site001
+g, staffUser1041,  staff001, /orgs/1/sites/site002
+g, staffUser1041,  staff001, /orgs/1/sites/site003
+g, staffUser1041,  staff001, /orgs/1/sites/site004
+g, staffUser1041,  staff001, /orgs/1/sites/site005
+
+g, staffUser1042,  staff001, /orgs/1/sites/site001
+g, staffUser1042,  staff001, /orgs/1/sites/site002
+g, staffUser1042,  staff001, /orgs/1/sites/site003
+g, staffUser1042,  staff001, /orgs/1/sites/site004
+g, staffUser1042,  staff001, /orgs/1/sites/site005
+
+g, staffUser1043, staff001, /orgs/1/sites/site001
+g, staffUser1043, staff001, /orgs/1/sites/site002
+g, staffUser1043, staff001, /orgs/1/sites/site003
+g, staffUser1043, staff001, /orgs/1/sites/site004
+g, staffUser1043, staff001, /orgs/1/sites/site005
+
+g, staffUser1044, staff001, /orgs/1/sites/site001
+g, staffUser1044, staff001, /orgs/1/sites/site002
+g, staffUser1044, staff001, /orgs/1/sites/site003
+g, staffUser1044, staff001, /orgs/1/sites/site004
+g, staffUser1044, staff001, /orgs/1/sites/site005
+
+g, staffUser1045, staff001, /orgs/1/sites/site001
+g, staffUser1045, staff001, /orgs/1/sites/site002
+g, staffUser1045, staff001, /orgs/1/sites/site003
+g, staffUser1045, staff001, /orgs/1/sites/site004
+g, staffUser1045, staff001, /orgs/1/sites/site005
+
+g, staffUser1046, staff001, /orgs/1/sites/site001
+g, staffUser1046, staff001, /orgs/1/sites/site002
+g, staffUser1046, staff001, /orgs/1/sites/site003
+g, staffUser1046, staff001, /orgs/1/sites/site004
+g, staffUser1046, staff001, /orgs/1/sites/site005
+
+g, staffUser1047, staff001, /orgs/1/sites/site001
+g, staffUser1047, staff001, /orgs/1/sites/site002
+g, staffUser1047, staff001, /orgs/1/sites/site003
+g, staffUser1047, staff001, /orgs/1/sites/site004
+g, staffUser1047, staff001, /orgs/1/sites/site005
+
+g, staffUser1048,  staff001, /orgs/1/sites/site001
+g, staffUser1048,  staff001, /orgs/1/sites/site002
+g, staffUser1048,  staff001, /orgs/1/sites/site003
+g, staffUser1048,  staff001, /orgs/1/sites/site004
+g, staffUser1048,  staff001, /orgs/1/sites/site005
+
+g, staffUser1049,  staff001, /orgs/1/sites/site001
+g, staffUser1049,  staff001, /orgs/1/sites/site002
+g, staffUser1049,  staff001, /orgs/1/sites/site003
+g, staffUser1049,  staff001, /orgs/1/sites/site004
+g, staffUser1049,  staff001, /orgs/1/sites/site005
+
+g, staffUser1050,  staff001, /orgs/1/sites/site001
+g, staffUser1050,  staff001, /orgs/1/sites/site002
+g, staffUser1050,  staff001, /orgs/1/sites/site003
+g, staffUser1050,  staff001, /orgs/1/sites/site004
+g, staffUser1050,  staff001, /orgs/1/sites/site005
+
+# Group - staff001, / org1
+g, staffUser2001, staff001, /orgs/1/sites/site001
+g, staffUser2001, staff001, /orgs/1/sites/site002
+g, staffUser2001, staff001, /orgs/1/sites/site003
+g, staffUser2001, staff001, /orgs/1/sites/site004
+g, staffUser2001, staff001, /orgs/1/sites/site005
+
+g, staffUser2001, staff001, /orgs/1/sites/site001
+g, staffUser2001, staff001, /orgs/1/sites/site002
+g, staffUser2001, staff001, /orgs/1/sites/site003
+g, staffUser2001, staff001, /orgs/1/sites/site004
+g, staffUser2001, staff001, /orgs/1/sites/site005
+
+g, staffUser2003, staff001, /orgs/1/sites/site001
+g, staffUser2003, staff001, /orgs/1/sites/site002
+g, staffUser2003, staff001, /orgs/1/sites/site003
+g, staffUser2003, staff001, /orgs/1/sites/site004
+g, staffUser2003, staff001, /orgs/1/sites/site005
+
+g, staffUser2004, staff001, /orgs/1/sites/site001
+g, staffUser2004, staff001, /orgs/1/sites/site002
+g, staffUser2004, staff001, /orgs/1/sites/site003
+g, staffUser2004, staff001, /orgs/1/sites/site004
+g, staffUser2004, staff001, /orgs/1/sites/site005
+
+g, staffUser2005, staff001, /orgs/1/sites/site001
+g, staffUser2005, staff001, /orgs/1/sites/site002
+g, staffUser2005, staff001, /orgs/1/sites/site003
+g, staffUser2005, staff001, /orgs/1/sites/site004
+g, staffUser2005, staff001, /orgs/1/sites/site005
+
+g, staffUser2006, staff001, /orgs/1/sites/site001
+g, staffUser2006, staff001, /orgs/1/sites/site002
+g, staffUser2006, staff001, /orgs/1/sites/site003
+g, staffUser2006, staff001, /orgs/1/sites/site004
+g, staffUser2006, staff001, /orgs/1/sites/site005
+
+g, staffUser2007, staff001, /orgs/1/sites/site001
+g, staffUser2007, staff001, /orgs/1/sites/site002
+g, staffUser2007, staff001, /orgs/1/sites/site003
+g, staffUser2007, staff001, /orgs/1/sites/site004
+g, staffUser2007, staff001, /orgs/1/sites/site005
+
+g, staffUser2008,  staff001, /orgs/1/sites/site001
+g, staffUser2008,  staff001, /orgs/1/sites/site002
+g, staffUser2008,  staff001, /orgs/1/sites/site003
+g, staffUser2008,  staff001, /orgs/1/sites/site004
+g, staffUser2008,  staff001, /orgs/1/sites/site005
+
+g, staffUser2009,  staff001, /orgs/1/sites/site001
+g, staffUser2009,  staff001, /orgs/1/sites/site002
+g, staffUser2009,  staff001, /orgs/1/sites/site003
+g, staffUser2009,  staff001, /orgs/1/sites/site004
+g, staffUser2009,  staff001, /orgs/1/sites/site005
+
+g, staffUser2010,  staff001, /orgs/1/sites/site001
+g, staffUser2010,  staff001, /orgs/1/sites/site002
+g, staffUser2010,  staff001, /orgs/1/sites/site003
+g, staffUser2010,  staff001, /orgs/1/sites/site004
+g, staffUser2010,  staff001, /orgs/1/sites/site005
+
+g, staffUser2011,  staff001, /orgs/1/sites/site001
+g, staffUser2011,  staff001, /orgs/1/sites/site002
+g, staffUser2011,  staff001, /orgs/1/sites/site003
+g, staffUser2011,  staff001, /orgs/1/sites/site004
+g, staffUser2011,  staff001, /orgs/1/sites/site005
+
+g, staffUser2012,  staff001, /orgs/1/sites/site001
+g, staffUser2012,  staff001, /orgs/1/sites/site002
+g, staffUser2012,  staff001, /orgs/1/sites/site003
+g, staffUser2012,  staff001, /orgs/1/sites/site004
+g, staffUser2012,  staff001, /orgs/1/sites/site005
+
+g, staffUser2013, staff001, /orgs/1/sites/site001
+g, staffUser2013, staff001, /orgs/1/sites/site002
+g, staffUser2013, staff001, /orgs/1/sites/site003
+g, staffUser2013, staff001, /orgs/1/sites/site004
+g, staffUser2013, staff001, /orgs/1/sites/site005
+
+g, staffUser2014, staff001, /orgs/1/sites/site001
+g, staffUser2014, staff001, /orgs/1/sites/site002
+g, staffUser2014, staff001, /orgs/1/sites/site003
+g, staffUser2014, staff001, /orgs/1/sites/site004
+g, staffUser2014, staff001, /orgs/1/sites/site005
+
+g, staffUser2015, staff001, /orgs/1/sites/site001
+g, staffUser2015, staff001, /orgs/1/sites/site002
+g, staffUser2015, staff001, /orgs/1/sites/site003
+g, staffUser2015, staff001, /orgs/1/sites/site004
+g, staffUser2015, staff001, /orgs/1/sites/site005
+
+g, staffUser2016, staff001, /orgs/1/sites/site001
+g, staffUser2016, staff001, /orgs/1/sites/site002
+g, staffUser2016, staff001, /orgs/1/sites/site003
+g, staffUser2016, staff001, /orgs/1/sites/site004
+g, staffUser2016, staff001, /orgs/1/sites/site005
+
+g, staffUser2017, staff001, /orgs/1/sites/site001
+g, staffUser2017, staff001, /orgs/1/sites/site002
+g, staffUser2017, staff001, /orgs/1/sites/site003
+g, staffUser2017, staff001, /orgs/1/sites/site004
+g, staffUser2017, staff001, /orgs/1/sites/site005
+
+g, staffUser2018,  staff001, /orgs/1/sites/site001
+g, staffUser2018,  staff001, /orgs/1/sites/site002
+g, staffUser2018,  staff001, /orgs/1/sites/site003
+g, staffUser2018,  staff001, /orgs/1/sites/site004
+g, staffUser2018,  staff001, /orgs/1/sites/site005
+
+g, staffUser2019,  staff001, /orgs/1/sites/site001
+g, staffUser2019,  staff001, /orgs/1/sites/site002
+g, staffUser2019,  staff001, /orgs/1/sites/site003
+g, staffUser2019,  staff001, /orgs/1/sites/site004
+g, staffUser2019,  staff001, /orgs/1/sites/site005
+
+g, staffUser2020,  staff001, /orgs/1/sites/site001
+g, staffUser2020,  staff001, /orgs/1/sites/site002
+g, staffUser2020,  staff001, /orgs/1/sites/site003
+g, staffUser2020,  staff001, /orgs/1/sites/site004
+g, staffUser2020,  staff001, /orgs/1/sites/site005
+
+g, staffUser2021,  staff001, /orgs/1/sites/site001
+g, staffUser2021,  staff001, /orgs/1/sites/site002
+g, staffUser2021,  staff001, /orgs/1/sites/site003
+g, staffUser2021,  staff001, /orgs/1/sites/site004
+g, staffUser2021,  staff001, /orgs/1/sites/site005
+
+g, staffUser2022,  staff001, /orgs/1/sites/site001
+g, staffUser2022,  staff001, /orgs/1/sites/site002
+g, staffUser2022,  staff001, /orgs/1/sites/site003
+g, staffUser2022,  staff001, /orgs/1/sites/site004
+g, staffUser2022,  staff001, /orgs/1/sites/site005
+
+g, staffUser2023, staff001, /orgs/1/sites/site001
+g, staffUser2023, staff001, /orgs/1/sites/site002
+g, staffUser2023, staff001, /orgs/1/sites/site003
+g, staffUser2023, staff001, /orgs/1/sites/site004
+g, staffUser2023, staff001, /orgs/1/sites/site005
+
+g, staffUser2024, staff001, /orgs/1/sites/site001
+g, staffUser2024, staff001, /orgs/1/sites/site002
+g, staffUser2024, staff001, /orgs/1/sites/site003
+g, staffUser2024, staff001, /orgs/1/sites/site004
+g, staffUser2024, staff001, /orgs/1/sites/site005
+
+g, staffUser2025, staff001, /orgs/1/sites/site001
+g, staffUser2025, staff001, /orgs/1/sites/site002
+g, staffUser2025, staff001, /orgs/1/sites/site003
+g, staffUser2025, staff001, /orgs/1/sites/site004
+g, staffUser2025, staff001, /orgs/1/sites/site005
+
+g, staffUser2026, staff001, /orgs/1/sites/site001
+g, staffUser2026, staff001, /orgs/1/sites/site002
+g, staffUser2026, staff001, /orgs/1/sites/site003
+g, staffUser2026, staff001, /orgs/1/sites/site004
+g, staffUser2026, staff001, /orgs/1/sites/site005
+
+g, staffUser2027, staff001, /orgs/1/sites/site001
+g, staffUser2027, staff001, /orgs/1/sites/site002
+g, staffUser2027, staff001, /orgs/1/sites/site003
+g, staffUser2027, staff001, /orgs/1/sites/site004
+g, staffUser2027, staff001, /orgs/1/sites/site005
+
+g, staffUser2028,  staff001, /orgs/1/sites/site001
+g, staffUser2028,  staff001, /orgs/1/sites/site002
+g, staffUser2028,  staff001, /orgs/1/sites/site003
+g, staffUser2028,  staff001, /orgs/1/sites/site004
+g, staffUser2028,  staff001, /orgs/1/sites/site005
+
+g, staffUser2029,  staff001, /orgs/1/sites/site001
+g, staffUser2029,  staff001, /orgs/1/sites/site002
+g, staffUser2029,  staff001, /orgs/1/sites/site003
+g, staffUser2029,  staff001, /orgs/1/sites/site004
+g, staffUser2029,  staff001, /orgs/1/sites/site005
+
+g, staffUser2030,  staff001, /orgs/1/sites/site001
+g, staffUser2030,  staff001, /orgs/1/sites/site002
+g, staffUser2030,  staff001, /orgs/1/sites/site003
+g, staffUser2030,  staff001, /orgs/1/sites/site004
+g, staffUser2030,  staff001, /orgs/1/sites/site005
+
+g, staffUser2031,  staff001, /orgs/1/sites/site001
+g, staffUser2031,  staff001, /orgs/1/sites/site002
+g, staffUser2031,  staff001, /orgs/1/sites/site003
+g, staffUser2031,  staff001, /orgs/1/sites/site004
+g, staffUser2031,  staff001, /orgs/1/sites/site005
+
+g, staffUser2032,  staff001, /orgs/1/sites/site001
+g, staffUser2032,  staff001, /orgs/1/sites/site002
+g, staffUser2032,  staff001, /orgs/1/sites/site003
+g, staffUser2032,  staff001, /orgs/1/sites/site004
+g, staffUser2032,  staff001, /orgs/1/sites/site005
+
+g, staffUser2033, staff001, /orgs/1/sites/site001
+g, staffUser2033, staff001, /orgs/1/sites/site002
+g, staffUser2033, staff001, /orgs/1/sites/site003
+g, staffUser2033, staff001, /orgs/1/sites/site004
+g, staffUser2033, staff001, /orgs/1/sites/site005
+
+g, staffUser2034, staff001, /orgs/1/sites/site001
+g, staffUser2034, staff001, /orgs/1/sites/site002
+g, staffUser2034, staff001, /orgs/1/sites/site003
+g, staffUser2034, staff001, /orgs/1/sites/site004
+g, staffUser2034, staff001, /orgs/1/sites/site005
+
+g, staffUser2035, staff001, /orgs/1/sites/site001
+g, staffUser2035, staff001, /orgs/1/sites/site002
+g, staffUser2035, staff001, /orgs/1/sites/site003
+g, staffUser2035, staff001, /orgs/1/sites/site004
+g, staffUser2035, staff001, /orgs/1/sites/site005
+
+g, staffUser2036, staff001, /orgs/1/sites/site001
+g, staffUser2036, staff001, /orgs/1/sites/site002
+g, staffUser2036, staff001, /orgs/1/sites/site003
+g, staffUser2036, staff001, /orgs/1/sites/site004
+g, staffUser2036, staff001, /orgs/1/sites/site005
+
+g, staffUser2037, staff001, /orgs/1/sites/site001
+g, staffUser2037, staff001, /orgs/1/sites/site002
+g, staffUser2037, staff001, /orgs/1/sites/site003
+g, staffUser2037, staff001, /orgs/1/sites/site004
+g, staffUser2037, staff001, /orgs/1/sites/site005
+
+g, staffUser2038,  staff001, /orgs/1/sites/site001
+g, staffUser2038,  staff001, /orgs/1/sites/site002
+g, staffUser2038,  staff001, /orgs/1/sites/site003
+g, staffUser2038,  staff001, /orgs/1/sites/site004
+g, staffUser2038,  staff001, /orgs/1/sites/site005
+
+g, staffUser2039,  staff001, /orgs/1/sites/site001
+g, staffUser2039,  staff001, /orgs/1/sites/site002
+g, staffUser2039,  staff001, /orgs/1/sites/site003
+g, staffUser2039,  staff001, /orgs/1/sites/site004
+g, staffUser2039,  staff001, /orgs/1/sites/site005
+
+g, staffUser2040,  staff001, /orgs/1/sites/site001
+g, staffUser2040,  staff001, /orgs/1/sites/site002
+g, staffUser2040,  staff001, /orgs/1/sites/site003
+g, staffUser2040,  staff001, /orgs/1/sites/site004
+g, staffUser2040,  staff001, /orgs/1/sites/site005
+
+g, staffUser2041,  staff001, /orgs/1/sites/site001
+g, staffUser2041,  staff001, /orgs/1/sites/site002
+g, staffUser2041,  staff001, /orgs/1/sites/site003
+g, staffUser2041,  staff001, /orgs/1/sites/site004
+g, staffUser2041,  staff001, /orgs/1/sites/site005
+
+g, staffUser2042,  staff001, /orgs/1/sites/site001
+g, staffUser2042,  staff001, /orgs/1/sites/site002
+g, staffUser2042,  staff001, /orgs/1/sites/site003
+g, staffUser2042,  staff001, /orgs/1/sites/site004
+g, staffUser2042,  staff001, /orgs/1/sites/site005
+
+g, staffUser2043, staff001, /orgs/1/sites/site001
+g, staffUser2043, staff001, /orgs/1/sites/site002
+g, staffUser2043, staff001, /orgs/1/sites/site003
+g, staffUser2043, staff001, /orgs/1/sites/site004
+g, staffUser2043, staff001, /orgs/1/sites/site005
+
+g, staffUser2044, staff001, /orgs/1/sites/site001
+g, staffUser2044, staff001, /orgs/1/sites/site002
+g, staffUser2044, staff001, /orgs/1/sites/site003
+g, staffUser2044, staff001, /orgs/1/sites/site004
+g, staffUser2044, staff001, /orgs/1/sites/site005
+
+g, staffUser2045, staff001, /orgs/1/sites/site001
+g, staffUser2045, staff001, /orgs/1/sites/site002
+g, staffUser2045, staff001, /orgs/1/sites/site003
+g, staffUser2045, staff001, /orgs/1/sites/site004
+g, staffUser2045, staff001, /orgs/1/sites/site005
+
+g, staffUser2046, staff001, /orgs/1/sites/site001
+g, staffUser2046, staff001, /orgs/1/sites/site002
+g, staffUser2046, staff001, /orgs/1/sites/site003
+g, staffUser2046, staff001, /orgs/1/sites/site004
+g, staffUser2046, staff001, /orgs/1/sites/site005
+
+g, staffUser2047, staff001, /orgs/1/sites/site001
+g, staffUser2047, staff001, /orgs/1/sites/site002
+g, staffUser2047, staff001, /orgs/1/sites/site003
+g, staffUser2047, staff001, /orgs/1/sites/site004
+g, staffUser2047, staff001, /orgs/1/sites/site005
+
+g, staffUser2048,  staff001, /orgs/1/sites/site001
+g, staffUser2048,  staff001, /orgs/1/sites/site002
+g, staffUser2048,  staff001, /orgs/1/sites/site003
+g, staffUser2048,  staff001, /orgs/1/sites/site004
+g, staffUser2048,  staff001, /orgs/1/sites/site005
+
+g, staffUser2049,  staff001, /orgs/1/sites/site001
+g, staffUser2049,  staff001, /orgs/1/sites/site002
+g, staffUser2049,  staff001, /orgs/1/sites/site003
+g, staffUser2049,  staff001, /orgs/1/sites/site004
+g, staffUser2049,  staff001, /orgs/1/sites/site005
+
+g, staffUser2050,  staff001, /orgs/1/sites/site001
+g, staffUser2050,  staff001, /orgs/1/sites/site002
+g, staffUser2050,  staff001, /orgs/1/sites/site003
+g, staffUser2050,  staff001, /orgs/1/sites/site004
+g, staffUser2050,  staff001, /orgs/1/sites/site005
+
+# Group - manager001, / org1
+g, managerUser1001, manager001, /orgs/1/sites/site001
+g, managerUser1001, manager001, /orgs/1/sites/site002
+g, managerUser1001, manager001, /orgs/1/sites/site003
+g, managerUser1001, manager001, /orgs/1/sites/site004
+g, managerUser1001, manager001, /orgs/1/sites/site005
+
+g, managerUser1001, manager001, /orgs/1/sites/site001
+g, managerUser1001, manager001, /orgs/1/sites/site002
+g, managerUser1001, manager001, /orgs/1/sites/site003
+g, managerUser1001, manager001, /orgs/1/sites/site004
+g, managerUser1001, manager001, /orgs/1/sites/site005
+
+g, managerUser1003, manager001, /orgs/1/sites/site001
+g, managerUser1003, manager001, /orgs/1/sites/site002
+g, managerUser1003, manager001, /orgs/1/sites/site003
+g, managerUser1003, manager001, /orgs/1/sites/site004
+g, managerUser1003, manager001, /orgs/1/sites/site005
+
+g, managerUser1004, manager001, /orgs/1/sites/site001
+g, managerUser1004, manager001, /orgs/1/sites/site002
+g, managerUser1004, manager001, /orgs/1/sites/site003
+g, managerUser1004, manager001, /orgs/1/sites/site004
+g, managerUser1004, manager001, /orgs/1/sites/site005
+
+g, managerUser1005, manager001, /orgs/1/sites/site001
+g, managerUser1005, manager001, /orgs/1/sites/site002
+g, managerUser1005, manager001, /orgs/1/sites/site003
+g, managerUser1005, manager001, /orgs/1/sites/site004
+g, managerUser1005, manager001, /orgs/1/sites/site005
+
+g, managerUser1006, manager001, /orgs/1/sites/site001
+g, managerUser1006, manager001, /orgs/1/sites/site002
+g, managerUser1006, manager001, /orgs/1/sites/site003
+g, managerUser1006, manager001, /orgs/1/sites/site004
+g, managerUser1006, manager001, /orgs/1/sites/site005
+
+g, managerUser1007, manager001, /orgs/1/sites/site001
+g, managerUser1007, manager001, /orgs/1/sites/site002
+g, managerUser1007, manager001, /orgs/1/sites/site003
+g, managerUser1007, manager001, /orgs/1/sites/site004
+g, managerUser1007, manager001, /orgs/1/sites/site005
+
+g, managerUser1008,  manager001, /orgs/1/sites/site001
+g, managerUser1008,  manager001, /orgs/1/sites/site002
+g, managerUser1008,  manager001, /orgs/1/sites/site003
+g, managerUser1008,  manager001, /orgs/1/sites/site004
+g, managerUser1008,  manager001, /orgs/1/sites/site005
+
+g, managerUser1009,  manager001, /orgs/1/sites/site001
+g, managerUser1009,  manager001, /orgs/1/sites/site002
+g, managerUser1009,  manager001, /orgs/1/sites/site003
+g, managerUser1009,  manager001, /orgs/1/sites/site004
+g, managerUser1009,  manager001, /orgs/1/sites/site005
+
+g, managerUser1010,  manager001, /orgs/1/sites/site001
+g, managerUser1010,  manager001, /orgs/1/sites/site002
+g, managerUser1010,  manager001, /orgs/1/sites/site003
+g, managerUser1010,  manager001, /orgs/1/sites/site004
+g, managerUser1010,  manager001, /orgs/1/sites/site005
+
+g, managerUser1011,  manager001, /orgs/1/sites/site001
+g, managerUser1011,  manager001, /orgs/1/sites/site002
+g, managerUser1011,  manager001, /orgs/1/sites/site003
+g, managerUser1011,  manager001, /orgs/1/sites/site004
+g, managerUser1011,  manager001, /orgs/1/sites/site005
+
+g, managerUser1012,  manager001, /orgs/1/sites/site001
+g, managerUser1012,  manager001, /orgs/1/sites/site002
+g, managerUser1012,  manager001, /orgs/1/sites/site003
+g, managerUser1012,  manager001, /orgs/1/sites/site004
+g, managerUser1012,  manager001, /orgs/1/sites/site005
+
+g, managerUser1013, manager001, /orgs/1/sites/site001
+g, managerUser1013, manager001, /orgs/1/sites/site002
+g, managerUser1013, manager001, /orgs/1/sites/site003
+g, managerUser1013, manager001, /orgs/1/sites/site004
+g, managerUser1013, manager001, /orgs/1/sites/site005
+
+g, managerUser1014, manager001, /orgs/1/sites/site001
+g, managerUser1014, manager001, /orgs/1/sites/site002
+g, managerUser1014, manager001, /orgs/1/sites/site003
+g, managerUser1014, manager001, /orgs/1/sites/site004
+g, managerUser1014, manager001, /orgs/1/sites/site005
+
+g, managerUser1015, manager001, /orgs/1/sites/site001
+g, managerUser1015, manager001, /orgs/1/sites/site002
+g, managerUser1015, manager001, /orgs/1/sites/site003
+g, managerUser1015, manager001, /orgs/1/sites/site004
+g, managerUser1015, manager001, /orgs/1/sites/site005
+
+g, managerUser1016, manager001, /orgs/1/sites/site001
+g, managerUser1016, manager001, /orgs/1/sites/site002
+g, managerUser1016, manager001, /orgs/1/sites/site003
+g, managerUser1016, manager001, /orgs/1/sites/site004
+g, managerUser1016, manager001, /orgs/1/sites/site005
+
+g, managerUser1017, manager001, /orgs/1/sites/site001
+g, managerUser1017, manager001, /orgs/1/sites/site002
+g, managerUser1017, manager001, /orgs/1/sites/site003
+g, managerUser1017, manager001, /orgs/1/sites/site004
+g, managerUser1017, manager001, /orgs/1/sites/site005
+
+g, managerUser1018,  manager001, /orgs/1/sites/site001
+g, managerUser1018,  manager001, /orgs/1/sites/site002
+g, managerUser1018,  manager001, /orgs/1/sites/site003
+g, managerUser1018,  manager001, /orgs/1/sites/site004
+g, managerUser1018,  manager001, /orgs/1/sites/site005
+
+g, managerUser1019,  manager001, /orgs/1/sites/site001
+g, managerUser1019,  manager001, /orgs/1/sites/site002
+g, managerUser1019,  manager001, /orgs/1/sites/site003
+g, managerUser1019,  manager001, /orgs/1/sites/site004
+g, managerUser1019,  manager001, /orgs/1/sites/site005
+
+g, managerUser1020,  manager001, /orgs/1/sites/site001
+g, managerUser1020,  manager001, /orgs/1/sites/site002
+g, managerUser1020,  manager001, /orgs/1/sites/site003
+g, managerUser1020,  manager001, /orgs/1/sites/site004
+g, managerUser1020,  manager001, /orgs/1/sites/site005
+
+g, managerUser1021,  manager001, /orgs/1/sites/site001
+g, managerUser1021,  manager001, /orgs/1/sites/site002
+g, managerUser1021,  manager001, /orgs/1/sites/site003
+g, managerUser1021,  manager001, /orgs/1/sites/site004
+g, managerUser1021,  manager001, /orgs/1/sites/site005
+
+g, managerUser1022,  manager001, /orgs/1/sites/site001
+g, managerUser1022,  manager001, /orgs/1/sites/site002
+g, managerUser1022,  manager001, /orgs/1/sites/site003
+g, managerUser1022,  manager001, /orgs/1/sites/site004
+g, managerUser1022,  manager001, /orgs/1/sites/site005
+
+g, managerUser1023, manager001, /orgs/1/sites/site001
+g, managerUser1023, manager001, /orgs/1/sites/site002
+g, managerUser1023, manager001, /orgs/1/sites/site003
+g, managerUser1023, manager001, /orgs/1/sites/site004
+g, managerUser1023, manager001, /orgs/1/sites/site005
+
+g, managerUser1024, manager001, /orgs/1/sites/site001
+g, managerUser1024, manager001, /orgs/1/sites/site002
+g, managerUser1024, manager001, /orgs/1/sites/site003
+g, managerUser1024, manager001, /orgs/1/sites/site004
+g, managerUser1024, manager001, /orgs/1/sites/site005
+
+g, managerUser1025, manager001, /orgs/1/sites/site001
+g, managerUser1025, manager001, /orgs/1/sites/site002
+g, managerUser1025, manager001, /orgs/1/sites/site003
+g, managerUser1025, manager001, /orgs/1/sites/site004
+g, managerUser1025, manager001, /orgs/1/sites/site005
+
+g, managerUser1026, manager001, /orgs/1/sites/site001
+g, managerUser1026, manager001, /orgs/1/sites/site002
+g, managerUser1026, manager001, /orgs/1/sites/site003
+g, managerUser1026, manager001, /orgs/1/sites/site004
+g, managerUser1026, manager001, /orgs/1/sites/site005
+
+g, managerUser1027, manager001, /orgs/1/sites/site001
+g, managerUser1027, manager001, /orgs/1/sites/site002
+g, managerUser1027, manager001, /orgs/1/sites/site003
+g, managerUser1027, manager001, /orgs/1/sites/site004
+g, managerUser1027, manager001, /orgs/1/sites/site005
+
+g, managerUser1028,  manager001, /orgs/1/sites/site001
+g, managerUser1028,  manager001, /orgs/1/sites/site002
+g, managerUser1028,  manager001, /orgs/1/sites/site003
+g, managerUser1028,  manager001, /orgs/1/sites/site004
+g, managerUser1028,  manager001, /orgs/1/sites/site005
+
+g, managerUser1029,  manager001, /orgs/1/sites/site001
+g, managerUser1029,  manager001, /orgs/1/sites/site002
+g, managerUser1029,  manager001, /orgs/1/sites/site003
+g, managerUser1029,  manager001, /orgs/1/sites/site004
+g, managerUser1029,  manager001, /orgs/1/sites/site005
+
+g, managerUser1030,  manager001, /orgs/1/sites/site001
+g, managerUser1030,  manager001, /orgs/1/sites/site002
+g, managerUser1030,  manager001, /orgs/1/sites/site003
+g, managerUser1030,  manager001, /orgs/1/sites/site004
+g, managerUser1030,  manager001, /orgs/1/sites/site005
+
+g, managerUser1031,  manager001, /orgs/1/sites/site001
+g, managerUser1031,  manager001, /orgs/1/sites/site002
+g, managerUser1031,  manager001, /orgs/1/sites/site003
+g, managerUser1031,  manager001, /orgs/1/sites/site004
+g, managerUser1031,  manager001, /orgs/1/sites/site005
+
+g, managerUser1032,  manager001, /orgs/1/sites/site001
+g, managerUser1032,  manager001, /orgs/1/sites/site002
+g, managerUser1032,  manager001, /orgs/1/sites/site003
+g, managerUser1032,  manager001, /orgs/1/sites/site004
+g, managerUser1032,  manager001, /orgs/1/sites/site005
+
+g, managerUser1033, manager001, /orgs/1/sites/site001
+g, managerUser1033, manager001, /orgs/1/sites/site002
+g, managerUser1033, manager001, /orgs/1/sites/site003
+g, managerUser1033, manager001, /orgs/1/sites/site004
+g, managerUser1033, manager001, /orgs/1/sites/site005
+
+g, managerUser1034, manager001, /orgs/1/sites/site001
+g, managerUser1034, manager001, /orgs/1/sites/site002
+g, managerUser1034, manager001, /orgs/1/sites/site003
+g, managerUser1034, manager001, /orgs/1/sites/site004
+g, managerUser1034, manager001, /orgs/1/sites/site005
+
+g, managerUser1035, manager001, /orgs/1/sites/site001
+g, managerUser1035, manager001, /orgs/1/sites/site002
+g, managerUser1035, manager001, /orgs/1/sites/site003
+g, managerUser1035, manager001, /orgs/1/sites/site004
+g, managerUser1035, manager001, /orgs/1/sites/site005
+
+g, managerUser1036, manager001, /orgs/1/sites/site001
+g, managerUser1036, manager001, /orgs/1/sites/site002
+g, managerUser1036, manager001, /orgs/1/sites/site003
+g, managerUser1036, manager001, /orgs/1/sites/site004
+g, managerUser1036, manager001, /orgs/1/sites/site005
+
+g, managerUser1037, manager001, /orgs/1/sites/site001
+g, managerUser1037, manager001, /orgs/1/sites/site002
+g, managerUser1037, manager001, /orgs/1/sites/site003
+g, managerUser1037, manager001, /orgs/1/sites/site004
+g, managerUser1037, manager001, /orgs/1/sites/site005
+
+g, managerUser1038,  manager001, /orgs/1/sites/site001
+g, managerUser1038,  manager001, /orgs/1/sites/site002
+g, managerUser1038,  manager001, /orgs/1/sites/site003
+g, managerUser1038,  manager001, /orgs/1/sites/site004
+g, managerUser1038,  manager001, /orgs/1/sites/site005
+
+g, managerUser1039,  manager001, /orgs/1/sites/site001
+g, managerUser1039,  manager001, /orgs/1/sites/site002
+g, managerUser1039,  manager001, /orgs/1/sites/site003
+g, managerUser1039,  manager001, /orgs/1/sites/site004
+g, managerUser1039,  manager001, /orgs/1/sites/site005
+
+g, managerUser1040,  manager001, /orgs/1/sites/site001
+g, managerUser1040,  manager001, /orgs/1/sites/site002
+g, managerUser1040,  manager001, /orgs/1/sites/site003
+g, managerUser1040,  manager001, /orgs/1/sites/site004
+g, managerUser1040,  manager001, /orgs/1/sites/site005
+
+g, managerUser1041,  manager001, /orgs/1/sites/site001
+g, managerUser1041,  manager001, /orgs/1/sites/site002
+g, managerUser1041,  manager001, /orgs/1/sites/site003
+g, managerUser1041,  manager001, /orgs/1/sites/site004
+g, managerUser1041,  manager001, /orgs/1/sites/site005
+
+g, managerUser1042,  manager001, /orgs/1/sites/site001
+g, managerUser1042,  manager001, /orgs/1/sites/site002
+g, managerUser1042,  manager001, /orgs/1/sites/site003
+g, managerUser1042,  manager001, /orgs/1/sites/site004
+g, managerUser1042,  manager001, /orgs/1/sites/site005
+
+g, managerUser1043, manager001, /orgs/1/sites/site001
+g, managerUser1043, manager001, /orgs/1/sites/site002
+g, managerUser1043, manager001, /orgs/1/sites/site003
+g, managerUser1043, manager001, /orgs/1/sites/site004
+g, managerUser1043, manager001, /orgs/1/sites/site005
+
+g, managerUser1044, manager001, /orgs/1/sites/site001
+g, managerUser1044, manager001, /orgs/1/sites/site002
+g, managerUser1044, manager001, /orgs/1/sites/site003
+g, managerUser1044, manager001, /orgs/1/sites/site004
+g, managerUser1044, manager001, /orgs/1/sites/site005
+
+g, managerUser1045, manager001, /orgs/1/sites/site001
+g, managerUser1045, manager001, /orgs/1/sites/site002
+g, managerUser1045, manager001, /orgs/1/sites/site003
+g, managerUser1045, manager001, /orgs/1/sites/site004
+g, managerUser1045, manager001, /orgs/1/sites/site005
+
+g, managerUser1046, manager001, /orgs/1/sites/site001
+g, managerUser1046, manager001, /orgs/1/sites/site002
+g, managerUser1046, manager001, /orgs/1/sites/site003
+g, managerUser1046, manager001, /orgs/1/sites/site004
+g, managerUser1046, manager001, /orgs/1/sites/site005
+
+g, managerUser1047, manager001, /orgs/1/sites/site001
+g, managerUser1047, manager001, /orgs/1/sites/site002
+g, managerUser1047, manager001, /orgs/1/sites/site003
+g, managerUser1047, manager001, /orgs/1/sites/site004
+g, managerUser1047, manager001, /orgs/1/sites/site005
+
+g, managerUser1048,  manager001, /orgs/1/sites/site001
+g, managerUser1048,  manager001, /orgs/1/sites/site002
+g, managerUser1048,  manager001, /orgs/1/sites/site003
+g, managerUser1048,  manager001, /orgs/1/sites/site004
+g, managerUser1048,  manager001, /orgs/1/sites/site005
+
+g, managerUser1049,  manager001, /orgs/1/sites/site001
+g, managerUser1049,  manager001, /orgs/1/sites/site002
+g, managerUser1049,  manager001, /orgs/1/sites/site003
+g, managerUser1049,  manager001, /orgs/1/sites/site004
+g, managerUser1049,  manager001, /orgs/1/sites/site005
+
+g, managerUser1050,  manager001, /orgs/1/sites/site001
+g, managerUser1050,  manager001, /orgs/1/sites/site002
+g, managerUser1050,  manager001, /orgs/1/sites/site003
+g, managerUser1050,  manager001, /orgs/1/sites/site004
+g, managerUser1050,  manager001, /orgs/1/sites/site005
+
+# Group - manager001, / org1
+g, managerUser2001, manager001, /orgs/1/sites/site001
+g, managerUser2001, manager001, /orgs/1/sites/site002
+g, managerUser2001, manager001, /orgs/1/sites/site003
+g, managerUser2001, manager001, /orgs/1/sites/site004
+g, managerUser2001, manager001, /orgs/1/sites/site005
+
+g, managerUser2001, manager001, /orgs/1/sites/site001
+g, managerUser2001, manager001, /orgs/1/sites/site002
+g, managerUser2001, manager001, /orgs/1/sites/site003
+g, managerUser2001, manager001, /orgs/1/sites/site004
+g, managerUser2001, manager001, /orgs/1/sites/site005
+
+g, managerUser2003, manager001, /orgs/1/sites/site001
+g, managerUser2003, manager001, /orgs/1/sites/site002
+g, managerUser2003, manager001, /orgs/1/sites/site003
+g, managerUser2003, manager001, /orgs/1/sites/site004
+g, managerUser2003, manager001, /orgs/1/sites/site005
+
+g, managerUser2004, manager001, /orgs/1/sites/site001
+g, managerUser2004, manager001, /orgs/1/sites/site002
+g, managerUser2004, manager001, /orgs/1/sites/site003
+g, managerUser2004, manager001, /orgs/1/sites/site004
+g, managerUser2004, manager001, /orgs/1/sites/site005
+
+g, managerUser2005, manager001, /orgs/1/sites/site001
+g, managerUser2005, manager001, /orgs/1/sites/site002
+g, managerUser2005, manager001, /orgs/1/sites/site003
+g, managerUser2005, manager001, /orgs/1/sites/site004
+g, managerUser2005, manager001, /orgs/1/sites/site005
+
+g, managerUser2006, manager001, /orgs/1/sites/site001
+g, managerUser2006, manager001, /orgs/1/sites/site002
+g, managerUser2006, manager001, /orgs/1/sites/site003
+g, managerUser2006, manager001, /orgs/1/sites/site004
+g, managerUser2006, manager001, /orgs/1/sites/site005
+
+g, managerUser2007, manager001, /orgs/1/sites/site001
+g, managerUser2007, manager001, /orgs/1/sites/site002
+g, managerUser2007, manager001, /orgs/1/sites/site003
+g, managerUser2007, manager001, /orgs/1/sites/site004
+g, managerUser2007, manager001, /orgs/1/sites/site005
+
+g, managerUser2008,  manager001, /orgs/1/sites/site001
+g, managerUser2008,  manager001, /orgs/1/sites/site002
+g, managerUser2008,  manager001, /orgs/1/sites/site003
+g, managerUser2008,  manager001, /orgs/1/sites/site004
+g, managerUser2008,  manager001, /orgs/1/sites/site005
+
+g, managerUser2009,  manager001, /orgs/1/sites/site001
+g, managerUser2009,  manager001, /orgs/1/sites/site002
+g, managerUser2009,  manager001, /orgs/1/sites/site003
+g, managerUser2009,  manager001, /orgs/1/sites/site004
+g, managerUser2009,  manager001, /orgs/1/sites/site005
+
+g, managerUser2010,  manager001, /orgs/1/sites/site001
+g, managerUser2010,  manager001, /orgs/1/sites/site002
+g, managerUser2010,  manager001, /orgs/1/sites/site003
+g, managerUser2010,  manager001, /orgs/1/sites/site004
+g, managerUser2010,  manager001, /orgs/1/sites/site005
+
+g, managerUser2011,  manager001, /orgs/1/sites/site001
+g, managerUser2011,  manager001, /orgs/1/sites/site002
+g, managerUser2011,  manager001, /orgs/1/sites/site003
+g, managerUser2011,  manager001, /orgs/1/sites/site004
+g, managerUser2011,  manager001, /orgs/1/sites/site005
+
+g, managerUser2012,  manager001, /orgs/1/sites/site001
+g, managerUser2012,  manager001, /orgs/1/sites/site002
+g, managerUser2012,  manager001, /orgs/1/sites/site003
+g, managerUser2012,  manager001, /orgs/1/sites/site004
+g, managerUser2012,  manager001, /orgs/1/sites/site005
+
+g, managerUser2013, manager001, /orgs/1/sites/site001
+g, managerUser2013, manager001, /orgs/1/sites/site002
+g, managerUser2013, manager001, /orgs/1/sites/site003
+g, managerUser2013, manager001, /orgs/1/sites/site004
+g, managerUser2013, manager001, /orgs/1/sites/site005
+
+g, managerUser2014, manager001, /orgs/1/sites/site001
+g, managerUser2014, manager001, /orgs/1/sites/site002
+g, managerUser2014, manager001, /orgs/1/sites/site003
+g, managerUser2014, manager001, /orgs/1/sites/site004
+g, managerUser2014, manager001, /orgs/1/sites/site005
+
+g, managerUser2015, manager001, /orgs/1/sites/site001
+g, managerUser2015, manager001, /orgs/1/sites/site002
+g, managerUser2015, manager001, /orgs/1/sites/site003
+g, managerUser2015, manager001, /orgs/1/sites/site004
+g, managerUser2015, manager001, /orgs/1/sites/site005
+
+g, managerUser2016, manager001, /orgs/1/sites/site001
+g, managerUser2016, manager001, /orgs/1/sites/site002
+g, managerUser2016, manager001, /orgs/1/sites/site003
+g, managerUser2016, manager001, /orgs/1/sites/site004
+g, managerUser2016, manager001, /orgs/1/sites/site005
+
+g, managerUser2017, manager001, /orgs/1/sites/site001
+g, managerUser2017, manager001, /orgs/1/sites/site002
+g, managerUser2017, manager001, /orgs/1/sites/site003
+g, managerUser2017, manager001, /orgs/1/sites/site004
+g, managerUser2017, manager001, /orgs/1/sites/site005
+
+g, managerUser2018,  manager001, /orgs/1/sites/site001
+g, managerUser2018,  manager001, /orgs/1/sites/site002
+g, managerUser2018,  manager001, /orgs/1/sites/site003
+g, managerUser2018,  manager001, /orgs/1/sites/site004
+g, managerUser2018,  manager001, /orgs/1/sites/site005
+
+g, managerUser2019,  manager001, /orgs/1/sites/site001
+g, managerUser2019,  manager001, /orgs/1/sites/site002
+g, managerUser2019,  manager001, /orgs/1/sites/site003
+g, managerUser2019,  manager001, /orgs/1/sites/site004
+g, managerUser2019,  manager001, /orgs/1/sites/site005
+
+g, managerUser2020,  manager001, /orgs/1/sites/site001
+g, managerUser2020,  manager001, /orgs/1/sites/site002
+g, managerUser2020,  manager001, /orgs/1/sites/site003
+g, managerUser2020,  manager001, /orgs/1/sites/site004
+g, managerUser2020,  manager001, /orgs/1/sites/site005
+
+g, managerUser2021,  manager001, /orgs/1/sites/site001
+g, managerUser2021,  manager001, /orgs/1/sites/site002
+g, managerUser2021,  manager001, /orgs/1/sites/site003
+g, managerUser2021,  manager001, /orgs/1/sites/site004
+g, managerUser2021,  manager001, /orgs/1/sites/site005
+
+g, managerUser2022,  manager001, /orgs/1/sites/site001
+g, managerUser2022,  manager001, /orgs/1/sites/site002
+g, managerUser2022,  manager001, /orgs/1/sites/site003
+g, managerUser2022,  manager001, /orgs/1/sites/site004
+g, managerUser2022,  manager001, /orgs/1/sites/site005
+
+g, managerUser2023, manager001, /orgs/1/sites/site001
+g, managerUser2023, manager001, /orgs/1/sites/site002
+g, managerUser2023, manager001, /orgs/1/sites/site003
+g, managerUser2023, manager001, /orgs/1/sites/site004
+g, managerUser2023, manager001, /orgs/1/sites/site005
+
+g, managerUser2024, manager001, /orgs/1/sites/site001
+g, managerUser2024, manager001, /orgs/1/sites/site002
+g, managerUser2024, manager001, /orgs/1/sites/site003
+g, managerUser2024, manager001, /orgs/1/sites/site004
+g, managerUser2024, manager001, /orgs/1/sites/site005
+
+g, managerUser2025, manager001, /orgs/1/sites/site001
+g, managerUser2025, manager001, /orgs/1/sites/site002
+g, managerUser2025, manager001, /orgs/1/sites/site003
+g, managerUser2025, manager001, /orgs/1/sites/site004
+g, managerUser2025, manager001, /orgs/1/sites/site005
+
+g, managerUser2026, manager001, /orgs/1/sites/site001
+g, managerUser2026, manager001, /orgs/1/sites/site002
+g, managerUser2026, manager001, /orgs/1/sites/site003
+g, managerUser2026, manager001, /orgs/1/sites/site004
+g, managerUser2026, manager001, /orgs/1/sites/site005
+
+g, managerUser2027, manager001, /orgs/1/sites/site001
+g, managerUser2027, manager001, /orgs/1/sites/site002
+g, managerUser2027, manager001, /orgs/1/sites/site003
+g, managerUser2027, manager001, /orgs/1/sites/site004
+g, managerUser2027, manager001, /orgs/1/sites/site005
+
+g, managerUser2028,  manager001, /orgs/1/sites/site001
+g, managerUser2028,  manager001, /orgs/1/sites/site002
+g, managerUser2028,  manager001, /orgs/1/sites/site003
+g, managerUser2028,  manager001, /orgs/1/sites/site004
+g, managerUser2028,  manager001, /orgs/1/sites/site005
+
+g, managerUser2029,  manager001, /orgs/1/sites/site001
+g, managerUser2029,  manager001, /orgs/1/sites/site002
+g, managerUser2029,  manager001, /orgs/1/sites/site003
+g, managerUser2029,  manager001, /orgs/1/sites/site004
+g, managerUser2029,  manager001, /orgs/1/sites/site005
+
+g, managerUser2030,  manager001, /orgs/1/sites/site001
+g, managerUser2030,  manager001, /orgs/1/sites/site002
+g, managerUser2030,  manager001, /orgs/1/sites/site003
+g, managerUser2030,  manager001, /orgs/1/sites/site004
+g, managerUser2030,  manager001, /orgs/1/sites/site005
+
+g, managerUser2031,  manager001, /orgs/1/sites/site001
+g, managerUser2031,  manager001, /orgs/1/sites/site002
+g, managerUser2031,  manager001, /orgs/1/sites/site003
+g, managerUser2031,  manager001, /orgs/1/sites/site004
+g, managerUser2031,  manager001, /orgs/1/sites/site005
+
+g, managerUser2032,  manager001, /orgs/1/sites/site001
+g, managerUser2032,  manager001, /orgs/1/sites/site002
+g, managerUser2032,  manager001, /orgs/1/sites/site003
+g, managerUser2032,  manager001, /orgs/1/sites/site004
+g, managerUser2032,  manager001, /orgs/1/sites/site005
+
+g, managerUser2033, manager001, /orgs/1/sites/site001
+g, managerUser2033, manager001, /orgs/1/sites/site002
+g, managerUser2033, manager001, /orgs/1/sites/site003
+g, managerUser2033, manager001, /orgs/1/sites/site004
+g, managerUser2033, manager001, /orgs/1/sites/site005
+
+g, managerUser2034, manager001, /orgs/1/sites/site001
+g, managerUser2034, manager001, /orgs/1/sites/site002
+g, managerUser2034, manager001, /orgs/1/sites/site003
+g, managerUser2034, manager001, /orgs/1/sites/site004
+g, managerUser2034, manager001, /orgs/1/sites/site005
+
+g, managerUser2035, manager001, /orgs/1/sites/site001
+g, managerUser2035, manager001, /orgs/1/sites/site002
+g, managerUser2035, manager001, /orgs/1/sites/site003
+g, managerUser2035, manager001, /orgs/1/sites/site004
+g, managerUser2035, manager001, /orgs/1/sites/site005
+
+g, managerUser2036, manager001, /orgs/1/sites/site001
+g, managerUser2036, manager001, /orgs/1/sites/site002
+g, managerUser2036, manager001, /orgs/1/sites/site003
+g, managerUser2036, manager001, /orgs/1/sites/site004
+g, managerUser2036, manager001, /orgs/1/sites/site005
+
+g, managerUser2037, manager001, /orgs/1/sites/site001
+g, managerUser2037, manager001, /orgs/1/sites/site002
+g, managerUser2037, manager001, /orgs/1/sites/site003
+g, managerUser2037, manager001, /orgs/1/sites/site004
+g, managerUser2037, manager001, /orgs/1/sites/site005
+
+g, managerUser2038,  manager001, /orgs/1/sites/site001
+g, managerUser2038,  manager001, /orgs/1/sites/site002
+g, managerUser2038,  manager001, /orgs/1/sites/site003
+g, managerUser2038,  manager001, /orgs/1/sites/site004
+g, managerUser2038,  manager001, /orgs/1/sites/site005
+
+g, managerUser2039,  manager001, /orgs/1/sites/site001
+g, managerUser2039,  manager001, /orgs/1/sites/site002
+g, managerUser2039,  manager001, /orgs/1/sites/site003
+g, managerUser2039,  manager001, /orgs/1/sites/site004
+g, managerUser2039,  manager001, /orgs/1/sites/site005
+
+g, managerUser2040,  manager001, /orgs/1/sites/site001
+g, managerUser2040,  manager001, /orgs/1/sites/site002
+g, managerUser2040,  manager001, /orgs/1/sites/site003
+g, managerUser2040,  manager001, /orgs/1/sites/site004
+g, managerUser2040,  manager001, /orgs/1/sites/site005
+
+g, managerUser2041,  manager001, /orgs/1/sites/site001
+g, managerUser2041,  manager001, /orgs/1/sites/site002
+g, managerUser2041,  manager001, /orgs/1/sites/site003
+g, managerUser2041,  manager001, /orgs/1/sites/site004
+g, managerUser2041,  manager001, /orgs/1/sites/site005
+
+g, managerUser2042,  manager001, /orgs/1/sites/site001
+g, managerUser2042,  manager001, /orgs/1/sites/site002
+g, managerUser2042,  manager001, /orgs/1/sites/site003
+g, managerUser2042,  manager001, /orgs/1/sites/site004
+g, managerUser2042,  manager001, /orgs/1/sites/site005
+
+g, managerUser2043, manager001, /orgs/1/sites/site001
+g, managerUser2043, manager001, /orgs/1/sites/site002
+g, managerUser2043, manager001, /orgs/1/sites/site003
+g, managerUser2043, manager001, /orgs/1/sites/site004
+g, managerUser2043, manager001, /orgs/1/sites/site005
+
+g, managerUser2044, manager001, /orgs/1/sites/site001
+g, managerUser2044, manager001, /orgs/1/sites/site002
+g, managerUser2044, manager001, /orgs/1/sites/site003
+g, managerUser2044, manager001, /orgs/1/sites/site004
+g, managerUser2044, manager001, /orgs/1/sites/site005
+
+g, managerUser2045, manager001, /orgs/1/sites/site001
+g, managerUser2045, manager001, /orgs/1/sites/site002
+g, managerUser2045, manager001, /orgs/1/sites/site003
+g, managerUser2045, manager001, /orgs/1/sites/site004
+g, managerUser2045, manager001, /orgs/1/sites/site005
+
+g, managerUser2046, manager001, /orgs/1/sites/site001
+g, managerUser2046, manager001, /orgs/1/sites/site002
+g, managerUser2046, manager001, /orgs/1/sites/site003
+g, managerUser2046, manager001, /orgs/1/sites/site004
+g, managerUser2046, manager001, /orgs/1/sites/site005
+
+g, managerUser2047, manager001, /orgs/1/sites/site001
+g, managerUser2047, manager001, /orgs/1/sites/site002
+g, managerUser2047, manager001, /orgs/1/sites/site003
+g, managerUser2047, manager001, /orgs/1/sites/site004
+g, managerUser2047, manager001, /orgs/1/sites/site005
+
+g, managerUser2048,  manager001, /orgs/1/sites/site001
+g, managerUser2048,  manager001, /orgs/1/sites/site002
+g, managerUser2048,  manager001, /orgs/1/sites/site003
+g, managerUser2048,  manager001, /orgs/1/sites/site004
+g, managerUser2048,  manager001, /orgs/1/sites/site005
+
+g, managerUser2049,  manager001, /orgs/1/sites/site001
+g, managerUser2049,  manager001, /orgs/1/sites/site002
+g, managerUser2049,  manager001, /orgs/1/sites/site003
+g, managerUser2049,  manager001, /orgs/1/sites/site004
+g, managerUser2049,  manager001, /orgs/1/sites/site005
+
+g, managerUser2050,  manager001, /orgs/1/sites/site001
+g, managerUser2050,  manager001, /orgs/1/sites/site002
+g, managerUser2050,  manager001, /orgs/1/sites/site003
+g, managerUser2050,  manager001, /orgs/1/sites/site004
+g, managerUser2050,  manager001, /orgs/1/sites/site005
+
+# Group - customer001, / org1
+g, customerUser1001, customer001, /orgs/1/sites/site001
+g, customerUser1001, customer001, /orgs/1/sites/site002
+g, customerUser1001, customer001, /orgs/1/sites/site003
+g, customerUser1001, customer001, /orgs/1/sites/site004
+g, customerUser1001, customer001, /orgs/1/sites/site005
+
+g, customerUser1001, customer001, /orgs/1/sites/site001
+g, customerUser1001, customer001, /orgs/1/sites/site002
+g, customerUser1001, customer001, /orgs/1/sites/site003
+g, customerUser1001, customer001, /orgs/1/sites/site004
+g, customerUser1001, customer001, /orgs/1/sites/site005
+
+g, customerUser1003, customer001, /orgs/1/sites/site001
+g, customerUser1003, customer001, /orgs/1/sites/site002
+g, customerUser1003, customer001, /orgs/1/sites/site003
+g, customerUser1003, customer001, /orgs/1/sites/site004
+g, customerUser1003, customer001, /orgs/1/sites/site005
+
+g, customerUser1004, customer001, /orgs/1/sites/site001
+g, customerUser1004, customer001, /orgs/1/sites/site002
+g, customerUser1004, customer001, /orgs/1/sites/site003
+g, customerUser1004, customer001, /orgs/1/sites/site004
+g, customerUser1004, customer001, /orgs/1/sites/site005
+
+g, customerUser1005, customer001, /orgs/1/sites/site001
+g, customerUser1005, customer001, /orgs/1/sites/site002
+g, customerUser1005, customer001, /orgs/1/sites/site003
+g, customerUser1005, customer001, /orgs/1/sites/site004
+g, customerUser1005, customer001, /orgs/1/sites/site005
+
+g, customerUser1006, customer001, /orgs/1/sites/site001
+g, customerUser1006, customer001, /orgs/1/sites/site002
+g, customerUser1006, customer001, /orgs/1/sites/site003
+g, customerUser1006, customer001, /orgs/1/sites/site004
+g, customerUser1006, customer001, /orgs/1/sites/site005
+
+g, customerUser1007, customer001, /orgs/1/sites/site001
+g, customerUser1007, customer001, /orgs/1/sites/site002
+g, customerUser1007, customer001, /orgs/1/sites/site003
+g, customerUser1007, customer001, /orgs/1/sites/site004
+g, customerUser1007, customer001, /orgs/1/sites/site005
+
+g, customerUser1008,  customer001, /orgs/1/sites/site001
+g, customerUser1008,  customer001, /orgs/1/sites/site002
+g, customerUser1008,  customer001, /orgs/1/sites/site003
+g, customerUser1008,  customer001, /orgs/1/sites/site004
+g, customerUser1008,  customer001, /orgs/1/sites/site005
+
+g, customerUser1009,  customer001, /orgs/1/sites/site001
+g, customerUser1009,  customer001, /orgs/1/sites/site002
+g, customerUser1009,  customer001, /orgs/1/sites/site003
+g, customerUser1009,  customer001, /orgs/1/sites/site004
+g, customerUser1009,  customer001, /orgs/1/sites/site005
+
+g, customerUser1010,  customer001, /orgs/1/sites/site001
+g, customerUser1010,  customer001, /orgs/1/sites/site002
+g, customerUser1010,  customer001, /orgs/1/sites/site003
+g, customerUser1010,  customer001, /orgs/1/sites/site004
+g, customerUser1010,  customer001, /orgs/1/sites/site005
+
+g, customerUser1011,  customer001, /orgs/1/sites/site001
+g, customerUser1011,  customer001, /orgs/1/sites/site002
+g, customerUser1011,  customer001, /orgs/1/sites/site003
+g, customerUser1011,  customer001, /orgs/1/sites/site004
+g, customerUser1011,  customer001, /orgs/1/sites/site005
+
+g, customerUser1012,  customer001, /orgs/1/sites/site001
+g, customerUser1012,  customer001, /orgs/1/sites/site002
+g, customerUser1012,  customer001, /orgs/1/sites/site003
+g, customerUser1012,  customer001, /orgs/1/sites/site004
+g, customerUser1012,  customer001, /orgs/1/sites/site005
+
+g, customerUser1013, customer001, /orgs/1/sites/site001
+g, customerUser1013, customer001, /orgs/1/sites/site002
+g, customerUser1013, customer001, /orgs/1/sites/site003
+g, customerUser1013, customer001, /orgs/1/sites/site004
+g, customerUser1013, customer001, /orgs/1/sites/site005
+
+g, customerUser1014, customer001, /orgs/1/sites/site001
+g, customerUser1014, customer001, /orgs/1/sites/site002
+g, customerUser1014, customer001, /orgs/1/sites/site003
+g, customerUser1014, customer001, /orgs/1/sites/site004
+g, customerUser1014, customer001, /orgs/1/sites/site005
+
+g, customerUser1015, customer001, /orgs/1/sites/site001
+g, customerUser1015, customer001, /orgs/1/sites/site002
+g, customerUser1015, customer001, /orgs/1/sites/site003
+g, customerUser1015, customer001, /orgs/1/sites/site004
+g, customerUser1015, customer001, /orgs/1/sites/site005
+
+g, customerUser1016, customer001, /orgs/1/sites/site001
+g, customerUser1016, customer001, /orgs/1/sites/site002
+g, customerUser1016, customer001, /orgs/1/sites/site003
+g, customerUser1016, customer001, /orgs/1/sites/site004
+g, customerUser1016, customer001, /orgs/1/sites/site005
+
+g, customerUser1017, customer001, /orgs/1/sites/site001
+g, customerUser1017, customer001, /orgs/1/sites/site002
+g, customerUser1017, customer001, /orgs/1/sites/site003
+g, customerUser1017, customer001, /orgs/1/sites/site004
+g, customerUser1017, customer001, /orgs/1/sites/site005
+
+g, customerUser1018,  customer001, /orgs/1/sites/site001
+g, customerUser1018,  customer001, /orgs/1/sites/site002
+g, customerUser1018,  customer001, /orgs/1/sites/site003
+g, customerUser1018,  customer001, /orgs/1/sites/site004
+g, customerUser1018,  customer001, /orgs/1/sites/site005
+
+g, customerUser1019,  customer001, /orgs/1/sites/site001
+g, customerUser1019,  customer001, /orgs/1/sites/site002
+g, customerUser1019,  customer001, /orgs/1/sites/site003
+g, customerUser1019,  customer001, /orgs/1/sites/site004
+g, customerUser1019,  customer001, /orgs/1/sites/site005
+
+g, customerUser1020,  customer001, /orgs/1/sites/site001
+g, customerUser1020,  customer001, /orgs/1/sites/site002
+g, customerUser1020,  customer001, /orgs/1/sites/site003
+g, customerUser1020,  customer001, /orgs/1/sites/site004
+g, customerUser1020,  customer001, /orgs/1/sites/site005
+
+g, customerUser1021,  customer001, /orgs/1/sites/site001
+g, customerUser1021,  customer001, /orgs/1/sites/site002
+g, customerUser1021,  customer001, /orgs/1/sites/site003
+g, customerUser1021,  customer001, /orgs/1/sites/site004
+g, customerUser1021,  customer001, /orgs/1/sites/site005
+
+g, customerUser1022,  customer001, /orgs/1/sites/site001
+g, customerUser1022,  customer001, /orgs/1/sites/site002
+g, customerUser1022,  customer001, /orgs/1/sites/site003
+g, customerUser1022,  customer001, /orgs/1/sites/site004
+g, customerUser1022,  customer001, /orgs/1/sites/site005
+
+g, customerUser1023, customer001, /orgs/1/sites/site001
+g, customerUser1023, customer001, /orgs/1/sites/site002
+g, customerUser1023, customer001, /orgs/1/sites/site003
+g, customerUser1023, customer001, /orgs/1/sites/site004
+g, customerUser1023, customer001, /orgs/1/sites/site005
+
+g, customerUser1024, customer001, /orgs/1/sites/site001
+g, customerUser1024, customer001, /orgs/1/sites/site002
+g, customerUser1024, customer001, /orgs/1/sites/site003
+g, customerUser1024, customer001, /orgs/1/sites/site004
+g, customerUser1024, customer001, /orgs/1/sites/site005
+
+g, customerUser1025, customer001, /orgs/1/sites/site001
+g, customerUser1025, customer001, /orgs/1/sites/site002
+g, customerUser1025, customer001, /orgs/1/sites/site003
+g, customerUser1025, customer001, /orgs/1/sites/site004
+g, customerUser1025, customer001, /orgs/1/sites/site005
+
+g, customerUser1026, customer001, /orgs/1/sites/site001
+g, customerUser1026, customer001, /orgs/1/sites/site002
+g, customerUser1026, customer001, /orgs/1/sites/site003
+g, customerUser1026, customer001, /orgs/1/sites/site004
+g, customerUser1026, customer001, /orgs/1/sites/site005
+
+g, customerUser1027, customer001, /orgs/1/sites/site001
+g, customerUser1027, customer001, /orgs/1/sites/site002
+g, customerUser1027, customer001, /orgs/1/sites/site003
+g, customerUser1027, customer001, /orgs/1/sites/site004
+g, customerUser1027, customer001, /orgs/1/sites/site005
+
+g, customerUser1028,  customer001, /orgs/1/sites/site001
+g, customerUser1028,  customer001, /orgs/1/sites/site002
+g, customerUser1028,  customer001, /orgs/1/sites/site003
+g, customerUser1028,  customer001, /orgs/1/sites/site004
+g, customerUser1028,  customer001, /orgs/1/sites/site005
+
+g, customerUser1029,  customer001, /orgs/1/sites/site001
+g, customerUser1029,  customer001, /orgs/1/sites/site002
+g, customerUser1029,  customer001, /orgs/1/sites/site003
+g, customerUser1029,  customer001, /orgs/1/sites/site004
+g, customerUser1029,  customer001, /orgs/1/sites/site005
+
+g, customerUser1030,  customer001, /orgs/1/sites/site001
+g, customerUser1030,  customer001, /orgs/1/sites/site002
+g, customerUser1030,  customer001, /orgs/1/sites/site003
+g, customerUser1030,  customer001, /orgs/1/sites/site004
+g, customerUser1030,  customer001, /orgs/1/sites/site005
+
+g, customerUser1031,  customer001, /orgs/1/sites/site001
+g, customerUser1031,  customer001, /orgs/1/sites/site002
+g, customerUser1031,  customer001, /orgs/1/sites/site003
+g, customerUser1031,  customer001, /orgs/1/sites/site004
+g, customerUser1031,  customer001, /orgs/1/sites/site005
+
+g, customerUser1032,  customer001, /orgs/1/sites/site001
+g, customerUser1032,  customer001, /orgs/1/sites/site002
+g, customerUser1032,  customer001, /orgs/1/sites/site003
+g, customerUser1032,  customer001, /orgs/1/sites/site004
+g, customerUser1032,  customer001, /orgs/1/sites/site005
+
+g, customerUser1033, customer001, /orgs/1/sites/site001
+g, customerUser1033, customer001, /orgs/1/sites/site002
+g, customerUser1033, customer001, /orgs/1/sites/site003
+g, customerUser1033, customer001, /orgs/1/sites/site004
+g, customerUser1033, customer001, /orgs/1/sites/site005
+
+g, customerUser1034, customer001, /orgs/1/sites/site001
+g, customerUser1034, customer001, /orgs/1/sites/site002
+g, customerUser1034, customer001, /orgs/1/sites/site003
+g, customerUser1034, customer001, /orgs/1/sites/site004
+g, customerUser1034, customer001, /orgs/1/sites/site005
+
+g, customerUser1035, customer001, /orgs/1/sites/site001
+g, customerUser1035, customer001, /orgs/1/sites/site002
+g, customerUser1035, customer001, /orgs/1/sites/site003
+g, customerUser1035, customer001, /orgs/1/sites/site004
+g, customerUser1035, customer001, /orgs/1/sites/site005
+
+g, customerUser1036, customer001, /orgs/1/sites/site001
+g, customerUser1036, customer001, /orgs/1/sites/site002
+g, customerUser1036, customer001, /orgs/1/sites/site003
+g, customerUser1036, customer001, /orgs/1/sites/site004
+g, customerUser1036, customer001, /orgs/1/sites/site005
+
+g, customerUser1037, customer001, /orgs/1/sites/site001
+g, customerUser1037, customer001, /orgs/1/sites/site002
+g, customerUser1037, customer001, /orgs/1/sites/site003
+g, customerUser1037, customer001, /orgs/1/sites/site004
+g, customerUser1037, customer001, /orgs/1/sites/site005
+
+g, customerUser1038,  customer001, /orgs/1/sites/site001
+g, customerUser1038,  customer001, /orgs/1/sites/site002
+g, customerUser1038,  customer001, /orgs/1/sites/site003
+g, customerUser1038,  customer001, /orgs/1/sites/site004
+g, customerUser1038,  customer001, /orgs/1/sites/site005
+
+g, customerUser1039,  customer001, /orgs/1/sites/site001
+g, customerUser1039,  customer001, /orgs/1/sites/site002
+g, customerUser1039,  customer001, /orgs/1/sites/site003
+g, customerUser1039,  customer001, /orgs/1/sites/site004
+g, customerUser1039,  customer001, /orgs/1/sites/site005
+
+g, customerUser1040,  customer001, /orgs/1/sites/site001
+g, customerUser1040,  customer001, /orgs/1/sites/site002
+g, customerUser1040,  customer001, /orgs/1/sites/site003
+g, customerUser1040,  customer001, /orgs/1/sites/site004
+g, customerUser1040,  customer001, /orgs/1/sites/site005
+
+g, customerUser1041,  customer001, /orgs/1/sites/site001
+g, customerUser1041,  customer001, /orgs/1/sites/site002
+g, customerUser1041,  customer001, /orgs/1/sites/site003
+g, customerUser1041,  customer001, /orgs/1/sites/site004
+g, customerUser1041,  customer001, /orgs/1/sites/site005
+
+g, customerUser1042,  customer001, /orgs/1/sites/site001
+g, customerUser1042,  customer001, /orgs/1/sites/site002
+g, customerUser1042,  customer001, /orgs/1/sites/site003
+g, customerUser1042,  customer001, /orgs/1/sites/site004
+g, customerUser1042,  customer001, /orgs/1/sites/site005
+
+g, customerUser1043, customer001, /orgs/1/sites/site001
+g, customerUser1043, customer001, /orgs/1/sites/site002
+g, customerUser1043, customer001, /orgs/1/sites/site003
+g, customerUser1043, customer001, /orgs/1/sites/site004
+g, customerUser1043, customer001, /orgs/1/sites/site005
+
+g, customerUser1044, customer001, /orgs/1/sites/site001
+g, customerUser1044, customer001, /orgs/1/sites/site002
+g, customerUser1044, customer001, /orgs/1/sites/site003
+g, customerUser1044, customer001, /orgs/1/sites/site004
+g, customerUser1044, customer001, /orgs/1/sites/site005
+
+g, customerUser1045, customer001, /orgs/1/sites/site001
+g, customerUser1045, customer001, /orgs/1/sites/site002
+g, customerUser1045, customer001, /orgs/1/sites/site003
+g, customerUser1045, customer001, /orgs/1/sites/site004
+g, customerUser1045, customer001, /orgs/1/sites/site005
+
+g, customerUser1046, customer001, /orgs/1/sites/site001
+g, customerUser1046, customer001, /orgs/1/sites/site002
+g, customerUser1046, customer001, /orgs/1/sites/site003
+g, customerUser1046, customer001, /orgs/1/sites/site004
+g, customerUser1046, customer001, /orgs/1/sites/site005
+
+g, customerUser1047, customer001, /orgs/1/sites/site001
+g, customerUser1047, customer001, /orgs/1/sites/site002
+g, customerUser1047, customer001, /orgs/1/sites/site003
+g, customerUser1047, customer001, /orgs/1/sites/site004
+g, customerUser1047, customer001, /orgs/1/sites/site005
+
+g, customerUser1048,  customer001, /orgs/1/sites/site001
+g, customerUser1048,  customer001, /orgs/1/sites/site002
+g, customerUser1048,  customer001, /orgs/1/sites/site003
+g, customerUser1048,  customer001, /orgs/1/sites/site004
+g, customerUser1048,  customer001, /orgs/1/sites/site005
+
+g, customerUser1049,  customer001, /orgs/1/sites/site001
+g, customerUser1049,  customer001, /orgs/1/sites/site002
+g, customerUser1049,  customer001, /orgs/1/sites/site003
+g, customerUser1049,  customer001, /orgs/1/sites/site004
+g, customerUser1049,  customer001, /orgs/1/sites/site005
+
+g, customerUser1050,  customer001, /orgs/1/sites/site001
+g, customerUser1050,  customer001, /orgs/1/sites/site002
+g, customerUser1050,  customer001, /orgs/1/sites/site003
+g, customerUser1050,  customer001, /orgs/1/sites/site004
+g, customerUser1050,  customer001, /orgs/1/sites/site005
+
+# Group - customer001, / org1
+g, customerUser2001, customer001, /orgs/1/sites/site001
+g, customerUser2001, customer001, /orgs/1/sites/site002
+g, customerUser2001, customer001, /orgs/1/sites/site003
+g, customerUser2001, customer001, /orgs/1/sites/site004
+g, customerUser2001, customer001, /orgs/1/sites/site005
+
+g, customerUser2001, customer001, /orgs/1/sites/site001
+g, customerUser2001, customer001, /orgs/1/sites/site002
+g, customerUser2001, customer001, /orgs/1/sites/site003
+g, customerUser2001, customer001, /orgs/1/sites/site004
+g, customerUser2001, customer001, /orgs/1/sites/site005
+
+g, customerUser2003, customer001, /orgs/1/sites/site001
+g, customerUser2003, customer001, /orgs/1/sites/site002
+g, customerUser2003, customer001, /orgs/1/sites/site003
+g, customerUser2003, customer001, /orgs/1/sites/site004
+g, customerUser2003, customer001, /orgs/1/sites/site005
+
+g, customerUser2004, customer001, /orgs/1/sites/site001
+g, customerUser2004, customer001, /orgs/1/sites/site002
+g, customerUser2004, customer001, /orgs/1/sites/site003
+g, customerUser2004, customer001, /orgs/1/sites/site004
+g, customerUser2004, customer001, /orgs/1/sites/site005
+
+g, customerUser2005, customer001, /orgs/1/sites/site001
+g, customerUser2005, customer001, /orgs/1/sites/site002
+g, customerUser2005, customer001, /orgs/1/sites/site003
+g, customerUser2005, customer001, /orgs/1/sites/site004
+g, customerUser2005, customer001, /orgs/1/sites/site005
+
+g, customerUser2006, customer001, /orgs/1/sites/site001
+g, customerUser2006, customer001, /orgs/1/sites/site002
+g, customerUser2006, customer001, /orgs/1/sites/site003
+g, customerUser2006, customer001, /orgs/1/sites/site004
+g, customerUser2006, customer001, /orgs/1/sites/site005
+
+g, customerUser2007, customer001, /orgs/1/sites/site001
+g, customerUser2007, customer001, /orgs/1/sites/site002
+g, customerUser2007, customer001, /orgs/1/sites/site003
+g, customerUser2007, customer001, /orgs/1/sites/site004
+g, customerUser2007, customer001, /orgs/1/sites/site005
+
+g, customerUser2008,  customer001, /orgs/1/sites/site001
+g, customerUser2008,  customer001, /orgs/1/sites/site002
+g, customerUser2008,  customer001, /orgs/1/sites/site003
+g, customerUser2008,  customer001, /orgs/1/sites/site004
+g, customerUser2008,  customer001, /orgs/1/sites/site005
+
+g, customerUser2009,  customer001, /orgs/1/sites/site001
+g, customerUser2009,  customer001, /orgs/1/sites/site002
+g, customerUser2009,  customer001, /orgs/1/sites/site003
+g, customerUser2009,  customer001, /orgs/1/sites/site004
+g, customerUser2009,  customer001, /orgs/1/sites/site005
+
+g, customerUser2010,  customer001, /orgs/1/sites/site001
+g, customerUser2010,  customer001, /orgs/1/sites/site002
+g, customerUser2010,  customer001, /orgs/1/sites/site003
+g, customerUser2010,  customer001, /orgs/1/sites/site004
+g, customerUser2010,  customer001, /orgs/1/sites/site005
+
+g, customerUser2011,  customer001, /orgs/1/sites/site001
+g, customerUser2011,  customer001, /orgs/1/sites/site002
+g, customerUser2011,  customer001, /orgs/1/sites/site003
+g, customerUser2011,  customer001, /orgs/1/sites/site004
+g, customerUser2011,  customer001, /orgs/1/sites/site005
+
+g, customerUser2012,  customer001, /orgs/1/sites/site001
+g, customerUser2012,  customer001, /orgs/1/sites/site002
+g, customerUser2012,  customer001, /orgs/1/sites/site003
+g, customerUser2012,  customer001, /orgs/1/sites/site004
+g, customerUser2012,  customer001, /orgs/1/sites/site005
+
+g, customerUser2013, customer001, /orgs/1/sites/site001
+g, customerUser2013, customer001, /orgs/1/sites/site002
+g, customerUser2013, customer001, /orgs/1/sites/site003
+g, customerUser2013, customer001, /orgs/1/sites/site004
+g, customerUser2013, customer001, /orgs/1/sites/site005
+
+g, customerUser2014, customer001, /orgs/1/sites/site001
+g, customerUser2014, customer001, /orgs/1/sites/site002
+g, customerUser2014, customer001, /orgs/1/sites/site003
+g, customerUser2014, customer001, /orgs/1/sites/site004
+g, customerUser2014, customer001, /orgs/1/sites/site005
+
+g, customerUser2015, customer001, /orgs/1/sites/site001
+g, customerUser2015, customer001, /orgs/1/sites/site002
+g, customerUser2015, customer001, /orgs/1/sites/site003
+g, customerUser2015, customer001, /orgs/1/sites/site004
+g, customerUser2015, customer001, /orgs/1/sites/site005
+
+g, customerUser2016, customer001, /orgs/1/sites/site001
+g, customerUser2016, customer001, /orgs/1/sites/site002
+g, customerUser2016, customer001, /orgs/1/sites/site003
+g, customerUser2016, customer001, /orgs/1/sites/site004
+g, customerUser2016, customer001, /orgs/1/sites/site005
+
+g, customerUser2017, customer001, /orgs/1/sites/site001
+g, customerUser2017, customer001, /orgs/1/sites/site002
+g, customerUser2017, customer001, /orgs/1/sites/site003
+g, customerUser2017, customer001, /orgs/1/sites/site004
+g, customerUser2017, customer001, /orgs/1/sites/site005
+
+g, customerUser2018,  customer001, /orgs/1/sites/site001
+g, customerUser2018,  customer001, /orgs/1/sites/site002
+g, customerUser2018,  customer001, /orgs/1/sites/site003
+g, customerUser2018,  customer001, /orgs/1/sites/site004
+g, customerUser2018,  customer001, /orgs/1/sites/site005
+
+g, customerUser2019,  customer001, /orgs/1/sites/site001
+g, customerUser2019,  customer001, /orgs/1/sites/site002
+g, customerUser2019,  customer001, /orgs/1/sites/site003
+g, customerUser2019,  customer001, /orgs/1/sites/site004
+g, customerUser2019,  customer001, /orgs/1/sites/site005
+
+g, customerUser2020,  customer001, /orgs/1/sites/site001
+g, customerUser2020,  customer001, /orgs/1/sites/site002
+g, customerUser2020,  customer001, /orgs/1/sites/site003
+g, customerUser2020,  customer001, /orgs/1/sites/site004
+g, customerUser2020,  customer001, /orgs/1/sites/site005
+
+g, customerUser2021,  customer001, /orgs/1/sites/site001
+g, customerUser2021,  customer001, /orgs/1/sites/site002
+g, customerUser2021,  customer001, /orgs/1/sites/site003
+g, customerUser2021,  customer001, /orgs/1/sites/site004
+g, customerUser2021,  customer001, /orgs/1/sites/site005
+
+g, customerUser2022,  customer001, /orgs/1/sites/site001
+g, customerUser2022,  customer001, /orgs/1/sites/site002
+g, customerUser2022,  customer001, /orgs/1/sites/site003
+g, customerUser2022,  customer001, /orgs/1/sites/site004
+g, customerUser2022,  customer001, /orgs/1/sites/site005
+
+g, customerUser2023, customer001, /orgs/1/sites/site001
+g, customerUser2023, customer001, /orgs/1/sites/site002
+g, customerUser2023, customer001, /orgs/1/sites/site003
+g, customerUser2023, customer001, /orgs/1/sites/site004
+g, customerUser2023, customer001, /orgs/1/sites/site005
+
+g, customerUser2024, customer001, /orgs/1/sites/site001
+g, customerUser2024, customer001, /orgs/1/sites/site002
+g, customerUser2024, customer001, /orgs/1/sites/site003
+g, customerUser2024, customer001, /orgs/1/sites/site004
+g, customerUser2024, customer001, /orgs/1/sites/site005
+
+g, customerUser2025, customer001, /orgs/1/sites/site001
+g, customerUser2025, customer001, /orgs/1/sites/site002
+g, customerUser2025, customer001, /orgs/1/sites/site003
+g, customerUser2025, customer001, /orgs/1/sites/site004
+g, customerUser2025, customer001, /orgs/1/sites/site005
+
+g, customerUser2026, customer001, /orgs/1/sites/site001
+g, customerUser2026, customer001, /orgs/1/sites/site002
+g, customerUser2026, customer001, /orgs/1/sites/site003
+g, customerUser2026, customer001, /orgs/1/sites/site004
+g, customerUser2026, customer001, /orgs/1/sites/site005
+
+g, customerUser2027, customer001, /orgs/1/sites/site001
+g, customerUser2027, customer001, /orgs/1/sites/site002
+g, customerUser2027, customer001, /orgs/1/sites/site003
+g, customerUser2027, customer001, /orgs/1/sites/site004
+g, customerUser2027, customer001, /orgs/1/sites/site005
+
+g, customerUser2028,  customer001, /orgs/1/sites/site001
+g, customerUser2028,  customer001, /orgs/1/sites/site002
+g, customerUser2028,  customer001, /orgs/1/sites/site003
+g, customerUser2028,  customer001, /orgs/1/sites/site004
+g, customerUser2028,  customer001, /orgs/1/sites/site005
+
+g, customerUser2029,  customer001, /orgs/1/sites/site001
+g, customerUser2029,  customer001, /orgs/1/sites/site002
+g, customerUser2029,  customer001, /orgs/1/sites/site003
+g, customerUser2029,  customer001, /orgs/1/sites/site004
+g, customerUser2029,  customer001, /orgs/1/sites/site005
+
+g, customerUser2030,  customer001, /orgs/1/sites/site001
+g, customerUser2030,  customer001, /orgs/1/sites/site002
+g, customerUser2030,  customer001, /orgs/1/sites/site003
+g, customerUser2030,  customer001, /orgs/1/sites/site004
+g, customerUser2030,  customer001, /orgs/1/sites/site005
+
+g, customerUser2031,  customer001, /orgs/1/sites/site001
+g, customerUser2031,  customer001, /orgs/1/sites/site002
+g, customerUser2031,  customer001, /orgs/1/sites/site003
+g, customerUser2031,  customer001, /orgs/1/sites/site004
+g, customerUser2031,  customer001, /orgs/1/sites/site005
+
+g, customerUser2032,  customer001, /orgs/1/sites/site001
+g, customerUser2032,  customer001, /orgs/1/sites/site002
+g, customerUser2032,  customer001, /orgs/1/sites/site003
+g, customerUser2032,  customer001, /orgs/1/sites/site004
+g, customerUser2032,  customer001, /orgs/1/sites/site005
+
+g, customerUser2033, customer001, /orgs/1/sites/site001
+g, customerUser2033, customer001, /orgs/1/sites/site002
+g, customerUser2033, customer001, /orgs/1/sites/site003
+g, customerUser2033, customer001, /orgs/1/sites/site004
+g, customerUser2033, customer001, /orgs/1/sites/site005
+
+g, customerUser2034, customer001, /orgs/1/sites/site001
+g, customerUser2034, customer001, /orgs/1/sites/site002
+g, customerUser2034, customer001, /orgs/1/sites/site003
+g, customerUser2034, customer001, /orgs/1/sites/site004
+g, customerUser2034, customer001, /orgs/1/sites/site005
+
+g, customerUser2035, customer001, /orgs/1/sites/site001
+g, customerUser2035, customer001, /orgs/1/sites/site002
+g, customerUser2035, customer001, /orgs/1/sites/site003
+g, customerUser2035, customer001, /orgs/1/sites/site004
+g, customerUser2035, customer001, /orgs/1/sites/site005
+
+g, customerUser2036, customer001, /orgs/1/sites/site001
+g, customerUser2036, customer001, /orgs/1/sites/site002
+g, customerUser2036, customer001, /orgs/1/sites/site003
+g, customerUser2036, customer001, /orgs/1/sites/site004
+g, customerUser2036, customer001, /orgs/1/sites/site005
+
+g, customerUser2037, customer001, /orgs/1/sites/site001
+g, customerUser2037, customer001, /orgs/1/sites/site002
+g, customerUser2037, customer001, /orgs/1/sites/site003
+g, customerUser2037, customer001, /orgs/1/sites/site004
+g, customerUser2037, customer001, /orgs/1/sites/site005
+
+g, customerUser2038,  customer001, /orgs/1/sites/site001
+g, customerUser2038,  customer001, /orgs/1/sites/site002
+g, customerUser2038,  customer001, /orgs/1/sites/site003
+g, customerUser2038,  customer001, /orgs/1/sites/site004
+g, customerUser2038,  customer001, /orgs/1/sites/site005
+
+g, customerUser2039,  customer001, /orgs/1/sites/site001
+g, customerUser2039,  customer001, /orgs/1/sites/site002
+g, customerUser2039,  customer001, /orgs/1/sites/site003
+g, customerUser2039,  customer001, /orgs/1/sites/site004
+g, customerUser2039,  customer001, /orgs/1/sites/site005
+
+g, customerUser2040,  customer001, /orgs/1/sites/site001
+g, customerUser2040,  customer001, /orgs/1/sites/site002
+g, customerUser2040,  customer001, /orgs/1/sites/site003
+g, customerUser2040,  customer001, /orgs/1/sites/site004
+g, customerUser2040,  customer001, /orgs/1/sites/site005
+
+g, customerUser2041,  customer001, /orgs/1/sites/site001
+g, customerUser2041,  customer001, /orgs/1/sites/site002
+g, customerUser2041,  customer001, /orgs/1/sites/site003
+g, customerUser2041,  customer001, /orgs/1/sites/site004
+g, customerUser2041,  customer001, /orgs/1/sites/site005
+
+g, customerUser2042,  customer001, /orgs/1/sites/site001
+g, customerUser2042,  customer001, /orgs/1/sites/site002
+g, customerUser2042,  customer001, /orgs/1/sites/site003
+g, customerUser2042,  customer001, /orgs/1/sites/site004
+g, customerUser2042,  customer001, /orgs/1/sites/site005
+
+g, customerUser2043, customer001, /orgs/1/sites/site001
+g, customerUser2043, customer001, /orgs/1/sites/site002
+g, customerUser2043, customer001, /orgs/1/sites/site003
+g, customerUser2043, customer001, /orgs/1/sites/site004
+g, customerUser2043, customer001, /orgs/1/sites/site005
+
+g, customerUser2044, customer001, /orgs/1/sites/site001
+g, customerUser2044, customer001, /orgs/1/sites/site002
+g, customerUser2044, customer001, /orgs/1/sites/site003
+g, customerUser2044, customer001, /orgs/1/sites/site004
+g, customerUser2044, customer001, /orgs/1/sites/site005
+
+g, customerUser2045, customer001, /orgs/1/sites/site001
+g, customerUser2045, customer001, /orgs/1/sites/site002
+g, customerUser2045, customer001, /orgs/1/sites/site003
+g, customerUser2045, customer001, /orgs/1/sites/site004
+g, customerUser2045, customer001, /orgs/1/sites/site005
+
+g, customerUser2046, customer001, /orgs/1/sites/site001
+g, customerUser2046, customer001, /orgs/1/sites/site002
+g, customerUser2046, customer001, /orgs/1/sites/site003
+g, customerUser2046, customer001, /orgs/1/sites/site004
+g, customerUser2046, customer001, /orgs/1/sites/site005
+
+g, customerUser2047, customer001, /orgs/1/sites/site001
+g, customerUser2047, customer001, /orgs/1/sites/site002
+g, customerUser2047, customer001, /orgs/1/sites/site003
+g, customerUser2047, customer001, /orgs/1/sites/site004
+g, customerUser2047, customer001, /orgs/1/sites/site005
+
+g, customerUser2048,  customer001, /orgs/1/sites/site001
+g, customerUser2048,  customer001, /orgs/1/sites/site002
+g, customerUser2048,  customer001, /orgs/1/sites/site003
+g, customerUser2048,  customer001, /orgs/1/sites/site004
+g, customerUser2048,  customer001, /orgs/1/sites/site005
+
+g, customerUser2049,  customer001, /orgs/1/sites/site001
+g, customerUser2049,  customer001, /orgs/1/sites/site002
+g, customerUser2049,  customer001, /orgs/1/sites/site003
+g, customerUser2049,  customer001, /orgs/1/sites/site004
+g, customerUser2049,  customer001, /orgs/1/sites/site005
+
+g, customerUser2050,  customer001, /orgs/1/sites/site001
+g, customerUser2050,  customer001, /orgs/1/sites/site002
+g, customerUser2050,  customer001, /orgs/1/sites/site003
+g, customerUser2050,  customer001, /orgs/1/sites/site004
+g, customerUser2050,  customer001, /orgs/1/sites/site005
+
+# Group - staff001, / org2
+g, staffUser1001, staff001, /orgs/2/sites/site001
+g, staffUser1001, staff001, /orgs/2/sites/site002
+g, staffUser1001, staff001, /orgs/2/sites/site003
+g, staffUser1001, staff001, /orgs/2/sites/site004
+g, staffUser1001, staff001, /orgs/2/sites/site005
+
+g, staffUser1001, staff001, /orgs/2/sites/site001
+g, staffUser1001, staff001, /orgs/2/sites/site002
+g, staffUser1001, staff001, /orgs/2/sites/site003
+g, staffUser1001, staff001, /orgs/2/sites/site004
+g, staffUser1001, staff001, /orgs/2/sites/site005
+
+g, staffUser1003, staff001, /orgs/2/sites/site001
+g, staffUser1003, staff001, /orgs/2/sites/site002
+g, staffUser1003, staff001, /orgs/2/sites/site003
+g, staffUser1003, staff001, /orgs/2/sites/site004
+g, staffUser1003, staff001, /orgs/2/sites/site005
+
+g, staffUser1004, staff001, /orgs/2/sites/site001
+g, staffUser1004, staff001, /orgs/2/sites/site002
+g, staffUser1004, staff001, /orgs/2/sites/site003
+g, staffUser1004, staff001, /orgs/2/sites/site004
+g, staffUser1004, staff001, /orgs/2/sites/site005
+
+g, staffUser1005, staff001, /orgs/2/sites/site001
+g, staffUser1005, staff001, /orgs/2/sites/site002
+g, staffUser1005, staff001, /orgs/2/sites/site003
+g, staffUser1005, staff001, /orgs/2/sites/site004
+g, staffUser1005, staff001, /orgs/2/sites/site005
+
+g, staffUser1006, staff001, /orgs/2/sites/site001
+g, staffUser1006, staff001, /orgs/2/sites/site002
+g, staffUser1006, staff001, /orgs/2/sites/site003
+g, staffUser1006, staff001, /orgs/2/sites/site004
+g, staffUser1006, staff001, /orgs/2/sites/site005
+
+g, staffUser1007, staff001, /orgs/2/sites/site001
+g, staffUser1007, staff001, /orgs/2/sites/site002
+g, staffUser1007, staff001, /orgs/2/sites/site003
+g, staffUser1007, staff001, /orgs/2/sites/site004
+g, staffUser1007, staff001, /orgs/2/sites/site005
+
+g, staffUser1008,  staff001, /orgs/2/sites/site001
+g, staffUser1008,  staff001, /orgs/2/sites/site002
+g, staffUser1008,  staff001, /orgs/2/sites/site003
+g, staffUser1008,  staff001, /orgs/2/sites/site004
+g, staffUser1008,  staff001, /orgs/2/sites/site005
+
+g, staffUser1009,  staff001, /orgs/2/sites/site001
+g, staffUser1009,  staff001, /orgs/2/sites/site002
+g, staffUser1009,  staff001, /orgs/2/sites/site003
+g, staffUser1009,  staff001, /orgs/2/sites/site004
+g, staffUser1009,  staff001, /orgs/2/sites/site005
+
+g, staffUser1010,  staff001, /orgs/2/sites/site001
+g, staffUser1010,  staff001, /orgs/2/sites/site002
+g, staffUser1010,  staff001, /orgs/2/sites/site003
+g, staffUser1010,  staff001, /orgs/2/sites/site004
+g, staffUser1010,  staff001, /orgs/2/sites/site005
+
+g, staffUser1011,  staff001, /orgs/2/sites/site001
+g, staffUser1011,  staff001, /orgs/2/sites/site002
+g, staffUser1011,  staff001, /orgs/2/sites/site003
+g, staffUser1011,  staff001, /orgs/2/sites/site004
+g, staffUser1011,  staff001, /orgs/2/sites/site005
+
+g, staffUser1012,  staff001, /orgs/2/sites/site001
+g, staffUser1012,  staff001, /orgs/2/sites/site002
+g, staffUser1012,  staff001, /orgs/2/sites/site003
+g, staffUser1012,  staff001, /orgs/2/sites/site004
+g, staffUser1012,  staff001, /orgs/2/sites/site005
+
+g, staffUser1013, staff001, /orgs/2/sites/site001
+g, staffUser1013, staff001, /orgs/2/sites/site002
+g, staffUser1013, staff001, /orgs/2/sites/site003
+g, staffUser1013, staff001, /orgs/2/sites/site004
+g, staffUser1013, staff001, /orgs/2/sites/site005
+
+g, staffUser1014, staff001, /orgs/2/sites/site001
+g, staffUser1014, staff001, /orgs/2/sites/site002
+g, staffUser1014, staff001, /orgs/2/sites/site003
+g, staffUser1014, staff001, /orgs/2/sites/site004
+g, staffUser1014, staff001, /orgs/2/sites/site005
+
+g, staffUser1015, staff001, /orgs/2/sites/site001
+g, staffUser1015, staff001, /orgs/2/sites/site002
+g, staffUser1015, staff001, /orgs/2/sites/site003
+g, staffUser1015, staff001, /orgs/2/sites/site004
+g, staffUser1015, staff001, /orgs/2/sites/site005
+
+g, staffUser1016, staff001, /orgs/2/sites/site001
+g, staffUser1016, staff001, /orgs/2/sites/site002
+g, staffUser1016, staff001, /orgs/2/sites/site003
+g, staffUser1016, staff001, /orgs/2/sites/site004
+g, staffUser1016, staff001, /orgs/2/sites/site005
+
+g, staffUser1017, staff001, /orgs/2/sites/site001
+g, staffUser1017, staff001, /orgs/2/sites/site002
+g, staffUser1017, staff001, /orgs/2/sites/site003
+g, staffUser1017, staff001, /orgs/2/sites/site004
+g, staffUser1017, staff001, /orgs/2/sites/site005
+
+g, staffUser1018,  staff001, /orgs/2/sites/site001
+g, staffUser1018,  staff001, /orgs/2/sites/site002
+g, staffUser1018,  staff001, /orgs/2/sites/site003
+g, staffUser1018,  staff001, /orgs/2/sites/site004
+g, staffUser1018,  staff001, /orgs/2/sites/site005
+
+g, staffUser1019,  staff001, /orgs/2/sites/site001
+g, staffUser1019,  staff001, /orgs/2/sites/site002
+g, staffUser1019,  staff001, /orgs/2/sites/site003
+g, staffUser1019,  staff001, /orgs/2/sites/site004
+g, staffUser1019,  staff001, /orgs/2/sites/site005
+
+g, staffUser1020,  staff001, /orgs/2/sites/site001
+g, staffUser1020,  staff001, /orgs/2/sites/site002
+g, staffUser1020,  staff001, /orgs/2/sites/site003
+g, staffUser1020,  staff001, /orgs/2/sites/site004
+g, staffUser1020,  staff001, /orgs/2/sites/site005
+
+g, staffUser1021,  staff001, /orgs/2/sites/site001
+g, staffUser1021,  staff001, /orgs/2/sites/site002
+g, staffUser1021,  staff001, /orgs/2/sites/site003
+g, staffUser1021,  staff001, /orgs/2/sites/site004
+g, staffUser1021,  staff001, /orgs/2/sites/site005
+
+g, staffUser1022,  staff001, /orgs/2/sites/site001
+g, staffUser1022,  staff001, /orgs/2/sites/site002
+g, staffUser1022,  staff001, /orgs/2/sites/site003
+g, staffUser1022,  staff001, /orgs/2/sites/site004
+g, staffUser1022,  staff001, /orgs/2/sites/site005
+
+g, staffUser1023, staff001, /orgs/2/sites/site001
+g, staffUser1023, staff001, /orgs/2/sites/site002
+g, staffUser1023, staff001, /orgs/2/sites/site003
+g, staffUser1023, staff001, /orgs/2/sites/site004
+g, staffUser1023, staff001, /orgs/2/sites/site005
+
+g, staffUser1024, staff001, /orgs/2/sites/site001
+g, staffUser1024, staff001, /orgs/2/sites/site002
+g, staffUser1024, staff001, /orgs/2/sites/site003
+g, staffUser1024, staff001, /orgs/2/sites/site004
+g, staffUser1024, staff001, /orgs/2/sites/site005
+
+g, staffUser1025, staff001, /orgs/2/sites/site001
+g, staffUser1025, staff001, /orgs/2/sites/site002
+g, staffUser1025, staff001, /orgs/2/sites/site003
+g, staffUser1025, staff001, /orgs/2/sites/site004
+g, staffUser1025, staff001, /orgs/2/sites/site005
+
+g, staffUser1026, staff001, /orgs/2/sites/site001
+g, staffUser1026, staff001, /orgs/2/sites/site002
+g, staffUser1026, staff001, /orgs/2/sites/site003
+g, staffUser1026, staff001, /orgs/2/sites/site004
+g, staffUser1026, staff001, /orgs/2/sites/site005
+
+g, staffUser1027, staff001, /orgs/2/sites/site001
+g, staffUser1027, staff001, /orgs/2/sites/site002
+g, staffUser1027, staff001, /orgs/2/sites/site003
+g, staffUser1027, staff001, /orgs/2/sites/site004
+g, staffUser1027, staff001, /orgs/2/sites/site005
+
+g, staffUser1028,  staff001, /orgs/2/sites/site001
+g, staffUser1028,  staff001, /orgs/2/sites/site002
+g, staffUser1028,  staff001, /orgs/2/sites/site003
+g, staffUser1028,  staff001, /orgs/2/sites/site004
+g, staffUser1028,  staff001, /orgs/2/sites/site005
+
+g, staffUser1029,  staff001, /orgs/2/sites/site001
+g, staffUser1029,  staff001, /orgs/2/sites/site002
+g, staffUser1029,  staff001, /orgs/2/sites/site003
+g, staffUser1029,  staff001, /orgs/2/sites/site004
+g, staffUser1029,  staff001, /orgs/2/sites/site005
+
+g, staffUser1030,  staff001, /orgs/2/sites/site001
+g, staffUser1030,  staff001, /orgs/2/sites/site002
+g, staffUser1030,  staff001, /orgs/2/sites/site003
+g, staffUser1030,  staff001, /orgs/2/sites/site004
+g, staffUser1030,  staff001, /orgs/2/sites/site005
+
+g, staffUser1031,  staff001, /orgs/2/sites/site001
+g, staffUser1031,  staff001, /orgs/2/sites/site002
+g, staffUser1031,  staff001, /orgs/2/sites/site003
+g, staffUser1031,  staff001, /orgs/2/sites/site004
+g, staffUser1031,  staff001, /orgs/2/sites/site005
+
+g, staffUser1032,  staff001, /orgs/2/sites/site001
+g, staffUser1032,  staff001, /orgs/2/sites/site002
+g, staffUser1032,  staff001, /orgs/2/sites/site003
+g, staffUser1032,  staff001, /orgs/2/sites/site004
+g, staffUser1032,  staff001, /orgs/2/sites/site005
+
+g, staffUser1033, staff001, /orgs/2/sites/site001
+g, staffUser1033, staff001, /orgs/2/sites/site002
+g, staffUser1033, staff001, /orgs/2/sites/site003
+g, staffUser1033, staff001, /orgs/2/sites/site004
+g, staffUser1033, staff001, /orgs/2/sites/site005
+
+g, staffUser1034, staff001, /orgs/2/sites/site001
+g, staffUser1034, staff001, /orgs/2/sites/site002
+g, staffUser1034, staff001, /orgs/2/sites/site003
+g, staffUser1034, staff001, /orgs/2/sites/site004
+g, staffUser1034, staff001, /orgs/2/sites/site005
+
+g, staffUser1035, staff001, /orgs/2/sites/site001
+g, staffUser1035, staff001, /orgs/2/sites/site002
+g, staffUser1035, staff001, /orgs/2/sites/site003
+g, staffUser1035, staff001, /orgs/2/sites/site004
+g, staffUser1035, staff001, /orgs/2/sites/site005
+
+g, staffUser1036, staff001, /orgs/2/sites/site001
+g, staffUser1036, staff001, /orgs/2/sites/site002
+g, staffUser1036, staff001, /orgs/2/sites/site003
+g, staffUser1036, staff001, /orgs/2/sites/site004
+g, staffUser1036, staff001, /orgs/2/sites/site005
+
+g, staffUser1037, staff001, /orgs/2/sites/site001
+g, staffUser1037, staff001, /orgs/2/sites/site002
+g, staffUser1037, staff001, /orgs/2/sites/site003
+g, staffUser1037, staff001, /orgs/2/sites/site004
+g, staffUser1037, staff001, /orgs/2/sites/site005
+
+g, staffUser1038,  staff001, /orgs/2/sites/site001
+g, staffUser1038,  staff001, /orgs/2/sites/site002
+g, staffUser1038,  staff001, /orgs/2/sites/site003
+g, staffUser1038,  staff001, /orgs/2/sites/site004
+g, staffUser1038,  staff001, /orgs/2/sites/site005
+
+g, staffUser1039,  staff001, /orgs/2/sites/site001
+g, staffUser1039,  staff001, /orgs/2/sites/site002
+g, staffUser1039,  staff001, /orgs/2/sites/site003
+g, staffUser1039,  staff001, /orgs/2/sites/site004
+g, staffUser1039,  staff001, /orgs/2/sites/site005
+
+g, staffUser1040,  staff001, /orgs/2/sites/site001
+g, staffUser1040,  staff001, /orgs/2/sites/site002
+g, staffUser1040,  staff001, /orgs/2/sites/site003
+g, staffUser1040,  staff001, /orgs/2/sites/site004
+g, staffUser1040,  staff001, /orgs/2/sites/site005
+
+g, staffUser1041,  staff001, /orgs/2/sites/site001
+g, staffUser1041,  staff001, /orgs/2/sites/site002
+g, staffUser1041,  staff001, /orgs/2/sites/site003
+g, staffUser1041,  staff001, /orgs/2/sites/site004
+g, staffUser1041,  staff001, /orgs/2/sites/site005
+
+g, staffUser1042,  staff001, /orgs/2/sites/site001
+g, staffUser1042,  staff001, /orgs/2/sites/site002
+g, staffUser1042,  staff001, /orgs/2/sites/site003
+g, staffUser1042,  staff001, /orgs/2/sites/site004
+g, staffUser1042,  staff001, /orgs/2/sites/site005
+
+g, staffUser1043, staff001, /orgs/2/sites/site001
+g, staffUser1043, staff001, /orgs/2/sites/site002
+g, staffUser1043, staff001, /orgs/2/sites/site003
+g, staffUser1043, staff001, /orgs/2/sites/site004
+g, staffUser1043, staff001, /orgs/2/sites/site005
+
+g, staffUser1044, staff001, /orgs/2/sites/site001
+g, staffUser1044, staff001, /orgs/2/sites/site002
+g, staffUser1044, staff001, /orgs/2/sites/site003
+g, staffUser1044, staff001, /orgs/2/sites/site004
+g, staffUser1044, staff001, /orgs/2/sites/site005
+
+g, staffUser1045, staff001, /orgs/2/sites/site001
+g, staffUser1045, staff001, /orgs/2/sites/site002
+g, staffUser1045, staff001, /orgs/2/sites/site003
+g, staffUser1045, staff001, /orgs/2/sites/site004
+g, staffUser1045, staff001, /orgs/2/sites/site005
+
+g, staffUser1046, staff001, /orgs/2/sites/site001
+g, staffUser1046, staff001, /orgs/2/sites/site002
+g, staffUser1046, staff001, /orgs/2/sites/site003
+g, staffUser1046, staff001, /orgs/2/sites/site004
+g, staffUser1046, staff001, /orgs/2/sites/site005
+
+g, staffUser1047, staff001, /orgs/2/sites/site001
+g, staffUser1047, staff001, /orgs/2/sites/site002
+g, staffUser1047, staff001, /orgs/2/sites/site003
+g, staffUser1047, staff001, /orgs/2/sites/site004
+g, staffUser1047, staff001, /orgs/2/sites/site005
+
+g, staffUser1048,  staff001, /orgs/2/sites/site001
+g, staffUser1048,  staff001, /orgs/2/sites/site002
+g, staffUser1048,  staff001, /orgs/2/sites/site003
+g, staffUser1048,  staff001, /orgs/2/sites/site004
+g, staffUser1048,  staff001, /orgs/2/sites/site005
+
+g, staffUser1049,  staff001, /orgs/2/sites/site001
+g, staffUser1049,  staff001, /orgs/2/sites/site002
+g, staffUser1049,  staff001, /orgs/2/sites/site003
+g, staffUser1049,  staff001, /orgs/2/sites/site004
+g, staffUser1049,  staff001, /orgs/2/sites/site005
+
+g, staffUser1050,  staff001, /orgs/2/sites/site001
+g, staffUser1050,  staff001, /orgs/2/sites/site002
+g, staffUser1050,  staff001, /orgs/2/sites/site003
+g, staffUser1050,  staff001, /orgs/2/sites/site004
+g, staffUser1050,  staff001, /orgs/2/sites/site005
+
+# Group - staff001, / org2
+g, staffUser2001, staff001, /orgs/2/sites/site001
+g, staffUser2001, staff001, /orgs/2/sites/site002
+g, staffUser2001, staff001, /orgs/2/sites/site003
+g, staffUser2001, staff001, /orgs/2/sites/site004
+g, staffUser2001, staff001, /orgs/2/sites/site005
+
+g, staffUser2001, staff001, /orgs/2/sites/site001
+g, staffUser2001, staff001, /orgs/2/sites/site002
+g, staffUser2001, staff001, /orgs/2/sites/site003
+g, staffUser2001, staff001, /orgs/2/sites/site004
+g, staffUser2001, staff001, /orgs/2/sites/site005
+
+g, staffUser2003, staff001, /orgs/2/sites/site001
+g, staffUser2003, staff001, /orgs/2/sites/site002
+g, staffUser2003, staff001, /orgs/2/sites/site003
+g, staffUser2003, staff001, /orgs/2/sites/site004
+g, staffUser2003, staff001, /orgs/2/sites/site005
+
+g, staffUser2004, staff001, /orgs/2/sites/site001
+g, staffUser2004, staff001, /orgs/2/sites/site002
+g, staffUser2004, staff001, /orgs/2/sites/site003
+g, staffUser2004, staff001, /orgs/2/sites/site004
+g, staffUser2004, staff001, /orgs/2/sites/site005
+
+g, staffUser2005, staff001, /orgs/2/sites/site001
+g, staffUser2005, staff001, /orgs/2/sites/site002
+g, staffUser2005, staff001, /orgs/2/sites/site003
+g, staffUser2005, staff001, /orgs/2/sites/site004
+g, staffUser2005, staff001, /orgs/2/sites/site005
+
+g, staffUser2006, staff001, /orgs/2/sites/site001
+g, staffUser2006, staff001, /orgs/2/sites/site002
+g, staffUser2006, staff001, /orgs/2/sites/site003
+g, staffUser2006, staff001, /orgs/2/sites/site004
+g, staffUser2006, staff001, /orgs/2/sites/site005
+
+g, staffUser2007, staff001, /orgs/2/sites/site001
+g, staffUser2007, staff001, /orgs/2/sites/site002
+g, staffUser2007, staff001, /orgs/2/sites/site003
+g, staffUser2007, staff001, /orgs/2/sites/site004
+g, staffUser2007, staff001, /orgs/2/sites/site005
+
+g, staffUser2008,  staff001, /orgs/2/sites/site001
+g, staffUser2008,  staff001, /orgs/2/sites/site002
+g, staffUser2008,  staff001, /orgs/2/sites/site003
+g, staffUser2008,  staff001, /orgs/2/sites/site004
+g, staffUser2008,  staff001, /orgs/2/sites/site005
+
+g, staffUser2009,  staff001, /orgs/2/sites/site001
+g, staffUser2009,  staff001, /orgs/2/sites/site002
+g, staffUser2009,  staff001, /orgs/2/sites/site003
+g, staffUser2009,  staff001, /orgs/2/sites/site004
+g, staffUser2009,  staff001, /orgs/2/sites/site005
+
+g, staffUser2010,  staff001, /orgs/2/sites/site001
+g, staffUser2010,  staff001, /orgs/2/sites/site002
+g, staffUser2010,  staff001, /orgs/2/sites/site003
+g, staffUser2010,  staff001, /orgs/2/sites/site004
+g, staffUser2010,  staff001, /orgs/2/sites/site005
+
+g, staffUser2011,  staff001, /orgs/2/sites/site001
+g, staffUser2011,  staff001, /orgs/2/sites/site002
+g, staffUser2011,  staff001, /orgs/2/sites/site003
+g, staffUser2011,  staff001, /orgs/2/sites/site004
+g, staffUser2011,  staff001, /orgs/2/sites/site005
+
+g, staffUser2012,  staff001, /orgs/2/sites/site001
+g, staffUser2012,  staff001, /orgs/2/sites/site002
+g, staffUser2012,  staff001, /orgs/2/sites/site003
+g, staffUser2012,  staff001, /orgs/2/sites/site004
+g, staffUser2012,  staff001, /orgs/2/sites/site005
+
+g, staffUser2013, staff001, /orgs/2/sites/site001
+g, staffUser2013, staff001, /orgs/2/sites/site002
+g, staffUser2013, staff001, /orgs/2/sites/site003
+g, staffUser2013, staff001, /orgs/2/sites/site004
+g, staffUser2013, staff001, /orgs/2/sites/site005
+
+g, staffUser2014, staff001, /orgs/2/sites/site001
+g, staffUser2014, staff001, /orgs/2/sites/site002
+g, staffUser2014, staff001, /orgs/2/sites/site003
+g, staffUser2014, staff001, /orgs/2/sites/site004
+g, staffUser2014, staff001, /orgs/2/sites/site005
+
+g, staffUser2015, staff001, /orgs/2/sites/site001
+g, staffUser2015, staff001, /orgs/2/sites/site002
+g, staffUser2015, staff001, /orgs/2/sites/site003
+g, staffUser2015, staff001, /orgs/2/sites/site004
+g, staffUser2015, staff001, /orgs/2/sites/site005
+
+g, staffUser2016, staff001, /orgs/2/sites/site001
+g, staffUser2016, staff001, /orgs/2/sites/site002
+g, staffUser2016, staff001, /orgs/2/sites/site003
+g, staffUser2016, staff001, /orgs/2/sites/site004
+g, staffUser2016, staff001, /orgs/2/sites/site005
+
+g, staffUser2017, staff001, /orgs/2/sites/site001
+g, staffUser2017, staff001, /orgs/2/sites/site002
+g, staffUser2017, staff001, /orgs/2/sites/site003
+g, staffUser2017, staff001, /orgs/2/sites/site004
+g, staffUser2017, staff001, /orgs/2/sites/site005
+
+g, staffUser2018,  staff001, /orgs/2/sites/site001
+g, staffUser2018,  staff001, /orgs/2/sites/site002
+g, staffUser2018,  staff001, /orgs/2/sites/site003
+g, staffUser2018,  staff001, /orgs/2/sites/site004
+g, staffUser2018,  staff001, /orgs/2/sites/site005
+
+g, staffUser2019,  staff001, /orgs/2/sites/site001
+g, staffUser2019,  staff001, /orgs/2/sites/site002
+g, staffUser2019,  staff001, /orgs/2/sites/site003
+g, staffUser2019,  staff001, /orgs/2/sites/site004
+g, staffUser2019,  staff001, /orgs/2/sites/site005
+
+g, staffUser2020,  staff001, /orgs/2/sites/site001
+g, staffUser2020,  staff001, /orgs/2/sites/site002
+g, staffUser2020,  staff001, /orgs/2/sites/site003
+g, staffUser2020,  staff001, /orgs/2/sites/site004
+g, staffUser2020,  staff001, /orgs/2/sites/site005
+
+g, staffUser2021,  staff001, /orgs/2/sites/site001
+g, staffUser2021,  staff001, /orgs/2/sites/site002
+g, staffUser2021,  staff001, /orgs/2/sites/site003
+g, staffUser2021,  staff001, /orgs/2/sites/site004
+g, staffUser2021,  staff001, /orgs/2/sites/site005
+
+g, staffUser2022,  staff001, /orgs/2/sites/site001
+g, staffUser2022,  staff001, /orgs/2/sites/site002
+g, staffUser2022,  staff001, /orgs/2/sites/site003
+g, staffUser2022,  staff001, /orgs/2/sites/site004
+g, staffUser2022,  staff001, /orgs/2/sites/site005
+
+g, staffUser2023, staff001, /orgs/2/sites/site001
+g, staffUser2023, staff001, /orgs/2/sites/site002
+g, staffUser2023, staff001, /orgs/2/sites/site003
+g, staffUser2023, staff001, /orgs/2/sites/site004
+g, staffUser2023, staff001, /orgs/2/sites/site005
+
+g, staffUser2024, staff001, /orgs/2/sites/site001
+g, staffUser2024, staff001, /orgs/2/sites/site002
+g, staffUser2024, staff001, /orgs/2/sites/site003
+g, staffUser2024, staff001, /orgs/2/sites/site004
+g, staffUser2024, staff001, /orgs/2/sites/site005
+
+g, staffUser2025, staff001, /orgs/2/sites/site001
+g, staffUser2025, staff001, /orgs/2/sites/site002
+g, staffUser2025, staff001, /orgs/2/sites/site003
+g, staffUser2025, staff001, /orgs/2/sites/site004
+g, staffUser2025, staff001, /orgs/2/sites/site005
+
+g, staffUser2026, staff001, /orgs/2/sites/site001
+g, staffUser2026, staff001, /orgs/2/sites/site002
+g, staffUser2026, staff001, /orgs/2/sites/site003
+g, staffUser2026, staff001, /orgs/2/sites/site004
+g, staffUser2026, staff001, /orgs/2/sites/site005
+
+g, staffUser2027, staff001, /orgs/2/sites/site001
+g, staffUser2027, staff001, /orgs/2/sites/site002
+g, staffUser2027, staff001, /orgs/2/sites/site003
+g, staffUser2027, staff001, /orgs/2/sites/site004
+g, staffUser2027, staff001, /orgs/2/sites/site005
+
+g, staffUser2028,  staff001, /orgs/2/sites/site001
+g, staffUser2028,  staff001, /orgs/2/sites/site002
+g, staffUser2028,  staff001, /orgs/2/sites/site003
+g, staffUser2028,  staff001, /orgs/2/sites/site004
+g, staffUser2028,  staff001, /orgs/2/sites/site005
+
+g, staffUser2029,  staff001, /orgs/2/sites/site001
+g, staffUser2029,  staff001, /orgs/2/sites/site002
+g, staffUser2029,  staff001, /orgs/2/sites/site003
+g, staffUser2029,  staff001, /orgs/2/sites/site004
+g, staffUser2029,  staff001, /orgs/2/sites/site005
+
+g, staffUser2030,  staff001, /orgs/2/sites/site001
+g, staffUser2030,  staff001, /orgs/2/sites/site002
+g, staffUser2030,  staff001, /orgs/2/sites/site003
+g, staffUser2030,  staff001, /orgs/2/sites/site004
+g, staffUser2030,  staff001, /orgs/2/sites/site005
+
+g, staffUser2031,  staff001, /orgs/2/sites/site001
+g, staffUser2031,  staff001, /orgs/2/sites/site002
+g, staffUser2031,  staff001, /orgs/2/sites/site003
+g, staffUser2031,  staff001, /orgs/2/sites/site004
+g, staffUser2031,  staff001, /orgs/2/sites/site005
+
+g, staffUser2032,  staff001, /orgs/2/sites/site001
+g, staffUser2032,  staff001, /orgs/2/sites/site002
+g, staffUser2032,  staff001, /orgs/2/sites/site003
+g, staffUser2032,  staff001, /orgs/2/sites/site004
+g, staffUser2032,  staff001, /orgs/2/sites/site005
+
+g, staffUser2033, staff001, /orgs/2/sites/site001
+g, staffUser2033, staff001, /orgs/2/sites/site002
+g, staffUser2033, staff001, /orgs/2/sites/site003
+g, staffUser2033, staff001, /orgs/2/sites/site004
+g, staffUser2033, staff001, /orgs/2/sites/site005
+
+g, staffUser2034, staff001, /orgs/2/sites/site001
+g, staffUser2034, staff001, /orgs/2/sites/site002
+g, staffUser2034, staff001, /orgs/2/sites/site003
+g, staffUser2034, staff001, /orgs/2/sites/site004
+g, staffUser2034, staff001, /orgs/2/sites/site005
+
+g, staffUser2035, staff001, /orgs/2/sites/site001
+g, staffUser2035, staff001, /orgs/2/sites/site002
+g, staffUser2035, staff001, /orgs/2/sites/site003
+g, staffUser2035, staff001, /orgs/2/sites/site004
+g, staffUser2035, staff001, /orgs/2/sites/site005
+
+g, staffUser2036, staff001, /orgs/2/sites/site001
+g, staffUser2036, staff001, /orgs/2/sites/site002
+g, staffUser2036, staff001, /orgs/2/sites/site003
+g, staffUser2036, staff001, /orgs/2/sites/site004
+g, staffUser2036, staff001, /orgs/2/sites/site005
+
+g, staffUser2037, staff001, /orgs/2/sites/site001
+g, staffUser2037, staff001, /orgs/2/sites/site002
+g, staffUser2037, staff001, /orgs/2/sites/site003
+g, staffUser2037, staff001, /orgs/2/sites/site004
+g, staffUser2037, staff001, /orgs/2/sites/site005
+
+g, staffUser2038,  staff001, /orgs/2/sites/site001
+g, staffUser2038,  staff001, /orgs/2/sites/site002
+g, staffUser2038,  staff001, /orgs/2/sites/site003
+g, staffUser2038,  staff001, /orgs/2/sites/site004
+g, staffUser2038,  staff001, /orgs/2/sites/site005
+
+g, staffUser2039,  staff001, /orgs/2/sites/site001
+g, staffUser2039,  staff001, /orgs/2/sites/site002
+g, staffUser2039,  staff001, /orgs/2/sites/site003
+g, staffUser2039,  staff001, /orgs/2/sites/site004
+g, staffUser2039,  staff001, /orgs/2/sites/site005
+
+g, staffUser2040,  staff001, /orgs/2/sites/site001
+g, staffUser2040,  staff001, /orgs/2/sites/site002
+g, staffUser2040,  staff001, /orgs/2/sites/site003
+g, staffUser2040,  staff001, /orgs/2/sites/site004
+g, staffUser2040,  staff001, /orgs/2/sites/site005
+
+g, staffUser2041,  staff001, /orgs/2/sites/site001
+g, staffUser2041,  staff001, /orgs/2/sites/site002
+g, staffUser2041,  staff001, /orgs/2/sites/site003
+g, staffUser2041,  staff001, /orgs/2/sites/site004
+g, staffUser2041,  staff001, /orgs/2/sites/site005
+
+g, staffUser2042,  staff001, /orgs/2/sites/site001
+g, staffUser2042,  staff001, /orgs/2/sites/site002
+g, staffUser2042,  staff001, /orgs/2/sites/site003
+g, staffUser2042,  staff001, /orgs/2/sites/site004
+g, staffUser2042,  staff001, /orgs/2/sites/site005
+
+g, staffUser2043, staff001, /orgs/2/sites/site001
+g, staffUser2043, staff001, /orgs/2/sites/site002
+g, staffUser2043, staff001, /orgs/2/sites/site003
+g, staffUser2043, staff001, /orgs/2/sites/site004
+g, staffUser2043, staff001, /orgs/2/sites/site005
+
+g, staffUser2044, staff001, /orgs/2/sites/site001
+g, staffUser2044, staff001, /orgs/2/sites/site002
+g, staffUser2044, staff001, /orgs/2/sites/site003
+g, staffUser2044, staff001, /orgs/2/sites/site004
+g, staffUser2044, staff001, /orgs/2/sites/site005
+
+g, staffUser2045, staff001, /orgs/2/sites/site001
+g, staffUser2045, staff001, /orgs/2/sites/site002
+g, staffUser2045, staff001, /orgs/2/sites/site003
+g, staffUser2045, staff001, /orgs/2/sites/site004
+g, staffUser2045, staff001, /orgs/2/sites/site005
+
+g, staffUser2046, staff001, /orgs/2/sites/site001
+g, staffUser2046, staff001, /orgs/2/sites/site002
+g, staffUser2046, staff001, /orgs/2/sites/site003
+g, staffUser2046, staff001, /orgs/2/sites/site004
+g, staffUser2046, staff001, /orgs/2/sites/site005
+
+g, staffUser2047, staff001, /orgs/2/sites/site001
+g, staffUser2047, staff001, /orgs/2/sites/site002
+g, staffUser2047, staff001, /orgs/2/sites/site003
+g, staffUser2047, staff001, /orgs/2/sites/site004
+g, staffUser2047, staff001, /orgs/2/sites/site005
+
+g, staffUser2048,  staff001, /orgs/2/sites/site001
+g, staffUser2048,  staff001, /orgs/2/sites/site002
+g, staffUser2048,  staff001, /orgs/2/sites/site003
+g, staffUser2048,  staff001, /orgs/2/sites/site004
+g, staffUser2048,  staff001, /orgs/2/sites/site005
+
+g, staffUser2049,  staff001, /orgs/2/sites/site001
+g, staffUser2049,  staff001, /orgs/2/sites/site002
+g, staffUser2049,  staff001, /orgs/2/sites/site003
+g, staffUser2049,  staff001, /orgs/2/sites/site004
+g, staffUser2049,  staff001, /orgs/2/sites/site005
+
+g, staffUser2050,  staff001, /orgs/2/sites/site001
+g, staffUser2050,  staff001, /orgs/2/sites/site002
+g, staffUser2050,  staff001, /orgs/2/sites/site003
+g, staffUser2050,  staff001, /orgs/2/sites/site004
+g, staffUser2050,  staff001, /orgs/2/sites/site005
+
+# Group - manager001, / org2
+g, managerUser1001, manager001, /orgs/2/sites/site001
+g, managerUser1001, manager001, /orgs/2/sites/site002
+g, managerUser1001, manager001, /orgs/2/sites/site003
+g, managerUser1001, manager001, /orgs/2/sites/site004
+g, managerUser1001, manager001, /orgs/2/sites/site005
+
+g, managerUser1001, manager001, /orgs/2/sites/site001
+g, managerUser1001, manager001, /orgs/2/sites/site002
+g, managerUser1001, manager001, /orgs/2/sites/site003
+g, managerUser1001, manager001, /orgs/2/sites/site004
+g, managerUser1001, manager001, /orgs/2/sites/site005
+
+g, managerUser1003, manager001, /orgs/2/sites/site001
+g, managerUser1003, manager001, /orgs/2/sites/site002
+g, managerUser1003, manager001, /orgs/2/sites/site003
+g, managerUser1003, manager001, /orgs/2/sites/site004
+g, managerUser1003, manager001, /orgs/2/sites/site005
+
+g, managerUser1004, manager001, /orgs/2/sites/site001
+g, managerUser1004, manager001, /orgs/2/sites/site002
+g, managerUser1004, manager001, /orgs/2/sites/site003
+g, managerUser1004, manager001, /orgs/2/sites/site004
+g, managerUser1004, manager001, /orgs/2/sites/site005
+
+g, managerUser1005, manager001, /orgs/2/sites/site001
+g, managerUser1005, manager001, /orgs/2/sites/site002
+g, managerUser1005, manager001, /orgs/2/sites/site003
+g, managerUser1005, manager001, /orgs/2/sites/site004
+g, managerUser1005, manager001, /orgs/2/sites/site005
+
+g, managerUser1006, manager001, /orgs/2/sites/site001
+g, managerUser1006, manager001, /orgs/2/sites/site002
+g, managerUser1006, manager001, /orgs/2/sites/site003
+g, managerUser1006, manager001, /orgs/2/sites/site004
+g, managerUser1006, manager001, /orgs/2/sites/site005
+
+g, managerUser1007, manager001, /orgs/2/sites/site001
+g, managerUser1007, manager001, /orgs/2/sites/site002
+g, managerUser1007, manager001, /orgs/2/sites/site003
+g, managerUser1007, manager001, /orgs/2/sites/site004
+g, managerUser1007, manager001, /orgs/2/sites/site005
+
+g, managerUser1008,  manager001, /orgs/2/sites/site001
+g, managerUser1008,  manager001, /orgs/2/sites/site002
+g, managerUser1008,  manager001, /orgs/2/sites/site003
+g, managerUser1008,  manager001, /orgs/2/sites/site004
+g, managerUser1008,  manager001, /orgs/2/sites/site005
+
+g, managerUser1009,  manager001, /orgs/2/sites/site001
+g, managerUser1009,  manager001, /orgs/2/sites/site002
+g, managerUser1009,  manager001, /orgs/2/sites/site003
+g, managerUser1009,  manager001, /orgs/2/sites/site004
+g, managerUser1009,  manager001, /orgs/2/sites/site005
+
+g, managerUser1010,  manager001, /orgs/2/sites/site001
+g, managerUser1010,  manager001, /orgs/2/sites/site002
+g, managerUser1010,  manager001, /orgs/2/sites/site003
+g, managerUser1010,  manager001, /orgs/2/sites/site004
+g, managerUser1010,  manager001, /orgs/2/sites/site005
+
+g, managerUser1011,  manager001, /orgs/2/sites/site001
+g, managerUser1011,  manager001, /orgs/2/sites/site002
+g, managerUser1011,  manager001, /orgs/2/sites/site003
+g, managerUser1011,  manager001, /orgs/2/sites/site004
+g, managerUser1011,  manager001, /orgs/2/sites/site005
+
+g, managerUser1012,  manager001, /orgs/2/sites/site001
+g, managerUser1012,  manager001, /orgs/2/sites/site002
+g, managerUser1012,  manager001, /orgs/2/sites/site003
+g, managerUser1012,  manager001, /orgs/2/sites/site004
+g, managerUser1012,  manager001, /orgs/2/sites/site005
+
+g, managerUser1013, manager001, /orgs/2/sites/site001
+g, managerUser1013, manager001, /orgs/2/sites/site002
+g, managerUser1013, manager001, /orgs/2/sites/site003
+g, managerUser1013, manager001, /orgs/2/sites/site004
+g, managerUser1013, manager001, /orgs/2/sites/site005
+
+g, managerUser1014, manager001, /orgs/2/sites/site001
+g, managerUser1014, manager001, /orgs/2/sites/site002
+g, managerUser1014, manager001, /orgs/2/sites/site003
+g, managerUser1014, manager001, /orgs/2/sites/site004
+g, managerUser1014, manager001, /orgs/2/sites/site005
+
+g, managerUser1015, manager001, /orgs/2/sites/site001
+g, managerUser1015, manager001, /orgs/2/sites/site002
+g, managerUser1015, manager001, /orgs/2/sites/site003
+g, managerUser1015, manager001, /orgs/2/sites/site004
+g, managerUser1015, manager001, /orgs/2/sites/site005
+
+g, managerUser1016, manager001, /orgs/2/sites/site001
+g, managerUser1016, manager001, /orgs/2/sites/site002
+g, managerUser1016, manager001, /orgs/2/sites/site003
+g, managerUser1016, manager001, /orgs/2/sites/site004
+g, managerUser1016, manager001, /orgs/2/sites/site005
+
+g, managerUser1017, manager001, /orgs/2/sites/site001
+g, managerUser1017, manager001, /orgs/2/sites/site002
+g, managerUser1017, manager001, /orgs/2/sites/site003
+g, managerUser1017, manager001, /orgs/2/sites/site004
+g, managerUser1017, manager001, /orgs/2/sites/site005
+
+g, managerUser1018,  manager001, /orgs/2/sites/site001
+g, managerUser1018,  manager001, /orgs/2/sites/site002
+g, managerUser1018,  manager001, /orgs/2/sites/site003
+g, managerUser1018,  manager001, /orgs/2/sites/site004
+g, managerUser1018,  manager001, /orgs/2/sites/site005
+
+g, managerUser1019,  manager001, /orgs/2/sites/site001
+g, managerUser1019,  manager001, /orgs/2/sites/site002
+g, managerUser1019,  manager001, /orgs/2/sites/site003
+g, managerUser1019,  manager001, /orgs/2/sites/site004
+g, managerUser1019,  manager001, /orgs/2/sites/site005
+
+g, managerUser1020,  manager001, /orgs/2/sites/site001
+g, managerUser1020,  manager001, /orgs/2/sites/site002
+g, managerUser1020,  manager001, /orgs/2/sites/site003
+g, managerUser1020,  manager001, /orgs/2/sites/site004
+g, managerUser1020,  manager001, /orgs/2/sites/site005
+
+g, managerUser1021,  manager001, /orgs/2/sites/site001
+g, managerUser1021,  manager001, /orgs/2/sites/site002
+g, managerUser1021,  manager001, /orgs/2/sites/site003
+g, managerUser1021,  manager001, /orgs/2/sites/site004
+g, managerUser1021,  manager001, /orgs/2/sites/site005
+
+g, managerUser1022,  manager001, /orgs/2/sites/site001
+g, managerUser1022,  manager001, /orgs/2/sites/site002
+g, managerUser1022,  manager001, /orgs/2/sites/site003
+g, managerUser1022,  manager001, /orgs/2/sites/site004
+g, managerUser1022,  manager001, /orgs/2/sites/site005
+
+g, managerUser1023, manager001, /orgs/2/sites/site001
+g, managerUser1023, manager001, /orgs/2/sites/site002
+g, managerUser1023, manager001, /orgs/2/sites/site003
+g, managerUser1023, manager001, /orgs/2/sites/site004
+g, managerUser1023, manager001, /orgs/2/sites/site005
+
+g, managerUser1024, manager001, /orgs/2/sites/site001
+g, managerUser1024, manager001, /orgs/2/sites/site002
+g, managerUser1024, manager001, /orgs/2/sites/site003
+g, managerUser1024, manager001, /orgs/2/sites/site004
+g, managerUser1024, manager001, /orgs/2/sites/site005
+
+g, managerUser1025, manager001, /orgs/2/sites/site001
+g, managerUser1025, manager001, /orgs/2/sites/site002
+g, managerUser1025, manager001, /orgs/2/sites/site003
+g, managerUser1025, manager001, /orgs/2/sites/site004
+g, managerUser1025, manager001, /orgs/2/sites/site005
+
+g, managerUser1026, manager001, /orgs/2/sites/site001
+g, managerUser1026, manager001, /orgs/2/sites/site002
+g, managerUser1026, manager001, /orgs/2/sites/site003
+g, managerUser1026, manager001, /orgs/2/sites/site004
+g, managerUser1026, manager001, /orgs/2/sites/site005
+
+g, managerUser1027, manager001, /orgs/2/sites/site001
+g, managerUser1027, manager001, /orgs/2/sites/site002
+g, managerUser1027, manager001, /orgs/2/sites/site003
+g, managerUser1027, manager001, /orgs/2/sites/site004
+g, managerUser1027, manager001, /orgs/2/sites/site005
+
+g, managerUser1028,  manager001, /orgs/2/sites/site001
+g, managerUser1028,  manager001, /orgs/2/sites/site002
+g, managerUser1028,  manager001, /orgs/2/sites/site003
+g, managerUser1028,  manager001, /orgs/2/sites/site004
+g, managerUser1028,  manager001, /orgs/2/sites/site005
+
+g, managerUser1029,  manager001, /orgs/2/sites/site001
+g, managerUser1029,  manager001, /orgs/2/sites/site002
+g, managerUser1029,  manager001, /orgs/2/sites/site003
+g, managerUser1029,  manager001, /orgs/2/sites/site004
+g, managerUser1029,  manager001, /orgs/2/sites/site005
+
+g, managerUser1030,  manager001, /orgs/2/sites/site001
+g, managerUser1030,  manager001, /orgs/2/sites/site002
+g, managerUser1030,  manager001, /orgs/2/sites/site003
+g, managerUser1030,  manager001, /orgs/2/sites/site004
+g, managerUser1030,  manager001, /orgs/2/sites/site005
+
+g, managerUser1031,  manager001, /orgs/2/sites/site001
+g, managerUser1031,  manager001, /orgs/2/sites/site002
+g, managerUser1031,  manager001, /orgs/2/sites/site003
+g, managerUser1031,  manager001, /orgs/2/sites/site004
+g, managerUser1031,  manager001, /orgs/2/sites/site005
+
+g, managerUser1032,  manager001, /orgs/2/sites/site001
+g, managerUser1032,  manager001, /orgs/2/sites/site002
+g, managerUser1032,  manager001, /orgs/2/sites/site003
+g, managerUser1032,  manager001, /orgs/2/sites/site004
+g, managerUser1032,  manager001, /orgs/2/sites/site005
+
+g, managerUser1033, manager001, /orgs/2/sites/site001
+g, managerUser1033, manager001, /orgs/2/sites/site002
+g, managerUser1033, manager001, /orgs/2/sites/site003
+g, managerUser1033, manager001, /orgs/2/sites/site004
+g, managerUser1033, manager001, /orgs/2/sites/site005
+
+g, managerUser1034, manager001, /orgs/2/sites/site001
+g, managerUser1034, manager001, /orgs/2/sites/site002
+g, managerUser1034, manager001, /orgs/2/sites/site003
+g, managerUser1034, manager001, /orgs/2/sites/site004
+g, managerUser1034, manager001, /orgs/2/sites/site005
+
+g, managerUser1035, manager001, /orgs/2/sites/site001
+g, managerUser1035, manager001, /orgs/2/sites/site002
+g, managerUser1035, manager001, /orgs/2/sites/site003
+g, managerUser1035, manager001, /orgs/2/sites/site004
+g, managerUser1035, manager001, /orgs/2/sites/site005
+
+g, managerUser1036, manager001, /orgs/2/sites/site001
+g, managerUser1036, manager001, /orgs/2/sites/site002
+g, managerUser1036, manager001, /orgs/2/sites/site003
+g, managerUser1036, manager001, /orgs/2/sites/site004
+g, managerUser1036, manager001, /orgs/2/sites/site005
+
+g, managerUser1037, manager001, /orgs/2/sites/site001
+g, managerUser1037, manager001, /orgs/2/sites/site002
+g, managerUser1037, manager001, /orgs/2/sites/site003
+g, managerUser1037, manager001, /orgs/2/sites/site004
+g, managerUser1037, manager001, /orgs/2/sites/site005
+
+g, managerUser1038,  manager001, /orgs/2/sites/site001
+g, managerUser1038,  manager001, /orgs/2/sites/site002
+g, managerUser1038,  manager001, /orgs/2/sites/site003
+g, managerUser1038,  manager001, /orgs/2/sites/site004
+g, managerUser1038,  manager001, /orgs/2/sites/site005
+
+g, managerUser1039,  manager001, /orgs/2/sites/site001
+g, managerUser1039,  manager001, /orgs/2/sites/site002
+g, managerUser1039,  manager001, /orgs/2/sites/site003
+g, managerUser1039,  manager001, /orgs/2/sites/site004
+g, managerUser1039,  manager001, /orgs/2/sites/site005
+
+g, managerUser1040,  manager001, /orgs/2/sites/site001
+g, managerUser1040,  manager001, /orgs/2/sites/site002
+g, managerUser1040,  manager001, /orgs/2/sites/site003
+g, managerUser1040,  manager001, /orgs/2/sites/site004
+g, managerUser1040,  manager001, /orgs/2/sites/site005
+
+g, managerUser1041,  manager001, /orgs/2/sites/site001
+g, managerUser1041,  manager001, /orgs/2/sites/site002
+g, managerUser1041,  manager001, /orgs/2/sites/site003
+g, managerUser1041,  manager001, /orgs/2/sites/site004
+g, managerUser1041,  manager001, /orgs/2/sites/site005
+
+g, managerUser1042,  manager001, /orgs/2/sites/site001
+g, managerUser1042,  manager001, /orgs/2/sites/site002
+g, managerUser1042,  manager001, /orgs/2/sites/site003
+g, managerUser1042,  manager001, /orgs/2/sites/site004
+g, managerUser1042,  manager001, /orgs/2/sites/site005
+
+g, managerUser1043, manager001, /orgs/2/sites/site001
+g, managerUser1043, manager001, /orgs/2/sites/site002
+g, managerUser1043, manager001, /orgs/2/sites/site003
+g, managerUser1043, manager001, /orgs/2/sites/site004
+g, managerUser1043, manager001, /orgs/2/sites/site005
+
+g, managerUser1044, manager001, /orgs/2/sites/site001
+g, managerUser1044, manager001, /orgs/2/sites/site002
+g, managerUser1044, manager001, /orgs/2/sites/site003
+g, managerUser1044, manager001, /orgs/2/sites/site004
+g, managerUser1044, manager001, /orgs/2/sites/site005
+
+g, managerUser1045, manager001, /orgs/2/sites/site001
+g, managerUser1045, manager001, /orgs/2/sites/site002
+g, managerUser1045, manager001, /orgs/2/sites/site003
+g, managerUser1045, manager001, /orgs/2/sites/site004
+g, managerUser1045, manager001, /orgs/2/sites/site005
+
+g, managerUser1046, manager001, /orgs/2/sites/site001
+g, managerUser1046, manager001, /orgs/2/sites/site002
+g, managerUser1046, manager001, /orgs/2/sites/site003
+g, managerUser1046, manager001, /orgs/2/sites/site004
+g, managerUser1046, manager001, /orgs/2/sites/site005
+
+g, managerUser1047, manager001, /orgs/2/sites/site001
+g, managerUser1047, manager001, /orgs/2/sites/site002
+g, managerUser1047, manager001, /orgs/2/sites/site003
+g, managerUser1047, manager001, /orgs/2/sites/site004
+g, managerUser1047, manager001, /orgs/2/sites/site005
+
+g, managerUser1048,  manager001, /orgs/2/sites/site001
+g, managerUser1048,  manager001, /orgs/2/sites/site002
+g, managerUser1048,  manager001, /orgs/2/sites/site003
+g, managerUser1048,  manager001, /orgs/2/sites/site004
+g, managerUser1048,  manager001, /orgs/2/sites/site005
+
+g, managerUser1049,  manager001, /orgs/2/sites/site001
+g, managerUser1049,  manager001, /orgs/2/sites/site002
+g, managerUser1049,  manager001, /orgs/2/sites/site003
+g, managerUser1049,  manager001, /orgs/2/sites/site004
+g, managerUser1049,  manager001, /orgs/2/sites/site005
+
+g, managerUser1050,  manager001, /orgs/2/sites/site001
+g, managerUser1050,  manager001, /orgs/2/sites/site002
+g, managerUser1050,  manager001, /orgs/2/sites/site003
+g, managerUser1050,  manager001, /orgs/2/sites/site004
+g, managerUser1050,  manager001, /orgs/2/sites/site005
+
+# Group - manager001, / org2
+g, managerUser2001, manager001, /orgs/2/sites/site001
+g, managerUser2001, manager001, /orgs/2/sites/site002
+g, managerUser2001, manager001, /orgs/2/sites/site003
+g, managerUser2001, manager001, /orgs/2/sites/site004
+g, managerUser2001, manager001, /orgs/2/sites/site005
+
+g, managerUser2001, manager001, /orgs/2/sites/site001
+g, managerUser2001, manager001, /orgs/2/sites/site002
+g, managerUser2001, manager001, /orgs/2/sites/site003
+g, managerUser2001, manager001, /orgs/2/sites/site004
+g, managerUser2001, manager001, /orgs/2/sites/site005
+
+g, managerUser2003, manager001, /orgs/2/sites/site001
+g, managerUser2003, manager001, /orgs/2/sites/site002
+g, managerUser2003, manager001, /orgs/2/sites/site003
+g, managerUser2003, manager001, /orgs/2/sites/site004
+g, managerUser2003, manager001, /orgs/2/sites/site005
+
+g, managerUser2004, manager001, /orgs/2/sites/site001
+g, managerUser2004, manager001, /orgs/2/sites/site002
+g, managerUser2004, manager001, /orgs/2/sites/site003
+g, managerUser2004, manager001, /orgs/2/sites/site004
+g, managerUser2004, manager001, /orgs/2/sites/site005
+
+g, managerUser2005, manager001, /orgs/2/sites/site001
+g, managerUser2005, manager001, /orgs/2/sites/site002
+g, managerUser2005, manager001, /orgs/2/sites/site003
+g, managerUser2005, manager001, /orgs/2/sites/site004
+g, managerUser2005, manager001, /orgs/2/sites/site005
+
+g, managerUser2006, manager001, /orgs/2/sites/site001
+g, managerUser2006, manager001, /orgs/2/sites/site002
+g, managerUser2006, manager001, /orgs/2/sites/site003
+g, managerUser2006, manager001, /orgs/2/sites/site004
+g, managerUser2006, manager001, /orgs/2/sites/site005
+
+g, managerUser2007, manager001, /orgs/2/sites/site001
+g, managerUser2007, manager001, /orgs/2/sites/site002
+g, managerUser2007, manager001, /orgs/2/sites/site003
+g, managerUser2007, manager001, /orgs/2/sites/site004
+g, managerUser2007, manager001, /orgs/2/sites/site005
+
+g, managerUser2008,  manager001, /orgs/2/sites/site001
+g, managerUser2008,  manager001, /orgs/2/sites/site002
+g, managerUser2008,  manager001, /orgs/2/sites/site003
+g, managerUser2008,  manager001, /orgs/2/sites/site004
+g, managerUser2008,  manager001, /orgs/2/sites/site005
+
+g, managerUser2009,  manager001, /orgs/2/sites/site001
+g, managerUser2009,  manager001, /orgs/2/sites/site002
+g, managerUser2009,  manager001, /orgs/2/sites/site003
+g, managerUser2009,  manager001, /orgs/2/sites/site004
+g, managerUser2009,  manager001, /orgs/2/sites/site005
+
+g, managerUser2010,  manager001, /orgs/2/sites/site001
+g, managerUser2010,  manager001, /orgs/2/sites/site002
+g, managerUser2010,  manager001, /orgs/2/sites/site003
+g, managerUser2010,  manager001, /orgs/2/sites/site004
+g, managerUser2010,  manager001, /orgs/2/sites/site005
+
+g, managerUser2011,  manager001, /orgs/2/sites/site001
+g, managerUser2011,  manager001, /orgs/2/sites/site002
+g, managerUser2011,  manager001, /orgs/2/sites/site003
+g, managerUser2011,  manager001, /orgs/2/sites/site004
+g, managerUser2011,  manager001, /orgs/2/sites/site005
+
+g, managerUser2012,  manager001, /orgs/2/sites/site001
+g, managerUser2012,  manager001, /orgs/2/sites/site002
+g, managerUser2012,  manager001, /orgs/2/sites/site003
+g, managerUser2012,  manager001, /orgs/2/sites/site004
+g, managerUser2012,  manager001, /orgs/2/sites/site005
+
+g, managerUser2013, manager001, /orgs/2/sites/site001
+g, managerUser2013, manager001, /orgs/2/sites/site002
+g, managerUser2013, manager001, /orgs/2/sites/site003
+g, managerUser2013, manager001, /orgs/2/sites/site004
+g, managerUser2013, manager001, /orgs/2/sites/site005
+
+g, managerUser2014, manager001, /orgs/2/sites/site001
+g, managerUser2014, manager001, /orgs/2/sites/site002
+g, managerUser2014, manager001, /orgs/2/sites/site003
+g, managerUser2014, manager001, /orgs/2/sites/site004
+g, managerUser2014, manager001, /orgs/2/sites/site005
+
+g, managerUser2015, manager001, /orgs/2/sites/site001
+g, managerUser2015, manager001, /orgs/2/sites/site002
+g, managerUser2015, manager001, /orgs/2/sites/site003
+g, managerUser2015, manager001, /orgs/2/sites/site004
+g, managerUser2015, manager001, /orgs/2/sites/site005
+
+g, managerUser2016, manager001, /orgs/2/sites/site001
+g, managerUser2016, manager001, /orgs/2/sites/site002
+g, managerUser2016, manager001, /orgs/2/sites/site003
+g, managerUser2016, manager001, /orgs/2/sites/site004
+g, managerUser2016, manager001, /orgs/2/sites/site005
+
+g, managerUser2017, manager001, /orgs/2/sites/site001
+g, managerUser2017, manager001, /orgs/2/sites/site002
+g, managerUser2017, manager001, /orgs/2/sites/site003
+g, managerUser2017, manager001, /orgs/2/sites/site004
+g, managerUser2017, manager001, /orgs/2/sites/site005
+
+g, managerUser2018,  manager001, /orgs/2/sites/site001
+g, managerUser2018,  manager001, /orgs/2/sites/site002
+g, managerUser2018,  manager001, /orgs/2/sites/site003
+g, managerUser2018,  manager001, /orgs/2/sites/site004
+g, managerUser2018,  manager001, /orgs/2/sites/site005
+
+g, managerUser2019,  manager001, /orgs/2/sites/site001
+g, managerUser2019,  manager001, /orgs/2/sites/site002
+g, managerUser2019,  manager001, /orgs/2/sites/site003
+g, managerUser2019,  manager001, /orgs/2/sites/site004
+g, managerUser2019,  manager001, /orgs/2/sites/site005
+
+g, managerUser2020,  manager001, /orgs/2/sites/site001
+g, managerUser2020,  manager001, /orgs/2/sites/site002
+g, managerUser2020,  manager001, /orgs/2/sites/site003
+g, managerUser2020,  manager001, /orgs/2/sites/site004
+g, managerUser2020,  manager001, /orgs/2/sites/site005
+
+g, managerUser2021,  manager001, /orgs/2/sites/site001
+g, managerUser2021,  manager001, /orgs/2/sites/site002
+g, managerUser2021,  manager001, /orgs/2/sites/site003
+g, managerUser2021,  manager001, /orgs/2/sites/site004
+g, managerUser2021,  manager001, /orgs/2/sites/site005
+
+g, managerUser2022,  manager001, /orgs/2/sites/site001
+g, managerUser2022,  manager001, /orgs/2/sites/site002
+g, managerUser2022,  manager001, /orgs/2/sites/site003
+g, managerUser2022,  manager001, /orgs/2/sites/site004
+g, managerUser2022,  manager001, /orgs/2/sites/site005
+
+g, managerUser2023, manager001, /orgs/2/sites/site001
+g, managerUser2023, manager001, /orgs/2/sites/site002
+g, managerUser2023, manager001, /orgs/2/sites/site003
+g, managerUser2023, manager001, /orgs/2/sites/site004
+g, managerUser2023, manager001, /orgs/2/sites/site005
+
+g, managerUser2024, manager001, /orgs/2/sites/site001
+g, managerUser2024, manager001, /orgs/2/sites/site002
+g, managerUser2024, manager001, /orgs/2/sites/site003
+g, managerUser2024, manager001, /orgs/2/sites/site004
+g, managerUser2024, manager001, /orgs/2/sites/site005
+
+g, managerUser2025, manager001, /orgs/2/sites/site001
+g, managerUser2025, manager001, /orgs/2/sites/site002
+g, managerUser2025, manager001, /orgs/2/sites/site003
+g, managerUser2025, manager001, /orgs/2/sites/site004
+g, managerUser2025, manager001, /orgs/2/sites/site005
+
+g, managerUser2026, manager001, /orgs/2/sites/site001
+g, managerUser2026, manager001, /orgs/2/sites/site002
+g, managerUser2026, manager001, /orgs/2/sites/site003
+g, managerUser2026, manager001, /orgs/2/sites/site004
+g, managerUser2026, manager001, /orgs/2/sites/site005
+
+g, managerUser2027, manager001, /orgs/2/sites/site001
+g, managerUser2027, manager001, /orgs/2/sites/site002
+g, managerUser2027, manager001, /orgs/2/sites/site003
+g, managerUser2027, manager001, /orgs/2/sites/site004
+g, managerUser2027, manager001, /orgs/2/sites/site005
+
+g, managerUser2028,  manager001, /orgs/2/sites/site001
+g, managerUser2028,  manager001, /orgs/2/sites/site002
+g, managerUser2028,  manager001, /orgs/2/sites/site003
+g, managerUser2028,  manager001, /orgs/2/sites/site004
+g, managerUser2028,  manager001, /orgs/2/sites/site005
+
+g, managerUser2029,  manager001, /orgs/2/sites/site001
+g, managerUser2029,  manager001, /orgs/2/sites/site002
+g, managerUser2029,  manager001, /orgs/2/sites/site003
+g, managerUser2029,  manager001, /orgs/2/sites/site004
+g, managerUser2029,  manager001, /orgs/2/sites/site005
+
+g, managerUser2030,  manager001, /orgs/2/sites/site001
+g, managerUser2030,  manager001, /orgs/2/sites/site002
+g, managerUser2030,  manager001, /orgs/2/sites/site003
+g, managerUser2030,  manager001, /orgs/2/sites/site004
+g, managerUser2030,  manager001, /orgs/2/sites/site005
+
+g, managerUser2031,  manager001, /orgs/2/sites/site001
+g, managerUser2031,  manager001, /orgs/2/sites/site002
+g, managerUser2031,  manager001, /orgs/2/sites/site003
+g, managerUser2031,  manager001, /orgs/2/sites/site004
+g, managerUser2031,  manager001, /orgs/2/sites/site005
+
+g, managerUser2032,  manager001, /orgs/2/sites/site001
+g, managerUser2032,  manager001, /orgs/2/sites/site002
+g, managerUser2032,  manager001, /orgs/2/sites/site003
+g, managerUser2032,  manager001, /orgs/2/sites/site004
+g, managerUser2032,  manager001, /orgs/2/sites/site005
+
+g, managerUser2033, manager001, /orgs/2/sites/site001
+g, managerUser2033, manager001, /orgs/2/sites/site002
+g, managerUser2033, manager001, /orgs/2/sites/site003
+g, managerUser2033, manager001, /orgs/2/sites/site004
+g, managerUser2033, manager001, /orgs/2/sites/site005
+
+g, managerUser2034, manager001, /orgs/2/sites/site001
+g, managerUser2034, manager001, /orgs/2/sites/site002
+g, managerUser2034, manager001, /orgs/2/sites/site003
+g, managerUser2034, manager001, /orgs/2/sites/site004
+g, managerUser2034, manager001, /orgs/2/sites/site005
+
+g, managerUser2035, manager001, /orgs/2/sites/site001
+g, managerUser2035, manager001, /orgs/2/sites/site002
+g, managerUser2035, manager001, /orgs/2/sites/site003
+g, managerUser2035, manager001, /orgs/2/sites/site004
+g, managerUser2035, manager001, /orgs/2/sites/site005
+
+g, managerUser2036, manager001, /orgs/2/sites/site001
+g, managerUser2036, manager001, /orgs/2/sites/site002
+g, managerUser2036, manager001, /orgs/2/sites/site003
+g, managerUser2036, manager001, /orgs/2/sites/site004
+g, managerUser2036, manager001, /orgs/2/sites/site005
+
+g, managerUser2037, manager001, /orgs/2/sites/site001
+g, managerUser2037, manager001, /orgs/2/sites/site002
+g, managerUser2037, manager001, /orgs/2/sites/site003
+g, managerUser2037, manager001, /orgs/2/sites/site004
+g, managerUser2037, manager001, /orgs/2/sites/site005
+
+g, managerUser2038,  manager001, /orgs/2/sites/site001
+g, managerUser2038,  manager001, /orgs/2/sites/site002
+g, managerUser2038,  manager001, /orgs/2/sites/site003
+g, managerUser2038,  manager001, /orgs/2/sites/site004
+g, managerUser2038,  manager001, /orgs/2/sites/site005
+
+g, managerUser2039,  manager001, /orgs/2/sites/site001
+g, managerUser2039,  manager001, /orgs/2/sites/site002
+g, managerUser2039,  manager001, /orgs/2/sites/site003
+g, managerUser2039,  manager001, /orgs/2/sites/site004
+g, managerUser2039,  manager001, /orgs/2/sites/site005
+
+g, managerUser2040,  manager001, /orgs/2/sites/site001
+g, managerUser2040,  manager001, /orgs/2/sites/site002
+g, managerUser2040,  manager001, /orgs/2/sites/site003
+g, managerUser2040,  manager001, /orgs/2/sites/site004
+g, managerUser2040,  manager001, /orgs/2/sites/site005
+
+g, managerUser2041,  manager001, /orgs/2/sites/site001
+g, managerUser2041,  manager001, /orgs/2/sites/site002
+g, managerUser2041,  manager001, /orgs/2/sites/site003
+g, managerUser2041,  manager001, /orgs/2/sites/site004
+g, managerUser2041,  manager001, /orgs/2/sites/site005
+
+g, managerUser2042,  manager001, /orgs/2/sites/site001
+g, managerUser2042,  manager001, /orgs/2/sites/site002
+g, managerUser2042,  manager001, /orgs/2/sites/site003
+g, managerUser2042,  manager001, /orgs/2/sites/site004
+g, managerUser2042,  manager001, /orgs/2/sites/site005
+
+g, managerUser2043, manager001, /orgs/2/sites/site001
+g, managerUser2043, manager001, /orgs/2/sites/site002
+g, managerUser2043, manager001, /orgs/2/sites/site003
+g, managerUser2043, manager001, /orgs/2/sites/site004
+g, managerUser2043, manager001, /orgs/2/sites/site005
+
+g, managerUser2044, manager001, /orgs/2/sites/site001
+g, managerUser2044, manager001, /orgs/2/sites/site002
+g, managerUser2044, manager001, /orgs/2/sites/site003
+g, managerUser2044, manager001, /orgs/2/sites/site004
+g, managerUser2044, manager001, /orgs/2/sites/site005
+
+g, managerUser2045, manager001, /orgs/2/sites/site001
+g, managerUser2045, manager001, /orgs/2/sites/site002
+g, managerUser2045, manager001, /orgs/2/sites/site003
+g, managerUser2045, manager001, /orgs/2/sites/site004
+g, managerUser2045, manager001, /orgs/2/sites/site005
+
+g, managerUser2046, manager001, /orgs/2/sites/site001
+g, managerUser2046, manager001, /orgs/2/sites/site002
+g, managerUser2046, manager001, /orgs/2/sites/site003
+g, managerUser2046, manager001, /orgs/2/sites/site004
+g, managerUser2046, manager001, /orgs/2/sites/site005
+
+g, managerUser2047, manager001, /orgs/2/sites/site001
+g, managerUser2047, manager001, /orgs/2/sites/site002
+g, managerUser2047, manager001, /orgs/2/sites/site003
+g, managerUser2047, manager001, /orgs/2/sites/site004
+g, managerUser2047, manager001, /orgs/2/sites/site005
+
+g, managerUser2048,  manager001, /orgs/2/sites/site001
+g, managerUser2048,  manager001, /orgs/2/sites/site002
+g, managerUser2048,  manager001, /orgs/2/sites/site003
+g, managerUser2048,  manager001, /orgs/2/sites/site004
+g, managerUser2048,  manager001, /orgs/2/sites/site005
+
+g, managerUser2049,  manager001, /orgs/2/sites/site001
+g, managerUser2049,  manager001, /orgs/2/sites/site002
+g, managerUser2049,  manager001, /orgs/2/sites/site003
+g, managerUser2049,  manager001, /orgs/2/sites/site004
+g, managerUser2049,  manager001, /orgs/2/sites/site005
+
+g, managerUser2050,  manager001, /orgs/2/sites/site001
+g, managerUser2050,  manager001, /orgs/2/sites/site002
+g, managerUser2050,  manager001, /orgs/2/sites/site003
+g, managerUser2050,  manager001, /orgs/2/sites/site004
+g, managerUser2050,  manager001, /orgs/2/sites/site005
+
+# Group - customer001, / org2
+g, customerUser1001, customer001, /orgs/2/sites/site001
+g, customerUser1001, customer001, /orgs/2/sites/site002
+g, customerUser1001, customer001, /orgs/2/sites/site003
+g, customerUser1001, customer001, /orgs/2/sites/site004
+g, customerUser1001, customer001, /orgs/2/sites/site005
+
+g, customerUser1001, customer001, /orgs/2/sites/site001
+g, customerUser1001, customer001, /orgs/2/sites/site002
+g, customerUser1001, customer001, /orgs/2/sites/site003
+g, customerUser1001, customer001, /orgs/2/sites/site004
+g, customerUser1001, customer001, /orgs/2/sites/site005
+
+g, customerUser1003, customer001, /orgs/2/sites/site001
+g, customerUser1003, customer001, /orgs/2/sites/site002
+g, customerUser1003, customer001, /orgs/2/sites/site003
+g, customerUser1003, customer001, /orgs/2/sites/site004
+g, customerUser1003, customer001, /orgs/2/sites/site005
+
+g, customerUser1004, customer001, /orgs/2/sites/site001
+g, customerUser1004, customer001, /orgs/2/sites/site002
+g, customerUser1004, customer001, /orgs/2/sites/site003
+g, customerUser1004, customer001, /orgs/2/sites/site004
+g, customerUser1004, customer001, /orgs/2/sites/site005
+
+g, customerUser1005, customer001, /orgs/2/sites/site001
+g, customerUser1005, customer001, /orgs/2/sites/site002
+g, customerUser1005, customer001, /orgs/2/sites/site003
+g, customerUser1005, customer001, /orgs/2/sites/site004
+g, customerUser1005, customer001, /orgs/2/sites/site005
+
+g, customerUser1006, customer001, /orgs/2/sites/site001
+g, customerUser1006, customer001, /orgs/2/sites/site002
+g, customerUser1006, customer001, /orgs/2/sites/site003
+g, customerUser1006, customer001, /orgs/2/sites/site004
+g, customerUser1006, customer001, /orgs/2/sites/site005
+
+g, customerUser1007, customer001, /orgs/2/sites/site001
+g, customerUser1007, customer001, /orgs/2/sites/site002
+g, customerUser1007, customer001, /orgs/2/sites/site003
+g, customerUser1007, customer001, /orgs/2/sites/site004
+g, customerUser1007, customer001, /orgs/2/sites/site005
+
+g, customerUser1008,  customer001, /orgs/2/sites/site001
+g, customerUser1008,  customer001, /orgs/2/sites/site002
+g, customerUser1008,  customer001, /orgs/2/sites/site003
+g, customerUser1008,  customer001, /orgs/2/sites/site004
+g, customerUser1008,  customer001, /orgs/2/sites/site005
+
+g, customerUser1009,  customer001, /orgs/2/sites/site001
+g, customerUser1009,  customer001, /orgs/2/sites/site002
+g, customerUser1009,  customer001, /orgs/2/sites/site003
+g, customerUser1009,  customer001, /orgs/2/sites/site004
+g, customerUser1009,  customer001, /orgs/2/sites/site005
+
+g, customerUser1010,  customer001, /orgs/2/sites/site001
+g, customerUser1010,  customer001, /orgs/2/sites/site002
+g, customerUser1010,  customer001, /orgs/2/sites/site003
+g, customerUser1010,  customer001, /orgs/2/sites/site004
+g, customerUser1010,  customer001, /orgs/2/sites/site005
+
+g, customerUser1011,  customer001, /orgs/2/sites/site001
+g, customerUser1011,  customer001, /orgs/2/sites/site002
+g, customerUser1011,  customer001, /orgs/2/sites/site003
+g, customerUser1011,  customer001, /orgs/2/sites/site004
+g, customerUser1011,  customer001, /orgs/2/sites/site005
+
+g, customerUser1012,  customer001, /orgs/2/sites/site001
+g, customerUser1012,  customer001, /orgs/2/sites/site002
+g, customerUser1012,  customer001, /orgs/2/sites/site003
+g, customerUser1012,  customer001, /orgs/2/sites/site004
+g, customerUser1012,  customer001, /orgs/2/sites/site005
+
+g, customerUser1013, customer001, /orgs/2/sites/site001
+g, customerUser1013, customer001, /orgs/2/sites/site002
+g, customerUser1013, customer001, /orgs/2/sites/site003
+g, customerUser1013, customer001, /orgs/2/sites/site004
+g, customerUser1013, customer001, /orgs/2/sites/site005
+
+g, customerUser1014, customer001, /orgs/2/sites/site001
+g, customerUser1014, customer001, /orgs/2/sites/site002
+g, customerUser1014, customer001, /orgs/2/sites/site003
+g, customerUser1014, customer001, /orgs/2/sites/site004
+g, customerUser1014, customer001, /orgs/2/sites/site005
+
+g, customerUser1015, customer001, /orgs/2/sites/site001
+g, customerUser1015, customer001, /orgs/2/sites/site002
+g, customerUser1015, customer001, /orgs/2/sites/site003
+g, customerUser1015, customer001, /orgs/2/sites/site004
+g, customerUser1015, customer001, /orgs/2/sites/site005
+
+g, customerUser1016, customer001, /orgs/2/sites/site001
+g, customerUser1016, customer001, /orgs/2/sites/site002
+g, customerUser1016, customer001, /orgs/2/sites/site003
+g, customerUser1016, customer001, /orgs/2/sites/site004
+g, customerUser1016, customer001, /orgs/2/sites/site005
+
+g, customerUser1017, customer001, /orgs/2/sites/site001
+g, customerUser1017, customer001, /orgs/2/sites/site002
+g, customerUser1017, customer001, /orgs/2/sites/site003
+g, customerUser1017, customer001, /orgs/2/sites/site004
+g, customerUser1017, customer001, /orgs/2/sites/site005
+
+g, customerUser1018,  customer001, /orgs/2/sites/site001
+g, customerUser1018,  customer001, /orgs/2/sites/site002
+g, customerUser1018,  customer001, /orgs/2/sites/site003
+g, customerUser1018,  customer001, /orgs/2/sites/site004
+g, customerUser1018,  customer001, /orgs/2/sites/site005
+
+g, customerUser1019,  customer001, /orgs/2/sites/site001
+g, customerUser1019,  customer001, /orgs/2/sites/site002
+g, customerUser1019,  customer001, /orgs/2/sites/site003
+g, customerUser1019,  customer001, /orgs/2/sites/site004
+g, customerUser1019,  customer001, /orgs/2/sites/site005
+
+g, customerUser1020,  customer001, /orgs/2/sites/site001
+g, customerUser1020,  customer001, /orgs/2/sites/site002
+g, customerUser1020,  customer001, /orgs/2/sites/site003
+g, customerUser1020,  customer001, /orgs/2/sites/site004
+g, customerUser1020,  customer001, /orgs/2/sites/site005
+
+g, customerUser1021,  customer001, /orgs/2/sites/site001
+g, customerUser1021,  customer001, /orgs/2/sites/site002
+g, customerUser1021,  customer001, /orgs/2/sites/site003
+g, customerUser1021,  customer001, /orgs/2/sites/site004
+g, customerUser1021,  customer001, /orgs/2/sites/site005
+
+g, customerUser1022,  customer001, /orgs/2/sites/site001
+g, customerUser1022,  customer001, /orgs/2/sites/site002
+g, customerUser1022,  customer001, /orgs/2/sites/site003
+g, customerUser1022,  customer001, /orgs/2/sites/site004
+g, customerUser1022,  customer001, /orgs/2/sites/site005
+
+g, customerUser1023, customer001, /orgs/2/sites/site001
+g, customerUser1023, customer001, /orgs/2/sites/site002
+g, customerUser1023, customer001, /orgs/2/sites/site003
+g, customerUser1023, customer001, /orgs/2/sites/site004
+g, customerUser1023, customer001, /orgs/2/sites/site005
+
+g, customerUser1024, customer001, /orgs/2/sites/site001
+g, customerUser1024, customer001, /orgs/2/sites/site002
+g, customerUser1024, customer001, /orgs/2/sites/site003
+g, customerUser1024, customer001, /orgs/2/sites/site004
+g, customerUser1024, customer001, /orgs/2/sites/site005
+
+g, customerUser1025, customer001, /orgs/2/sites/site001
+g, customerUser1025, customer001, /orgs/2/sites/site002
+g, customerUser1025, customer001, /orgs/2/sites/site003
+g, customerUser1025, customer001, /orgs/2/sites/site004
+g, customerUser1025, customer001, /orgs/2/sites/site005
+
+g, customerUser1026, customer001, /orgs/2/sites/site001
+g, customerUser1026, customer001, /orgs/2/sites/site002
+g, customerUser1026, customer001, /orgs/2/sites/site003
+g, customerUser1026, customer001, /orgs/2/sites/site004
+g, customerUser1026, customer001, /orgs/2/sites/site005
+
+g, customerUser1027, customer001, /orgs/2/sites/site001
+g, customerUser1027, customer001, /orgs/2/sites/site002
+g, customerUser1027, customer001, /orgs/2/sites/site003
+g, customerUser1027, customer001, /orgs/2/sites/site004
+g, customerUser1027, customer001, /orgs/2/sites/site005
+
+g, customerUser1028,  customer001, /orgs/2/sites/site001
+g, customerUser1028,  customer001, /orgs/2/sites/site002
+g, customerUser1028,  customer001, /orgs/2/sites/site003
+g, customerUser1028,  customer001, /orgs/2/sites/site004
+g, customerUser1028,  customer001, /orgs/2/sites/site005
+
+g, customerUser1029,  customer001, /orgs/2/sites/site001
+g, customerUser1029,  customer001, /orgs/2/sites/site002
+g, customerUser1029,  customer001, /orgs/2/sites/site003
+g, customerUser1029,  customer001, /orgs/2/sites/site004
+g, customerUser1029,  customer001, /orgs/2/sites/site005
+
+g, customerUser1030,  customer001, /orgs/2/sites/site001
+g, customerUser1030,  customer001, /orgs/2/sites/site002
+g, customerUser1030,  customer001, /orgs/2/sites/site003
+g, customerUser1030,  customer001, /orgs/2/sites/site004
+g, customerUser1030,  customer001, /orgs/2/sites/site005
+
+g, customerUser1031,  customer001, /orgs/2/sites/site001
+g, customerUser1031,  customer001, /orgs/2/sites/site002
+g, customerUser1031,  customer001, /orgs/2/sites/site003
+g, customerUser1031,  customer001, /orgs/2/sites/site004
+g, customerUser1031,  customer001, /orgs/2/sites/site005
+
+g, customerUser1032,  customer001, /orgs/2/sites/site001
+g, customerUser1032,  customer001, /orgs/2/sites/site002
+g, customerUser1032,  customer001, /orgs/2/sites/site003
+g, customerUser1032,  customer001, /orgs/2/sites/site004
+g, customerUser1032,  customer001, /orgs/2/sites/site005
+
+g, customerUser1033, customer001, /orgs/2/sites/site001
+g, customerUser1033, customer001, /orgs/2/sites/site002
+g, customerUser1033, customer001, /orgs/2/sites/site003
+g, customerUser1033, customer001, /orgs/2/sites/site004
+g, customerUser1033, customer001, /orgs/2/sites/site005
+
+g, customerUser1034, customer001, /orgs/2/sites/site001
+g, customerUser1034, customer001, /orgs/2/sites/site002
+g, customerUser1034, customer001, /orgs/2/sites/site003
+g, customerUser1034, customer001, /orgs/2/sites/site004
+g, customerUser1034, customer001, /orgs/2/sites/site005
+
+g, customerUser1035, customer001, /orgs/2/sites/site001
+g, customerUser1035, customer001, /orgs/2/sites/site002
+g, customerUser1035, customer001, /orgs/2/sites/site003
+g, customerUser1035, customer001, /orgs/2/sites/site004
+g, customerUser1035, customer001, /orgs/2/sites/site005
+
+g, customerUser1036, customer001, /orgs/2/sites/site001
+g, customerUser1036, customer001, /orgs/2/sites/site002
+g, customerUser1036, customer001, /orgs/2/sites/site003
+g, customerUser1036, customer001, /orgs/2/sites/site004
+g, customerUser1036, customer001, /orgs/2/sites/site005
+
+g, customerUser1037, customer001, /orgs/2/sites/site001
+g, customerUser1037, customer001, /orgs/2/sites/site002
+g, customerUser1037, customer001, /orgs/2/sites/site003
+g, customerUser1037, customer001, /orgs/2/sites/site004
+g, customerUser1037, customer001, /orgs/2/sites/site005
+
+g, customerUser1038,  customer001, /orgs/2/sites/site001
+g, customerUser1038,  customer001, /orgs/2/sites/site002
+g, customerUser1038,  customer001, /orgs/2/sites/site003
+g, customerUser1038,  customer001, /orgs/2/sites/site004
+g, customerUser1038,  customer001, /orgs/2/sites/site005
+
+g, customerUser1039,  customer001, /orgs/2/sites/site001
+g, customerUser1039,  customer001, /orgs/2/sites/site002
+g, customerUser1039,  customer001, /orgs/2/sites/site003
+g, customerUser1039,  customer001, /orgs/2/sites/site004
+g, customerUser1039,  customer001, /orgs/2/sites/site005
+
+g, customerUser1040,  customer001, /orgs/2/sites/site001
+g, customerUser1040,  customer001, /orgs/2/sites/site002
+g, customerUser1040,  customer001, /orgs/2/sites/site003
+g, customerUser1040,  customer001, /orgs/2/sites/site004
+g, customerUser1040,  customer001, /orgs/2/sites/site005
+
+g, customerUser1041,  customer001, /orgs/2/sites/site001
+g, customerUser1041,  customer001, /orgs/2/sites/site002
+g, customerUser1041,  customer001, /orgs/2/sites/site003
+g, customerUser1041,  customer001, /orgs/2/sites/site004
+g, customerUser1041,  customer001, /orgs/2/sites/site005
+
+g, customerUser1042,  customer001, /orgs/2/sites/site001
+g, customerUser1042,  customer001, /orgs/2/sites/site002
+g, customerUser1042,  customer001, /orgs/2/sites/site003
+g, customerUser1042,  customer001, /orgs/2/sites/site004
+g, customerUser1042,  customer001, /orgs/2/sites/site005
+
+g, customerUser1043, customer001, /orgs/2/sites/site001
+g, customerUser1043, customer001, /orgs/2/sites/site002
+g, customerUser1043, customer001, /orgs/2/sites/site003
+g, customerUser1043, customer001, /orgs/2/sites/site004
+g, customerUser1043, customer001, /orgs/2/sites/site005
+
+g, customerUser1044, customer001, /orgs/2/sites/site001
+g, customerUser1044, customer001, /orgs/2/sites/site002
+g, customerUser1044, customer001, /orgs/2/sites/site003
+g, customerUser1044, customer001, /orgs/2/sites/site004
+g, customerUser1044, customer001, /orgs/2/sites/site005
+
+g, customerUser1045, customer001, /orgs/2/sites/site001
+g, customerUser1045, customer001, /orgs/2/sites/site002
+g, customerUser1045, customer001, /orgs/2/sites/site003
+g, customerUser1045, customer001, /orgs/2/sites/site004
+g, customerUser1045, customer001, /orgs/2/sites/site005
+
+g, customerUser1046, customer001, /orgs/2/sites/site001
+g, customerUser1046, customer001, /orgs/2/sites/site002
+g, customerUser1046, customer001, /orgs/2/sites/site003
+g, customerUser1046, customer001, /orgs/2/sites/site004
+g, customerUser1046, customer001, /orgs/2/sites/site005
+
+g, customerUser1047, customer001, /orgs/2/sites/site001
+g, customerUser1047, customer001, /orgs/2/sites/site002
+g, customerUser1047, customer001, /orgs/2/sites/site003
+g, customerUser1047, customer001, /orgs/2/sites/site004
+g, customerUser1047, customer001, /orgs/2/sites/site005
+
+g, customerUser1048,  customer001, /orgs/2/sites/site001
+g, customerUser1048,  customer001, /orgs/2/sites/site002
+g, customerUser1048,  customer001, /orgs/2/sites/site003
+g, customerUser1048,  customer001, /orgs/2/sites/site004
+g, customerUser1048,  customer001, /orgs/2/sites/site005
+
+g, customerUser1049,  customer001, /orgs/2/sites/site001
+g, customerUser1049,  customer001, /orgs/2/sites/site002
+g, customerUser1049,  customer001, /orgs/2/sites/site003
+g, customerUser1049,  customer001, /orgs/2/sites/site004
+g, customerUser1049,  customer001, /orgs/2/sites/site005
+
+g, customerUser1050,  customer001, /orgs/2/sites/site001
+g, customerUser1050,  customer001, /orgs/2/sites/site002
+g, customerUser1050,  customer001, /orgs/2/sites/site003
+g, customerUser1050,  customer001, /orgs/2/sites/site004
+g, customerUser1050,  customer001, /orgs/2/sites/site005
+
+# Group - customer001, / org2
+g, customerUser2001, customer001, /orgs/2/sites/site001
+g, customerUser2001, customer001, /orgs/2/sites/site002
+g, customerUser2001, customer001, /orgs/2/sites/site003
+g, customerUser2001, customer001, /orgs/2/sites/site004
+g, customerUser2001, customer001, /orgs/2/sites/site005
+
+g, customerUser2001, customer001, /orgs/2/sites/site001
+g, customerUser2001, customer001, /orgs/2/sites/site002
+g, customerUser2001, customer001, /orgs/2/sites/site003
+g, customerUser2001, customer001, /orgs/2/sites/site004
+g, customerUser2001, customer001, /orgs/2/sites/site005
+
+g, customerUser2003, customer001, /orgs/2/sites/site001
+g, customerUser2003, customer001, /orgs/2/sites/site002
+g, customerUser2003, customer001, /orgs/2/sites/site003
+g, customerUser2003, customer001, /orgs/2/sites/site004
+g, customerUser2003, customer001, /orgs/2/sites/site005
+
+g, customerUser2004, customer001, /orgs/2/sites/site001
+g, customerUser2004, customer001, /orgs/2/sites/site002
+g, customerUser2004, customer001, /orgs/2/sites/site003
+g, customerUser2004, customer001, /orgs/2/sites/site004
+g, customerUser2004, customer001, /orgs/2/sites/site005
+
+g, customerUser2005, customer001, /orgs/2/sites/site001
+g, customerUser2005, customer001, /orgs/2/sites/site002
+g, customerUser2005, customer001, /orgs/2/sites/site003
+g, customerUser2005, customer001, /orgs/2/sites/site004
+g, customerUser2005, customer001, /orgs/2/sites/site005
+
+g, customerUser2006, customer001, /orgs/2/sites/site001
+g, customerUser2006, customer001, /orgs/2/sites/site002
+g, customerUser2006, customer001, /orgs/2/sites/site003
+g, customerUser2006, customer001, /orgs/2/sites/site004
+g, customerUser2006, customer001, /orgs/2/sites/site005
+
+g, customerUser2007, customer001, /orgs/2/sites/site001
+g, customerUser2007, customer001, /orgs/2/sites/site002
+g, customerUser2007, customer001, /orgs/2/sites/site003
+g, customerUser2007, customer001, /orgs/2/sites/site004
+g, customerUser2007, customer001, /orgs/2/sites/site005
+
+g, customerUser2008,  customer001, /orgs/2/sites/site001
+g, customerUser2008,  customer001, /orgs/2/sites/site002
+g, customerUser2008,  customer001, /orgs/2/sites/site003
+g, customerUser2008,  customer001, /orgs/2/sites/site004
+g, customerUser2008,  customer001, /orgs/2/sites/site005
+
+g, customerUser2009,  customer001, /orgs/2/sites/site001
+g, customerUser2009,  customer001, /orgs/2/sites/site002
+g, customerUser2009,  customer001, /orgs/2/sites/site003
+g, customerUser2009,  customer001, /orgs/2/sites/site004
+g, customerUser2009,  customer001, /orgs/2/sites/site005
+
+g, customerUser2010,  customer001, /orgs/2/sites/site001
+g, customerUser2010,  customer001, /orgs/2/sites/site002
+g, customerUser2010,  customer001, /orgs/2/sites/site003
+g, customerUser2010,  customer001, /orgs/2/sites/site004
+g, customerUser2010,  customer001, /orgs/2/sites/site005
+
+g, customerUser2011,  customer001, /orgs/2/sites/site001
+g, customerUser2011,  customer001, /orgs/2/sites/site002
+g, customerUser2011,  customer001, /orgs/2/sites/site003
+g, customerUser2011,  customer001, /orgs/2/sites/site004
+g, customerUser2011,  customer001, /orgs/2/sites/site005
+
+g, customerUser2012,  customer001, /orgs/2/sites/site001
+g, customerUser2012,  customer001, /orgs/2/sites/site002
+g, customerUser2012,  customer001, /orgs/2/sites/site003
+g, customerUser2012,  customer001, /orgs/2/sites/site004
+g, customerUser2012,  customer001, /orgs/2/sites/site005
+
+g, customerUser2013, customer001, /orgs/2/sites/site001
+g, customerUser2013, customer001, /orgs/2/sites/site002
+g, customerUser2013, customer001, /orgs/2/sites/site003
+g, customerUser2013, customer001, /orgs/2/sites/site004
+g, customerUser2013, customer001, /orgs/2/sites/site005
+
+g, customerUser2014, customer001, /orgs/2/sites/site001
+g, customerUser2014, customer001, /orgs/2/sites/site002
+g, customerUser2014, customer001, /orgs/2/sites/site003
+g, customerUser2014, customer001, /orgs/2/sites/site004
+g, customerUser2014, customer001, /orgs/2/sites/site005
+
+g, customerUser2015, customer001, /orgs/2/sites/site001
+g, customerUser2015, customer001, /orgs/2/sites/site002
+g, customerUser2015, customer001, /orgs/2/sites/site003
+g, customerUser2015, customer001, /orgs/2/sites/site004
+g, customerUser2015, customer001, /orgs/2/sites/site005
+
+g, customerUser2016, customer001, /orgs/2/sites/site001
+g, customerUser2016, customer001, /orgs/2/sites/site002
+g, customerUser2016, customer001, /orgs/2/sites/site003
+g, customerUser2016, customer001, /orgs/2/sites/site004
+g, customerUser2016, customer001, /orgs/2/sites/site005
+
+g, customerUser2017, customer001, /orgs/2/sites/site001
+g, customerUser2017, customer001, /orgs/2/sites/site002
+g, customerUser2017, customer001, /orgs/2/sites/site003
+g, customerUser2017, customer001, /orgs/2/sites/site004
+g, customerUser2017, customer001, /orgs/2/sites/site005
+
+g, customerUser2018,  customer001, /orgs/2/sites/site001
+g, customerUser2018,  customer001, /orgs/2/sites/site002
+g, customerUser2018,  customer001, /orgs/2/sites/site003
+g, customerUser2018,  customer001, /orgs/2/sites/site004
+g, customerUser2018,  customer001, /orgs/2/sites/site005
+
+g, customerUser2019,  customer001, /orgs/2/sites/site001
+g, customerUser2019,  customer001, /orgs/2/sites/site002
+g, customerUser2019,  customer001, /orgs/2/sites/site003
+g, customerUser2019,  customer001, /orgs/2/sites/site004
+g, customerUser2019,  customer001, /orgs/2/sites/site005
+
+g, customerUser2020,  customer001, /orgs/2/sites/site001
+g, customerUser2020,  customer001, /orgs/2/sites/site002
+g, customerUser2020,  customer001, /orgs/2/sites/site003
+g, customerUser2020,  customer001, /orgs/2/sites/site004
+g, customerUser2020,  customer001, /orgs/2/sites/site005
+
+g, customerUser2021,  customer001, /orgs/2/sites/site001
+g, customerUser2021,  customer001, /orgs/2/sites/site002
+g, customerUser2021,  customer001, /orgs/2/sites/site003
+g, customerUser2021,  customer001, /orgs/2/sites/site004
+g, customerUser2021,  customer001, /orgs/2/sites/site005
+
+g, customerUser2022,  customer001, /orgs/2/sites/site001
+g, customerUser2022,  customer001, /orgs/2/sites/site002
+g, customerUser2022,  customer001, /orgs/2/sites/site003
+g, customerUser2022,  customer001, /orgs/2/sites/site004
+g, customerUser2022,  customer001, /orgs/2/sites/site005
+
+g, customerUser2023, customer001, /orgs/2/sites/site001
+g, customerUser2023, customer001, /orgs/2/sites/site002
+g, customerUser2023, customer001, /orgs/2/sites/site003
+g, customerUser2023, customer001, /orgs/2/sites/site004
+g, customerUser2023, customer001, /orgs/2/sites/site005
+
+g, customerUser2024, customer001, /orgs/2/sites/site001
+g, customerUser2024, customer001, /orgs/2/sites/site002
+g, customerUser2024, customer001, /orgs/2/sites/site003
+g, customerUser2024, customer001, /orgs/2/sites/site004
+g, customerUser2024, customer001, /orgs/2/sites/site005
+
+g, customerUser2025, customer001, /orgs/2/sites/site001
+g, customerUser2025, customer001, /orgs/2/sites/site002
+g, customerUser2025, customer001, /orgs/2/sites/site003
+g, customerUser2025, customer001, /orgs/2/sites/site004
+g, customerUser2025, customer001, /orgs/2/sites/site005
+
+g, customerUser2026, customer001, /orgs/2/sites/site001
+g, customerUser2026, customer001, /orgs/2/sites/site002
+g, customerUser2026, customer001, /orgs/2/sites/site003
+g, customerUser2026, customer001, /orgs/2/sites/site004
+g, customerUser2026, customer001, /orgs/2/sites/site005
+
+g, customerUser2027, customer001, /orgs/2/sites/site001
+g, customerUser2027, customer001, /orgs/2/sites/site002
+g, customerUser2027, customer001, /orgs/2/sites/site003
+g, customerUser2027, customer001, /orgs/2/sites/site004
+g, customerUser2027, customer001, /orgs/2/sites/site005
+
+g, customerUser2028,  customer001, /orgs/2/sites/site001
+g, customerUser2028,  customer001, /orgs/2/sites/site002
+g, customerUser2028,  customer001, /orgs/2/sites/site003
+g, customerUser2028,  customer001, /orgs/2/sites/site004
+g, customerUser2028,  customer001, /orgs/2/sites/site005
+
+g, customerUser2029,  customer001, /orgs/2/sites/site001
+g, customerUser2029,  customer001, /orgs/2/sites/site002
+g, customerUser2029,  customer001, /orgs/2/sites/site003
+g, customerUser2029,  customer001, /orgs/2/sites/site004
+g, customerUser2029,  customer001, /orgs/2/sites/site005
+
+g, customerUser2030,  customer001, /orgs/2/sites/site001
+g, customerUser2030,  customer001, /orgs/2/sites/site002
+g, customerUser2030,  customer001, /orgs/2/sites/site003
+g, customerUser2030,  customer001, /orgs/2/sites/site004
+g, customerUser2030,  customer001, /orgs/2/sites/site005
+
+g, customerUser2031,  customer001, /orgs/2/sites/site001
+g, customerUser2031,  customer001, /orgs/2/sites/site002
+g, customerUser2031,  customer001, /orgs/2/sites/site003
+g, customerUser2031,  customer001, /orgs/2/sites/site004
+g, customerUser2031,  customer001, /orgs/2/sites/site005
+
+g, customerUser2032,  customer001, /orgs/2/sites/site001
+g, customerUser2032,  customer001, /orgs/2/sites/site002
+g, customerUser2032,  customer001, /orgs/2/sites/site003
+g, customerUser2032,  customer001, /orgs/2/sites/site004
+g, customerUser2032,  customer001, /orgs/2/sites/site005
+
+g, customerUser2033, customer001, /orgs/2/sites/site001
+g, customerUser2033, customer001, /orgs/2/sites/site002
+g, customerUser2033, customer001, /orgs/2/sites/site003
+g, customerUser2033, customer001, /orgs/2/sites/site004
+g, customerUser2033, customer001, /orgs/2/sites/site005
+
+g, customerUser2034, customer001, /orgs/2/sites/site001
+g, customerUser2034, customer001, /orgs/2/sites/site002
+g, customerUser2034, customer001, /orgs/2/sites/site003
+g, customerUser2034, customer001, /orgs/2/sites/site004
+g, customerUser2034, customer001, /orgs/2/sites/site005
+
+g, customerUser2035, customer001, /orgs/2/sites/site001
+g, customerUser2035, customer001, /orgs/2/sites/site002
+g, customerUser2035, customer001, /orgs/2/sites/site003
+g, customerUser2035, customer001, /orgs/2/sites/site004
+g, customerUser2035, customer001, /orgs/2/sites/site005
+
+g, customerUser2036, customer001, /orgs/2/sites/site001
+g, customerUser2036, customer001, /orgs/2/sites/site002
+g, customerUser2036, customer001, /orgs/2/sites/site003
+g, customerUser2036, customer001, /orgs/2/sites/site004
+g, customerUser2036, customer001, /orgs/2/sites/site005
+
+g, customerUser2037, customer001, /orgs/2/sites/site001
+g, customerUser2037, customer001, /orgs/2/sites/site002
+g, customerUser2037, customer001, /orgs/2/sites/site003
+g, customerUser2037, customer001, /orgs/2/sites/site004
+g, customerUser2037, customer001, /orgs/2/sites/site005
+
+g, customerUser2038,  customer001, /orgs/2/sites/site001
+g, customerUser2038,  customer001, /orgs/2/sites/site002
+g, customerUser2038,  customer001, /orgs/2/sites/site003
+g, customerUser2038,  customer001, /orgs/2/sites/site004
+g, customerUser2038,  customer001, /orgs/2/sites/site005
+
+g, customerUser2039,  customer001, /orgs/2/sites/site001
+g, customerUser2039,  customer001, /orgs/2/sites/site002
+g, customerUser2039,  customer001, /orgs/2/sites/site003
+g, customerUser2039,  customer001, /orgs/2/sites/site004
+g, customerUser2039,  customer001, /orgs/2/sites/site005
+
+g, customerUser2040,  customer001, /orgs/2/sites/site001
+g, customerUser2040,  customer001, /orgs/2/sites/site002
+g, customerUser2040,  customer001, /orgs/2/sites/site003
+g, customerUser2040,  customer001, /orgs/2/sites/site004
+g, customerUser2040,  customer001, /orgs/2/sites/site005
+
+g, customerUser2041,  customer001, /orgs/2/sites/site001
+g, customerUser2041,  customer001, /orgs/2/sites/site002
+g, customerUser2041,  customer001, /orgs/2/sites/site003
+g, customerUser2041,  customer001, /orgs/2/sites/site004
+g, customerUser2041,  customer001, /orgs/2/sites/site005
+
+g, customerUser2042,  customer001, /orgs/2/sites/site001
+g, customerUser2042,  customer001, /orgs/2/sites/site002
+g, customerUser2042,  customer001, /orgs/2/sites/site003
+g, customerUser2042,  customer001, /orgs/2/sites/site004
+g, customerUser2042,  customer001, /orgs/2/sites/site005
+
+g, customerUser2043, customer001, /orgs/2/sites/site001
+g, customerUser2043, customer001, /orgs/2/sites/site002
+g, customerUser2043, customer001, /orgs/2/sites/site003
+g, customerUser2043, customer001, /orgs/2/sites/site004
+g, customerUser2043, customer001, /orgs/2/sites/site005
+
+g, customerUser2044, customer001, /orgs/2/sites/site001
+g, customerUser2044, customer001, /orgs/2/sites/site002
+g, customerUser2044, customer001, /orgs/2/sites/site003
+g, customerUser2044, customer001, /orgs/2/sites/site004
+g, customerUser2044, customer001, /orgs/2/sites/site005
+
+g, customerUser2045, customer001, /orgs/2/sites/site001
+g, customerUser2045, customer001, /orgs/2/sites/site002
+g, customerUser2045, customer001, /orgs/2/sites/site003
+g, customerUser2045, customer001, /orgs/2/sites/site004
+g, customerUser2045, customer001, /orgs/2/sites/site005
+
+g, customerUser2046, customer001, /orgs/2/sites/site001
+g, customerUser2046, customer001, /orgs/2/sites/site002
+g, customerUser2046, customer001, /orgs/2/sites/site003
+g, customerUser2046, customer001, /orgs/2/sites/site004
+g, customerUser2046, customer001, /orgs/2/sites/site005
+
+g, customerUser2047, customer001, /orgs/2/sites/site001
+g, customerUser2047, customer001, /orgs/2/sites/site002
+g, customerUser2047, customer001, /orgs/2/sites/site003
+g, customerUser2047, customer001, /orgs/2/sites/site004
+g, customerUser2047, customer001, /orgs/2/sites/site005
+
+g, customerUser2048,  customer001, /orgs/2/sites/site001
+g, customerUser2048,  customer001, /orgs/2/sites/site002
+g, customerUser2048,  customer001, /orgs/2/sites/site003
+g, customerUser2048,  customer001, /orgs/2/sites/site004
+g, customerUser2048,  customer001, /orgs/2/sites/site005
+
+g, customerUser2049,  customer001, /orgs/2/sites/site001
+g, customerUser2049,  customer001, /orgs/2/sites/site002
+g, customerUser2049,  customer001, /orgs/2/sites/site003
+g, customerUser2049,  customer001, /orgs/2/sites/site004
+g, customerUser2049,  customer001, /orgs/2/sites/site005
+
+g, customerUser2050,  customer001, /orgs/2/sites/site001
+g, customerUser2050,  customer001, /orgs/2/sites/site002
+g, customerUser2050,  customer001, /orgs/2/sites/site003
+g, customerUser2050,  customer001, /orgs/2/sites/site004
+g, customerUser2050,  customer001, /orgs/2/sites/site005

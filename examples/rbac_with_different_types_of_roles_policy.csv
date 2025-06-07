@@ -1,0 +1,12 @@
+p, role:owner, domain1, _, (read|write)
+p, role:developer, domain1, _, read
+
+p, role:owner, domain2, _, (read|write)
+p, role:developer, domain2, _, read
+
+g, alice, role:owner, domain1, _, _
+g, bob, role:developer, domain2, _, 9999-12-30 00:00:00
+g, carol, role:owner, domain2, _, 0000-01-02 00:00:00
+
+g2, data1, domain1
+g2, data2, domain2
