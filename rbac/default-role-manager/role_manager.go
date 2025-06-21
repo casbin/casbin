@@ -203,6 +203,7 @@ type RoleManagerImpl struct {
 	domainMatchingFunc rbac.MatchingFunc
 	logger             log.Logger
 	matchingFuncCache  *util.SyncLRUCache
+	mutex              sync.Mutex
 }
 
 // NewRoleManagerImpl is the constructor for creating an instance of the
@@ -348,6 +349,10 @@ func (rm *RoleManagerImpl) HasLink(name1 string, name2 string, domains ...string
 	if name1 == name2 || (rm.matchingFunc != nil && rm.Match(name1, name2)) {
 		return true, nil
 	}
+
+	// Lock to prevent race conditions between getRole and removeRole
+	rm.mutex.Lock()
+	defer rm.mutex.Unlock()
 
 	user, userCreated := rm.getRole(name1)
 	role, roleCreated := rm.getRole(name2)
@@ -755,6 +760,10 @@ func (crm *ConditionalRoleManager) HasLink(name1 string, name2 string, domains .
 	if name1 == name2 || (crm.matchingFunc != nil && crm.Match(name1, name2)) {
 		return true, nil
 	}
+
+	// Lock to prevent race conditions between getRole and removeRole
+	crm.mutex.Lock()
+	defer crm.mutex.Unlock()
 
 	user, userCreated := crm.getRole(name1)
 	role, roleCreated := crm.getRole(name2)
