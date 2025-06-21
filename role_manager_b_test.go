@@ -178,3 +178,18 @@ func BenchmarkHasLinkWithPatternAndDomainPatternLarge(b *testing.B) {
 		_, _ = rm.HasLink("staffUser1001", "staff001", "/orgs/1/sites/site001")
 	}
 }
+
+// BenchmarkConcurrentHasLinkWithMatching benchmarks concurrent HasLink performance with matching functions.
+// Performance test for concurrent access with temporary role creation.
+func BenchmarkConcurrentHasLinkWithMatching(b *testing.B) {
+	e, _ := NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
+	e.AddNamedMatchingFunc("g2", "keyMatch2", util.KeyMatch2)
+	rm := e.GetRoleManager()
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			_, _ = rm.HasLink("alice", "/book/123")
+		}
+	})
+}
