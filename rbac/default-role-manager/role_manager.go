@@ -15,6 +15,7 @@
 package defaultrolemanager
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -717,6 +718,12 @@ func (dm *DomainManager) BuildRelationship(name1 string, name2 string, domain ..
 	return nil
 }
 
+// DeleteDomain deletes the specified domain from DomainManager.
+func (dm *DomainManager) DeleteDomain(domain string) error {
+	dm.rmMap.Delete(domain)
+	return nil
+}
+
 type RoleManager struct {
 	*DomainManager
 }
@@ -725,6 +732,11 @@ func NewRoleManager(maxHierarchyLevel int) *RoleManager {
 	rm := &RoleManager{}
 	rm.DomainManager = NewDomainManager(maxHierarchyLevel)
 	return rm
+}
+
+// DeleteDomain does nothing for RoleManagerImpl (no domain concept).
+func (rm *RoleManagerImpl) DeleteDomain(domain string) error {
+	return errors.New("DeleteDomain is not supported by RoleManagerImpl (no domain concept)")
 }
 
 type ConditionalRoleManager struct {

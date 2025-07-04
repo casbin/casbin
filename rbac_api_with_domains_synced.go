@@ -58,3 +58,11 @@ func (e *SyncedEnforcer) DeleteRolesForUserInDomain(user string, domain string) 
 	defer e.m.Unlock()
 	return e.Enforcer.DeleteRolesForUserInDomain(user, domain)
 }
+
+// DeleteDomains deletes domains from the model.
+// Returns false if the domain does not exist (aka not affected).
+func (e *SyncedEnforcer) DeleteDomains(domains ...string) (bool, error) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	return e.Enforcer.DeleteDomains(domains...)
+}

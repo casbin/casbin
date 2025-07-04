@@ -144,16 +144,25 @@ func (e *Enforcer) DeleteAllUsersByDomain(domain string) (bool, error) {
 	return true, nil
 }
 
-// DeleteDomains would delete all associated users and roles.
+// DeleteDomains would delete all associated policies.
 // It would delete all domains if parameter is not provided.
 func (e *Enforcer) DeleteDomains(domains ...string) (bool, error) {
 	if len(domains) == 0 {
-		e.ClearPolicy()
-		return true, nil
+		var err error
+		domains, err = e.GetAllDomains()
+		if err != nil {
+			return false, err
+		}
 	}
 	for _, domain := range domains {
 		if _, err := e.DeleteAllUsersByDomain(domain); err != nil {
 			return false, err
+		}
+		// remove the domain from the RoleManager.
+		if e.GetRoleManager() != nil {
+			if err := e.GetRoleManager().DeleteDomain(domain); err != nil {
+				return false, err
+			}
 		}
 	}
 	return true, nil

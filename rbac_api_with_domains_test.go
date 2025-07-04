@@ -296,3 +296,47 @@ func TestGetAllRolesByDomain(t *testing.T) {
 	testGetAllRolesByDomain(t, e, "domain2", []string{"admin"})
 	testGetAllRolesByDomain(t, e, "domain3", []string{"user"})
 }
+
+func testDeleteDomains(t *testing.T, domains []string, expectedPolicy, expectedGroupingPolicy [][]string, expectedDomains []string) {
+	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
+
+	_, _ = e.DeleteDomains(domains...)
+	policy, err := e.GetPolicy()
+	if err != nil {
+		t.Error(err)
+	}
+	if !util.Array2DEquals(policy, expectedPolicy) {
+		t.Errorf("policy after deleting domains %v: %v, supposed to be %v\n", domains, policy, expectedPolicy)
+	}
+
+	policies, err := e.GetGroupingPolicy()
+	if err != nil {
+		t.Error(err)
+	}
+	if !util.Array2DEquals(policies, expectedGroupingPolicy) {
+		t.Errorf("grouping policy after deleting domains %v: %v, supposed to be %v\n", domains, policies, expectedGroupingPolicy)
+	}
+
+	domainsAfterRemoval, _ := e.GetAllDomains()
+	if !util.SetEquals(domainsAfterRemoval, expectedDomains) {
+		t.Errorf("domains after deleting %v: %v, supposed to be %v\n", domains, domainsAfterRemoval, expectedDomains)
+	}
+}
+
+func TestDeleteDomains(t *testing.T) {
+	testDeleteDomains(t, []string{"domain1"}, [][]string{
+		{"admin", "domain2", "data2", "read"},
+		{"admin", "domain2", "data2", "write"},
+	}, [][]string{
+		{"bob", "admin", "domain2"},
+	}, []string{"domain2"})
+
+	testDeleteDomains(t, []string{"domain2"}, [][]string{
+		{"admin", "domain1", "data1", "read"},
+		{"admin", "domain1", "data1", "write"},
+	}, [][]string{
+		{"alice", "admin", "domain1"},
+	}, []string{"domain1"})
+
+	testDeleteDomains(t, []string{}, [][]string{}, [][]string{}, []string{})
+}
