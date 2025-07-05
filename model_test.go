@@ -411,6 +411,10 @@ func (rm *testCustomRoleManager) AddDomainLinkConditionFunc(user string, role st
 func (rm *testCustomRoleManager) SetDomainLinkConditionFuncParams(user string, role string, domain string, params ...string) {
 }
 
+func (rm *testCustomRoleManager) DeleteDomain(domain string) error {
+	return nil
+}
+
 func TestRBACModelWithCustomRoleManager(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	e.SetRoleManager(NewRoleManager())

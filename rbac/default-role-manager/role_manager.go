@@ -717,6 +717,12 @@ func (dm *DomainManager) BuildRelationship(name1 string, name2 string, domain ..
 	return nil
 }
 
+// DeleteDomain deletes the specified domain from DomainManager.
+func (dm *DomainManager) DeleteDomain(domain string) error {
+	dm.rmMap.Delete(domain)
+	return nil
+}
+
 type RoleManager struct {
 	*DomainManager
 }
@@ -725,6 +731,16 @@ func NewRoleManager(maxHierarchyLevel int) *RoleManager {
 	rm := &RoleManager{}
 	rm.DomainManager = NewDomainManager(maxHierarchyLevel)
 	return rm
+}
+
+// DeleteDomain does nothing for RoleManagerImpl (no domain concept).
+func (rm *RoleManagerImpl) DeleteDomain(domain string) error {
+	return nil
+}
+
+// DeleteDomain proxies to DomainManager.
+func (rm *RoleManager) DeleteDomain(domain string) error {
+	return rm.DomainManager.DeleteDomain(domain)
 }
 
 type ConditionalRoleManager struct {
