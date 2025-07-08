@@ -15,6 +15,7 @@
 package defaultrolemanager
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -35,6 +36,7 @@ type Role struct {
 	matchedBy                  *sync.Map
 	linkConditionFuncMap       *sync.Map
 	linkConditionFuncParamsMap *sync.Map
+	level                      int
 }
 
 func newRole(name string) *Role {
@@ -46,12 +48,65 @@ func newRole(name string) *Role {
 	r.matchedBy = &sync.Map{}
 	r.linkConditionFuncMap = &sync.Map{}
 	r.linkConditionFuncParamsMap = &sync.Map{}
+	r.level = -1
 	return &r
+}
+
+func (r *Role) predictLevel(role *Role, visited map[string]bool) int {
+	if visited[r.name] {
+		return 0
+	}
+	visited[r.name] = true
+	if r.name == role.name {
+		return 0
+	}
+
+	minLevel := -1
+	role.users.Range(func(_, value interface{}) bool {
+		parentRole := value.(*Role)
+		if !visited[parentRole.name] {
+			level := r.predictLevel(parentRole, visited)
+			if level >= 0 && (minLevel == -1 || level < minLevel) {
+				minLevel = level + 1
+			}
+		}
+		return true
+	})
+
+	return minLevel
+}
+
+func (r *Role) updateLevel() {
+	maxLevel := 0
+	hasParent := false
+	r.users.Range(func(_, value interface{}) bool {
+		hasParent = true
+		parentRole := value.(*Role)
+		if parentRole.level >= 0 && parentRole.level+1 > maxLevel {
+			maxLevel = parentRole.level + 1
+		}
+		return true
+	})
+
+	newLevel := 0
+	if hasParent {
+		newLevel = maxLevel
+	}
+
+	if newLevel != r.level {
+		r.level = newLevel
+		r.roles.Range(func(_, value interface{}) bool {
+			role := value.(*Role)
+			role.updateLevel()
+			return true
+		})
+	}
 }
 
 func (r *Role) addRole(role *Role) {
 	r.roles.Store(role.name, role)
 	role.addUser(r)
+	r.updateLevel()
 }
 
 func (r *Role) removeRole(role *Role) {
@@ -331,6 +386,9 @@ func (rm *RoleManagerImpl) Clear() error {
 func (rm *RoleManagerImpl) AddLink(name1 string, name2 string, domains ...string) error {
 	user, _ := rm.getRole(name1)
 	role, _ := rm.getRole(name2)
+	if rm.maxHierarchyLevel > 0 && role.level >= rm.maxHierarchyLevel-1 {
+		return errors.New("exceeded level limit")
+	}
 	user.addRole(role)
 	return nil
 }
@@ -392,7 +450,25 @@ func (rm *RoleManagerImpl) GetRoles(name string, domains ...string) ([]string, e
 	if created {
 		defer rm.removeRole(user.name)
 	}
-	return user.getRoles(), nil
+
+	if rm.maxHierarchyLevel <= 0 {
+		return user.getRoles(), nil
+	}
+
+	allRoles := user.getRoles()
+	var filteredRoles []string
+
+	for _, roleName := range allRoles {
+		role, roleCreated := rm.getRole(roleName)
+		if roleCreated {
+			defer rm.removeRole(role.name)
+		}
+		if role.level <= rm.maxHierarchyLevel {
+			filteredRoles = append(filteredRoles, roleName)
+		}
+	}
+
+	return filteredRoles, nil
 }
 
 // GetUsers gets the users of a role.
@@ -402,7 +478,22 @@ func (rm *RoleManagerImpl) GetUsers(name string, domain ...string) ([]string, er
 	if created {
 		defer rm.removeRole(role.name)
 	}
-	return role.getUsers(), nil
+
+	if rm.maxHierarchyLevel <= 0 {
+		return role.getUsers(), nil
+	}
+
+	allUsers := role.getUsers()
+	var filteredUsers []string
+
+	for _, userName := range allUsers {
+		user, _ := rm.getRole(userName)
+		if user.level < rm.maxHierarchyLevel {
+			filteredUsers = append(filteredUsers, userName)
+		}
+	}
+
+	return filteredUsers, nil
 }
 
 func (rm *RoleManagerImpl) toString() []string {
