@@ -364,29 +364,47 @@ func TestTemporaryRoles(t *testing.T) {
 }
 
 func TestMaxHierarchyLevel(t *testing.T) {
-	rm := NewRoleManager(1)
-	_ = rm.AddLink("level0", "level1")
-	_ = rm.AddLink("level1", "level2")
-	_ = rm.AddLink("level2", "level3")
+	rm1 := NewRoleManager(1)
+	_ = rm1.AddLink("level0", "level1")
+	_ = rm1.AddLink("level1", "level2")
+	_ = rm1.AddLink("level2", "level3")
 
-	testRole(t, rm, "level0", "level0", true)
-	testRole(t, rm, "level0", "level1", true)
-	testRole(t, rm, "level0", "level2", false)
-	testRole(t, rm, "level0", "level3", false)
-	testRole(t, rm, "level1", "level2", true)
-	testRole(t, rm, "level1", "level3", false)
+	testRole(t, rm1, "level0", "level0", true)
+	testRole(t, rm1, "level0", "level1", true)
+	testRole(t, rm1, "level0", "level2", false)
+	testRole(t, rm1, "level0", "level3", false)
+	testRole(t, rm1, "level1", "level2", false)
+	testRole(t, rm1, "level1", "level3", false)
 
-	rm = NewRoleManager(2)
-	_ = rm.AddLink("level0", "level1")
-	_ = rm.AddLink("level1", "level2")
-	_ = rm.AddLink("level2", "level3")
+	rm2 := NewRoleManager(2)
+	_ = rm2.AddLink("level0", "level1")
+	_ = rm2.AddLink("level1", "level2")
+	_ = rm2.AddLink("level2", "level3")
 
-	testRole(t, rm, "level0", "level0", true)
-	testRole(t, rm, "level0", "level1", true)
-	testRole(t, rm, "level0", "level2", true)
-	testRole(t, rm, "level0", "level3", false)
-	testRole(t, rm, "level1", "level2", true)
-	testRole(t, rm, "level1", "level3", true)
+	testRole(t, rm2, "level0", "level0", true)
+	testRole(t, rm2, "level0", "level1", true)
+	testRole(t, rm2, "level0", "level2", true)
+	testRole(t, rm2, "level0", "level3", false)
+	testRole(t, rm2, "level1", "level2", true)
+	testRole(t, rm2, "level1", "level3", false)
+	testRole(t, rm2, "level2", "level3", false)
+
+	rm3 := NewRoleManager(3)
+	_ = rm3.AddLink("level0", "level1")
+	_ = rm3.AddLink("level1", "level2")
+	_ = rm3.AddLink("level2", "level3")
+	_ = rm3.AddLink("level3", "level4")
+	_ = rm3.AddLink("level4", "level5")
+
+	testRole(t, rm3, "level0", "level0", true)
+	testRole(t, rm3, "level0", "level1", true)
+	testRole(t, rm3, "level0", "level2", true)
+	testRole(t, rm3, "level0", "level3", true)
+	testRole(t, rm3, "level1", "level2", true)
+	testRole(t, rm3, "level1", "level3", true)
+	testRole(t, rm3, "level2", "level3", true)
+	testRole(t, rm3, "level2", "level4", false)
+	testRole(t, rm3, "level2", "level5", false)
 }
 
 // TestConcurrentHasLink tests concurrent HasLink calls for race conditions.
@@ -430,4 +448,72 @@ func TestConcurrentHasLink(t *testing.T) {
 		t.Errorf("Found %d inconsistencies in %d total operations",
 			inconsistencies, numGoroutines*numIterations)
 	}
+}
+
+func TestAddLink_Cycle(t *testing.T) {
+	rm := NewRoleManager(10)
+	_ = rm.AddLink("a", "b")
+	_ = rm.AddLink("b", "c")
+	err := rm.AddLink("c", "a")
+
+	if err == nil {
+		t.Errorf("Expected an error when creating a cycle, but got nil")
+	} else {
+		t.Logf("Successfully detected cycle: %s", err)
+	}
+}
+
+func TestHierarchyLimitAndGetRoles(t *testing.T) {
+	rm := NewRoleManager(3)
+
+	_ = rm.AddLink("g0", "g1")
+	_ = rm.AddLink("g2", "g3")
+	_ = rm.AddLink("g1", "g2")
+	_ = rm.AddLink("g3", "g4")
+
+	expectedLevels := map[string]int{
+		"g0": 0,
+		"g1": 1,
+		"g2": 2,
+		"g3": 3,
+		"g4": 4,
+	}
+
+	rm.rmMap.Range(func(key, value interface{}) bool {
+		domain := key.(string)
+		rm := value.(*RoleManagerImpl)
+		fmt.Printf("Domain: %s\n", domain)
+		rm.allRoles.Range(func(k, v interface{}) bool {
+			role := v.(*Role)
+			if expectedLevels[role.name] != role.level {
+				t.Errorf("Role %s level mismatch: got %d, want %d", role.name, role.level, expectedLevels[role.name])
+			}
+			return true
+		})
+		return true
+	})
+
+	_ = rm.DeleteLink("g1", "g2")
+
+	expectedLevelsAfterDelete := map[string]int{
+		"g0": 0,
+		"g1": 1,
+		"g2": 0,
+		"g3": 1,
+		"g4": 2,
+	}
+
+	rm.rmMap.Range(func(key, value interface{}) bool {
+		domain := key.(string)
+		rm := value.(*RoleManagerImpl)
+		fmt.Printf("After delete, Domain: %s\n", domain)
+		rm.allRoles.Range(func(k, v interface{}) bool {
+			role := v.(*Role)
+			if expectedLevelsAfterDelete[role.name] != role.level {
+				t.Errorf("[After delete] Role %s level mismatch: got %d, want %d", role.name, role.level, expectedLevelsAfterDelete[role.name])
+			}
+			return true
+		})
+		return true
+	})
 }
