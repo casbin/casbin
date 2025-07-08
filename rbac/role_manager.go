@@ -41,6 +41,10 @@ type RoleManager interface {
 	// GetUsers gets the users that inherits a role.
 	// domain is a prefix to the users (can be used for other purposes).
 	GetUsers(name string, domain ...string) ([]string, error)
+
+	GetImplicitRoles(name string, domains ...string) ([]string, error)
+
+	GetImplicitUsers(name string, domains ...string) ([]string, error)
 	// GetDomains gets domains that a user has
 	GetDomains(name string) ([]string, error)
 	// GetAllDomains gets all domains

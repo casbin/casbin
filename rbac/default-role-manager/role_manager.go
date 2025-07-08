@@ -331,8 +331,35 @@ func (rm *RoleManagerImpl) Clear() error {
 func (rm *RoleManagerImpl) AddLink(name1 string, name2 string, domains ...string) error {
 	user, _ := rm.getRole(name1)
 	role, _ := rm.getRole(name2)
+
+	if rm.hasPath(role, user) {
+		return fmt.Errorf("cannot add link from '%s' to '%s': would create a cycle", name1, name2)
+	}
 	user.addRole(role)
+
 	return nil
+}
+
+func (rm *RoleManagerImpl) hasPath(from, to *Role) bool {
+	visited := make(map[string]bool)
+	var dfs func(r *Role) bool
+	dfs = func(r *Role) bool {
+		if r.name == to.name {
+			return true
+		}
+		visited[r.name] = true
+		found := false
+		r.roles.Range(func(_, value interface{}) bool {
+			next := value.(*Role)
+			if !visited[next.name] && dfs(next) {
+				found = true
+				return false
+			}
+			return true
+		})
+		return found
+	}
+	return dfs(from)
 }
 
 // DeleteLink deletes the inheritance link between role: name1 and role: name2.
@@ -392,6 +419,7 @@ func (rm *RoleManagerImpl) GetRoles(name string, domains ...string) ([]string, e
 	if created {
 		defer rm.removeRole(user.name)
 	}
+
 	return user.getRoles(), nil
 }
 
@@ -402,7 +430,58 @@ func (rm *RoleManagerImpl) GetUsers(name string, domain ...string) ([]string, er
 	if created {
 		defer rm.removeRole(role.name)
 	}
+
 	return role.getUsers(), nil
+}
+
+// GetImplicitRoles gets all roles that a user inherits, including direct and indirect roles.
+func (rm *RoleManagerImpl) GetImplicitRoles(name string, domains ...string) ([]string, error) {
+	return rm.getImplicitElements(name, func(r *Role, fn func(key, value interface{}) bool) {
+		r.rangeRoles(fn)
+	}, domains...)
+}
+
+// GetImplicitUsers gets all users that inherit a role, including direct and indirect users.
+func (rm *RoleManagerImpl) GetImplicitUsers(name string, domains ...string) ([]string, error) {
+	return rm.getImplicitElements(name, func(r *Role, fn func(key, value interface{}) bool) {
+		r.rangeUsers(fn)
+	}, domains...)
+}
+
+func (rm *RoleManagerImpl) getImplicitElements(name string, rf func(*Role, func(key, value interface{}) bool), domains ...string) ([]string, error) {
+	element, created := rm.getRole(name)
+	if created {
+		defer rm.removeRole(element.name)
+	}
+
+	result := make([]string, 0, 10)
+	visited := make(map[string]bool)
+
+	queue := []*Role{element}
+	level := rm.maxHierarchyLevel
+
+	for len(queue) > 0 && level > 0 {
+		size := len(queue)
+		for i := 0; i < size; i++ {
+			currentRole := queue[0]
+			queue = queue[1:]
+
+			rf(currentRole, func(key, value interface{}) bool {
+				elementName := key.(string)
+				elementValue := value.(*Role)
+
+				if !visited[elementName] {
+					visited[elementName] = true
+					result = append(result, elementName)
+					queue = append(queue, elementValue)
+				}
+				return true
+			})
+		}
+		level--
+	}
+
+	return result, nil
 }
 
 func (rm *RoleManagerImpl) toString() []string {
@@ -605,12 +684,17 @@ func (dm *DomainManager) AddLink(name1 string, name2 string, domains ...string) 
 		return err
 	}
 	roleManager := dm.getRoleManager(domain, true) // create role manager if it does not exist
-	_ = roleManager.AddLink(name1, name2, domains...)
+	if linkErr := roleManager.AddLink(name1, name2, domains...); linkErr != nil {
+		return linkErr
+	}
 
+	var managerErr error
 	dm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
-		_ = rm.AddLink(name1, name2, domains...)
+		if managerErr == nil {
+			managerErr = rm.AddLink(name1, name2, domain)
+		}
 	})
-	return nil
+	return managerErr
 }
 
 // DeleteLink deletes the inheritance link between role: name1 and role: name2.
@@ -657,6 +741,26 @@ func (dm *DomainManager) GetUsers(name string, domains ...string) ([]string, err
 	}
 	rm := dm.getRoleManager(domain, false)
 	return rm.GetUsers(name, domains...)
+}
+
+// GetImplicitRoles gets all the roles that a subject inherits, including direct and indirect roles.
+func (dm *DomainManager) GetImplicitRoles(name string, domains ...string) ([]string, error) {
+	domain, err := dm.getDomain(domains...)
+	if err != nil {
+		return nil, err
+	}
+	rm := dm.getRoleManager(domain, false)
+	return rm.GetImplicitRoles(name, domains...)
+}
+
+// GetImplicitUsers gets all the users that inherits a role, including direct and indirect users.
+func (dm *DomainManager) GetImplicitUsers(name string, domains ...string) ([]string, error) {
+	domain, err := dm.getDomain(domains...)
+	if err != nil {
+		return nil, err
+	}
+	rm := dm.getRoleManager(domain, false)
+	return rm.GetImplicitUsers(name, domains...)
 }
 
 func (dm *DomainManager) toString() []string {
@@ -966,12 +1070,17 @@ func (cdm *ConditionalDomainManager) AddLink(name1 string, name2 string, domains
 		return err
 	}
 	conditionalRoleManager := cdm.getConditionalRoleManager(domain, true) // create role manager if it does not exist
-	_ = conditionalRoleManager.AddLink(name1, name2, domain)
+	if linkErr := conditionalRoleManager.AddLink(name1, name2, domain); linkErr != nil {
+		return linkErr
+	}
 
+	var managerErr error
 	cdm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
-		_ = rm.AddLink(name1, name2, domain)
+		if managerErr == nil {
+			managerErr = rm.AddLink(name1, name2, domain)
+		}
 	})
-	return nil
+	return managerErr
 }
 
 // DeleteLink deletes the inheritance link between role: name1 and role: name2.

@@ -431,3 +431,16 @@ func TestConcurrentHasLink(t *testing.T) {
 			inconsistencies, numGoroutines*numIterations)
 	}
 }
+
+func TestAddLink_Cycle(t *testing.T) {
+	rm := NewRoleManager(10)
+	_ = rm.AddLink("a", "b")
+	_ = rm.AddLink("b", "c")
+	err := rm.AddLink("c", "a")
+
+	if err == nil {
+		t.Errorf("Expected an error when creating a cycle, but got nil")
+	} else {
+		t.Logf("Successfully detected cycle: %s", err)
+	}
+}

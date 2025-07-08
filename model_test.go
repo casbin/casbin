@@ -389,6 +389,12 @@ func (rm *testCustomRoleManager) GetRoles(name string, domain ...string) ([]stri
 func (rm *testCustomRoleManager) GetUsers(name string, domain ...string) ([]string, error) {
 	return []string{}, nil
 }
+func (rm *testCustomRoleManager) GetImplicitRoles(name string, domains ...string) ([]string, error) {
+	return []string{}, nil
+}
+func (rm *testCustomRoleManager) GetImplicitUsers(name string, domains ...string) ([]string, error) {
+	return []string{}, nil
+}
 func (rm *testCustomRoleManager) GetDomains(name string) ([]string, error) {
 	return []string{}, nil
 }
