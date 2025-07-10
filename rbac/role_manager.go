@@ -55,6 +55,8 @@ type RoleManager interface {
 	AddMatchingFunc(name string, fn MatchingFunc)
 	// AddDomainMatchingFunc adds the domain matching function
 	AddDomainMatchingFunc(name string, fn MatchingFunc)
+	// DeleteDomain deletes all data of a domain in the role manager.
+	DeleteDomain(domain string) error
 }
 
 // ConditionalRoleManager provides interface to define the operations for managing roles.
