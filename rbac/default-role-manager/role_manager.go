@@ -36,6 +36,7 @@ type Role struct {
 	matchedBy                  *sync.Map
 	linkConditionFuncMap       *sync.Map
 	linkConditionFuncParamsMap *sync.Map
+	level                      int
 }
 
 func newRole(name string) *Role {
@@ -47,17 +48,40 @@ func newRole(name string) *Role {
 	r.matchedBy = &sync.Map{}
 	r.linkConditionFuncMap = &sync.Map{}
 	r.linkConditionFuncParamsMap = &sync.Map{}
+	r.level = -1
 	return &r
+}
+
+func (r *Role) updateLevel() {
+	maxLevel := 0
+	r.users.Range(func(_, value interface{}) bool {
+		if parentRole := value.(*Role); parentRole.level >= 0 && parentRole.level+1 > maxLevel {
+			maxLevel = parentRole.level + 1
+		}
+		return true
+	})
+	if r.level != maxLevel {
+		r.level = maxLevel
+	}
+	r.roles.Range(func(_, value interface{}) bool {
+		if role := value.(*Role); role.level != r.level+1 {
+			role.updateLevel()
+		}
+		return true
+	})
 }
 
 func (r *Role) addRole(role *Role) {
 	r.roles.Store(role.name, role)
 	role.addUser(r)
+	r.updateLevel()
 }
 
 func (r *Role) removeRole(role *Role) {
 	r.roles.Delete(role.name)
 	role.removeUser(r)
+	r.updateLevel()
+	role.updateLevel()
 }
 
 // should only be called inside addRole.
@@ -332,8 +356,35 @@ func (rm *RoleManagerImpl) Clear() error {
 func (rm *RoleManagerImpl) AddLink(name1 string, name2 string, domains ...string) error {
 	user, _ := rm.getRole(name1)
 	role, _ := rm.getRole(name2)
+
+	if rm.hasPath(role, user) {
+		return fmt.Errorf("cannot add link from '%s' to '%s': would create a cycle", name1, name2)
+	}
 	user.addRole(role)
+
 	return nil
+}
+
+func (rm *RoleManagerImpl) hasPath(from, to *Role) bool {
+	visited := make(map[string]bool)
+	var dfs func(r *Role) bool
+	dfs = func(r *Role) bool {
+		if r.name == to.name {
+			return true
+		}
+		visited[r.name] = true
+		found := false
+		r.roles.Range(func(_, value interface{}) bool {
+			next := value.(*Role)
+			if !visited[next.name] && dfs(next) {
+				found = true
+				return false
+			}
+			return true
+		})
+		return found
+	}
+	return dfs(from)
 }
 
 // DeleteLink deletes the inheritance link between role: name1 and role: name2.
@@ -358,6 +409,10 @@ func (rm *RoleManagerImpl) HasLink(name1 string, name2 string, domains ...string
 	user, userCreated := rm.getRole(name1)
 	role, roleCreated := rm.getRole(name2)
 
+	if rm.maxHierarchyLevel > 0 && role.level > rm.maxHierarchyLevel {
+		return false, nil
+	}
+
 	if userCreated {
 		defer rm.removeRole(user.name)
 	}
@@ -365,11 +420,11 @@ func (rm *RoleManagerImpl) HasLink(name1 string, name2 string, domains ...string
 		defer rm.removeRole(role.name)
 	}
 
-	return rm.hasLinkHelper(role.name, map[string]*Role{user.name: user}, rm.maxHierarchyLevel), nil
+	return rm.hasLinkHelper(role.name, map[string]*Role{user.name: user}), nil
 }
 
-func (rm *RoleManagerImpl) hasLinkHelper(targetName string, roles map[string]*Role, level int) bool {
-	if level < 0 || len(roles) == 0 {
+func (rm *RoleManagerImpl) hasLinkHelper(targetName string, roles map[string]*Role) bool {
+	if len(roles) == 0 {
 		return false
 	}
 
@@ -384,7 +439,7 @@ func (rm *RoleManagerImpl) hasLinkHelper(targetName string, roles map[string]*Ro
 		})
 	}
 
-	return rm.hasLinkHelper(targetName, nextRoles, level-1)
+	return rm.hasLinkHelper(targetName, nextRoles)
 }
 
 // GetRoles gets the roles that a user inherits.
@@ -393,7 +448,8 @@ func (rm *RoleManagerImpl) GetRoles(name string, domains ...string) ([]string, e
 	if created {
 		defer rm.removeRole(user.name)
 	}
-	return user.getRoles(), nil
+
+	return rm.filterHelper(user.getRoles()), nil
 }
 
 // GetUsers gets the users of a role.
@@ -403,7 +459,27 @@ func (rm *RoleManagerImpl) GetUsers(name string, domain ...string) ([]string, er
 	if created {
 		defer rm.removeRole(role.name)
 	}
-	return role.getUsers(), nil
+
+	return rm.filterHelper(role.getUsers()), nil
+}
+
+func (rm *RoleManagerImpl) filterHelper(names []string) []string {
+	if rm.maxHierarchyLevel <= 0 {
+		return names
+	}
+
+	filteredNames := make([]string, 0, len(names))
+	for _, name := range names {
+		role, ok := rm.load(name)
+		if !ok {
+			continue
+		}
+		if role.level <= rm.maxHierarchyLevel {
+			filteredNames = append(filteredNames, name)
+		}
+	}
+
+	return filteredNames
 }
 
 func (rm *RoleManagerImpl) toString() []string {
@@ -606,12 +682,17 @@ func (dm *DomainManager) AddLink(name1 string, name2 string, domains ...string) 
 		return err
 	}
 	roleManager := dm.getRoleManager(domain, true) // create role manager if it does not exist
-	_ = roleManager.AddLink(name1, name2, domains...)
+	if linkErr := roleManager.AddLink(name1, name2, domains...); linkErr != nil {
+		return linkErr
+	}
 
+	var managerErr error
 	dm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
-		_ = rm.AddLink(name1, name2, domains...)
+		if managerErr == nil {
+			managerErr = rm.AddLink(name1, name2, domain)
+		}
 	})
-	return nil
+	return managerErr
 }
 
 // DeleteLink deletes the inheritance link between role: name1 and role: name2.
@@ -978,12 +1059,17 @@ func (cdm *ConditionalDomainManager) AddLink(name1 string, name2 string, domains
 		return err
 	}
 	conditionalRoleManager := cdm.getConditionalRoleManager(domain, true) // create role manager if it does not exist
-	_ = conditionalRoleManager.AddLink(name1, name2, domain)
+	if linkErr := conditionalRoleManager.AddLink(name1, name2, domain); linkErr != nil {
+		return linkErr
+	}
 
+	var managerErr error
 	cdm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
-		_ = rm.AddLink(name1, name2, domain)
+		if managerErr == nil {
+			managerErr = rm.AddLink(name1, name2, domain)
+		}
 	})
-	return nil
+	return managerErr
 }
 
 // DeleteLink deletes the inheritance link between role: name1 and role: name2.
