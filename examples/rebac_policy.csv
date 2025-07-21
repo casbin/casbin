@@ -1,0 +1,7 @@
+p, collaborator, doc, read
+
+g, alice, doc1, collaborator
+g, bob, doc2, collaborator
+
+g2, doc1, doc
+g2, doc2, doc
