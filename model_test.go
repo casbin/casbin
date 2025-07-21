@@ -680,3 +680,21 @@ func TestTemporalRolesModelWithDomain(t *testing.T) {
 	testDomainEnforce(t, e, "alice", "domain_not_exist", "data8", "read", false)
 	testDomainEnforce(t, e, "alice", "domain_not_exist", "data8", "write", false)
 }
+
+func TestReBACModel(t *testing.T) {
+	e, _ := NewEnforcer("examples/rebac_model.conf", "examples/rebac_policy.csv")
+
+	testEnforce(t, e, "alice", "doc1", "read", true)
+	testEnforce(t, e, "alice", "doc1", "write", false)
+	testEnforce(t, e, "alice", "doc2", "read", false)
+	testEnforce(t, e, "alice", "doc2", "write", false)
+	testEnforce(t, e, "alice", "doc3", "read", false)
+	testEnforce(t, e, "alice", "doc3", "write", false)
+
+	testEnforce(t, e, "bob", "doc1", "read", false)
+	testEnforce(t, e, "bob", "doc1", "write", false)
+	testEnforce(t, e, "bob", "doc2", "read", true)
+	testEnforce(t, e, "bob", "doc2", "write", false)
+	testEnforce(t, e, "bob", "doc3", "read", false)
+	testEnforce(t, e, "bob", "doc3", "write", false)
+}
