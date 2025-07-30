@@ -343,7 +343,7 @@ func TestDeleteDomains(t *testing.T) {
 	testDeleteDomains(t, []string{}, [][]string{}, [][]string{}, []string{})
 }
 
-// TestGetRolesForUserInDomainWithConditionalFunctions
+// TestGetRolesForUserInDomainWithConditionalFunctions.
 func TestGetRolesForUserInDomainWithConditionalFunctions(t *testing.T) {
 	// Create a model with 5-field role definition format
 	modelText := `
@@ -398,15 +398,13 @@ g, bob, qa1, domain2, _, 2025-07-30 00:00:00`
 		}
 	})
 
-	// Test with conditional functions - this should work now with our fix
 	t.Run("WithConditionalFunctions", func(t *testing.T) {
-		// Create a new enforcer for this test
 		e2, err := NewEnforcer(m, a)
 		if err != nil {
 			t.Fatalf("Failed to create enforcer: %v", err)
 		}
 
-		// Add conditional functions for all role assignments
+		// Add time-based conditional functions
 		g, err := e2.GetNamedGroupingPolicy("g")
 		if err != nil {
 			t.Fatalf("Failed to get grouping policy: %v", err)
@@ -418,30 +416,24 @@ g, bob, qa1, domain2, _, 2025-07-30 00:00:00`
 			}
 		}
 
-		// Test that GetRolesForUserInDomain still works (this was the bug)
 		roles := e2.GetRolesForUserInDomain("alice", "domain1")
-		// Note: roles might be empty due to time condition, but the method should not panic
-		// The important thing is that the method returns a result (even if empty) instead of nil
 		if roles == nil {
 			t.Error("GetRolesForUserInDomain should not return nil, even with conditional functions")
 		}
 
-		// Test for bob in domain2
 		roles = e2.GetRolesForUserInDomain("bob", "domain2")
 		if roles == nil {
 			t.Error("GetRolesForUserInDomain should not return nil for bob, even with conditional functions")
 		}
 	})
 
-	// Test with a simple condition function that always returns true
 	t.Run("WithAlwaysTrueCondition", func(t *testing.T) {
-		// Create a new enforcer for this test
 		e3, err := NewEnforcer(m, a)
 		if err != nil {
 			t.Fatalf("Failed to create enforcer: %v", err)
 		}
 
-		// Add a simple condition function that always returns true
+		// Use always-true condition function
 		alwaysTrueFunc := func(params ...string) (bool, error) {
 			return true, nil
 		}
@@ -456,7 +448,6 @@ g, bob, qa1, domain2, _, 2025-07-30 00:00:00`
 			}
 		}
 
-		// Test that GetRolesForUserInDomain works with always-true condition
 		roles := e3.GetRolesForUserInDomain("alice", "domain1")
 		expected := []string{"test1"}
 		if !util.SetEquals(roles, expected) {
@@ -470,16 +461,15 @@ g, bob, qa1, domain2, _, 2025-07-30 00:00:00`
 		}
 	})
 
-	// Test comparison between with and without conditional functions
 	t.Run("ComparisonTest", func(t *testing.T) {
-		// Without conditional functions
+		// Test without conditional functions
 		e4, err := NewEnforcer(m, a)
 		if err != nil {
 			t.Fatalf("Failed to create enforcer: %v", err)
 		}
 		roles1 := e4.GetRolesForUserInDomain("alice", "domain1")
 
-		// With conditional functions
+		// Test with conditional functions
 		e5, err := NewEnforcer(m, a)
 		if err != nil {
 			t.Fatalf("Failed to create enforcer: %v", err)
@@ -495,7 +485,6 @@ g, bob, qa1, domain2, _, 2025-07-30 00:00:00`
 		}
 		roles2 := e5.GetRolesForUserInDomain("alice", "domain1")
 
-		// Both should return a result (even if empty due to time condition)
 		if roles1 == nil {
 			t.Error("GetRolesForUserInDomain should not return nil without conditional functions")
 		}
@@ -503,7 +492,6 @@ g, bob, qa1, domain2, _, 2025-07-30 00:00:00`
 			t.Error("GetRolesForUserInDomain should not return nil with conditional functions")
 		}
 
-		// Log the results for debugging
 		t.Logf("Without conditional functions: %v", roles1)
 		t.Logf("With conditional functions: %v", roles2)
 	})
