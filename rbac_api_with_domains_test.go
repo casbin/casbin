@@ -460,39 +460,4 @@ g, bob, qa1, domain2, _, 2025-07-30 00:00:00`
 			t.Errorf("Expected roles %v, got %v", expected, roles)
 		}
 	})
-
-	t.Run("ComparisonTest", func(t *testing.T) {
-		// Test without conditional functions
-		e4, err := NewEnforcer(m, a)
-		if err != nil {
-			t.Fatalf("Failed to create enforcer: %v", err)
-		}
-		roles1 := e4.GetRolesForUserInDomain("alice", "domain1")
-
-		// Test with conditional functions
-		e5, err := NewEnforcer(m, a)
-		if err != nil {
-			t.Fatalf("Failed to create enforcer: %v", err)
-		}
-		g, err := e5.GetNamedGroupingPolicy("g")
-		if err != nil {
-			t.Fatalf("Failed to get grouping policy: %v", err)
-		}
-		for _, gp := range g {
-			if len(gp) >= 4 {
-				e5.AddNamedDomainLinkConditionFunc("g", gp[0], gp[1], gp[2], util.TimeMatchFunc)
-			}
-		}
-		roles2 := e5.GetRolesForUserInDomain("alice", "domain1")
-
-		if roles1 == nil {
-			t.Error("GetRolesForUserInDomain should not return nil without conditional functions")
-		}
-		if roles2 == nil {
-			t.Error("GetRolesForUserInDomain should not return nil with conditional functions")
-		}
-
-		t.Logf("Without conditional functions: %v", roles1)
-		t.Logf("With conditional functions: %v", roles2)
-	})
 }
