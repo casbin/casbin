@@ -18,6 +18,8 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/casbin/casbin/v2/model"
+	stringadapter "github.com/casbin/casbin/v2/persist/string-adapter"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -339,4 +341,123 @@ func TestDeleteDomains(t *testing.T) {
 	}, []string{"domain1"})
 
 	testDeleteDomains(t, []string{}, [][]string{}, [][]string{}, []string{})
+}
+
+// TestGetRolesForUserInDomainWithConditionalFunctions.
+func TestGetRolesForUserInDomainWithConditionalFunctions(t *testing.T) {
+	// Create a model with 5-field role definition format
+	modelText := `
+[request_definition]
+r = sub, dom, obj, act
+
+[policy_definition]
+p = sub, dom, obj, act
+
+[role_definition]
+g = _, _, _, (_, _)
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub, r.dom) && r.dom == p.dom && r.obj == p.obj && \
+(keyMatch(r.act, p.act) || keyMatch2(r.act, p.act) || keyMatch3(r.act, p.act) || keyMatch4(r.act, p.act) || keyMatch5(r.act, p.act) || globMatch(r.act, p.act))
+`
+
+	// Create policy with conditional role assignments
+	policyText := `p, test1, domain1, service1, /list
+p, test1, domain1, service1, /get/:id/*
+p, test1, domain1, service1, /add
+p, test1, domain1, service1, /user/*
+p, admin, domain1, service1, /*
+p, qa1, domain2, service2, /broadcast
+p, qa1, domain2, service2, /trip
+p, qa1, domain2, service2, /notify
+p, qa1, domain2, service2, /dynamic-sql
+
+g, alice, test1, domain1, _, 2025-07-30 00:00:00
+g, bob, qa1, domain2, _, 2025-07-30 00:00:00`
+
+	m, err := model.NewModelFromString(modelText)
+	if err != nil {
+		t.Fatalf("Failed to create model: %v", err)
+	}
+
+	a := stringadapter.NewAdapter(policyText)
+	e, err := NewEnforcer(m, a)
+	if err != nil {
+		t.Fatalf("Failed to create enforcer: %v", err)
+	}
+
+	// Test without conditional functions
+	t.Run("WithoutConditionalFunctions", func(t *testing.T) {
+		roles := e.GetRolesForUserInDomain("alice", "domain1")
+		expected := []string{"test1"}
+		if !util.SetEquals(roles, expected) {
+			t.Errorf("Expected roles %v, got %v", expected, roles)
+		}
+	})
+
+	t.Run("WithConditionalFunctions", func(t *testing.T) {
+		e2, err := NewEnforcer(m, a)
+		if err != nil {
+			t.Fatalf("Failed to create enforcer: %v", err)
+		}
+
+		// Add time-based conditional functions
+		g, err := e2.GetNamedGroupingPolicy("g")
+		if err != nil {
+			t.Fatalf("Failed to get grouping policy: %v", err)
+		}
+		for _, gp := range g {
+			if len(gp) >= 4 {
+				e2.AddNamedDomainLinkConditionFunc("g", gp[0], gp[1], gp[2], util.TimeMatchFunc)
+				e2.SetNamedDomainLinkConditionFuncParams("g", gp[0], gp[1], gp[2], "_", gp[4])
+			}
+		}
+
+		roles := e2.GetRolesForUserInDomain("alice", "domain1")
+		if roles == nil {
+			t.Error("GetRolesForUserInDomain should not return nil, even with conditional functions")
+		}
+
+		roles = e2.GetRolesForUserInDomain("bob", "domain2")
+		if roles == nil {
+			t.Error("GetRolesForUserInDomain should not return nil for bob, even with conditional functions")
+		}
+	})
+
+	t.Run("WithAlwaysTrueCondition", func(t *testing.T) {
+		e3, err := NewEnforcer(m, a)
+		if err != nil {
+			t.Fatalf("Failed to create enforcer: %v", err)
+		}
+
+		// Use always-true condition function
+		alwaysTrueFunc := func(params ...string) (bool, error) {
+			return true, nil
+		}
+
+		g, err := e3.GetNamedGroupingPolicy("g")
+		if err != nil {
+			t.Fatalf("Failed to get grouping policy: %v", err)
+		}
+		for _, gp := range g {
+			if len(gp) >= 4 {
+				e3.AddNamedDomainLinkConditionFunc("g", gp[0], gp[1], gp[2], alwaysTrueFunc)
+			}
+		}
+
+		roles := e3.GetRolesForUserInDomain("alice", "domain1")
+		expected := []string{"test1"}
+		if !util.SetEquals(roles, expected) {
+			t.Errorf("Expected roles %v, got %v", expected, roles)
+		}
+
+		roles = e3.GetRolesForUserInDomain("bob", "domain2")
+		expected = []string{"qa1"}
+		if !util.SetEquals(roles, expected) {
+			t.Errorf("Expected roles %v, got %v", expected, roles)
+		}
+	})
 }

@@ -1033,3 +1033,43 @@ func (cdm *ConditionalDomainManager) SetDomainLinkConditionFuncParams(userName, 
 		return true
 	})
 }
+
+// GetRoles gets the roles that a user inherits.
+func (crm *ConditionalRoleManager) GetRoles(name string, domains ...string) ([]string, error) {
+	user, created := crm.getRole(name)
+	if created {
+		defer crm.removeRole(user.name)
+	}
+
+	var roles []string
+	user.rangeRoles(func(key, value interface{}) bool {
+		roleName := key.(string)
+		role := value.(*Role)
+
+		passLinkConditionFunc := true
+		if len(domains) > 0 {
+			if linkConditionFunc, existLinkCondition := crm.GetDomainLinkConditionFunc(user.name, role.name, domains[0]); existLinkCondition {
+				params, _ := crm.GetLinkConditionFuncParams(user.name, role.name, domains[0])
+				passLinkConditionFunc, _ = linkConditionFunc(params...)
+			}
+		}
+
+		if passLinkConditionFunc {
+			roles = append(roles, roleName)
+		}
+
+		return true
+	})
+
+	return util.RemoveDuplicateElement(roles), nil
+}
+
+// GetRoles gets the roles that a subject inherits.
+func (cdm *ConditionalDomainManager) GetRoles(name string, domains ...string) ([]string, error) {
+	domain, err := cdm.getDomain(domains...)
+	if err != nil {
+		return nil, err
+	}
+	rm := cdm.getConditionalRoleManager(domain, false)
+	return rm.GetRoles(name, domains...)
+}
