@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/casbin/casbin/v2/rbac"
+
 	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/util"
@@ -231,8 +233,16 @@ func (e *Enforcer) HasPermissionForUser(user string, permission ...string) (bool
 func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]string, error) {
 	var res []string
 
-	for v := range e.rmMap {
-		roles, err := e.GetNamedImplicitRolesForUser(v, name, domain...)
+	for rm := range e.rmMap {
+		roles, err := e.GetNamedImplicitRolesForUser(rm, name, domain...)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, roles...)
+	}
+
+	for crm := range e.condRmMap {
+		roles, err := e.GetNamedImplicitRolesForUser(crm, name, domain...)
 		if err != nil {
 			return nil, err
 		}
@@ -286,8 +296,16 @@ func (e *Enforcer) GetNamedImplicitRolesForUser(ptype string, name string, domai
 // GetImplicitUsersForRole gets implicit users for a role.
 func (e *Enforcer) GetImplicitUsersForRole(name string, domain ...string) ([]string, error) {
 	res := []string{}
+	var rms []rbac.RoleManager
 
 	for _, rm := range e.rmMap {
+		rms = append(rms, rm)
+	}
+	for _, crm := range e.condRmMap {
+		rms = append(rms, crm)
+	}
+
+	for _, rm := range rms {
 		roleSet := make(map[string]bool)
 		roleSet[name] = true
 		q := make([]string, 0)
@@ -429,6 +447,13 @@ func (e *Enforcer) GetDomainsForUser(user string) ([]string, error) {
 	var domains []string
 	for _, rm := range e.rmMap {
 		domain, err := rm.GetDomains(user)
+		if err != nil {
+			return nil, err
+		}
+		domains = append(domains, domain...)
+	}
+	for _, crm := range e.condRmMap {
+		domain, err := crm.GetDomains(user)
 		if err != nil {
 			return nil, err
 		}

@@ -35,14 +35,6 @@ func (e *Enforcer) GetRolesForUserInDomain(name string, domain string) []string 
 		res, _ := rm.GetRoles(name, domain)
 		return res
 	}
-
-	if e.condRmMap != nil {
-		if condRm := e.condRmMap["g"]; condRm != nil {
-			res, _ := condRm.GetRoles(name, domain)
-			return res
-		}
-	}
-
 	return nil
 }
 
