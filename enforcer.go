@@ -913,6 +913,10 @@ func (e *Enforcer) AddNamedDomainMatchingFunc(ptype, name string, fn rbac.Matchi
 		rm.AddDomainMatchingFunc(name, fn)
 		return true
 	}
+	if condRm, ok := e.condRmMap[ptype]; ok {
+		condRm.AddDomainMatchingFunc(name, fn)
+		return true
+	}
 	return false
 }
 

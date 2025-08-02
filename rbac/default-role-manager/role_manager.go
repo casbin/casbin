@@ -1105,3 +1105,12 @@ func (cdm *ConditionalDomainManager) SetDomainLinkConditionFuncParams(userName, 
 		return true
 	})
 }
+
+// AddDomainMatchingFunc support use domain pattern in g.
+func (cdm *ConditionalDomainManager) AddDomainMatchingFunc(name string, fn rbac.MatchingFunc) {
+	cdm.domainMatchingFunc = fn
+	cdm.rmMap.Range(func(key, value interface{}) bool {
+		value.(*ConditionalRoleManager).AddDomainMatchingFunc(name, fn)
+		return true
+	})
+}
