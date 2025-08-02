@@ -1,0 +1,13 @@
+p, test1, domain1, service1, /list
+p, test1, domain1, service1, /get/:id/*
+p, test1, domain1, service1, /add
+p, test1, domain1, service1, /user/*
+p, admin, domain1, service1, /*
+p, qa1, domain2, service2, /broadcast
+p, qa1, domain2, service2, /trip
+p, qa1, domain2, service2, /notify
+p, qa1, domain2, service2, /dynamic-sql
+
+g, alice, test1, domain1, _, 2999-12-30 00:00:00
+g, bob, qa1, domain2, _, 2999-12-30 00:00:00
+g, jack, test1, domain1, _, 0000-12-30 00:00:00

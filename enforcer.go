@@ -279,6 +279,8 @@ func (e *Enforcer) SetWatcher(watcher persist.Watcher) error {
 func (e *Enforcer) GetRoleManager() rbac.RoleManager {
 	if e.rmMap != nil && e.rmMap["g"] != nil {
 		return e.rmMap["g"]
+	} else if e.condRmMap != nil && e.condRmMap["g"] != nil {
+		return e.condRmMap["g"]
 	} else {
 		return nil
 	}
@@ -288,6 +290,8 @@ func (e *Enforcer) GetRoleManager() rbac.RoleManager {
 func (e *Enforcer) GetNamedRoleManager(ptype string) rbac.RoleManager {
 	if e.rmMap != nil && e.rmMap[ptype] != nil {
 		return e.rmMap[ptype]
+	} else if e.condRmMap != nil && e.condRmMap[ptype] != nil {
+		return e.condRmMap[ptype]
 	} else {
 		return nil
 	}

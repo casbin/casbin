@@ -811,20 +811,7 @@ func (crm *ConditionalRoleManager) hasLinkHelper(targetName string, roles map[st
 }
 
 func (crm *ConditionalRoleManager) getNextRoles(currentRole, nextRole *Role, domains []string, nextRoles map[string]*Role) bool {
-	passLinkConditionFunc := true
-	var err error
-	// If LinkConditionFunc exists, it needs to pass the verification to get nextRole
-	if len(domains) == 0 {
-		if linkConditionFunc, existLinkCondition := crm.GetLinkConditionFunc(currentRole.name, nextRole.name); existLinkCondition {
-			params, _ := crm.GetLinkConditionFuncParams(currentRole.name, nextRole.name)
-			passLinkConditionFunc, err = linkConditionFunc(params...)
-		}
-	} else {
-		if linkConditionFunc, existLinkCondition := crm.GetDomainLinkConditionFunc(currentRole.name, nextRole.name, domains[0]); existLinkCondition {
-			params, _ := crm.GetLinkConditionFuncParams(currentRole.name, nextRole.name, domains[0])
-			passLinkConditionFunc, err = linkConditionFunc(params...)
-		}
-	}
+	passLinkConditionFunc, err := crm.checkLinkCondition(currentRole.name, nextRole.name, domains)
 
 	if err != nil {
 		crm.logger.LogError(err, "hasLinkHelper LinkCondition Error")
@@ -836,6 +823,73 @@ func (crm *ConditionalRoleManager) getNextRoles(currentRole, nextRole *Role, dom
 	}
 
 	return true
+}
+
+func (crm *ConditionalRoleManager) checkLinkCondition(name1, name2 string, domain []string) (bool, error) {
+	passLinkConditionFunc := true
+	var err error
+
+	if len(domain) == 0 {
+		if linkConditionFunc, existLinkCondition := crm.GetLinkConditionFunc(name1, name2); existLinkCondition {
+			params, _ := crm.GetLinkConditionFuncParams(name1, name2)
+			passLinkConditionFunc, err = linkConditionFunc(params...)
+		}
+	} else {
+		if linkConditionFunc, existLinkCondition := crm.GetDomainLinkConditionFunc(name1, name2, domain[0]); existLinkCondition {
+			params, _ := crm.GetLinkConditionFuncParams(name1, name2, domain[0])
+			passLinkConditionFunc, err = linkConditionFunc(params...)
+		}
+	}
+
+	return passLinkConditionFunc, err
+}
+
+func (crm *ConditionalRoleManager) GetRoles(name string, domains ...string) ([]string, error) {
+	user, created := crm.getRole(name)
+	if created {
+		defer crm.removeRole(user.name)
+	}
+	var roles []string
+	user.rangeRoles(func(key, value interface{}) bool {
+		roleName := key.(string)
+		passLinkConditionFunc, err := crm.checkLinkCondition(name, roleName, domains)
+		if err != nil {
+			crm.logger.LogError(err, "getRoles LinkCondition Error")
+			return true
+		}
+
+		if passLinkConditionFunc {
+			roles = append(roles, roleName)
+		}
+
+		return true
+	})
+	return roles, nil
+}
+
+func (crm *ConditionalRoleManager) GetUsers(name string, domains ...string) ([]string, error) {
+	role, created := crm.getRole(name)
+	if created {
+		defer crm.removeRole(name)
+	}
+	var users []string
+	role.rangeUsers(func(key, value interface{}) bool {
+		userName := key.(string)
+
+		passLinkConditionFunc, err := crm.checkLinkCondition(userName, name, domains)
+		if err != nil {
+			crm.logger.LogError(err, "getUsers LinkCondition Error")
+			return true
+		}
+
+		if passLinkConditionFunc {
+			users = append(users, userName)
+		}
+
+		return true
+	})
+
+	return users, nil
 }
 
 // GetLinkConditionFunc get LinkConditionFunc based on userName, roleName.
@@ -970,6 +1024,24 @@ func (cdm *ConditionalDomainManager) HasLink(name1 string, name2 string, domains
 	return rm.HasLink(name1, name2, domains...)
 }
 
+func (cdm *ConditionalDomainManager) GetRoles(name string, domains ...string) ([]string, error) {
+	domain, err := cdm.getDomain(domains...)
+	if err != nil {
+		return nil, err
+	}
+	crm := cdm.getConditionalRoleManager(domain, false)
+	return crm.GetRoles(name, domains...)
+}
+
+func (cdm *ConditionalDomainManager) GetUsers(name string, domains ...string) ([]string, error) {
+	domain, err := cdm.getDomain(domains...)
+	if err != nil {
+		return nil, err
+	}
+	crm := cdm.getConditionalRoleManager(domain, false)
+	return crm.GetUsers(name, domains...)
+}
+
 // AddLink adds the inheritance link between role: name1 and role: name2.
 // aka role: name1 inherits role: name2.
 func (cdm *ConditionalDomainManager) AddLink(name1 string, name2 string, domains ...string) error {
@@ -1033,6 +1105,7 @@ func (cdm *ConditionalDomainManager) SetDomainLinkConditionFuncParams(userName, 
 		return true
 	})
 }
+<<<<<<< HEAD
 
 // GetRoles gets the roles that a user inherits.
 func (crm *ConditionalRoleManager) GetRoles(name string, domains ...string) ([]string, error) {

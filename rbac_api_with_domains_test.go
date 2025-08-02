@@ -18,8 +18,6 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/casbin/casbin/v2/model"
-	stringadapter "github.com/casbin/casbin/v2/persist/string-adapter"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -345,46 +343,10 @@ func TestDeleteDomains(t *testing.T) {
 
 // TestGetRolesForUserInDomainWithConditionalFunctions.
 func TestGetRolesForUserInDomainWithConditionalFunctions(t *testing.T) {
-	// Create a model with 5-field role definition format
-	modelText := `
-[request_definition]
-r = sub, dom, obj, act
+	modelText := "examples/rbac_with_domains_conditional_model.conf"
+	policyText := "examples/rbac_with_domains_conditional_policy.csv"
 
-[policy_definition]
-p = sub, dom, obj, act
-
-[role_definition]
-g = _, _, _, (_, _)
-
-[policy_effect]
-e = some(where (p.eft == allow))
-
-[matchers]
-m = g(r.sub, p.sub, r.dom) && r.dom == p.dom && r.obj == p.obj && \
-(keyMatch(r.act, p.act) || keyMatch2(r.act, p.act) || keyMatch3(r.act, p.act) || keyMatch4(r.act, p.act) || keyMatch5(r.act, p.act) || globMatch(r.act, p.act))
-`
-
-	// Create policy with conditional role assignments
-	policyText := `p, test1, domain1, service1, /list
-p, test1, domain1, service1, /get/:id/*
-p, test1, domain1, service1, /add
-p, test1, domain1, service1, /user/*
-p, admin, domain1, service1, /*
-p, qa1, domain2, service2, /broadcast
-p, qa1, domain2, service2, /trip
-p, qa1, domain2, service2, /notify
-p, qa1, domain2, service2, /dynamic-sql
-
-g, alice, test1, domain1, _, 2025-07-30 00:00:00
-g, bob, qa1, domain2, _, 2025-07-30 00:00:00`
-
-	m, err := model.NewModelFromString(modelText)
-	if err != nil {
-		t.Fatalf("Failed to create model: %v", err)
-	}
-
-	a := stringadapter.NewAdapter(policyText)
-	e, err := NewEnforcer(m, a)
+	e, err := NewEnforcer(modelText, policyText)
 	if err != nil {
 		t.Fatalf("Failed to create enforcer: %v", err)
 	}
@@ -399,7 +361,7 @@ g, bob, qa1, domain2, _, 2025-07-30 00:00:00`
 	})
 
 	t.Run("WithConditionalFunctions", func(t *testing.T) {
-		e2, err := NewEnforcer(m, a)
+		e2, err := NewEnforcer(modelText, policyText)
 		if err != nil {
 			t.Fatalf("Failed to create enforcer: %v", err)
 		}
@@ -428,7 +390,7 @@ g, bob, qa1, domain2, _, 2025-07-30 00:00:00`
 	})
 
 	t.Run("WithAlwaysTrueCondition", func(t *testing.T) {
-		e3, err := NewEnforcer(m, a)
+		e3, err := NewEnforcer(modelText, policyText)
 		if err != nil {
 			t.Fatalf("Failed to create enforcer: %v", err)
 		}

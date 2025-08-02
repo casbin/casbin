@@ -657,3 +657,18 @@ func TestGetImplicitUsersForResourceByDomain(t *testing.T) {
 	testGetImplicitUsersForResourceByDomain(t, e, [][]string{{"bob", "domain2", "data2", "read"},
 		{"bob", "domain2", "data2", "write"}}, "data2", "domain2")
 }
+
+func TestConditional(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domains_conditional_model.conf", "examples/rbac_with_domains_conditional_policy.csv")
+	g, _ := e.GetNamedGroupingPolicy("g")
+	for _, gp := range g {
+		e.AddNamedDomainLinkConditionFunc("g", gp[0], gp[1], gp[2], util.TimeMatchFunc)
+	}
+
+	testDomainEnforce(t, e, "alice", "domain1", "service1", "/list", true)
+	testDomainEnforce(t, e, "bob", "domain2", "service2", "/broadcast", true)
+	testDomainEnforce(t, e, "jack", "domain1", "service1", "/list", false)
+	testGetImplicitRolesInDomain(t, e, "alice", "domain1", []string{"test1"})
+	testGetRolesInDomain(t, e, "alice", "domain1", []string{"test1"})
+	testGetUsersInDomain(t, e, "test1", "domain1", []string{"alice"})
+}
