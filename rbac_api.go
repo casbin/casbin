@@ -249,6 +249,7 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]str
 		res = append(res, roles...)
 	}
 
+	util.ArrayRemoveDuplicates(&res)
 	return res, nil
 }
 
@@ -329,6 +330,7 @@ func (e *Enforcer) GetImplicitUsersForRole(name string, domain ...string) ([]str
 		}
 	}
 
+	util.ArrayRemoveDuplicates(&res)
 	return res, nil
 }
 
@@ -343,6 +345,10 @@ func (e *Enforcer) GetImplicitUsersForRole(name string, domain ...string) ([]str
 // But GetImplicitPermissionsForUser("alice") will get: [["admin", "data1", "read"], ["alice", "data2", "read"]].
 func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) ([][]string, error) {
 	return e.GetNamedImplicitPermissionsForUser("p", "g", user, domain...)
+}
+
+func (e *Enforcer) GetImplicitPermissionsForUserFromAllRoles(user string, domain ...string) ([][]string, error) {
+	return e.GetNamedImplicitPermissionsForUser("p", "*", user, domain...)
 }
 
 // GetNamedImplicitPermissionsForUser gets implicit permissions for a user or role by named policy.
