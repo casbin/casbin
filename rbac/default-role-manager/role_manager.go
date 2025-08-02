@@ -1073,3 +1073,12 @@ func (cdm *ConditionalDomainManager) GetRoles(name string, domains ...string) ([
 	rm := cdm.getConditionalRoleManager(domain, false)
 	return rm.GetRoles(name, domains...)
 }
+
+// AddDomainMatchingFunc support use domain pattern in g.
+func (cdm *ConditionalDomainManager) AddDomainMatchingFunc(name string, fn rbac.MatchingFunc) {
+	cdm.domainMatchingFunc = fn
+	cdm.rmMap.Range(func(key, value interface{}) bool {
+		value.(*ConditionalRoleManager).AddDomainMatchingFunc(name, fn)
+		return true
+	})
+}
