@@ -262,35 +262,13 @@ func (e *Enforcer) GetImplicitRolesForUser(name string, domain ...string) ([]str
 // GetImplicitRolesForUser("alice") can only get: ["role:admin", "role:user"].
 // But GetNamedImplicitRolesForUser("g2", "alice") will get: ["role:admin2"].
 func (e *Enforcer) GetNamedImplicitRolesForUser(ptype string, name string, domain ...string) ([]string, error) {
-	var res []string
-
 	rm := e.GetNamedRoleManager(ptype)
 	if rm == nil {
 		return nil, fmt.Errorf("role manager %s is not initialized", ptype)
 	}
-	roleSet := make(map[string]bool)
-	roleSet[name] = true
-	q := make([]string, 0)
-	q = append(q, name)
 
-	for len(q) > 0 {
-		name := q[0]
-		q = q[1:]
-
-		roles, err := rm.GetRoles(name, domain...)
-		if err != nil {
-			return nil, err
-		}
-		for _, r := range roles {
-			if _, ok := roleSet[r]; !ok {
-				res = append(res, r)
-				q = append(q, r)
-				roleSet[r] = true
-			}
-		}
-	}
-
-	return res, nil
+	// Use the role manager's GetImplicitRoles method which respects maxHierarchyLevel
+	return rm.GetImplicitRoles(name, domain...)
 }
 
 // GetImplicitUsersForRole gets implicit users for a role.
@@ -306,27 +284,12 @@ func (e *Enforcer) GetImplicitUsersForRole(name string, domain ...string) ([]str
 	}
 
 	for _, rm := range rms {
-		roleSet := make(map[string]bool)
-		roleSet[name] = true
-		q := make([]string, 0)
-		q = append(q, name)
-
-		for len(q) > 0 {
-			name := q[0]
-			q = q[1:]
-
-			roles, err := rm.GetUsers(name, domain...)
-			if err != nil && err.Error() != "error: name does not exist" {
-				return nil, err
-			}
-			for _, r := range roles {
-				if _, ok := roleSet[r]; !ok {
-					res = append(res, r)
-					q = append(q, r)
-					roleSet[r] = true
-				}
-			}
+		// Use the role manager's GetImplicitUsers method which respects maxHierarchyLevel
+		users, err := rm.GetImplicitUsers(name, domain...)
+		if err != nil && err.Error() != "error: name does not exist" {
+			return nil, err
 		}
+		res = append(res, users...)
 	}
 
 	return res, nil

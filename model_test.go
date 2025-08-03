@@ -415,6 +415,14 @@ func (rm *testCustomRoleManager) DeleteDomain(domain string) error {
 	return nil
 }
 
+func (rm *testCustomRoleManager) GetImplicitRoles(name string, domain ...string) ([]string, error) {
+	return []string{}, nil
+}
+
+func (rm *testCustomRoleManager) GetImplicitUsers(name string, domain ...string) ([]string, error) {
+	return []string{}, nil
+}
+
 func TestRBACModelWithCustomRoleManager(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	e.SetRoleManager(NewRoleManager())
