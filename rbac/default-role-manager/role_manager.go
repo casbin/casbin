@@ -406,6 +406,80 @@ func (rm *RoleManagerImpl) GetUsers(name string, domain ...string) ([]string, er
 	return role.getUsers(), nil
 }
 
+// GetImplicitRoles gets the implicit roles that a user inherits, respecting maxHierarchyLevel.
+func (rm *RoleManagerImpl) GetImplicitRoles(name string, domain ...string) ([]string, error) {
+	user, created := rm.getRole(name)
+	if created {
+		defer rm.removeRole(user.name)
+	}
+
+	var res []string
+	roleSet := make(map[string]bool)
+	roleSet[name] = true
+	roles := map[string]*Role{user.name: user}
+
+	return rm.getImplicitRolesHelper(roles, roleSet, res, 0), nil
+}
+
+// GetImplicitUsers gets the implicit users that inherits a role, respecting maxHierarchyLevel.
+func (rm *RoleManagerImpl) GetImplicitUsers(name string, domain ...string) ([]string, error) {
+	role, created := rm.getRole(name)
+	if created {
+		defer rm.removeRole(role.name)
+	}
+
+	var res []string
+	userSet := make(map[string]bool)
+	userSet[name] = true
+	users := map[string]*Role{role.name: role}
+
+	return rm.getImplicitUsersHelper(users, userSet, res, 0), nil
+}
+
+// getImplicitRolesHelper is a helper function for GetImplicitRoles that respects maxHierarchyLevel.
+func (rm *RoleManagerImpl) getImplicitRolesHelper(roles map[string]*Role, roleSet map[string]bool, res []string, level int) []string {
+	if level >= rm.maxHierarchyLevel || len(roles) == 0 {
+		return res
+	}
+
+	nextRoles := map[string]*Role{}
+	for _, role := range roles {
+		role.rangeRoles(func(key, value interface{}) bool {
+			roleName := key.(string)
+			if _, ok := roleSet[roleName]; !ok {
+				res = append(res, roleName)
+				roleSet[roleName] = true
+				nextRoles[roleName] = value.(*Role)
+			}
+			return true
+		})
+	}
+
+	return rm.getImplicitRolesHelper(nextRoles, roleSet, res, level+1)
+}
+
+// getImplicitUsersHelper is a helper function for GetImplicitUsers that respects maxHierarchyLevel.
+func (rm *RoleManagerImpl) getImplicitUsersHelper(users map[string]*Role, userSet map[string]bool, res []string, level int) []string {
+	if level >= rm.maxHierarchyLevel || len(users) == 0 {
+		return res
+	}
+
+	nextUsers := map[string]*Role{}
+	for _, user := range users {
+		user.rangeUsers(func(key, value interface{}) bool {
+			userName := key.(string)
+			if _, ok := userSet[userName]; !ok {
+				res = append(res, userName)
+				userSet[userName] = true
+				nextUsers[userName] = value.(*Role)
+			}
+			return true
+		})
+	}
+
+	return rm.getImplicitUsersHelper(nextUsers, userSet, res, level+1)
+}
+
 func (rm *RoleManagerImpl) toString() []string {
 	var roles []string
 
@@ -660,6 +734,26 @@ func (dm *DomainManager) GetUsers(name string, domains ...string) ([]string, err
 	return rm.GetUsers(name, domains...)
 }
 
+// GetImplicitRoles gets the implicit roles that a subject inherits, respecting maxHierarchyLevel.
+func (dm *DomainManager) GetImplicitRoles(name string, domains ...string) ([]string, error) {
+	domain, err := dm.getDomain(domains...)
+	if err != nil {
+		return nil, err
+	}
+	rm := dm.getRoleManager(domain, false)
+	return rm.GetImplicitRoles(name, domains...)
+}
+
+// GetImplicitUsers gets the implicit users that inherits a role, respecting maxHierarchyLevel.
+func (dm *DomainManager) GetImplicitUsers(name string, domains ...string) ([]string, error) {
+	domain, err := dm.getDomain(domains...)
+	if err != nil {
+		return nil, err
+	}
+	rm := dm.getRoleManager(domain, false)
+	return rm.GetImplicitUsers(name, domains...)
+}
+
 func (dm *DomainManager) toString() []string {
 	var roles []string
 
@@ -892,6 +986,96 @@ func (crm *ConditionalRoleManager) GetUsers(name string, domains ...string) ([]s
 	return users, nil
 }
 
+// GetImplicitRoles gets the implicit roles that a user inherits, respecting maxHierarchyLevel and link conditions.
+func (crm *ConditionalRoleManager) GetImplicitRoles(name string, domain ...string) ([]string, error) {
+	user, created := crm.getRole(name)
+	if created {
+		defer crm.removeRole(user.name)
+	}
+
+	var res []string
+	roleSet := make(map[string]bool)
+	roleSet[name] = true
+	roles := map[string]*Role{user.name: user}
+
+	return crm.getImplicitRolesHelper(roles, roleSet, res, 0, domain), nil
+}
+
+// GetImplicitUsers gets the implicit users that inherits a role, respecting maxHierarchyLevel and link conditions.
+func (crm *ConditionalRoleManager) GetImplicitUsers(name string, domain ...string) ([]string, error) {
+	role, created := crm.getRole(name)
+	if created {
+		defer crm.removeRole(role.name)
+	}
+
+	var res []string
+	userSet := make(map[string]bool)
+	userSet[name] = true
+	users := map[string]*Role{role.name: role}
+
+	return crm.getImplicitUsersHelper(users, userSet, res, 0, domain), nil
+}
+
+// getImplicitRolesHelper is a helper function for GetImplicitRoles that respects maxHierarchyLevel and link conditions.
+func (crm *ConditionalRoleManager) getImplicitRolesHelper(roles map[string]*Role, roleSet map[string]bool, res []string, level int, domains []string) []string {
+	if level >= crm.maxHierarchyLevel || len(roles) == 0 {
+		return res
+	}
+
+	nextRoles := map[string]*Role{}
+	for _, role := range roles {
+		role.rangeRoles(func(key, value interface{}) bool {
+			roleName := key.(string)
+			if _, ok := roleSet[roleName]; !ok {
+				passLinkConditionFunc, err := crm.checkLinkCondition(role.name, roleName, domains)
+				if err != nil {
+					crm.logger.LogError(err, "getImplicitRoles LinkCondition Error")
+					return true
+				}
+
+				if passLinkConditionFunc {
+					res = append(res, roleName)
+					roleSet[roleName] = true
+					nextRoles[roleName] = value.(*Role)
+				}
+			}
+			return true
+		})
+	}
+
+	return crm.getImplicitRolesHelper(nextRoles, roleSet, res, level+1, domains)
+}
+
+// getImplicitUsersHelper is a helper function for GetImplicitUsers that respects maxHierarchyLevel and link conditions.
+func (crm *ConditionalRoleManager) getImplicitUsersHelper(users map[string]*Role, userSet map[string]bool, res []string, level int, domains []string) []string {
+	if level >= crm.maxHierarchyLevel || len(users) == 0 {
+		return res
+	}
+
+	nextUsers := map[string]*Role{}
+	for _, user := range users {
+		user.rangeUsers(func(key, value interface{}) bool {
+			userName := key.(string)
+			if _, ok := userSet[userName]; !ok {
+				passLinkConditionFunc, err := crm.checkLinkCondition(userName, user.name, domains)
+				if err != nil {
+					crm.logger.LogError(err, "getImplicitUsers LinkCondition Error")
+					return true
+				}
+
+				if passLinkConditionFunc {
+					res = append(res, userName)
+					userSet[userName] = true
+					nextUsers[userName] = value.(*Role)
+				}
+			}
+			return true
+		})
+	}
+
+	return crm.getImplicitUsersHelper(nextUsers, userSet, res, level+1, domains)
+}
+
 // GetLinkConditionFunc get LinkConditionFunc based on userName, roleName.
 func (crm *ConditionalRoleManager) GetLinkConditionFunc(userName, roleName string) (rbac.LinkConditionFunc, bool) {
 	return crm.GetDomainLinkConditionFunc(userName, roleName, defaultDomain)
@@ -1042,6 +1226,24 @@ func (cdm *ConditionalDomainManager) GetUsers(name string, domains ...string) ([
 	return crm.GetUsers(name, domains...)
 }
 
+func (cdm *ConditionalDomainManager) GetImplicitRoles(name string, domains ...string) ([]string, error) {
+	domain, err := cdm.getDomain(domains...)
+	if err != nil {
+		return nil, err
+	}
+	crm := cdm.getConditionalRoleManager(domain, false)
+	return crm.GetImplicitRoles(name, domains...)
+}
+
+func (cdm *ConditionalDomainManager) GetImplicitUsers(name string, domains ...string) ([]string, error) {
+	domain, err := cdm.getDomain(domains...)
+	if err != nil {
+		return nil, err
+	}
+	crm := cdm.getConditionalRoleManager(domain, false)
+	return crm.GetImplicitUsers(name, domains...)
+}
+
 // AddLink adds the inheritance link between role: name1 and role: name2.
 // aka role: name1 inherits role: name2.
 func (cdm *ConditionalDomainManager) AddLink(name1 string, name2 string, domains ...string) error {
@@ -1111,6 +1313,23 @@ func (cdm *ConditionalDomainManager) AddDomainMatchingFunc(name string, fn rbac.
 	cdm.domainMatchingFunc = fn
 	cdm.rmMap.Range(func(key, value interface{}) bool {
 		value.(*ConditionalRoleManager).AddDomainMatchingFunc(name, fn)
+		return true
+	})
+	cdm.rebuild()
+}
+
+// rebuild clears the map of ConditionalRoleManagers.
+func (cdm *ConditionalDomainManager) rebuild() {
+	rmMap := cdm.rmMap
+	_ = cdm.Clear()
+	rmMap.Range(func(key, value interface{}) bool {
+		domain := key.(string)
+		crm := value.(*ConditionalRoleManager)
+
+		crm.Range(func(name1, name2 string, _ ...string) bool {
+			_ = cdm.AddLink(name1, name2, domain)
+			return true
+		})
 		return true
 	})
 }
