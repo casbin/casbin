@@ -15,12 +15,14 @@
 package casbin
 
 import (
+	"fmt"
 	"log"
 	"sort"
 	"testing"
 
 	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/errors"
+	defaultrolemanager "github.com/casbin/casbin/v2/rbac/default-role-manager"
 	"github.com/casbin/casbin/v2/util"
 )
 
@@ -671,4 +673,137 @@ func TestConditional(t *testing.T) {
 	testGetImplicitRolesInDomain(t, e, "alice", "domain1", []string{"test1"})
 	testGetRolesInDomain(t, e, "alice", "domain1", []string{"test1"})
 	testGetUsersInDomain(t, e, "test1", "domain1", []string{"alice"})
+}
+
+func TestMaxHierarchyLevelConsistency(t *testing.T) {
+	// Test consistency behavior under different maxHierarchyLevel values
+	testCases := []struct {
+		maxLevel int
+		name     string
+	}{
+		{1, "maxHierarchyLevel=1"},
+		{2, "maxHierarchyLevel=2"},
+		{3, "maxHierarchyLevel=3"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Use model files from examples
+			e, err := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+			if err != nil {
+				t.Fatalf("Failed to create enforcer: %v", err)
+			}
+
+			// Set the maximum hierarchy level for role manager
+			rm := defaultrolemanager.NewRoleManager(tc.maxLevel)
+			e.SetRoleManager(rm)
+
+			// Add role hierarchy: level0 -> level1 -> level2 -> level3 -> level4
+			_, err = e.AddRoleForUser("level0", "level1")
+			if err != nil {
+				t.Fatalf("Failed to add role for user: %v", err)
+			}
+			_, err = e.AddRoleForUser("level1", "level2")
+			if err != nil {
+				t.Fatalf("Failed to add role for user: %v", err)
+			}
+			_, err = e.AddRoleForUser("level2", "level3")
+			if err != nil {
+				t.Fatalf("Failed to add role for user: %v", err)
+			}
+			_, err = e.AddRoleForUser("level3", "level4")
+			if err != nil {
+				t.Fatalf("Failed to add role for user: %v", err)
+			}
+
+			// Test HasLink method
+			t.Run("HasLink", func(t *testing.T) {
+				for i := 1; i <= 4; i++ {
+					hasLink, err := rm.HasLink("level0", fmt.Sprintf("level%d", i))
+					if err != nil {
+						t.Fatalf("HasLink error: %v", err)
+					}
+					expected := i <= tc.maxLevel
+					if hasLink != expected {
+						t.Errorf("HasLink(level0, level%d): got %v, want %v", i, hasLink, expected)
+					}
+				}
+			})
+
+			// Test GetImplicitRolesForUser method
+			t.Run("GetImplicitRolesForUser", func(t *testing.T) {
+				implicitRoles, err := e.GetImplicitRolesForUser("level0")
+				if err != nil {
+					t.Fatalf("GetImplicitRolesForUser error: %v", err)
+				}
+
+				expectedCount := tc.maxLevel
+				if len(implicitRoles) != expectedCount {
+					t.Errorf("GetImplicitRolesForUser(level0): got %d roles %v, want %d roles",
+						len(implicitRoles), implicitRoles, expectedCount)
+				}
+
+				// Verify that returned roles are correct
+				for i := 1; i <= tc.maxLevel; i++ {
+					expectedRole := fmt.Sprintf("level%d", i)
+					found := false
+					for _, role := range implicitRoles {
+						if role == expectedRole {
+							found = true
+							break
+						}
+					}
+					if !found {
+						t.Errorf("Expected role %s not found in implicit roles: %v", expectedRole, implicitRoles)
+					}
+				}
+			})
+
+			// Test GetImplicitUsersForRole method
+			t.Run("GetImplicitUsersForRole", func(t *testing.T) {
+				implicitUsers, err := e.GetImplicitUsersForRole("level4")
+				if err != nil {
+					t.Fatalf("GetImplicitUsersForRole error: %v", err)
+				}
+
+				expectedCount := tc.maxLevel
+				if len(implicitUsers) != expectedCount {
+					t.Errorf("GetImplicitUsersForRole(level4): got %d users %v, want %d users",
+						len(implicitUsers), implicitUsers, expectedCount)
+				}
+
+				// Verify that returned users are correct (starting from level3 upward)
+				for i := 0; i < tc.maxLevel; i++ {
+					expectedUser := fmt.Sprintf("level%d", 3-i)
+					found := false
+					for _, user := range implicitUsers {
+						if user == expectedUser {
+							found = true
+							break
+						}
+					}
+					if !found {
+						t.Errorf("Expected user %s not found in implicit users: %v", expectedUser, implicitUsers)
+					}
+				}
+			})
+
+			// Test implicit roles for different users
+			t.Run("DifferentUsersImplicitRoles", func(t *testing.T) {
+				for i := 0; i <= 3; i++ {
+					user := fmt.Sprintf("level%d", i)
+					implicitRoles, err := e.GetImplicitRolesForUser(user)
+					if err != nil {
+						t.Fatalf("GetImplicitRolesForUser(%s) error: %v", user, err)
+					}
+
+					// Verify that the number of returned roles does not exceed maxHierarchyLevel
+					if len(implicitRoles) > tc.maxLevel {
+						t.Errorf("GetImplicitRolesForUser(%s): got %d roles, should not exceed maxHierarchyLevel %d",
+							user, len(implicitRoles), tc.maxLevel)
+					}
+				}
+			})
+		})
+	}
 }
