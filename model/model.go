@@ -419,6 +419,8 @@ func (model Model) Copy() Model {
 
 func (model Model) GetFieldIndex(ptype string, field string) (int, error) {
 	assertion := model["p"][ptype]
+	assertion.policyMu.RLock()
+	defer assertion.policyMu.RUnlock()
 	if index, ok := assertion.FieldIndexMap[field]; ok {
 		return index, nil
 	}

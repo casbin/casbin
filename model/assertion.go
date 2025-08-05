@@ -16,8 +16,11 @@ package model
 
 import (
 	"errors"
+	"strconv"
 	"strings"
+	"sync"
 
+	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
 )
@@ -29,6 +32,7 @@ type Assertion struct {
 	Value         string
 	Tokens        []string
 	ParamsTokens  []string
+	policyMu      sync.RWMutex
 	Policy        [][]string
 	PolicyMap     map[string]int
 	RM            rbac.RoleManager
@@ -191,4 +195,29 @@ func (ast *Assertion) copy() *Assertion {
 	}
 
 	return newAst
+}
+
+func (ast *Assertion) addPolicy(sec string, rule []string) {
+	ast.Policy = append(ast.Policy, rule)
+	ast.PolicyMap[strings.Join(rule, DefaultSep)] = len(ast.Policy) - 1
+
+	hasPriority := false
+	if _, ok := ast.FieldIndexMap[constant.PriorityIndex]; ok {
+		hasPriority = true
+	}
+	if sec == "p" && hasPriority {
+		if idxInsert, err := strconv.Atoi(rule[ast.FieldIndexMap[constant.PriorityIndex]]); err == nil {
+			i := len(ast.Policy) - 1
+			for ; i > 0; i-- {
+				idx, err := strconv.Atoi(ast.Policy[i-1][ast.FieldIndexMap[constant.PriorityIndex]])
+				if err != nil || idx <= idxInsert {
+					break
+				}
+				ast.Policy[i] = ast.Policy[i-1]
+				ast.PolicyMap[strings.Join(ast.Policy[i-1], DefaultSep)]++
+			}
+			ast.Policy[i] = rule
+			ast.PolicyMap[strings.Join(rule, DefaultSep)] = i
+		}
+	}
 }
