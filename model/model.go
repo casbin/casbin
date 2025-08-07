@@ -22,6 +22,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/casbin/casbin/v2/config"
 	"github.com/casbin/casbin/v2/constant"
@@ -75,7 +76,7 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 	ast := Assertion{}
 	ast.Key = key
 	ast.Value = value
-	ast.PolicyMap = make(map[string]int)
+	ast.PolicyMap = sync.Map{}
 	ast.FieldIndexMap = make(map[string]int)
 	ast.setLogger(model.GetLogger())
 
@@ -273,7 +274,7 @@ func (model Model) SortPoliciesBySubjectHierarchy() error {
 			return p1 > p2
 		})
 		for i, policy := range assertion.Policy {
-			assertion.PolicyMap[strings.Join(policy, ",")] = i
+			assertion.PolicyMap.Store(strings.Join(policy, ","), i)
 		}
 	}
 	return nil
@@ -353,7 +354,7 @@ func (model Model) SortPoliciesByPriority() error {
 			return p1 < p2
 		})
 		for i, policy := range assertion.Policy {
-			assertion.PolicyMap[strings.Join(policy, ",")] = i
+			assertion.PolicyMap.Store(strings.Join(policy, ","), i)
 		}
 	}
 	return nil

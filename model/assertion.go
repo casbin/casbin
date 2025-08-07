@@ -17,6 +17,7 @@ package model
 import (
 	"errors"
 	"strings"
+	"sync"
 
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
@@ -30,7 +31,7 @@ type Assertion struct {
 	Tokens        []string
 	ParamsTokens  []string
 	Policy        [][]string
-	PolicyMap     map[string]int
+	PolicyMap     sync.Map // Thread-safe map to store policy rule keys and their indices.
 	RM            rbac.RoleManager
 	CondRM        rbac.ConditionalRoleManager
 	FieldIndexMap map[string]int
@@ -176,19 +177,19 @@ func (ast *Assertion) copy() *Assertion {
 	for i, p := range ast.Policy {
 		policy[i] = append(policy[i], p...)
 	}
-	policyMap := make(map[string]int)
-	for k, v := range ast.PolicyMap {
-		policyMap[k] = v
-	}
 
 	newAst := &Assertion{
 		Key:           ast.Key,
 		Value:         ast.Value,
-		PolicyMap:     policyMap,
 		Tokens:        tokens,
 		Policy:        policy,
 		FieldIndexMap: ast.FieldIndexMap,
 	}
+	// Copy sync.Map entries to avoid lock value copying.
+	ast.PolicyMap.Range(func(k, v interface{}) bool {
+		newAst.PolicyMap.Store(k, v)
+		return true
+	})
 
 	return newAst
 }
