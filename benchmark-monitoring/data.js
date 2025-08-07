@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1754229316313,
+  "lastUpdate": 1754583059731,
   "repoUrl": "https://github.com/casbin/casbin",
   "entries": {
     "Benchmark": [
@@ -69384,6 +69384,1230 @@ window.BENCHMARK_DATA = {
             "value": 11,
             "unit": "allocs/op",
             "extra": "1934691 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "1532529704@qq.com",
+            "name": "yxrxy",
+            "username": "yxrxy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a2a6c3aecabb730b741f16ac17d534489c20985a",
+          "message": "feat: add BLP (Bell-LaPadula) model support and test (#1512)",
+          "timestamp": "2025-08-08T00:07:40+08:00",
+          "tree_id": "36c64e1df6c2ad8680ae45ac9b6b698bbe485f50",
+          "url": "https://github.com/casbin/casbin/commit/a2a6c3aecabb730b741f16ac17d534489c20985a"
+        },
+        "date": 1754583058767,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkCachedRaw",
+            "value": 15.09,
+            "unit": "ns/op\t       0 B/op\t       0 allocs/op",
+            "extra": "158705034 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRaw - ns/op",
+            "value": 15.09,
+            "unit": "ns/op",
+            "extra": "158705034 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRaw - B/op",
+            "value": 0,
+            "unit": "B/op",
+            "extra": "158705034 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRaw - allocs/op",
+            "value": 0,
+            "unit": "allocs/op",
+            "extra": "158705034 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedBasicModel",
+            "value": 172.9,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "13802029 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedBasicModel - ns/op",
+            "value": 172.9,
+            "unit": "ns/op",
+            "extra": "13802029 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedBasicModel - B/op",
+            "value": 104,
+            "unit": "B/op",
+            "extra": "13802029 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedBasicModel - allocs/op",
+            "value": 4,
+            "unit": "allocs/op",
+            "extra": "13802029 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModel",
+            "value": 173.5,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "13824997 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModel - ns/op",
+            "value": 173.5,
+            "unit": "ns/op",
+            "extra": "13824997 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModel - B/op",
+            "value": 104,
+            "unit": "B/op",
+            "extra": "13824997 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModel - allocs/op",
+            "value": 4,
+            "unit": "allocs/op",
+            "extra": "13824997 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelSmall",
+            "value": 177.5,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "13300272 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelSmall - ns/op",
+            "value": 177.5,
+            "unit": "ns/op",
+            "extra": "13300272 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelSmall - B/op",
+            "value": 104,
+            "unit": "B/op",
+            "extra": "13300272 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelSmall - allocs/op",
+            "value": 4,
+            "unit": "allocs/op",
+            "extra": "13300272 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelMedium",
+            "value": 185.1,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "13010827 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelMedium - ns/op",
+            "value": 185.1,
+            "unit": "ns/op",
+            "extra": "13010827 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelMedium - B/op",
+            "value": 104,
+            "unit": "B/op",
+            "extra": "13010827 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelMedium - allocs/op",
+            "value": 4,
+            "unit": "allocs/op",
+            "extra": "13010827 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelLarge",
+            "value": 161.5,
+            "unit": "ns/op\t      96 B/op\t       3 allocs/op",
+            "extra": "13060104 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelLarge - ns/op",
+            "value": 161.5,
+            "unit": "ns/op",
+            "extra": "13060104 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelLarge - B/op",
+            "value": 96,
+            "unit": "B/op",
+            "extra": "13060104 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelLarge - allocs/op",
+            "value": 3,
+            "unit": "allocs/op",
+            "extra": "13060104 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithResourceRoles",
+            "value": 175.9,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "13739162 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithResourceRoles - ns/op",
+            "value": 175.9,
+            "unit": "ns/op",
+            "extra": "13739162 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithResourceRoles - B/op",
+            "value": 104,
+            "unit": "B/op",
+            "extra": "13739162 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithResourceRoles - allocs/op",
+            "value": 4,
+            "unit": "allocs/op",
+            "extra": "13739162 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithDomains",
+            "value": 182.6,
+            "unit": "ns/op\t     120 B/op\t       4 allocs/op",
+            "extra": "13241827 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithDomains - ns/op",
+            "value": 182.6,
+            "unit": "ns/op",
+            "extra": "13241827 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithDomains - B/op",
+            "value": 120,
+            "unit": "B/op",
+            "extra": "13241827 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithDomains - allocs/op",
+            "value": 4,
+            "unit": "allocs/op",
+            "extra": "13241827 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedABACModel",
+            "value": 2761,
+            "unit": "ns/op\t    1546 B/op\t      18 allocs/op",
+            "extra": "820927 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedABACModel - ns/op",
+            "value": 2761,
+            "unit": "ns/op",
+            "extra": "820927 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedABACModel - B/op",
+            "value": 1546,
+            "unit": "B/op",
+            "extra": "820927 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedABACModel - allocs/op",
+            "value": 18,
+            "unit": "allocs/op",
+            "extra": "820927 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedKeyMatchModel",
+            "value": 187.5,
+            "unit": "ns/op\t     152 B/op\t       4 allocs/op",
+            "extra": "12751740 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedKeyMatchModel - ns/op",
+            "value": 187.5,
+            "unit": "ns/op",
+            "extra": "12751740 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedKeyMatchModel - B/op",
+            "value": 152,
+            "unit": "B/op",
+            "extra": "12751740 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedKeyMatchModel - allocs/op",
+            "value": 4,
+            "unit": "allocs/op",
+            "extra": "12751740 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithDeny",
+            "value": 174.7,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "13592535 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithDeny - ns/op",
+            "value": 174.7,
+            "unit": "ns/op",
+            "extra": "13592535 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithDeny - B/op",
+            "value": 104,
+            "unit": "B/op",
+            "extra": "13592535 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelWithDeny - allocs/op",
+            "value": 4,
+            "unit": "allocs/op",
+            "extra": "13592535 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedPriorityModel",
+            "value": 179.5,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "13373858 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedPriorityModel - ns/op",
+            "value": 179.5,
+            "unit": "ns/op",
+            "extra": "13373858 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedPriorityModel - B/op",
+            "value": 104,
+            "unit": "B/op",
+            "extra": "13373858 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedPriorityModel - allocs/op",
+            "value": 4,
+            "unit": "allocs/op",
+            "extra": "13373858 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedWithEnforceContext",
+            "value": 286.3,
+            "unit": "ns/op\t     240 B/op\t       5 allocs/op",
+            "extra": "8354712 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedWithEnforceContext - ns/op",
+            "value": 286.3,
+            "unit": "ns/op",
+            "extra": "8354712 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedWithEnforceContext - B/op",
+            "value": 240,
+            "unit": "B/op",
+            "extra": "8354712 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedWithEnforceContext - allocs/op",
+            "value": 5,
+            "unit": "allocs/op",
+            "extra": "8354712 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelMediumParallel",
+            "value": 169.9,
+            "unit": "ns/op\t     104 B/op\t       4 allocs/op",
+            "extra": "13462015 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelMediumParallel - ns/op",
+            "value": 169.9,
+            "unit": "ns/op",
+            "extra": "13462015 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelMediumParallel - B/op",
+            "value": 104,
+            "unit": "B/op",
+            "extra": "13462015 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCachedRBACModelMediumParallel - allocs/op",
+            "value": 4,
+            "unit": "allocs/op",
+            "extra": "13462015 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicySmall",
+            "value": 542.4,
+            "unit": "ns/op\t     150 B/op\t       6 allocs/op",
+            "extra": "4397122 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicySmall - ns/op",
+            "value": 542.4,
+            "unit": "ns/op",
+            "extra": "4397122 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicySmall - B/op",
+            "value": 150,
+            "unit": "B/op",
+            "extra": "4397122 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicySmall - allocs/op",
+            "value": 6,
+            "unit": "allocs/op",
+            "extra": "4397122 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicyMedium",
+            "value": 576.9,
+            "unit": "ns/op\t     157 B/op\t       6 allocs/op",
+            "extra": "4275406 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicyMedium - ns/op",
+            "value": 576.9,
+            "unit": "ns/op",
+            "extra": "4275406 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicyMedium - B/op",
+            "value": 157,
+            "unit": "B/op",
+            "extra": "4275406 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicyMedium - allocs/op",
+            "value": 6,
+            "unit": "allocs/op",
+            "extra": "4275406 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicyLarge",
+            "value": 576.2,
+            "unit": "ns/op\t     165 B/op\t       7 allocs/op",
+            "extra": "4163401 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicyLarge - ns/op",
+            "value": 576.2,
+            "unit": "ns/op",
+            "extra": "4163401 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicyLarge - B/op",
+            "value": 165,
+            "unit": "B/op",
+            "extra": "4163401 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasPolicyLarge - allocs/op",
+            "value": 7,
+            "unit": "allocs/op",
+            "extra": "4163401 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicySmall",
+            "value": 552.2,
+            "unit": "ns/op\t     152 B/op\t       6 allocs/op",
+            "extra": "4380849 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicySmall - ns/op",
+            "value": 552.2,
+            "unit": "ns/op",
+            "extra": "4380849 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicySmall - B/op",
+            "value": 152,
+            "unit": "B/op",
+            "extra": "4380849 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicySmall - allocs/op",
+            "value": 6,
+            "unit": "allocs/op",
+            "extra": "4380849 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicyMedium",
+            "value": 626.9,
+            "unit": "ns/op\t     166 B/op\t       7 allocs/op",
+            "extra": "3605250 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicyMedium - ns/op",
+            "value": 626.9,
+            "unit": "ns/op",
+            "extra": "3605250 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicyMedium - B/op",
+            "value": 166,
+            "unit": "B/op",
+            "extra": "3605250 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicyMedium - allocs/op",
+            "value": 7,
+            "unit": "allocs/op",
+            "extra": "3605250 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicyLarge",
+            "value": 1198,
+            "unit": "ns/op\t     413 B/op\t       9 allocs/op",
+            "extra": "1989109 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicyLarge - ns/op",
+            "value": 1198,
+            "unit": "ns/op",
+            "extra": "1989109 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicyLarge - B/op",
+            "value": 413,
+            "unit": "B/op",
+            "extra": "1989109 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkAddPolicyLarge - allocs/op",
+            "value": 9,
+            "unit": "allocs/op",
+            "extra": "1989109 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicySmall",
+            "value": 520.3,
+            "unit": "ns/op\t     166 B/op\t       7 allocs/op",
+            "extra": "4625155 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicySmall - ns/op",
+            "value": 520.3,
+            "unit": "ns/op",
+            "extra": "4625155 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicySmall - B/op",
+            "value": 166,
+            "unit": "B/op",
+            "extra": "4625155 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicySmall - allocs/op",
+            "value": 7,
+            "unit": "allocs/op",
+            "extra": "4625155 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicyMedium",
+            "value": 563.5,
+            "unit": "ns/op\t     174 B/op\t       7 allocs/op",
+            "extra": "4185434 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicyMedium - ns/op",
+            "value": 563.5,
+            "unit": "ns/op",
+            "extra": "4185434 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicyMedium - B/op",
+            "value": 174,
+            "unit": "B/op",
+            "extra": "4185434 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicyMedium - allocs/op",
+            "value": 7,
+            "unit": "allocs/op",
+            "extra": "4185434 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicyLarge",
+            "value": 600.6,
+            "unit": "ns/op\t     181 B/op\t       8 allocs/op",
+            "extra": "4016778 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicyLarge - ns/op",
+            "value": 600.6,
+            "unit": "ns/op",
+            "extra": "4016778 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicyLarge - B/op",
+            "value": 181,
+            "unit": "B/op",
+            "extra": "4016778 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRemovePolicyLarge - allocs/op",
+            "value": 8,
+            "unit": "allocs/op",
+            "extra": "4016778 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRaw",
+            "value": 15.08,
+            "unit": "ns/op\t       0 B/op\t       0 allocs/op",
+            "extra": "159327620 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRaw - ns/op",
+            "value": 15.08,
+            "unit": "ns/op",
+            "extra": "159327620 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRaw - B/op",
+            "value": 0,
+            "unit": "B/op",
+            "extra": "159327620 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRaw - allocs/op",
+            "value": 0,
+            "unit": "allocs/op",
+            "extra": "159327620 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBasicModel",
+            "value": 3568,
+            "unit": "ns/op\t    1525 B/op\t      18 allocs/op",
+            "extra": "651292 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBasicModel - ns/op",
+            "value": 3568,
+            "unit": "ns/op",
+            "extra": "651292 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBasicModel - B/op",
+            "value": 1525,
+            "unit": "B/op",
+            "extra": "651292 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBasicModel - allocs/op",
+            "value": 18,
+            "unit": "allocs/op",
+            "extra": "651292 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModel",
+            "value": 5474,
+            "unit": "ns/op\t    2082 B/op\t      36 allocs/op",
+            "extra": "433551 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModel - ns/op",
+            "value": 5474,
+            "unit": "ns/op",
+            "extra": "433551 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModel - B/op",
+            "value": 2082,
+            "unit": "B/op",
+            "extra": "433551 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModel - allocs/op",
+            "value": 36,
+            "unit": "allocs/op",
+            "extra": "433551 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/small",
+            "value": 51073,
+            "unit": "ns/op\t   20250 B/op\t     481 allocs/op",
+            "extra": "47206 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/small - ns/op",
+            "value": 51073,
+            "unit": "ns/op",
+            "extra": "47206 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/small - B/op",
+            "value": 20250,
+            "unit": "B/op",
+            "extra": "47206 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/small - allocs/op",
+            "value": 481,
+            "unit": "allocs/op",
+            "extra": "47206 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/medium",
+            "value": 508639,
+            "unit": "ns/op\t  191678 B/op\t    4829 allocs/op",
+            "extra": "3981 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/medium - ns/op",
+            "value": 508639,
+            "unit": "ns/op",
+            "extra": "3981 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/medium - B/op",
+            "value": 191678,
+            "unit": "B/op",
+            "extra": "3981 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/medium - allocs/op",
+            "value": 4829,
+            "unit": "allocs/op",
+            "extra": "3981 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/large",
+            "value": 5892251,
+            "unit": "ns/op\t 1897462 B/op\t   48115 allocs/op",
+            "extra": "405 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/large - ns/op",
+            "value": 5892251,
+            "unit": "ns/op",
+            "extra": "405 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/large - B/op",
+            "value": 1897462,
+            "unit": "B/op",
+            "extra": "405 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSizes/large - allocs/op",
+            "value": 48115,
+            "unit": "allocs/op",
+            "extra": "405 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSmall",
+            "value": 62696,
+            "unit": "ns/op\t   20381 B/op\t     616 allocs/op",
+            "extra": "38054 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSmall - ns/op",
+            "value": 62696,
+            "unit": "ns/op",
+            "extra": "38054 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSmall - B/op",
+            "value": 20381,
+            "unit": "B/op",
+            "extra": "38054 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelSmall - allocs/op",
+            "value": 616,
+            "unit": "allocs/op",
+            "extra": "38054 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelMedium",
+            "value": 588165,
+            "unit": "ns/op\t  194584 B/op\t    6016 allocs/op",
+            "extra": "3818 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelMedium - ns/op",
+            "value": 588165,
+            "unit": "ns/op",
+            "extra": "3818 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelMedium - B/op",
+            "value": 194584,
+            "unit": "B/op",
+            "extra": "3818 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelMedium - allocs/op",
+            "value": 6016,
+            "unit": "allocs/op",
+            "extra": "3818 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelLarge",
+            "value": 6235902,
+            "unit": "ns/op\t 1929994 B/op\t   60078 allocs/op",
+            "extra": "387 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelLarge - ns/op",
+            "value": 6235902,
+            "unit": "ns/op",
+            "extra": "387 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelLarge - B/op",
+            "value": 1929994,
+            "unit": "B/op",
+            "extra": "387 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelLarge - allocs/op",
+            "value": 60078,
+            "unit": "allocs/op",
+            "extra": "387 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithResourceRoles",
+            "value": 4575,
+            "unit": "ns/op\t    1852 B/op\t      28 allocs/op",
+            "extra": "488098 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithResourceRoles - ns/op",
+            "value": 4575,
+            "unit": "ns/op",
+            "extra": "488098 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithResourceRoles - B/op",
+            "value": 1852,
+            "unit": "B/op",
+            "extra": "488098 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithResourceRoles - allocs/op",
+            "value": 28,
+            "unit": "allocs/op",
+            "extra": "488098 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDomains",
+            "value": 5201,
+            "unit": "ns/op\t    1845 B/op\t      26 allocs/op",
+            "extra": "474001 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDomains - ns/op",
+            "value": 5201,
+            "unit": "ns/op",
+            "extra": "474001 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDomains - B/op",
+            "value": 1845,
+            "unit": "B/op",
+            "extra": "474001 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDomains - allocs/op",
+            "value": 26,
+            "unit": "allocs/op",
+            "extra": "474001 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkABACModel",
+            "value": 2807,
+            "unit": "ns/op\t    1543 B/op\t      17 allocs/op",
+            "extra": "834657 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkABACModel - ns/op",
+            "value": 2807,
+            "unit": "ns/op",
+            "extra": "834657 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkABACModel - B/op",
+            "value": 1543,
+            "unit": "B/op",
+            "extra": "834657 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkABACModel - allocs/op",
+            "value": 17,
+            "unit": "allocs/op",
+            "extra": "834657 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkABACRuleModel",
+            "value": 4019324,
+            "unit": "ns/op\t 1326608 B/op\t   39094 allocs/op",
+            "extra": "602 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkABACRuleModel - ns/op",
+            "value": 4019324,
+            "unit": "ns/op",
+            "extra": "602 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkABACRuleModel - B/op",
+            "value": 1326608,
+            "unit": "B/op",
+            "extra": "602 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkABACRuleModel - allocs/op",
+            "value": 39094,
+            "unit": "allocs/op",
+            "extra": "602 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkKeyMatchModel",
+            "value": 6201,
+            "unit": "ns/op\t    3088 B/op\t      38 allocs/op",
+            "extra": "383508 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkKeyMatchModel - ns/op",
+            "value": 6201,
+            "unit": "ns/op",
+            "extra": "383508 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkKeyMatchModel - B/op",
+            "value": 3088,
+            "unit": "B/op",
+            "extra": "383508 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkKeyMatchModel - allocs/op",
+            "value": 38,
+            "unit": "allocs/op",
+            "extra": "383508 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDeny",
+            "value": 7184,
+            "unit": "ns/op\t    2500 B/op\t      50 allocs/op",
+            "extra": "337440 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDeny - ns/op",
+            "value": 7184,
+            "unit": "ns/op",
+            "extra": "337440 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDeny - B/op",
+            "value": 2500,
+            "unit": "B/op",
+            "extra": "337440 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDeny - allocs/op",
+            "value": 50,
+            "unit": "allocs/op",
+            "extra": "337440 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPriorityModel",
+            "value": 4260,
+            "unit": "ns/op\t    1779 B/op\t      23 allocs/op",
+            "extra": "573508 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPriorityModel - ns/op",
+            "value": 4260,
+            "unit": "ns/op",
+            "extra": "573508 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPriorityModel - B/op",
+            "value": 1779,
+            "unit": "B/op",
+            "extra": "573508 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPriorityModel - allocs/op",
+            "value": 23,
+            "unit": "allocs/op",
+            "extra": "573508 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDomainPatternLarge",
+            "value": 13621,
+            "unit": "ns/op\t    8892 B/op\t      73 allocs/op",
+            "extra": "163362 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDomainPatternLarge - ns/op",
+            "value": 13621,
+            "unit": "ns/op",
+            "extra": "163362 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDomainPatternLarge - B/op",
+            "value": 8892,
+            "unit": "B/op",
+            "extra": "163362 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRBACModelWithDomainPatternLarge - allocs/op",
+            "value": 73,
+            "unit": "allocs/op",
+            "extra": "163362 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerSmall",
+            "value": 50427,
+            "unit": "ns/op\t     800 B/op\t     100 allocs/op",
+            "extra": "47065 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerSmall - ns/op",
+            "value": 50427,
+            "unit": "ns/op",
+            "extra": "47065 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerSmall - B/op",
+            "value": 800,
+            "unit": "B/op",
+            "extra": "47065 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerSmall - allocs/op",
+            "value": 100,
+            "unit": "allocs/op",
+            "extra": "47065 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerMedium",
+            "value": 553597,
+            "unit": "ns/op\t   13953 B/op\t    1744 allocs/op",
+            "extra": "4473 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerMedium - ns/op",
+            "value": 553597,
+            "unit": "ns/op",
+            "extra": "4473 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerMedium - B/op",
+            "value": 13953,
+            "unit": "B/op",
+            "extra": "4473 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerMedium - allocs/op",
+            "value": 1744,
+            "unit": "allocs/op",
+            "extra": "4473 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerLarge",
+            "value": 6111777,
+            "unit": "ns/op\t  229958 B/op\t   19744 allocs/op",
+            "extra": "381 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerLarge - ns/op",
+            "value": 6111777,
+            "unit": "ns/op",
+            "extra": "381 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerLarge - B/op",
+            "value": 229958,
+            "unit": "B/op",
+            "extra": "381 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkRoleManagerLarge - allocs/op",
+            "value": 19744,
+            "unit": "allocs/op",
+            "extra": "381 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithPatternLarge",
+            "value": 289227001,
+            "unit": "ns/op\t63735308 B/op\t 3560280 allocs/op",
+            "extra": "7 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithPatternLarge - ns/op",
+            "value": 289227001,
+            "unit": "ns/op",
+            "extra": "7 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithPatternLarge - B/op",
+            "value": 63735308,
+            "unit": "B/op",
+            "extra": "7 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithPatternLarge - allocs/op",
+            "value": 3560280,
+            "unit": "allocs/op",
+            "extra": "7 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithDomainPatternLarge",
+            "value": 9563513,
+            "unit": "ns/op\t 4139052 B/op\t  120172 allocs/op",
+            "extra": "253 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithDomainPatternLarge - ns/op",
+            "value": 9563513,
+            "unit": "ns/op",
+            "extra": "253 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithDomainPatternLarge - B/op",
+            "value": 4139052,
+            "unit": "B/op",
+            "extra": "253 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithDomainPatternLarge - allocs/op",
+            "value": 120172,
+            "unit": "allocs/op",
+            "extra": "253 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithPatternAndDomainPatternLarge",
+            "value": 298187383,
+            "unit": "ns/op\t65464808 B/op\t 3636818 allocs/op",
+            "extra": "7 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithPatternAndDomainPatternLarge - ns/op",
+            "value": 298187383,
+            "unit": "ns/op",
+            "extra": "7 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithPatternAndDomainPatternLarge - B/op",
+            "value": 65464808,
+            "unit": "B/op",
+            "extra": "7 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkBuildRoleLinksWithPatternAndDomainPatternLarge - allocs/op",
+            "value": 3636818,
+            "unit": "allocs/op",
+            "extra": "7 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithPatternLarge",
+            "value": 1012,
+            "unit": "ns/op\t     112 B/op\t       9 allocs/op",
+            "extra": "2406074 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithPatternLarge - ns/op",
+            "value": 1012,
+            "unit": "ns/op",
+            "extra": "2406074 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithPatternLarge - B/op",
+            "value": 112,
+            "unit": "B/op",
+            "extra": "2406074 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithPatternLarge - allocs/op",
+            "value": 9,
+            "unit": "allocs/op",
+            "extra": "2406074 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithDomainPatternLarge",
+            "value": 340.4,
+            "unit": "ns/op\t      16 B/op\t       1 allocs/op",
+            "extra": "6947095 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithDomainPatternLarge - ns/op",
+            "value": 340.4,
+            "unit": "ns/op",
+            "extra": "6947095 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithDomainPatternLarge - B/op",
+            "value": 16,
+            "unit": "B/op",
+            "extra": "6947095 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithDomainPatternLarge - allocs/op",
+            "value": 1,
+            "unit": "allocs/op",
+            "extra": "6947095 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithPatternAndDomainPatternLarge",
+            "value": 1007,
+            "unit": "ns/op\t     112 B/op\t       9 allocs/op",
+            "extra": "2416744 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithPatternAndDomainPatternLarge - ns/op",
+            "value": 1007,
+            "unit": "ns/op",
+            "extra": "2416744 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithPatternAndDomainPatternLarge - B/op",
+            "value": 112,
+            "unit": "B/op",
+            "extra": "2416744 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkHasLinkWithPatternAndDomainPatternLarge - allocs/op",
+            "value": 9,
+            "unit": "allocs/op",
+            "extra": "2416744 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkConcurrentHasLinkWithMatching",
+            "value": 1276,
+            "unit": "ns/op\t     736 B/op\t      11 allocs/op",
+            "extra": "1960431 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkConcurrentHasLinkWithMatching - ns/op",
+            "value": 1276,
+            "unit": "ns/op",
+            "extra": "1960431 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkConcurrentHasLinkWithMatching - B/op",
+            "value": 736,
+            "unit": "B/op",
+            "extra": "1960431 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkConcurrentHasLinkWithMatching - allocs/op",
+            "value": 11,
+            "unit": "allocs/op",
+            "extra": "1960431 times\n4 procs"
           }
         ]
       }
