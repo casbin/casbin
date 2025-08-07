@@ -18,85 +18,26 @@ import (
 	"testing"
 )
 
-func TestBLPModel(t *testing.T) {
-	e, err := NewEnforcer("examples/blp_model.conf", "examples/blp_policy.csv")
-	if err != nil {
-		t.Fatal(err)
+func testEnforceBLP(t *testing.T, e *Enforcer, sub string, subLevel float64, obj string, objLevel float64, act string, res bool) {
+	t.Helper()
+	if myRes, err := e.Enforce(sub, subLevel, obj, objLevel, act); err != nil {
+		t.Errorf("Enforce Error: %s", err)
+	} else if myRes != res {
+		t.Errorf("%s, %v, %s, %v, %s: %t, supposed to be %t", sub, subLevel, obj, objLevel, act, myRes, res)
 	}
+}
 
-	t.Run("BLP Core Rules", func(t *testing.T) {
-		result, err := e.Enforce("alice", 3, "top_secret_doc", 3, "read")
-		if err != nil {
-			t.Fatalf("Enforce failed: %v", err)
-		}
-		if !result {
-			t.Error("Alice should be able to read top_secret_doc")
-		}
+func TestBLPModel(t *testing.T) {
+	e, _ := NewEnforcer("examples/blp_model.conf")
 
-		result, err = e.Enforce("alice", 3, "secret_doc", 2, "read")
-		if err != nil {
-			t.Fatalf("Enforce failed: %v", err)
-		}
-		if !result {
-			t.Error("Alice should be able to read secret_doc")
-		}
+	testEnforceBLP(t, e, "alice", 3, "top_secret_doc", 3, "read", true)
+	testEnforceBLP(t, e, "alice", 3, "secret_doc", 2, "read", true)
+	testEnforceBLP(t, e, "bob", 2, "secret_doc", 2, "read", true)
+	testEnforceBLP(t, e, "bob", 2, "top_secret_doc", 3, "write", true)
+	testEnforceBLP(t, e, "charlie", 1, "public_doc", 1, "read", true)
 
-		result, err = e.Enforce("bob", 2, "secret_doc", 2, "read")
-		if err != nil {
-			t.Fatalf("Enforce failed: %v", err)
-		}
-		if !result {
-			t.Error("Bob should be able to read secret_doc")
-		}
-
-		result, err = e.Enforce("bob", 2, "top_secret_doc", 3, "write")
-		if err != nil {
-			t.Fatalf("Enforce failed: %v", err)
-		}
-		if !result {
-			t.Error("Bob should be able to write to top_secret_doc")
-		}
-
-		result, err = e.Enforce("charlie", 1, "public_doc", 1, "read")
-		if err != nil {
-			t.Fatalf("Enforce failed: %v", err)
-		}
-		if !result {
-			t.Error("Charlie should be able to read public_doc")
-		}
-	})
-
-	t.Run("BLP Rule Violations", func(t *testing.T) {
-		result, err := e.Enforce("bob", 2, "top_secret_doc", 3, "read")
-		if err != nil {
-			t.Fatalf("Enforce failed: %v", err)
-		}
-		if result {
-			t.Error("Bob should not be able to read top_secret_doc")
-		}
-
-		result, err = e.Enforce("charlie", 1, "secret_doc", 2, "read")
-		if err != nil {
-			t.Fatalf("Enforce failed: %v", err)
-		}
-		if result {
-			t.Error("Charlie should not be able to read secret_doc")
-		}
-
-		result, err = e.Enforce("alice", 3, "secret_doc", 2, "write")
-		if err != nil {
-			t.Fatalf("Enforce failed: %v", err)
-		}
-		if result {
-			t.Error("Alice should not be able to write to secret_doc")
-		}
-
-		result, err = e.Enforce("bob", 2, "public_doc", 1, "write")
-		if err != nil {
-			t.Fatalf("Enforce failed: %v", err)
-		}
-		if result {
-			t.Error("Bob should not be able to write to public_doc")
-		}
-	})
+	testEnforceBLP(t, e, "bob", 2, "top_secret_doc", 3, "read", false)
+	testEnforceBLP(t, e, "charlie", 1, "secret_doc", 2, "read", false)
+	testEnforceBLP(t, e, "alice", 3, "secret_doc", 2, "write", false)
+	testEnforceBLP(t, e, "bob", 2, "public_doc", 1, "write", false)
 }
