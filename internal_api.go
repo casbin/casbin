@@ -236,6 +236,7 @@ func (e *Enforcer) removePoliciesWithoutNotify(sec string, ptype string, rules [
 			return rulesRemoved, err
 		}
 	}
+
 	return rulesRemoved, nil
 }
 

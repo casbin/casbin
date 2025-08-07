@@ -1,0 +1,12 @@
+p, alice, top_secret_doc, read
+p, alice, top_secret_doc, write
+p, alice, secret_doc, read
+p, alice, public_doc, read
+
+p, bob, secret_doc, read
+p, bob, secret_doc, write
+p, bob, top_secret_doc, write
+p, bob, public_doc, read
+
+p, charlie, public_doc, read
+p, charlie, public_doc, write 
