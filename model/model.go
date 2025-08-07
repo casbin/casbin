@@ -76,7 +76,6 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 	ast.Key = key
 	ast.Value = value
 	ast.PolicyMap = make(map[string]int)
-	ast.FieldIndexMap = make(map[string]int)
 	ast.setLogger(model.GetLogger())
 
 	if sec == "r" || sec == "p" {
@@ -419,7 +418,7 @@ func (model Model) Copy() Model {
 
 func (model Model) GetFieldIndex(ptype string, field string) (int, error) {
 	assertion := model["p"][ptype]
-	if index, ok := assertion.FieldIndexMap[field]; ok {
+	if index, ok := assertion.GetFieldIndex(field); ok {
 		return index, nil
 	}
 	pattern := fmt.Sprintf("%s_"+field, ptype)
@@ -433,6 +432,6 @@ func (model Model) GetFieldIndex(ptype string, field string) (int, error) {
 	if index == -1 {
 		return index, fmt.Errorf(field + " index is not set, please use enforcer.SetFieldIndex() to set index")
 	}
-	assertion.FieldIndexMap[field] = index
+	assertion.FieldIndexMap.Store(field, index)
 	return index, nil
 }

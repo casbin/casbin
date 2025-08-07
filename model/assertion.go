@@ -17,6 +17,7 @@ package model
 import (
 	"errors"
 	"strings"
+	"sync"
 
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
@@ -33,9 +34,23 @@ type Assertion struct {
 	PolicyMap     map[string]int
 	RM            rbac.RoleManager
 	CondRM        rbac.ConditionalRoleManager
-	FieldIndexMap map[string]int
+	FieldIndexMap sync.Map
 
 	logger log.Logger
+}
+
+func (ast *Assertion) GetFieldIndex(field string) (idx int, ok bool) {
+	value, found := ast.FieldIndexMap.Load(field)
+	if found {
+		ok = true
+		idx = value.(int)
+	}
+	return idx, ok
+}
+
+func (ast *Assertion) GetFieldIndexOrZero(field string) (idx int) {
+	idx, _ = ast.GetFieldIndex(field)
+	return idx
 }
 
 func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
@@ -182,13 +197,17 @@ func (ast *Assertion) copy() *Assertion {
 	}
 
 	newAst := &Assertion{
-		Key:           ast.Key,
-		Value:         ast.Value,
-		PolicyMap:     policyMap,
-		Tokens:        tokens,
-		Policy:        policy,
-		FieldIndexMap: ast.FieldIndexMap,
+		Key:       ast.Key,
+		Value:     ast.Value,
+		PolicyMap: policyMap,
+		Tokens:    tokens,
+		Policy:    policy,
 	}
+
+	ast.FieldIndexMap.Range(func(key, value interface{}) bool {
+		newAst.FieldIndexMap.Store(key, value)
+		return true
+	})
 
 	return newAst
 }

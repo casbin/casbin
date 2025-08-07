@@ -493,5 +493,5 @@ func (e *Enforcer) GetFieldIndex(ptype string, field string) (int, error) {
 
 func (e *Enforcer) SetFieldIndex(ptype string, field string, index int) {
 	assertion := e.model["p"][ptype]
-	assertion.FieldIndexMap[field] = index
+	assertion.FieldIndexMap.Store(field, index)
 }
