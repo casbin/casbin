@@ -30,14 +30,21 @@ func testEnforceBLP(t *testing.T, e *Enforcer, sub string, subLevel float64, obj
 func TestBLPModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/blp_model.conf")
 
-	testEnforceBLP(t, e, "alice", 3, "top_secret_doc", 3, "read", true)
-	testEnforceBLP(t, e, "alice", 3, "secret_doc", 2, "read", true)
-	testEnforceBLP(t, e, "bob", 2, "secret_doc", 2, "read", true)
-	testEnforceBLP(t, e, "bob", 2, "top_secret_doc", 3, "write", true)
-	testEnforceBLP(t, e, "charlie", 1, "public_doc", 1, "read", true)
+	// Read operations: subject level >= object level
+	testEnforceBLP(t, e, "alice", 3, "data1", 1, "read", true)
+	testEnforceBLP(t, e, "bob", 2, "data2", 2, "read", true)
+	testEnforceBLP(t, e, "charlie", 1, "data1", 1, "read", true)
 
-	testEnforceBLP(t, e, "bob", 2, "top_secret_doc", 3, "read", false)
-	testEnforceBLP(t, e, "charlie", 1, "secret_doc", 2, "read", false)
-	testEnforceBLP(t, e, "alice", 3, "secret_doc", 2, "write", false)
-	testEnforceBLP(t, e, "bob", 2, "public_doc", 1, "write", false)
+	// Read violations: subject level < object level
+	testEnforceBLP(t, e, "bob", 2, "data3", 3, "read", false)
+	testEnforceBLP(t, e, "charlie", 1, "data2", 2, "read", false)
+
+	// Write operations: subject level <= object level
+	testEnforceBLP(t, e, "alice", 3, "data3", 3, "write", true)
+	testEnforceBLP(t, e, "bob", 2, "data3", 3, "write", true)
+	testEnforceBLP(t, e, "charlie", 1, "data2", 2, "write", true)
+
+	// Write violations: subject level > object level
+	testEnforceBLP(t, e, "alice", 3, "data1", 1, "write", false)
+	testEnforceBLP(t, e, "bob", 2, "data1", 1, "write", false)
 }
