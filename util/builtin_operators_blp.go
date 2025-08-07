@@ -18,10 +18,10 @@ import (
 	"fmt"
 )
 
-// CheckSecurityLevel enforces Bell-LaPadula security model.
+// levelMatch enforces Bell-LaPadula security model.
 // Simple Security Property: no read-up.
 // Star Property: no write-down.
-func CheckSecurityLevel(action string, subjectLevel, objectLevel interface{}) bool {
+func levelMatch(action string, subjectLevel, objectLevel interface{}) bool {
 	subLevel := int(subjectLevel.(float64))
 	objLevel := int(objectLevel.(float64))
 
@@ -34,26 +34,26 @@ func CheckSecurityLevel(action string, subjectLevel, objectLevel interface{}) bo
 	return false
 }
 
-// CheckSecurityLevelFunc is the wrapper for CheckSecurityLevel.
-func CheckSecurityLevelFunc(args ...interface{}) (interface{}, error) {
+// LevelMatchFunc is the wrapper for levelMatch.
+func LevelMatchFunc(args ...interface{}) (interface{}, error) {
 	if len(args) != 3 {
-		return false, fmt.Errorf("blp: expected 3 arguments (action, subjectLevel, objectLevel), but got %d", len(args))
+		return false, fmt.Errorf("levelMatch: expected 3 arguments (action, subjectLevel, objectLevel), but got %d", len(args))
 	}
 
 	action, ok := args[0].(string)
 	if !ok {
-		return false, fmt.Errorf("blp: action argument must be a string")
+		return false, fmt.Errorf("levelMatch: action argument must be a string")
 	}
 
 	subjectLevel, ok := args[1].(float64)
 	if !ok {
-		return false, fmt.Errorf("blp: subjectLevel argument must be a number")
+		return false, fmt.Errorf("levelMatch: subjectLevel argument must be a number")
 	}
 
 	objectLevel, ok := args[2].(float64)
 	if !ok {
-		return false, fmt.Errorf("blp: objectLevel argument must be a number")
+		return false, fmt.Errorf("levelMatch: objectLevel argument must be a number")
 	}
 
-	return CheckSecurityLevel(action, subjectLevel, objectLevel), nil
+	return levelMatch(action, subjectLevel, objectLevel), nil
 }

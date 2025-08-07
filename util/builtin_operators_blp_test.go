@@ -18,8 +18,7 @@ import (
 	"testing"
 )
 
-func TestCheckSecurityLevel(t *testing.T) {
-	// Each test case checks if the Bell-LaPadula model enforces the correct access control
+func TestLevelMatch(t *testing.T) {
 	tests := []struct {
 		action      string
 		levels      []float64
@@ -59,7 +58,7 @@ func TestCheckSecurityLevel(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		allowed := CheckSecurityLevel(tc.action, tc.levels[0], tc.levels[1])
+		allowed := levelMatch(tc.action, tc.levels[0], tc.levels[1])
 		if allowed != tc.expectAllow {
 			t.Errorf("%s: action=%s, levels=%v, expect=%v, got=%v", tc.desc, tc.action, tc.levels, tc.expectAllow, allowed)
 		}
