@@ -1,0 +1,52 @@
+# role, doamin(orgnization), obj(view), act(activity), ctx(context)
+p, manager, company_a, financial_view, read_activity, "workHour", allow
+p, manager, company_a, financial_view, write_activity, "workHour", allow
+p, analyst, company_a, data_view, analyze_activity, "always", allow
+p, admin, company_a, system_view, manage_activity, "always", allow
+p, guest, company_a, public_view, browse_activity, "always", allow
+
+p, manager, company_b, financial_view, read_activity, "workHour", allow
+
+# role, user
+g, alice, manager
+g, bob, analyst
+g, charlie, admin
+g, david, guest
+
+# role, role
+g, charlie, manager
+
+# role, domain
+g2, manager, company_a
+g2, analyst, company_a
+g2, admin, company_a
+g2, guest, company_a
+g2, manager, company_b
+
+# obj, view
+g3, /finance/budget.xlsx, financial_view
+g3, /data/sales.csv, data_view
+g3, /system/config.json, system_view
+g3, /public/news.html, public_view
+
+# view, domain
+g4, financial_view, company_a
+g4, data_view, company_a
+g4, system_view, company_a
+g4, public_view, company_a
+g4, financial_view, company_b
+
+# act, activity
+g5, read, read_activity
+g5, write, write_activity
+g5, analyze, analyze_activity
+g5, delete, manage_activity
+g5, browse, browse_activity
+
+# activity, domain
+g6, read_activity, company_a
+g6, write_activity, company_a
+g6, analyze_activity, company_a
+g6, manage_activity, company_a
+g6, browse_activity, company_a
+g6, read_activity, company_b

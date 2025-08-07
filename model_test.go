@@ -48,6 +48,15 @@ func testDomainEnforce(t *testing.T, e *Enforcer, sub string, dom string, obj st
 	}
 }
 
+func testOrBACEnforce(t *testing.T, e *Enforcer, sub string, org string, obj string, act string, ctx string, res bool) {
+	t.Helper()
+	if myRes, err := e.Enforce(sub, org, obj, act, ctx); err != nil {
+		t.Errorf("OrBAC Enforce Error: %s", err)
+	} else if myRes != res {
+		t.Errorf("OrBAC: %s, %s, %s, %s, %s: %t, supposed to be %t", sub, org, obj, act, ctx, myRes, res)
+	}
+}
+
 func TestBasicModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 
@@ -705,4 +714,60 @@ func TestReBACModel(t *testing.T) {
 	testEnforce(t, e, "bob", "doc2", "write", false)
 	testEnforce(t, e, "bob", "doc3", "read", false)
 	testEnforce(t, e, "bob", "doc3", "write", false)
+}
+
+func TestOrBACModel(t *testing.T) {
+	e, err := NewEnforcer("examples/orbac_model.conf", "examples/orbac_policy.csv")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "read", "workHour", true)
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "write", "workHour", true)
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "read", "afterHours", false)
+
+	testOrBACEnforce(t, e, "bob", "company_a", "/data/sales.csv", "analyze", "always", true)
+	testOrBACEnforce(t, e, "bob", "company_a", "/finance/budget.xlsx", "read", "workHour", false)
+
+	testOrBACEnforce(t, e, "charlie", "company_a", "/system/config.json", "delete", "always", true)
+	testOrBACEnforce(t, e, "charlie", "company_a", "/finance/budget.xlsx", "read", "workHour", true)
+	testOrBACEnforce(t, e, "charlie", "company_a", "/finance/budget.xlsx", "write", "workHour", true)
+
+	testOrBACEnforce(t, e, "david", "company_a", "/public/news.html", "browse", "always", true)
+	testOrBACEnforce(t, e, "david", "company_a", "/finance/budget.xlsx", "read", "workHour", false)
+	testOrBACEnforce(t, e, "david", "company_a", "/data/sales.csv", "analyze", "always", false)
+	testOrBACEnforce(t, e, "david", "company_a", "/system/config.json", "delete", "always", false)
+
+	testOrBACEnforce(t, e, "alice", "company_b", "/finance/budget.xlsx", "read", "workHour", true)
+	testOrBACEnforce(t, e, "alice", "company_b", "/finance/budget.xlsx", "write", "workHour", false) // company_b没有write权限
+	testOrBACEnforce(t, e, "bob", "company_b", "/data/sales.csv", "analyze", "always", false)        // bob在company_b没有权限
+	testOrBACEnforce(t, e, "charlie", "company_b", "/finance/budget.xlsx", "read", "workHour", true) // charlie继承manager权限
+
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "read", "workHour", true)
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "read", "lunch", false)
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "read", "weekend", false)
+	testOrBACEnforce(t, e, "bob", "company_a", "/data/sales.csv", "analyze", "workHour", true) // always上下文
+	testOrBACEnforce(t, e, "bob", "company_a", "/data/sales.csv", "analyze", "midnight", true) // always上下文
+
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "read", "workHour", true)
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "write", "workHour", true)
+	testOrBACEnforce(t, e, "charlie", "company_a", "/system/config.json", "delete", "always", true)
+	testOrBACEnforce(t, e, "charlie", "company_a", "/system/config.json", "create", "always", false) // 没有create映射
+	testOrBACEnforce(t, e, "david", "company_a", "/public/news.html", "browse", "always", true)
+
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "read", "workHour", true)
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/report.pdf", "read", "workHour", false) // 未映射资源
+	testOrBACEnforce(t, e, "bob", "company_a", "/data/sales.csv", "analyze", "always", true)
+	testOrBACEnforce(t, e, "bob", "company_a", "/data/marketing.xlsx", "analyze", "always", false) // 未映射资源
+
+	testOrBACEnforce(t, e, "alice", "company_a", "/nonexistent/file.txt", "read", "workHour", false)
+	testOrBACEnforce(t, e, "unknown_user", "company_a", "/public/news.html", "browse", "always", false)
+	testOrBACEnforce(t, e, "alice", "unknown_company", "/finance/budget.xlsx", "read", "workHour", false)
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "unknown_action", "workHour", false)
+
+	testOrBACEnforce(t, e, "", "company_a", "/public/news.html", "browse", "always", false)
+	testOrBACEnforce(t, e, "alice", "", "/finance/budget.xlsx", "read", "workHour", false)
+	testOrBACEnforce(t, e, "alice", "company_a", "", "read", "workHour", false)
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "", "workHour", false)
+	testOrBACEnforce(t, e, "alice", "company_a", "/finance/budget.xlsx", "read", "", false)
 }
