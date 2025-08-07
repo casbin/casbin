@@ -229,14 +229,15 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) error {
 	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
 
 	hasPriority := false
-	if _, ok := assertion.FieldIndexMap[constant.PriorityIndex]; ok {
+	if _, ok := assertion.FieldIndexMap.Load(constant.PriorityIndex); ok {
 		hasPriority = true
 	}
 	if sec == "p" && hasPriority {
-		if idxInsert, err := strconv.Atoi(rule[assertion.FieldIndexMap[constant.PriorityIndex]]); err == nil {
+		priorityIndex := assertion.GetFieldIndexOrZero(constant.PriorityIndex)
+		if idxInsert, err := strconv.Atoi(rule[priorityIndex]); err == nil {
 			i := len(assertion.Policy) - 1
 			for ; i > 0; i-- {
-				idx, err := strconv.Atoi(assertion.Policy[i-1][assertion.FieldIndexMap[constant.PriorityIndex]])
+				idx, err := strconv.Atoi(assertion.Policy[i-1][priorityIndex])
 				if err != nil || idx <= idxInsert {
 					break
 				}
