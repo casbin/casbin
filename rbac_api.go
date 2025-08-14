@@ -529,10 +529,8 @@ func removeDuplicatePermissions(permissions [][]string) [][]string {
 // p, data2_admin, data2, read
 // p, data2_admin, data2, write
 // g, alice, data2_admin
-// g2, app, admin_data
 // GetImplicitUsersForResource("data2") will return [[bob data2 write] [alice data2 read] [alice data2 write]]
 // GetImplicitUsersForResource("data1") will return [[alice data1 read]]
-// GetImplicitUsersForResource("app") will return users who have access to admin_data through g2 relationship.
 // Note: only users will be returned, roles (2nd arg in "g") will be excluded.
 func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, error) {
 	permissions := make([][]string, 0)
@@ -576,25 +574,40 @@ func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, err
 		}
 	}
 
-	// Process g2 resource roles if available
-	if g2Permissions := e.processG2ResourceRoles(resource, subjectIndex, objectIndex, isRole, rm); len(g2Permissions) > 0 {
-		permissions = append(permissions, g2Permissions...)
-	}
-
 	res := removeDuplicatePermissions(permissions)
 	return res, nil
 }
 
-// processG2ResourceRoles processes g2 resource roles and returns permissions.
-func (e *Enforcer) processG2ResourceRoles(resource string, subjectIndex, objectIndex int, isRole map[string]bool, rm rbac.RoleManager) [][]string {
+// GetNamedImplicitUsersForResource return implicit user based on resource with g2 support.
+// This function specifically handles g2 resource role relationships.
+// for example:
+// p, admin_group, admin_data, *
+// g, admin, admin_group
+// g2, app, admin_data
+// GetNamedImplicitUsersForResource("app") will return users who have access to admin_data through g2 relationship.
+func (e *Enforcer) GetNamedImplicitUsersForResource(resource string) ([][]string, error) {
 	permissions := make([][]string, 0)
+	subjectIndex, _ := e.GetFieldIndex("p", "sub")
+	objectIndex, _ := e.GetFieldIndex("p", "obj")
+	rm := e.GetRoleManager()
+	if rm == nil {
+		return nil, fmt.Errorf("role manager is not initialized")
+	}
+
+	isRole := make(map[string]bool)
+	roles, err := e.GetAllRoles()
+	if err != nil {
+		return nil, err
+	}
+	for _, role := range roles {
+		isRole[role] = true
+	}
 
 	g2Rm := e.GetNamedRoleManager("g2")
 	if g2Rm == nil {
-		return permissions
+		return permissions, nil
 	}
 
-	// Get all roles that this resource can access through g2
 	g2Policies, _ := e.GetNamedGroupingPolicy("g2")
 	resourceAccessibleRoles := make(map[string]bool)
 
@@ -628,7 +641,8 @@ func (e *Enforcer) processG2ResourceRoles(resource string, subjectIndex, objectI
 		}
 	}
 
-	return permissions
+	res := removeDuplicatePermissions(permissions)
+	return res, nil
 }
 
 // GetImplicitUsersForResourceByDomain return implicit user based on resource and domain.
