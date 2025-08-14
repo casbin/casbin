@@ -584,8 +584,8 @@ func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, err
 // p, admin_group, admin_data, *
 // g, admin, admin_group
 // g2, app, admin_data
-// GetNamedImplicitUsersForResource("app") will return users who have access to admin_data through g2 relationship.
-func (e *Enforcer) GetNamedImplicitUsersForResource(resource string) ([][]string, error) {
+// GetNamedImplicitUsersForResource("g2", "app") will return users who have access to admin_data through g2 relationship.
+func (e *Enforcer) GetNamedImplicitUsersForResource(ptype string, resource string) ([][]string, error) {
 	permissions := make([][]string, 0)
 	subjectIndex, _ := e.GetFieldIndex("p", "sub")
 	objectIndex, _ := e.GetFieldIndex("p", "obj")
@@ -603,12 +603,35 @@ func (e *Enforcer) GetNamedImplicitUsersForResource(resource string) ([][]string
 		isRole[role] = true
 	}
 
-	g2Rm := e.GetNamedRoleManager("g2")
+	for _, rule := range e.model["p"]["p"].Policy {
+		obj := rule[objectIndex]
+		if obj != resource {
+			continue
+		}
+
+		sub := rule[subjectIndex]
+		if !isRole[sub] {
+			permissions = append(permissions, rule)
+		} else {
+			users, err := rm.GetUsers(sub)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, user := range users {
+				implicitUserRule := deepCopyPolicy(rule)
+				implicitUserRule[subjectIndex] = user
+				permissions = append(permissions, implicitUserRule)
+			}
+		}
+	}
+
+	g2Rm := e.GetNamedRoleManager(ptype)
 	if g2Rm == nil {
 		return permissions, nil
 	}
 
-	g2Policies, _ := e.GetNamedGroupingPolicy("g2")
+	g2Policies, _ := e.GetNamedGroupingPolicy(ptype)
 	resourceAccessibleRoles := make(map[string]bool)
 
 	for _, g2Policy := range g2Policies {

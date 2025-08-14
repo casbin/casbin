@@ -639,23 +639,23 @@ func TestGetImplicitUsersForResourceWithResourceRoles(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv")
 
 	// Test data1 resource - should return users who have access through g2 relationships
-	data1Users, err := e.GetNamedImplicitUsersForResource("data1")
+	data1Users, err := e.GetNamedImplicitUsersForResource("g2", "data1")
 	if err != nil {
 		t.Fatalf("GetNamedImplicitUsersForResource failed: %v", err)
 	}
 
-	expectedData1Users := 1 // [alice data_group write]
+	expectedData1Users := 2 // [alice data1 read] + [alice data_group write]
 	if len(data1Users) != expectedData1Users {
 		t.Errorf("Expected %d users for data1 resource, got %d: %v", expectedData1Users, len(data1Users), data1Users)
 	}
 
 	// Test data2 resource - should return users who have access through g2 relationships
-	data2Users, err := e.GetImplicitUsersForResource("data2")
+	data2Users, err := e.GetNamedImplicitUsersForResource("g2", "data2")
 	if err != nil {
-		t.Fatalf("GetImplicitUsersForResource failed: %v", err)
+		t.Fatalf("GetNamedImplicitUsersForResource failed: %v", err)
 	}
 
-	expectedData2Users := 1 // [alice data_group write]
+	expectedData2Users := 2 // [bob data2 write] + [alice data_group write]
 	if len(data2Users) != expectedData2Users {
 		t.Errorf("Expected %d users for data2 resource, got %d: %v", expectedData2Users, len(data2Users), data2Users)
 	}
