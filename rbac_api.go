@@ -533,6 +533,17 @@ func removeDuplicatePermissions(permissions [][]string) [][]string {
 // GetImplicitUsersForResource("data1") will return [[alice data1 read]]
 // Note: only users will be returned, roles (2nd arg in "g") will be excluded.
 func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, error) {
+	return e.GetNamedImplicitUsersForResource("g", resource)
+}
+
+// GetNamedImplicitUsersForResource return implicit user based on resource with named policy support.
+// This function handles resource role relationships through named policies (e.g., g2, g3, etc.).
+// for example:
+// p, admin_group, admin_data, *
+// g, admin, admin_group
+// g2, app, admin_data
+// GetNamedImplicitUsersForResource("g2", "app") will return users who have access to admin_data through g2 relationship.
+func (e *Enforcer) GetNamedImplicitUsersForResource(ptype string, resource string) ([][]string, error) {
 	permissions := make([][]string, 0)
 	subjectIndex, _ := e.GetFieldIndex("p", "sub")
 	objectIndex, _ := e.GetFieldIndex("p", "obj")
@@ -550,26 +561,35 @@ func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, err
 		isRole[role] = true
 	}
 
+	// Get all resource types that the resource can access through ptype (e.g., g2)
+	ptypePolicies, _ := e.GetNamedGroupingPolicy(ptype)
+	resourceAccessibleResourceTypes := make(map[string]bool)
+
+	for _, ptypePolicy := range ptypePolicies {
+		if ptypePolicy[0] == resource { // ptypePolicy[0] is the resource
+			resourceAccessibleResourceTypes[ptypePolicy[1]] = true // ptypePolicy[1] is the resource type it can access
+		}
+	}
+
 	for _, rule := range e.model["p"]["p"].Policy {
 		obj := rule[objectIndex]
-		if obj != resource {
-			continue
-		}
-
 		sub := rule[subjectIndex]
 
-		if !isRole[sub] {
-			permissions = append(permissions, rule)
-		} else {
-			users, err := rm.GetUsers(sub)
-			if err != nil {
-				return nil, err
-			}
+		// Check if this policy is directly for the resource OR for a resource type the resource can access
+		if obj == resource || resourceAccessibleResourceTypes[obj] {
+			if !isRole[sub] {
+				permissions = append(permissions, rule)
+			} else {
+				users, err := rm.GetUsers(sub)
+				if err != nil {
+					continue
+				}
 
-			for _, user := range users {
-				implicitUserRule := deepCopyPolicy(rule)
-				implicitUserRule[subjectIndex] = user
-				permissions = append(permissions, implicitUserRule)
+				for _, user := range users {
+					implicitUserRule := deepCopyPolicy(rule)
+					implicitUserRule[subjectIndex] = user
+					permissions = append(permissions, implicitUserRule)
+				}
 			}
 		}
 	}
