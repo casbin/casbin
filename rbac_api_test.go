@@ -659,6 +659,17 @@ func TestGetImplicitUsersForResourceWithResourceRoles(t *testing.T) {
 	if len(data2Users) != expectedData2Users {
 		t.Errorf("Expected %d users for data2 resource, got %d: %v", expectedData2Users, len(data2Users), data2Users)
 	}
+
+	// Test with "g" policy type - should return users who have access through g relationships
+	data1UsersG, err := e.GetNamedImplicitUsersForResource("g", "data1")
+	if err != nil {
+		t.Fatalf("GetNamedImplicitUsersForResource with g failed: %v", err)
+	}
+
+	expectedData1UsersG := 1 // [alice data1 read] only
+	if len(data1UsersG) != expectedData1UsersG {
+		t.Errorf("Expected %d users for data1 resource with g policy, got %d: %v", expectedData1UsersG, len(data1UsersG), data1UsersG)
+	}
 }
 
 func testGetImplicitUsersForResourceByDomain(t *testing.T, e *Enforcer, res [][]string, resource string, domain string) {
