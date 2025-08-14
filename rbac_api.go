@@ -529,8 +529,10 @@ func removeDuplicatePermissions(permissions [][]string) [][]string {
 // p, data2_admin, data2, read
 // p, data2_admin, data2, write
 // g, alice, data2_admin
+// g2, app, admin_data
 // GetImplicitUsersForResource("data2") will return [[bob data2 write] [alice data2 read] [alice data2 write]]
 // GetImplicitUsersForResource("data1") will return [[alice data1 read]]
+// GetImplicitUsersForResource("app") will return users who have access to admin_data through g2 relationship.
 // Note: only users will be returned, roles (2nd arg in "g") will be excluded.
 func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, error) {
 	permissions := make([][]string, 0)
@@ -574,8 +576,59 @@ func (e *Enforcer) GetImplicitUsersForResource(resource string) ([][]string, err
 		}
 	}
 
+	// Process g2 resource roles if available
+	if g2Permissions := e.processG2ResourceRoles(resource, subjectIndex, objectIndex, isRole, rm); len(g2Permissions) > 0 {
+		permissions = append(permissions, g2Permissions...)
+	}
+
 	res := removeDuplicatePermissions(permissions)
 	return res, nil
+}
+
+// processG2ResourceRoles processes g2 resource roles and returns permissions.
+func (e *Enforcer) processG2ResourceRoles(resource string, subjectIndex, objectIndex int, isRole map[string]bool, rm rbac.RoleManager) [][]string {
+	permissions := make([][]string, 0)
+
+	g2Rm := e.GetNamedRoleManager("g2")
+	if g2Rm == nil {
+		return permissions
+	}
+
+	// Get all roles that this resource can access through g2
+	g2Policies, _ := e.GetNamedGroupingPolicy("g2")
+	resourceAccessibleRoles := make(map[string]bool)
+
+	for _, g2Policy := range g2Policies {
+		if g2Policy[0] == resource { // g2Policy[0] is the resource
+			resourceAccessibleRoles[g2Policy[1]] = true // g2Policy[1] is the role it can access
+		}
+	}
+
+	// For each resource type that the resource can access, find policies for that resource type
+	for resourceType := range resourceAccessibleRoles {
+		for _, rule := range e.model["p"]["p"].Policy {
+			// Check if this policy is for the resource type that the resource can access
+			if rule[objectIndex] == resourceType {
+				sub := rule[subjectIndex]
+				if !isRole[sub] {
+					permissions = append(permissions, rule)
+				} else {
+					users, err := rm.GetUsers(sub)
+					if err != nil {
+						continue
+					}
+
+					for _, user := range users {
+						implicitUserRule := deepCopyPolicy(rule)
+						implicitUserRule[subjectIndex] = user
+						permissions = append(permissions, implicitUserRule)
+					}
+				}
+			}
+		}
+	}
+
+	return permissions
 }
 
 // GetImplicitUsersForResourceByDomain return implicit user based on resource and domain.
