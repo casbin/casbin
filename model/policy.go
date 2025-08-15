@@ -16,10 +16,8 @@ package model
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
-	"github.com/casbin/casbin/v2/constant"
 	"github.com/casbin/casbin/v2/rbac"
 	"github.com/casbin/casbin/v2/util"
 )
@@ -123,31 +121,39 @@ func (model Model) PrintPolicy() {
 // ClearPolicy clears all current policy.
 func (model Model) ClearPolicy() {
 	for _, ast := range model["p"] {
+		ast.policyMu.Lock()
 		ast.Policy = nil
 		ast.PolicyMap = map[string]int{}
+		ast.policyMu.Unlock()
 	}
 
 	for _, ast := range model["g"] {
+		ast.policyMu.Lock()
 		ast.Policy = nil
 		ast.PolicyMap = map[string]int{}
+		ast.policyMu.Unlock()
 	}
 }
 
 // GetPolicy gets all rules in a policy.
 func (model Model) GetPolicy(sec string, ptype string) ([][]string, error) {
-	_, err := model.GetAssertion(sec, ptype)
+	ast, err := model.GetAssertion(sec, ptype)
 	if err != nil {
 		return nil, err
 	}
+	ast.policyMu.RLock()
+	defer ast.policyMu.RUnlock()
 	return model[sec][ptype].Policy, nil
 }
 
 // GetFilteredPolicy gets rules based on field filters from a policy.
 func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) ([][]string, error) {
-	_, err := model.GetAssertion(sec, ptype)
+	ast, err := model.GetAssertion(sec, ptype)
 	if err != nil {
 		return nil, err
 	}
+	ast.policyMu.RLock()
+	defer ast.policyMu.RUnlock()
 	res := [][]string{}
 
 	for _, rule := range model[sec][ptype].Policy {
@@ -196,10 +202,12 @@ func (model Model) HasPolicyEx(sec string, ptype string, rule []string) (bool, e
 
 // HasPolicy determines whether a model has the specified policy rule.
 func (model Model) HasPolicy(sec string, ptype string, rule []string) (bool, error) {
-	_, err := model.GetAssertion(sec, ptype)
+	ast, err := model.GetAssertion(sec, ptype)
 	if err != nil {
 		return false, err
 	}
+	ast.policyMu.RLock()
+	defer ast.policyMu.RUnlock()
 	_, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
 	return ok, nil
 }
@@ -225,28 +233,9 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) error {
 	if err != nil {
 		return err
 	}
-	assertion.Policy = append(assertion.Policy, rule)
-	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
-
-	hasPriority := false
-	if _, ok := assertion.FieldIndexMap[constant.PriorityIndex]; ok {
-		hasPriority = true
-	}
-	if sec == "p" && hasPriority {
-		if idxInsert, err := strconv.Atoi(rule[assertion.FieldIndexMap[constant.PriorityIndex]]); err == nil {
-			i := len(assertion.Policy) - 1
-			for ; i > 0; i-- {
-				idx, err := strconv.Atoi(assertion.Policy[i-1][assertion.FieldIndexMap[constant.PriorityIndex]])
-				if err != nil || idx <= idxInsert {
-					break
-				}
-				assertion.Policy[i] = assertion.Policy[i-1]
-				assertion.PolicyMap[strings.Join(assertion.Policy[i-1], DefaultSep)]++
-			}
-			assertion.Policy[i] = rule
-			assertion.PolicyMap[strings.Join(rule, DefaultSep)] = i
-		}
-	}
+	assertion.policyMu.Lock()
+	defer assertion.policyMu.Unlock()
+	assertion.addPolicy(sec, rule)
 	return nil
 }
 
@@ -258,10 +247,12 @@ func (model Model) AddPolicies(sec string, ptype string, rules [][]string) error
 
 // AddPoliciesWithAffected adds policy rules to the model, and returns affected rules.
 func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]string) ([][]string, error) {
-	_, err := model.GetAssertion(sec, ptype)
+	assertion, err := model.GetAssertion(sec, ptype)
 	if err != nil {
 		return nil, err
 	}
+	assertion.policyMu.Lock()
+	defer assertion.policyMu.Unlock()
 	var affected [][]string
 	for _, rule := range rules {
 		hashKey := strings.Join(rule, DefaultSep)
@@ -270,10 +261,7 @@ func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]s
 			continue
 		}
 		affected = append(affected, rule)
-		err = model.AddPolicy(sec, ptype, rule)
-		if err != nil {
-			return affected, err
-		}
+		assertion.addPolicy(sec, rule)
 	}
 	return affected, err
 }
@@ -285,6 +273,8 @@ func (model Model) RemovePolicy(sec string, ptype string, rule []string) (bool, 
 	if err != nil {
 		return false, err
 	}
+	ast.policyMu.Lock()
+	defer ast.policyMu.Unlock()
 	key := strings.Join(rule, DefaultSep)
 	index, ok := ast.PolicyMap[key]
 	if !ok {
@@ -304,10 +294,12 @@ func (model Model) RemovePolicy(sec string, ptype string, rule []string) (bool, 
 
 // UpdatePolicy updates a policy rule from the model.
 func (model Model) UpdatePolicy(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
-	_, err := model.GetAssertion(sec, ptype)
+	ast, err := model.GetAssertion(sec, ptype)
 	if err != nil {
 		return false, err
 	}
+	ast.policyMu.Lock()
+	defer ast.policyMu.Unlock()
 	oldPolicy := strings.Join(oldRule, DefaultSep)
 	index, ok := model[sec][ptype].PolicyMap[oldPolicy]
 	if !ok {
@@ -323,10 +315,12 @@ func (model Model) UpdatePolicy(sec string, ptype string, oldRule []string, newR
 
 // UpdatePolicies updates a policy rule from the model.
 func (model Model) UpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) (bool, error) {
-	_, err := model.GetAssertion(sec, ptype)
+	ast, err := model.GetAssertion(sec, ptype)
 	if err != nil {
 		return false, err
 	}
+	ast.policyMu.Lock()
+	defer ast.policyMu.Unlock()
 	rollbackFlag := false
 	// index -> []{oldIndex, newIndex}
 	modifiedRuleIndex := make(map[int][]int)
@@ -370,10 +364,12 @@ func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) (b
 
 // RemovePoliciesWithAffected removes policy rules from the model, and returns affected rules.
 func (model Model) RemovePoliciesWithAffected(sec string, ptype string, rules [][]string) ([][]string, error) {
-	_, err := model.GetAssertion(sec, ptype)
+	ast, err := model.GetAssertion(sec, ptype)
 	if err != nil {
 		return nil, err
 	}
+	ast.policyMu.Lock()
+	defer ast.policyMu.Unlock()
 	var affected [][]string
 	for _, rule := range rules {
 		index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
