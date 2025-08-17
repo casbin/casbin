@@ -19,6 +19,12 @@ import (
 	"encoding/json"
 )
 
+ // CasbinJsGetPermissionForUser 生成 casbin.js 前端所需的数据载荷。
+ // 返回内容包含：
+ // - m: 模型的文本表示（model.ToText()）
+ // - p: 所有策略规则，格式为 [ptype, ...params]
+ // - g: 所有分组/角色继承规则，格式为 [ptype, ...params]
+ // 说明：参数 user 仅为兼容保留，不在服务端用于过滤，前端可结合 casbin.js 进行用户态判定。
 func CasbinJsGetPermissionForUser(e IEnforcer, user string) (string, error) {
 	model := e.GetModel()
 	m := map[string]interface{}{}
