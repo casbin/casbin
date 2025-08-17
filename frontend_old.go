@@ -16,21 +16,26 @@ package casbin
 
 import "encoding/json"
 
-// Deprecated: CasbinJsGetPermissionForUserOld 已废弃。
-// 请使用 CasbinJsGetPermissionForUser + 前端 casbin.js 进行权限判定。
-// 该旧接口仅返回一个资源到动作的映射，且不包含模型信息。
-func CasbinJsGetPermissionForUserOld(e IEnforcer, user string) ([]byte, error) {
-	policy, err := e.GetImplicitPermissionsForUser(user)
-	if err != nil {
-		return nil, err
-	}
-	permission := make(map[string][]string)
-	for _, p := range policy {
-		permission[p[2]] = append(permission[p[2]], p[1])
-	}
-	b, err := json.Marshal(permission)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
+func (e *Enforcer) GetImplicitPermissionsForUserWithDomain(user string, domain string) ([]byte, error) {
+    policy, err := e.GetImplicitPermissionsForUser(user, domain)
+    if err != nil {
+        return nil, err
+    }
+
+    permission := make(map[string][]string)
+    for _, p := range policy {
+       
+        if len(p) < 3 {
+            return nil, fmt.Errorf("invalid policy entry: insufficient elements %v", p)
+        }
+        permission[p[2]] = append(permission[p[2]], p[1])
+    }
+
+    b, jsonErr := json.Marshal(permission)
+    if jsonErr != nil {
+        return nil, jsonErr
+    }
+
+    return b, nil
 }
+
