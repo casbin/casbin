@@ -844,3 +844,40 @@ func TestMaxHierarchyLevelConsistency(t *testing.T) {
 		})
 	}
 }
+
+func testGetImplicitObjectPatternsForUser(t *testing.T, e *Enforcer, user string, domain string, action string, res []string) {
+	t.Helper()
+	myRes, err := e.GetImplicitObjectPatternsForUser(user, domain, action)
+	if err != nil {
+		t.Error("Implicit object patterns for ", user, " under domain ", domain, " with action ", action, " could not be fetched: ", err.Error())
+	}
+	t.Log("Implicit object patterns for ", user, " under domain ", domain, " with action ", action, ": ", myRes)
+
+	if !util.SetEquals(res, myRes) {
+		t.Error("Implicit object patterns for ", user, " under domain ", domain, " with action ", action, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
+func TestGetImplicitObjectPatternsForUser(t *testing.T) {
+	// Test with domain pattern model
+	e, _ := NewEnforcer("examples/rbac_with_domain_pattern_model.conf", "examples/rbac_with_domain_pattern_policy.csv")
+	e.AddNamedDomainMatchingFunc("g", "KeyMatch", util.KeyMatch)
+
+	// Test case 1: admin user with wildcard domain access
+	testGetImplicitObjectPatternsForUser(t, e, "admin", "domain1", "read", []string{"data1", "data3"})
+	testGetImplicitObjectPatternsForUser(t, e, "admin", "domain1", "write", []string{"data1"})
+
+	// Test case 2: alice user inheriting admin role in domain2
+	testGetImplicitObjectPatternsForUser(t, e, "alice", "domain2", "read", []string{"data2", "data3"})
+	testGetImplicitObjectPatternsForUser(t, e, "alice", "domain2", "write", []string{"data2"})
+
+	// Test case 3: bob user with specific domain access
+	testGetImplicitObjectPatternsForUser(t, e, "bob", "domain2", "read", []string{"data2", "data3"})
+	testGetImplicitObjectPatternsForUser(t, e, "bob", "domain2", "write", []string{"data2"})
+
+	// Test case 4: non-existent domain (admin has wildcard access to data3)
+	testGetImplicitObjectPatternsForUser(t, e, "admin", "non_existent", "read", []string{"data3"})
+
+	// Test case 5: non-existent action
+	testGetImplicitObjectPatternsForUser(t, e, "admin", "domain1", "non_existent", []string{})
+}
