@@ -209,8 +209,8 @@ func (e *SyncedEnforcer) GetImplicitUsersForPermission(permission ...string) ([]
 // g, alice, admin
 // g, bob, user
 //
-// GetImplicitObjectPatternsForUser("alice", "chronicle/123", "read") will return ["location/*"]
-// GetImplicitObjectPatternsForUser("bob", "chronicle/456", "read") will return ["location/789"]
+// GetImplicitObjectPatternsForUser("alice", "chronicle/123", "read") will return ["location/*"].
+// GetImplicitObjectPatternsForUser("bob", "chronicle/456", "read") will return ["location/789"].
 func (e *SyncedEnforcer) GetImplicitObjectPatternsForUser(user string, domain string, action string) ([]string, error) {
 	e.m.RLock()
 	defer e.m.RUnlock()

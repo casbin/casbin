@@ -658,8 +658,8 @@ func (e *Enforcer) GetImplicitUsersForResourceByDomain(resource string, domain s
 // g, alice, admin
 // g, bob, user
 //
-// GetImplicitObjectPatternsForUser("alice", "chronicle/123", "read") will return ["location/*"]
-// GetImplicitObjectPatternsForUser("bob", "chronicle/456", "read") will return ["location/789"]
+// GetImplicitObjectPatternsForUser("alice", "chronicle/123", "read") will return ["location/*"].
+// GetImplicitObjectPatternsForUser("bob", "chronicle/456", "read") will return ["location/789"].
 func (e *Enforcer) GetImplicitObjectPatternsForUser(user string, domain string, action string) ([]string, error) {
 	roles, err := e.GetImplicitRolesForUser(user, domain)
 	if err != nil {
@@ -686,26 +686,8 @@ func (e *Enforcer) GetImplicitObjectPatternsForUser(user string, domain string, 
 			continue
 		}
 
-		if domainIndex >= 0 && domain != "" {
-			ruleDomain := rule[domainIndex]
-			if ruleDomain != domain {
-				matched := false
-				for _, rm := range e.rmMap {
-					if rm.Match(domain, ruleDomain) {
-						matched = true
-						break
-					}
-				}
-				for _, crm := range e.condRmMap {
-					if crm.Match(domain, ruleDomain) {
-						matched = true
-						break
-					}
-				}
-				if !matched {
-					continue
-				}
-			}
+		if !e.matchDomain(domainIndex, domain, rule) {
+			continue
 		}
 
 		ruleAction := rule[actionIndex]
@@ -723,4 +705,26 @@ func (e *Enforcer) GetImplicitObjectPatternsForUser(user string, domain string, 
 	}
 
 	return result, nil
+}
+
+// matchDomain checks if the domain matches the rule domain using pattern matching.
+func (e *Enforcer) matchDomain(domainIndex int, domain string, rule []string) bool {
+	if domainIndex < 0 || domain == "" {
+		return true
+	}
+	ruleDomain := rule[domainIndex]
+	if ruleDomain == domain {
+		return true
+	}
+	for _, rm := range e.rmMap {
+		if rm.Match(domain, ruleDomain) {
+			return true
+		}
+	}
+	for _, crm := range e.condRmMap {
+		if crm.Match(domain, ruleDomain) {
+			return true
+		}
+	}
+	return false
 }
