@@ -201,3 +201,18 @@ func (e *SyncedEnforcer) GetImplicitUsersForPermission(permission ...string) ([]
 	defer e.m.RUnlock()
 	return e.Enforcer.GetImplicitUsersForPermission(permission...)
 }
+
+// GetImplicitObjectPatternsForUser returns all object patterns (with wildcards) that a user has for a given domain and action.
+// For example:
+// p, admin, chronicle/123, location/*, read
+// p, user, chronicle/456, location/789, read
+// g, alice, admin
+// g, bob, user
+//
+// GetImplicitObjectPatternsForUser("alice", "chronicle/123", "read") will return ["location/*"].
+// GetImplicitObjectPatternsForUser("bob", "chronicle/456", "read") will return ["location/789"].
+func (e *SyncedEnforcer) GetImplicitObjectPatternsForUser(user string, domain string, action string) ([]string, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetImplicitObjectPatternsForUser(user, domain, action)
+}

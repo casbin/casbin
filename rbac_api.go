@@ -650,3 +650,81 @@ func (e *Enforcer) GetImplicitUsersForResourceByDomain(resource string, domain s
 	res := removeDuplicatePermissions(permissions)
 	return res, nil
 }
+
+// GetImplicitObjectPatternsForUser returns all object patterns (with wildcards) that a user has for a given domain and action.
+// For example:
+// p, admin, chronicle/123, location/*, read
+// p, user, chronicle/456, location/789, read
+// g, alice, admin
+// g, bob, user
+//
+// GetImplicitObjectPatternsForUser("alice", "chronicle/123", "read") will return ["location/*"].
+// GetImplicitObjectPatternsForUser("bob", "chronicle/456", "read") will return ["location/789"].
+func (e *Enforcer) GetImplicitObjectPatternsForUser(user string, domain string, action string) ([]string, error) {
+	roles, err := e.GetImplicitRolesForUser(user, domain)
+	if err != nil {
+		return nil, err
+	}
+
+	subjects := append([]string{user}, roles...)
+	subjectIndex, _ := e.GetFieldIndex("p", constant.SubjectIndex)
+	domainIndex, _ := e.GetFieldIndex("p", constant.DomainIndex)
+	objectIndex, _ := e.GetFieldIndex("p", constant.ObjectIndex)
+	actionIndex, _ := e.GetFieldIndex("p", constant.ActionIndex)
+
+	patterns := make(map[string]struct{})
+	for _, rule := range e.model["p"]["p"].Policy {
+		sub := rule[subjectIndex]
+		matched := false
+		for _, subject := range subjects {
+			if sub == subject {
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			continue
+		}
+
+		if !e.matchDomain(domainIndex, domain, rule) {
+			continue
+		}
+
+		ruleAction := rule[actionIndex]
+		if ruleAction != action && ruleAction != "*" {
+			continue
+		}
+
+		obj := rule[objectIndex]
+		patterns[obj] = struct{}{}
+	}
+
+	result := make([]string, 0, len(patterns))
+	for pattern := range patterns {
+		result = append(result, pattern)
+	}
+
+	return result, nil
+}
+
+// matchDomain checks if the domain matches the rule domain using pattern matching.
+func (e *Enforcer) matchDomain(domainIndex int, domain string, rule []string) bool {
+	if domainIndex < 0 || domain == "" {
+		return true
+	}
+	ruleDomain := rule[domainIndex]
+	if ruleDomain == domain {
+		return true
+	}
+	for _, rm := range e.rmMap {
+		if rm.Match(domain, ruleDomain) {
+			return true
+		}
+	}
+	for _, crm := range e.condRmMap {
+		if crm.Match(domain, ruleDomain) {
+			return true
+		}
+	}
+	return false
+}
