@@ -15,7 +15,7 @@
 package model
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -63,7 +63,7 @@ func TestNewModelFromFile(t *testing.T) {
 }
 
 func TestNewModelFromString(t *testing.T) {
-	modelBytes, _ := ioutil.ReadFile(basicExample)
+	modelBytes, _ := os.ReadFile(basicExample)
 	modelString := string(modelBytes)
 	m, err := NewModelFromString(modelString)
 	if err != nil {
@@ -125,7 +125,47 @@ func TestModel_AddDef(t *testing.T) {
 	}
 }
 
-func TestModelToTest(t *testing.T) {
+func TestModel_Copy(t *testing.T) {
+	m, err := NewModelFromFile(basicExample)
+	if err != nil {
+		t.Errorf("model failed to load from file: %s", err)
+	}
+
+	newModel := m.Copy()
+	if newModel.ToText() != m.ToText() {
+		t.Errorf("new model is not equal to original")
+	}
+}
+
+func TestModel_Copy_includesFieldMapInCopy(t *testing.T) {
+	m, err := NewModelFromFile(basicExample)
+	if err != nil {
+		t.Errorf("model failed to load from file: %s", err)
+	}
+
+	idx, _ := m.GetFieldIndex("p", "act")
+	if idx != 2 {
+		t.Errorf("unexpected field index: %d", idx)
+	}
+
+	newModel := m.Copy()
+	if newModel.ToText() != m.ToText() {
+		t.Error("new model is not equal to original")
+	}
+
+	assertion, err := newModel.GetAssertion("p", "p")
+	if err != nil {
+		t.Errorf("model failed to get assertion: %s", err)
+	}
+	if _, ok := assertion.GetFieldIndex("act"); !ok {
+		t.Errorf("model does not have the field index in cache")
+	}
+	if idx, err := newModel.GetFieldIndex("p", "act"); err != nil || idx != 2 {
+		t.Errorf("unexpected field index: %s - %d", err, idx)
+	}
+}
+
+func TestModel_ToText(t *testing.T) {
 	testModelToText(t, "r.sub == p.sub && r.obj == p.obj && r_func(r.act, p.act) && testr_func(r.act, p.act)", "r_sub == p_sub && r_obj == p_obj && r_func(r_act, p_act) && testr_func(r_act, p_act)")
 	testModelToText(t, "r.sub == p.sub && r.obj == p.obj && p_func(r.act, p.act) && testp_func(r.act, p.act)", "r_sub == p_sub && r_obj == p_obj && p_func(r_act, p_act) && testp_func(r_act, p_act)")
 }
