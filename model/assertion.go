@@ -17,6 +17,7 @@ package model
 import (
 	"errors"
 	"strings"
+	"sync"
 
 	"github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
@@ -25,15 +26,16 @@ import (
 // Assertion represents an expression in a section of the model.
 // For example: r = sub, obj, act.
 type Assertion struct {
-	Key           string
-	Value         string
-	Tokens        []string
-	ParamsTokens  []string
-	Policy        [][]string
-	PolicyMap     map[string]int
-	RM            rbac.RoleManager
-	CondRM        rbac.ConditionalRoleManager
-	FieldIndexMap map[string]int
+	Key             string
+	Value           string
+	Tokens          []string
+	ParamsTokens    []string
+	Policy          [][]string
+	PolicyMap       map[string]int
+	RM              rbac.RoleManager
+	CondRM          rbac.ConditionalRoleManager
+	FieldIndexMap   map[string]int
+	FieldIndexMutex sync.RWMutex
 
 	logger log.Logger
 }
@@ -181,13 +183,20 @@ func (ast *Assertion) copy() *Assertion {
 		policyMap[k] = v
 	}
 
+	ast.FieldIndexMutex.RLock()
+	fieldIndexMap := make(map[string]int)
+	for k, v := range ast.FieldIndexMap {
+		fieldIndexMap[k] = v
+	}
+	ast.FieldIndexMutex.RUnlock()
+
 	newAst := &Assertion{
 		Key:           ast.Key,
 		Value:         ast.Value,
 		PolicyMap:     policyMap,
 		Tokens:        tokens,
 		Policy:        policy,
-		FieldIndexMap: ast.FieldIndexMap,
+		FieldIndexMap: fieldIndexMap,
 	}
 
 	return newAst
