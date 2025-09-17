@@ -401,12 +401,12 @@ func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 	return GlobMatch(name1, name2)
 }
 
-// Global LRU cache for GenerateGFunction
-var gFunctionCache = NewLRUCache(2000)
+// Global LRU cache for GenerateGFunction.
+var gFunctionCache = NewSyncLRUCache(2000)
 
-// ClearGFunctionCache clears the g function cache, should be called when policies change
+// ClearGFunctionCache clears the g function cache, should be called when policies change.
 func ClearGFunctionCache() {
-	gFunctionCache = NewLRUCache(2000)
+	gFunctionCache = NewSyncLRUCache(2000)
 }
 
 // GenerateGFunction is the factory method of the g(_, _[, _]) function.

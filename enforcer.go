@@ -584,7 +584,7 @@ func (e *Enforcer) BuildRoleLinks() error {
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
 func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, rules [][]string) error {
 	e.invalidateMatcherMap()
-	// Clear g function cache as role relationships have changed
+	// Clear g function cache as role relationships have changed.
 	util.ClearGFunctionCache()
 	return e.model.BuildIncrementalRoleLinks(e.rmMap, op, "g", ptype, rules)
 }
@@ -592,7 +592,7 @@ func (e *Enforcer) BuildIncrementalRoleLinks(op model.PolicyOp, ptype string, ru
 // BuildIncrementalConditionalRoleLinks provides incremental build the role inheritance relations with conditions.
 func (e *Enforcer) BuildIncrementalConditionalRoleLinks(op model.PolicyOp, ptype string, rules [][]string) error {
 	e.invalidateMatcherMap()
-	// Clear g function cache as conditional role relationships have changed
+	// Clear g function cache as conditional role relationships have changed.
 	util.ClearGFunctionCache()
 	return e.model.BuildIncrementalConditionalRoleLinks(e.condRmMap, op, "g", ptype, rules)
 }
