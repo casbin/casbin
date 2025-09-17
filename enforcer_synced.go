@@ -22,6 +22,7 @@ import (
 	"github.com/casbin/govaluate"
 
 	"github.com/casbin/casbin/v2/persist"
+	"github.com/casbin/casbin/v2/rbac"
 )
 
 // SyncedEnforcer wraps Enforcer and provides synchronized access.
@@ -49,6 +50,34 @@ func NewSyncedEnforcer(params ...interface{}) (*SyncedEnforcer, error) {
 // GetLock return the private RWMutex lock.
 func (e *SyncedEnforcer) GetLock() *sync.RWMutex {
 	return &e.m
+}
+
+// GetRoleManager gets the current role manager with synchronization.
+func (e *SyncedEnforcer) GetRoleManager() rbac.RoleManager {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetRoleManager()
+}
+
+// GetNamedRoleManager gets the role manager for the named policy with synchronization.
+func (e *SyncedEnforcer) GetNamedRoleManager(ptype string) rbac.RoleManager {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetNamedRoleManager(ptype)
+}
+
+// SetRoleManager sets the current role manager with synchronization.
+func (e *SyncedEnforcer) SetRoleManager(rm rbac.RoleManager) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	e.Enforcer.SetRoleManager(rm)
+}
+
+// SetNamedRoleManager sets the role manager for the named policy with synchronization.
+func (e *SyncedEnforcer) SetNamedRoleManager(ptype string, rm rbac.RoleManager) {
+	e.m.Lock()
+	defer e.m.Unlock()
+	e.Enforcer.SetNamedRoleManager(ptype, rm)
 }
 
 // IsAutoLoadingRunning check if SyncedEnforcer is auto loading policies.
