@@ -401,9 +401,16 @@ func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 	return GlobMatch(name1, name2)
 }
 
+// Global LRU cache for GenerateGFunction
+var gFunctionCache = NewLRUCache(2000)
+
+// ClearGFunctionCache clears the g function cache, should be called when policies change
+func ClearGFunctionCache() {
+	gFunctionCache = NewLRUCache(2000)
+}
+
 // GenerateGFunction is the factory method of the g(_, _[, _]) function.
 func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
-	memorized := sync.Map{}
 	return func(args ...interface{}) (interface{}, error) {
 		// Like all our other govaluate functions, all args are strings.
 
@@ -422,14 +429,14 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 		key := builder.String()
 
 		// ...and see if we've already calculated this.
-		v, found := memorized.Load(key)
-		if found {
-			return v, nil
+		if value, found := gFunctionCache.Get(key); found {
+			return value, nil
 		}
 
 		// If not, do the calculation.
 		// There are guaranteed to be exactly 2 or 3 arguments.
 		name1, name2 := args[0].(string), args[1].(string)
+		var v interface{}
 		if rm == nil {
 			v = name1 == name2
 		} else if len(args) == 2 {
@@ -439,7 +446,7 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 			v, _ = rm.HasLink(name1, name2, domain)
 		}
 
-		memorized.Store(key, v)
+		gFunctionCache.Put(key, v)
 		return v, nil
 	}
 }
