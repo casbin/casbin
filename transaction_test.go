@@ -264,8 +264,8 @@ func TestMultipleTransactions(t *testing.T) {
 
 	tx1.AddPolicy("alice", "data1", "read")
 
-	if err := tx1.Commit(); err != nil {
-		t.Fatalf("Failed to commit first transaction: %v", err)
+	if commitErr := tx1.Commit(); commitErr != nil {
+		t.Fatalf("Failed to commit first transaction: %v", commitErr)
 	}
 
 	// Second transaction.

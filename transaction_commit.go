@@ -22,7 +22,7 @@ import (
 
 // Commit commits the transaction using a two-phase commit protocol.
 // Phase 1: Apply all operations to the database
-// Phase 2: Apply changes to the in-memory model and rebuild role links
+// Phase 2: Apply changes to the in-memory model and rebuild role links.
 func (tx *Transaction) Commit() error {
 	tx.mutex.Lock()
 	defer tx.mutex.Unlock()
@@ -155,17 +155,19 @@ func (tx *Transaction) applyUpdateOperationToDatabase(adapter persist.Adapter, o
 	if updateAdapter, ok := adapter.(persist.UpdatableAdapter); ok {
 		// Use update operation if available.
 		return updateAdapter.UpdatePolicies(op.Section, op.PolicyType, op.OldRules, op.Rules)
-	} else {
-		// Fall back to remove + add.
-		for i, oldRule := range op.OldRules {
-			if i < len(op.Rules) {
-				if err := adapter.RemovePolicy(op.Section, op.PolicyType, oldRule); err != nil {
-					return err
-				}
-				if err := adapter.AddPolicy(op.Section, op.PolicyType, op.Rules[i]); err != nil {
-					return err
-				}
-			}
+	}
+
+	// Fall back to remove + add.
+	for i, oldRule := range op.OldRules {
+		if i >= len(op.Rules) {
+			continue
+		}
+
+		if err := adapter.RemovePolicy(op.Section, op.PolicyType, oldRule); err != nil {
+			return err
+		}
+		if err := adapter.AddPolicy(op.Section, op.PolicyType, op.Rules[i]); err != nil {
+			return err
 		}
 	}
 	return nil
