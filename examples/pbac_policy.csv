@@ -1,0 +1,2 @@
+p, r.sub.Role == 'admin', r.obj.Type == 'doc', read
+p, r.sub.Age >= 18, r.obj.Type == 'video', play
