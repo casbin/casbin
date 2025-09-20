@@ -403,7 +403,9 @@ func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 
 // GenerateGFunction is the factory method of the g(_, _[, _]) function.
 func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
-	memorized := sync.Map{}
+	// Use SyncMapLRUCache with dynamic capacity and TTL caching
+	cacheSize := CalculateDynamicCacheSize()
+	memorized := NewSyncLRUCache(cacheSize)
 	return func(args ...interface{}) (interface{}, error) {
 		// Like all our other govaluate functions, all args are strings.
 
@@ -422,7 +424,7 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 		key := builder.String()
 
 		// ...and see if we've already calculated this.
-		v, found := memorized.Load(key)
+		v, found := memorized.Get(key)
 		if found {
 			return v, nil
 		}
@@ -439,7 +441,7 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 			v, _ = rm.HasLink(name1, name2, domain)
 		}
 
-		memorized.Store(key, v)
+		memorized.Put(key, v)
 		return v, nil
 	}
 }
