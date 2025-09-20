@@ -15,13 +15,46 @@
 package util
 
 import (
-	"runtime"
+	"sync"
+	"time"
 
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
+// Cache size calculation cache with TTL.
+var (
+	cachedCacheSize     int
+	cachedCacheSizeTime time.Time
+	cacheSizeMu         sync.RWMutex
+	cacheSizeTTL        = 10 * time.Second // Cache for 10 seconds
+)
+
 // CalculateDynamicCacheSize dynamically calculates cache size based on real system memory usage.
+// Uses caching to reduce expensive system calls and avoid frequent recalculation.
 func CalculateDynamicCacheSize() int {
+	// Check cache first - most calls will hit this fast path
+	cacheSizeMu.RLock()
+	if time.Since(cachedCacheSizeTime) < cacheSizeTTL {
+		result := cachedCacheSize
+		cacheSizeMu.RUnlock()
+		return result
+	}
+	cacheSizeMu.RUnlock()
+
+	// Cache expired or not set, calculate new value
+	newCacheSize := calculateCacheSizeInternal()
+
+	// Update cache
+	cacheSizeMu.Lock()
+	cachedCacheSize = newCacheSize
+	cachedCacheSizeTime = time.Now()
+	cacheSizeMu.Unlock()
+
+	return newCacheSize
+}
+
+// calculateCacheSizeInternal performs the actual expensive calculation.
+func calculateCacheSizeInternal() int {
 	// Get real system memory information
 	memInfo, err := mem.VirtualMemory()
 	if err != nil {
@@ -29,51 +62,34 @@ func CalculateDynamicCacheSize() int {
 		return 1000000 // Default 1 million entries
 	}
 
-	// Get Go program memory usage
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
+	// Simplified pressure detection - only use system memory info
+	// Avoid expensive GC stats for better performance
+	systemMemoryUsageRate := float64(memInfo.Used) / float64(memInfo.Total)
+	systemAvailableRate := float64(memInfo.Available) / float64(memInfo.Total)
 
-	// Set reasonable range limits
-	const (
-		minCacheSize = 10000    // Minimum cache size (10k entries)
-		maxCacheSize = 50000000 // Maximum cache size (50M entries)
-	)
-
-	// Calculate system available memory
-	systemAvailableMemory := memInfo.Available
-	systemTotalMemory := memInfo.Total
-	systemUsedMemory := memInfo.Used
-
-	// Calculate system memory usage rate
-	systemMemoryUsageRate := float64(systemUsedMemory) / float64(systemTotalMemory)
-	systemAvailableRate := float64(systemAvailableMemory) / float64(systemTotalMemory)
-
-	// Detect system pressure level
-	pressureLevel := detectSystemPressureWithRealMemory(m, systemMemoryUsageRate, systemAvailableRate)
-
-	// Adjust cache size based on pressure level
+	// Optimized pressure detection thresholds - increased cache limits for better performance
 	var cacheMemoryLimit uint64
-	switch pressureLevel {
-	case "low":
-		// Low pressure: use 20% of system available memory for cache
-		cacheMemoryLimit = systemAvailableMemory / 5
-	case "medium":
-		// Medium pressure: use 10% of system available memory for cache
-		cacheMemoryLimit = systemAvailableMemory / 10
-	case "high":
-		// High pressure: use 5% of system available memory for cache
-		cacheMemoryLimit = systemAvailableMemory / 20
-	case "critical":
-		// Critical pressure: use minimum cache
-		return minCacheSize
+	switch {
+	case systemAvailableRate < 0.05: // < 5% available (more aggressive threshold)
+		return 50000 // Increased minimum cache
+	case systemAvailableRate < 0.15: // < 15% available
+		cacheMemoryLimit = memInfo.Available / 8 // 12.5% of available (increased from 5%)
+	case systemAvailableRate < 0.25: // < 25% available
+		cacheMemoryLimit = memInfo.Available / 4 // 25% of available (increased from 10%)
+	case systemMemoryUsageRate > 0.85: // > 85% used (more aggressive threshold)
+		cacheMemoryLimit = memInfo.Available / 4 // 25% of available (increased from 10%)
 	default:
-		// Default: use 10% of system available memory for cache
-		cacheMemoryLimit = systemAvailableMemory / 10
+		cacheMemoryLimit = memInfo.Available / 2 // 50% of available (increased from 20%)
 	}
 
-	// Each cache entry approximately takes 67 bytes (key + value + overhead)
-	// Conservative estimate: 100 bytes per entry
-	bytesPerEntry := uint64(100)
+	// Set reasonable range limits - increased for better performance
+	const (
+		minCacheSize = 50000     // Increased minimum cache size (50k entries)
+		maxCacheSize = 100000000 // Increased maximum cache size (100M entries)
+	)
+
+	// Conservative estimate: 50 bytes per entry
+	bytesPerEntry := uint64(50)
 
 	// Calculate maximum cache entries
 	maxEntries := cacheMemoryLimit / bytesPerEntry
@@ -87,47 +103,4 @@ func CalculateDynamicCacheSize() int {
 	}
 
 	return int(maxEntries)
-}
-
-// detectSystemPressureWithRealMemory detects system pressure level based on real system memory.
-func detectSystemPressureWithRealMemory(m runtime.MemStats, systemMemoryUsageRate, systemAvailableRate float64) string {
-	// Calculate GC pressure
-	gcPressure := float64(m.NumGC) / float64(m.NumForcedGC+1) // Avoid division by zero
-
-	// Pressure detection thresholds
-	const (
-		criticalSystemMemoryRate = 0.90 // System memory usage > 90% is critical pressure
-		highSystemMemoryRate     = 0.80 // System memory usage > 80% is high pressure
-		mediumSystemMemoryRate   = 0.70 // System memory usage > 70% is medium pressure
-
-		criticalSystemAvailableRate = 0.10 // System available memory < 10% is critical pressure
-		highSystemAvailableRate     = 0.20 // System available memory < 20% is high pressure
-		mediumSystemAvailableRate   = 0.30 // System available memory < 30% is medium pressure
-
-		highGCPressure   = 10.0 // GC pressure > 10 is high pressure
-		mediumGCPressure = 5.0  // GC pressure > 5 is medium pressure
-	)
-
-	// Detect critical pressure
-	if systemMemoryUsageRate > criticalSystemMemoryRate ||
-		systemAvailableRate < criticalSystemAvailableRate {
-		return "critical"
-	}
-
-	// Detect high pressure
-	if systemMemoryUsageRate > highSystemMemoryRate ||
-		systemAvailableRate < highSystemAvailableRate ||
-		gcPressure > highGCPressure {
-		return "high"
-	}
-
-	// Detect medium pressure
-	if systemMemoryUsageRate > mediumSystemMemoryRate ||
-		systemAvailableRate < mediumSystemAvailableRate ||
-		gcPressure > mediumGCPressure {
-		return "medium"
-	}
-
-	// Low pressure
-	return "low"
 }
