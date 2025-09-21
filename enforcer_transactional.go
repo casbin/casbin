@@ -18,16 +18,20 @@ import (
 	"context"
 	"errors"
 	"sync"
+	"sync/atomic"
+	"time"
 
 	"github.com/casbin/casbin/v2/persist"
+	"github.com/google/uuid"
 )
 
 // TransactionalEnforcer extends Enforcer with transaction support.
 // It provides atomic policy operations through transactions.
 type TransactionalEnforcer struct {
-	*Enforcer              // Embedded enforcer for all standard functionality
-	currentTx *Transaction // Current active transaction (nil if none)
-	txMutex   sync.RWMutex // Protects transaction state
+	*Enforcer                     // Embedded enforcer for all standard functionality
+	activeTransactions sync.Map   // Stores active transactions.
+	modelVersion       int64      // Model version number for optimistic locking.
+	commitLock         sync.Mutex // Protects commit and rollback operations.
 }
 
 // NewTransactionalEnforcer creates a new TransactionalEnforcer.
@@ -46,13 +50,6 @@ func NewTransactionalEnforcer(params ...interface{}) (*TransactionalEnforcer, er
 // BeginTransaction starts a new transaction.
 // Returns an error if a transaction is already in progress or if the adapter doesn't support transactions.
 func (te *TransactionalEnforcer) BeginTransaction(ctx context.Context) (*Transaction, error) {
-	te.txMutex.Lock()
-	defer te.txMutex.Unlock()
-
-	if te.currentTx != nil {
-		return nil, errors.New("transaction already in progress")
-	}
-
 	// Check if adapter supports transactions.
 	txAdapter, ok := te.adapter.(persist.TransactionalAdapter)
 	if !ok {
@@ -69,35 +66,33 @@ func (te *TransactionalEnforcer) BeginTransaction(ctx context.Context) (*Transac
 	buffer := NewTransactionBuffer(te.model)
 
 	tx := &Transaction{
-		enforcer:  te,
-		buffer:    buffer,
-		txContext: txContext,
-		ctx:       ctx,
+		id:          uuid.New().String(),
+		enforcer:    te,
+		buffer:      buffer,
+		txContext:   txContext,
+		ctx:         ctx,
+		baseVersion: atomic.LoadInt64(&te.modelVersion),
+		startTime:   time.Now(),
 	}
 
-	te.currentTx = tx
+	te.activeTransactions.Store(tx.id, tx)
 	return tx, nil
 }
 
-// GetCurrentTransaction returns the current active transaction, or nil if none.
-func (te *TransactionalEnforcer) GetCurrentTransaction() *Transaction {
-	te.txMutex.RLock()
-	defer te.txMutex.RUnlock()
-	return te.currentTx
+// GetTransaction returns a transaction by its ID, or nil if not found.
+func (te *TransactionalEnforcer) GetTransaction(id string) *Transaction {
+	if tx, ok := te.activeTransactions.Load(id); ok {
+		return tx.(*Transaction)
+	}
+	return nil
 }
 
-// IsInTransaction returns true if there is an active transaction.
-func (te *TransactionalEnforcer) IsInTransaction() bool {
-	te.txMutex.RLock()
-	defer te.txMutex.RUnlock()
-	return te.currentTx != nil
-}
-
-// clearTransaction clears the current transaction (called internally).
-func (te *TransactionalEnforcer) clearTransaction() {
-	te.txMutex.Lock()
-	defer te.txMutex.Unlock()
-	te.currentTx = nil
+// IsTransactionActive returns true if the transaction with the given ID is active.
+func (te *TransactionalEnforcer) IsTransactionActive(id string) bool {
+	if tx := te.GetTransaction(id); tx != nil {
+		return tx.IsActive()
+	}
+	return false
 }
 
 // WithTransaction executes a function within a transaction.

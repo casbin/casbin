@@ -16,6 +16,7 @@ package casbin
 
 import (
 	"errors"
+	"sync/atomic"
 
 	"github.com/casbin/casbin/v2/persist"
 )
@@ -24,6 +25,14 @@ import (
 // Phase 1: Apply all operations to the database
 // Phase 2: Apply changes to the in-memory model and rebuild role links.
 func (tx *Transaction) Commit() error {
+	// Try to acquire the commit lock with timeout.
+	if !tryLockWithTimeout(&tx.enforcer.commitLock, tx.startTime, defaultLockTimeout) {
+		_ = tx.txContext.Rollback()
+		tx.enforcer.activeTransactions.Delete(tx.id)
+		return errors.New("transaction timeout: failed to acquire lock")
+	}
+	defer tx.enforcer.commitLock.Unlock()
+
 	tx.mutex.Lock()
 	defer tx.mutex.Unlock()
 
@@ -34,13 +43,29 @@ func (tx *Transaction) Commit() error {
 		return errors.New("transaction already rolled back")
 	}
 
+	// First check if model version has changed.
+	currentVersion := atomic.LoadInt64(&tx.enforcer.modelVersion)
+	if currentVersion != tx.baseVersion {
+		// Model has been modified, need to check for conflicts.
+		detector := NewConflictDetector(
+			tx.buffer.GetModelSnapshot(),
+			tx.enforcer.model,
+			tx.buffer.GetOperations(),
+		)
+		if err := detector.DetectConflicts(); err != nil {
+			_ = tx.txContext.Rollback()
+			tx.enforcer.activeTransactions.Delete(tx.id)
+			return err
+		}
+	}
+
 	// If no operations, just commit the database transaction and clear state.
 	if !tx.buffer.HasOperations() {
 		if err := tx.txContext.Commit(); err != nil {
 			return err
 		}
 		tx.committed = true
-		tx.enforcer.clearTransaction()
+		tx.enforcer.activeTransactions.Delete(tx.id)
 		return nil
 	}
 
@@ -48,11 +73,13 @@ func (tx *Transaction) Commit() error {
 	if err := tx.applyOperationsToDatabase(); err != nil {
 		// Rollback database transaction on failure.
 		_ = tx.txContext.Rollback()
+		tx.enforcer.activeTransactions.Delete(tx.id)
 		return err
 	}
 
 	// Commit database transaction.
 	if err := tx.txContext.Commit(); err != nil {
+		tx.enforcer.activeTransactions.Delete(tx.id)
 		return err
 	}
 
@@ -60,11 +87,15 @@ func (tx *Transaction) Commit() error {
 	if err := tx.applyOperationsToModel(); err != nil {
 		// At this point, database is committed but model update failed.
 		// This is a critical error that should not happen in normal circumstances.
+		tx.enforcer.activeTransactions.Delete(tx.id)
 		return errors.New("critical error: database committed but model update failed: " + err.Error())
 	}
 
+	// Increment model version number.
+	atomic.AddInt64(&tx.enforcer.modelVersion, 1)
+
 	tx.committed = true
-	tx.enforcer.clearTransaction()
+	tx.enforcer.activeTransactions.Delete(tx.id)
 
 	return nil
 }
@@ -72,6 +103,13 @@ func (tx *Transaction) Commit() error {
 // Rollback rolls back the transaction.
 // This will rollback the database transaction and clear the transaction state.
 func (tx *Transaction) Rollback() error {
+	// Try to acquire the commit lock with timeout.
+	if !tryLockWithTimeout(&tx.enforcer.commitLock, tx.startTime, defaultLockTimeout) {
+		tx.enforcer.activeTransactions.Delete(tx.id)
+		return errors.New("transaction timeout: failed to acquire lock for rollback")
+	}
+	defer tx.enforcer.commitLock.Unlock()
+
 	tx.mutex.Lock()
 	defer tx.mutex.Unlock()
 
@@ -88,7 +126,7 @@ func (tx *Transaction) Rollback() error {
 	}
 
 	tx.rolledBack = true
-	tx.enforcer.clearTransaction()
+	tx.enforcer.activeTransactions.Delete(tx.id)
 
 	return nil
 }
@@ -159,10 +197,6 @@ func (tx *Transaction) applyUpdateOperationToDatabase(adapter persist.Adapter, o
 
 	// Fall back to remove + add.
 	for i, oldRule := range op.OldRules {
-		if i >= len(op.Rules) {
-			continue
-		}
-
 		if err := adapter.RemovePolicy(op.Section, op.PolicyType, oldRule); err != nil {
 			return err
 		}
