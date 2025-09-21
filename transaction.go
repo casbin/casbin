@@ -18,22 +18,31 @@ import (
 	"context"
 	"errors"
 	"sync"
+	"time"
 
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
+)
+
+const (
+	// Default timeout duration for lock acquisition.
+	defaultLockTimeout = 30 * time.Second
 )
 
 // Transaction represents a Casbin transaction.
 // It provides methods to perform policy operations within a transaction.
 // and commit or rollback all changes atomically.
 type Transaction struct {
-	enforcer   *TransactionalEnforcer     // Reference to the transactional enforcer.
-	buffer     *TransactionBuffer         // Buffer for policy operations.
-	txContext  persist.TransactionContext // Database transaction context.
-	ctx        context.Context            // Context for the transaction.
-	committed  bool                       // Whether the transaction has been committed.
-	rolledBack bool                       // Whether the transaction has been rolled back.
-	mutex      sync.RWMutex               // Protects transaction state.
+	id          string                     // Unique transaction identifier.
+	enforcer    *TransactionalEnforcer     // Reference to the transactional enforcer.
+	buffer      *TransactionBuffer         // Buffer for policy operations.
+	txContext   persist.TransactionContext // Database transaction context.
+	ctx         context.Context            // Context for the transaction.
+	baseVersion int64                      // Model version at transaction start.
+	committed   bool                       // Whether the transaction has been committed.
+	rolledBack  bool                       // Whether the transaction has been rolled back.
+	startTime   time.Time                  // Transaction start timestamp.
+	mutex       sync.RWMutex               // Protects transaction state.
 }
 
 // AddPolicy adds a policy within the transaction.
@@ -112,8 +121,8 @@ func (tx *Transaction) AddNamedPolicies(ptype string, rules [][]string) (bool, e
 	tx.mutex.Lock()
 	defer tx.mutex.Unlock()
 
-	if tx.committed || tx.rolledBack {
-		return false, errors.New("transaction is not active")
+	if err := tx.checkTransactionStatus(); err != nil {
+		return false, err
 	}
 
 	if len(rules) == 0 {
@@ -202,8 +211,8 @@ func (tx *Transaction) RemoveNamedPolicies(ptype string, rules [][]string) (bool
 	tx.mutex.Lock()
 	defer tx.mutex.Unlock()
 
-	if tx.committed || tx.rolledBack {
-		return false, errors.New("transaction is not active")
+	if err := tx.checkTransactionStatus(); err != nil {
+		return false, err
 	}
 
 	if len(rules) == 0 {
@@ -253,8 +262,8 @@ func (tx *Transaction) UpdateNamedPolicy(ptype string, oldPolicy []string, newPo
 	tx.mutex.Lock()
 	defer tx.mutex.Unlock()
 
-	if tx.committed || tx.rolledBack {
-		return false, errors.New("transaction is not active")
+	if err := tx.checkTransactionStatus(); err != nil {
+		return false, err
 	}
 
 	// Check if old policy exists and new policy doesn't exist.
@@ -376,8 +385,8 @@ func (tx *Transaction) GetBufferedModel() (model.Model, error) {
 	tx.mutex.RLock()
 	defer tx.mutex.RUnlock()
 
-	if tx.committed || tx.rolledBack {
-		return nil, errors.New("transaction is not active")
+	if err := tx.checkTransactionStatus(); err != nil {
+		return nil, err
 	}
 
 	return tx.buffer.ApplyOperationsToModel(tx.buffer.GetModelSnapshot())
@@ -395,4 +404,32 @@ func (tx *Transaction) OperationCount() int {
 	tx.mutex.RLock()
 	defer tx.mutex.RUnlock()
 	return tx.buffer.OperationCount()
+}
+
+// tryLockWithTimeout attempts to acquire the lock within the specified timeout period.
+func tryLockWithTimeout(lock *sync.Mutex, startTime time.Time, maxWait time.Duration) bool {
+	// Calculate remaining wait time based on transaction start time.
+	remainingTime := maxWait - time.Since(startTime)
+	if remainingTime <= 0 {
+		return false
+	}
+
+	// Create a context with timeout for lock acquisition.
+	ctx, cancel := context.WithTimeout(context.Background(), remainingTime)
+	defer cancel()
+
+	// Use channel for timeout control.
+	done := make(chan bool, 1)
+	go func() {
+		lock.Lock()
+		done <- true
+	}()
+
+	// Wait for either lock acquisition or timeout.
+	select {
+	case <-done:
+		return true
+	case <-ctx.Done():
+		return false
+	}
 }
