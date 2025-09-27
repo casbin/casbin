@@ -110,7 +110,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 	return result, explainIndex, nil
 }
 
-// evaluateCustomEffect evaluates custom effect expressions like "some(where (p.eft == allow))"
+// evaluateCustomEffect evaluates custom effect expressions like "some(where (p.eft == allow))".
 func (e *DefaultEffector) evaluateCustomEffect(expr string, effects []Effect, matches []float64, policyIndex int, policyLength int) (Effect, int, error) {
 	// Handle "some(where (p.eft == allow))" pattern
 	if strings.Contains(expr, "some(where") && strings.Contains(expr, "allow") {
@@ -146,36 +146,49 @@ func (e *DefaultEffector) evaluateCustomEffect(expr string, effects []Effect, ma
 	}
 
 	// Handle "some(where (p.eft == allow)) && !some(where (p.eft == deny))" pattern
-	if strings.Contains(expr, "some(where") && strings.Contains(expr, "allow") && strings.Contains(expr, "!some(where") && strings.Contains(expr, "deny") {
-		hasAllow := false
-		hasDeny := false
-		allowIndex := -1
-		denyIndex := -1
-
-		for i := 0; i < policyLength; i++ {
-			if matches[i] != 0 {
-				if effects[i] == Allow {
-					hasAllow = true
-					if allowIndex == -1 {
-						allowIndex = i
-					}
-				} else if effects[i] == Deny {
-					hasDeny = true
-					if denyIndex == -1 {
-						denyIndex = i
-					}
-				}
-			}
-		}
-
-		if hasDeny {
-			return Deny, denyIndex, nil
-		}
-		if hasAllow {
-			return Allow, allowIndex, nil
-		}
-		return Deny, -1, nil
+	if e.isCompoundExpression(expr) {
+		return e.evaluateCompoundExpression(effects, matches, policyLength)
 	}
 
 	return Deny, -1, errors.New("unsupported custom effect: " + expr)
+}
+
+// isCompoundExpression checks if the expression is a compound expression.
+func (e *DefaultEffector) isCompoundExpression(expr string) bool {
+	return strings.Contains(expr, "some(where") && strings.Contains(expr, "allow") &&
+		strings.Contains(expr, "!some(where") && strings.Contains(expr, "deny")
+}
+
+// evaluateCompoundExpression evaluates compound expressions.
+func (e *DefaultEffector) evaluateCompoundExpression(effects []Effect, matches []float64, policyLength int) (Effect, int, error) {
+	hasAllow := false
+	hasDeny := false
+	allowIndex := -1
+	denyIndex := -1
+
+	for i := 0; i < policyLength; i++ {
+		if matches[i] == 0 {
+			continue
+		}
+
+		if effects[i] == Allow {
+			hasAllow = true
+			if allowIndex == -1 {
+				allowIndex = i
+			}
+		} else if effects[i] == Deny {
+			hasDeny = true
+			if denyIndex == -1 {
+				denyIndex = i
+			}
+		}
+	}
+
+	if hasDeny {
+		return Deny, denyIndex, nil
+	}
+	if hasAllow {
+		return Allow, allowIndex, nil
+	}
+	return Deny, -1, nil
 }
