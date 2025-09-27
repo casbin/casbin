@@ -1,0 +1,20 @@
+p, hospital, doctor, read, patient_record, allow
+p, hospital, nurse, read, patient_record, allow
+p, hospital, doctor, write, patient_record, allow
+p, hospital, nurse, write, patient_record, deny
+p, hospital, admin, read, patient_record, allow
+p, hospital, admin, write, patient_record, allow
+
+p, school, teacher, read, student_record, allow
+p, school, teacher, write, student_record, allow
+p, school, student, read, student_record, deny
+p, school, student, write, student_record, deny
+p, school, admin, read, student_record, allow
+p, school, admin, write, student_record, allow
+
+g, alice, doctor, hospital
+g, bob, nurse, hospital
+g, charlie, admin, hospital
+g, david, teacher, school
+g, eve, student, school
+g, frank, admin, school
