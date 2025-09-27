@@ -16,6 +16,7 @@ package effector
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/casbin/casbin/v2/constant"
 )
@@ -102,8 +103,79 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 			}
 		}
 	default:
-		return Deny, -1, errors.New("unsupported effect")
+		// Support custom effect expressions like "some(where (p.eft == allow))"
+		return e.evaluateCustomEffect(expr, effects, matches, policyIndex, policyLength)
 	}
 
 	return result, explainIndex, nil
+}
+
+// evaluateCustomEffect evaluates custom effect expressions like "some(where (p.eft == allow))"
+func (e *DefaultEffector) evaluateCustomEffect(expr string, effects []Effect, matches []float64, policyIndex int, policyLength int) (Effect, int, error) {
+	// Handle "some(where (p.eft == allow))" pattern
+	if strings.Contains(expr, "some(where") && strings.Contains(expr, "allow") {
+		// Check if any matched policy has allow effect
+		for i := 0; i < policyLength; i++ {
+			if matches[i] != 0 && effects[i] == Allow {
+				return Allow, i, nil
+			}
+		}
+		return Deny, -1, nil
+	}
+
+	// Handle "some(where (p.eft == deny))" pattern
+	if strings.Contains(expr, "some(where") && strings.Contains(expr, "deny") {
+		// Check if any matched policy has deny effect
+		for i := 0; i < policyLength; i++ {
+			if matches[i] != 0 && effects[i] == Deny {
+				return Deny, i, nil
+			}
+		}
+		return Allow, -1, nil
+	}
+
+	// Handle "!some(where (p.eft == deny))" pattern
+	if strings.Contains(expr, "!some(where") && strings.Contains(expr, "deny") {
+		// Check if no matched policy has deny effect
+		for i := 0; i < policyLength; i++ {
+			if matches[i] != 0 && effects[i] == Deny {
+				return Deny, i, nil
+			}
+		}
+		return Allow, -1, nil
+	}
+
+	// Handle "some(where (p.eft == allow)) && !some(where (p.eft == deny))" pattern
+	if strings.Contains(expr, "some(where") && strings.Contains(expr, "allow") && strings.Contains(expr, "!some(where") && strings.Contains(expr, "deny") {
+		hasAllow := false
+		hasDeny := false
+		allowIndex := -1
+		denyIndex := -1
+
+		for i := 0; i < policyLength; i++ {
+			if matches[i] != 0 {
+				if effects[i] == Allow {
+					hasAllow = true
+					if allowIndex == -1 {
+						allowIndex = i
+					}
+				} else if effects[i] == Deny {
+					hasDeny = true
+					if denyIndex == -1 {
+						denyIndex = i
+					}
+				}
+			}
+		}
+
+		if hasDeny {
+			return Deny, denyIndex, nil
+		}
+		if hasAllow {
+			return Allow, allowIndex, nil
+		}
+		return Deny, -1, nil
+	}
+
+	return Deny, -1, errors.New("unsupported custom effect: " + expr)
 }
