@@ -15,6 +15,7 @@
 package casbin
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"runtime/debug"
@@ -607,6 +608,28 @@ func (e *Enforcer) invalidateMatcherMap() {
 	e.matcherMap = sync.Map{}
 }
 
+// enforceCtx is the internal implementation of enforcement with context support.
+func (e *Enforcer) enforceCtx(ctx context.Context, matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	// Check if adapter supports context operations
+	if adapter, ok := e.adapter.(persist.ContextAdapter); ok {
+		if err := adapter.LoadPolicyCtx(ctx, e.model); err != nil {
+			return false, err
+		}
+	}
+
+	// Check context cancellation
+	select {
+	case <-ctx.Done():
+		return false, ctx.Err()
+	default:
+		return e.enforce(matcher, explains, rvals...)
+	}
+}
+
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
 	defer func() {
@@ -896,6 +919,11 @@ func (e *Enforcer) BatchEnforceWithMatcher(matcher string, requests [][]interfac
 		results = append(results, result)
 	}
 	return results, nil
+}
+
+// EnforceCtx determines whether a "subject" can access a "object" with the operation "action" with context support.
+func (e *Enforcer) EnforceCtx(ctx context.Context, rvals ...interface{}) (bool, error) {
+	return e.enforceCtx(ctx, "", nil, rvals...)
 }
 
 // AddNamedMatchingFunc add MatchingFunc by ptype RoleManager.
