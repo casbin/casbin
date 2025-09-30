@@ -69,21 +69,21 @@ func (e EnforceContext) GetCacheKey() string {
 	return "EnforceContext{" + e.RType + "-" + e.PType + "-" + e.EType + "-" + e.MType + "}"
 }
 
-// EnforcementContext holds the execution context for policy evaluation
+// EnforcementContext holds the execution context for policy evaluation.
 type EnforcementContext struct {
-	RType        string
-	PType        string
-	EType        string
-	MType        string
-	RTokens      map[string]int
-	PTokens      map[string]int
-	RVals        []interface{}
-	Parameters   enforceParameters
-	ExpString    string
-	HasEval      bool
+	RType      string
+	PType      string
+	EType      string
+	MType      string
+	RTokens    map[string]int
+	PTokens    map[string]int
+	RVals      []interface{}
+	Parameters enforceParameters
+	ExpString  string
+	HasEval    bool
 }
 
-// PolicyEvaluationResult contains the result of policy evaluation
+// PolicyEvaluationResult contains the result of policy evaluation.
 type PolicyEvaluationResult struct {
 	Effect        effector.Effect
 	ExplainIndex  int
@@ -91,7 +91,7 @@ type PolicyEvaluationResult struct {
 	MatchResults  []float64
 }
 
-// EnforcementError represents specific error types during enforcement
+// EnforcementError represents specific error types during enforcement.
 type EnforcementError struct {
 	Type    EnforcementErrorType
 	Message string
@@ -102,7 +102,7 @@ func (e EnforcementError) Error() string {
 	return e.Message
 }
 
-// EnforcementErrorType represents different types of enforcement errors
+// EnforcementErrorType represents different types of enforcement errors.
 type EnforcementErrorType int
 
 const (
@@ -651,7 +651,7 @@ func (e *Enforcer) invalidateMatcherMap() {
 	e.matcherMap = sync.Map{}
 }
 
-// validateEnforcementState validates the enforcer's operational state before processing
+// validateEnforcementState validates the enforcer's operational state before processing.
 func (e *Enforcer) validateEnforcementState() error {
 	if !e.enabled {
 		return nil // Early return for disabled enforcer, not an error
@@ -680,7 +680,7 @@ func (e *Enforcer) validateEnforcementState() error {
 	return nil
 }
 
-// prepareEnforcementContext prepares the execution context for policy evaluation
+// prepareEnforcementContext prepares the execution context for policy evaluation.
 func (e *Enforcer) prepareEnforcementContext(rvals []interface{}) (*EnforcementContext, error) {
 	context := &EnforcementContext{
 		RType: "r",
@@ -746,7 +746,7 @@ func (e *Enforcer) prepareEnforcementContext(rvals []interface{}) (*EnforcementC
 	return context, nil
 }
 
-// processJsonRequests processes JSON request values if JSON support is enabled
+// processJsonRequests processes JSON request values if JSON support is enabled.
 func (e *Enforcer) processJsonRequests(context *EnforcementContext) error {
 	// Try to parse all request values from json to map[string]interface{}
 	// Skip if there is an error
@@ -761,7 +761,7 @@ func (e *Enforcer) processJsonRequests(context *EnforcementContext) error {
 	return nil
 }
 
-// buildMatcherExpression compiles and caches matcher expressions with functions
+// buildMatcherExpression compiles and caches matcher expressions with functions.
 func (e *Enforcer) buildMatcherExpression(matcher string, context *EnforcementContext) (*govaluate.EvaluableExpression, error) {
 	// Resolve matcher expression string
 	if err := e.resolveMatcherExpression(matcher, context); err != nil {
@@ -783,7 +783,7 @@ func (e *Enforcer) buildMatcherExpression(matcher string, context *EnforcementCo
 	return e.getAndStoreMatcherExpression(context.HasEval, context.ExpString, functions)
 }
 
-// resolveMatcherExpression determines the matcher expression string to use
+// resolveMatcherExpression determines the matcher expression string to use.
 func (e *Enforcer) resolveMatcherExpression(matcher string, context *EnforcementContext) error {
 	if matcher == "" {
 		// Use model matcher
@@ -806,7 +806,7 @@ func (e *Enforcer) resolveMatcherExpression(matcher string, context *Enforcement
 	return nil
 }
 
-// setupEvaluationFunctions sets up the function map for expression evaluation
+// setupEvaluationFunctions sets up the function map for expression evaluation.
 func (e *Enforcer) setupEvaluationFunctions(context *EnforcementContext) (map[string]govaluate.ExpressionFunction, error) {
 	functions := e.fm.GetFunctions()
 
@@ -828,7 +828,7 @@ func (e *Enforcer) setupEvaluationFunctions(context *EnforcementContext) (map[st
 	return functions, nil
 }
 
-// evaluatePolicies executes policy evaluation logic with proper separation of concerns
+// evaluatePolicies executes policy evaluation logic with proper separation of concerns.
 func (e *Enforcer) evaluatePolicies(expression *govaluate.EvaluableExpression, context *EnforcementContext) (*PolicyEvaluationResult, error) {
 	// Validate request format
 	if err := e.validateRequestFormat(context); err != nil {
@@ -845,7 +845,7 @@ func (e *Enforcer) evaluatePolicies(expression *govaluate.EvaluableExpression, c
 	}
 }
 
-// validateRequestFormat validates the request format against model expectations
+// validateRequestFormat validates the request format against model expectations.
 func (e *Enforcer) validateRequestFormat(context *EnforcementContext) error {
 	expectedLen := len(e.model["r"][context.RType].Tokens)
 	actualLen := len(context.RVals)
@@ -865,7 +865,7 @@ func (e *Enforcer) validateRequestFormat(context *EnforcementContext) error {
 	return nil
 }
 
-// evaluateAgainstPolicies evaluates request against all policies
+// evaluateAgainstPolicies evaluates request against all policies.
 func (e *Enforcer) evaluateAgainstPolicies(expression *govaluate.EvaluableExpression, context *EnforcementContext, policyLen int) (*PolicyEvaluationResult, error) {
 	result := &PolicyEvaluationResult{
 		PolicyEffects: make([]effector.Effect, policyLen),
@@ -913,7 +913,7 @@ func (e *Enforcer) evaluateAgainstPolicies(expression *govaluate.EvaluableExpres
 	return result, nil
 }
 
-// evaluateWithoutPolicies evaluates request when no policies exist or don't apply
+// evaluateWithoutPolicies evaluates request when no policies exist or don't apply.
 func (e *Enforcer) evaluateWithoutPolicies(expression *govaluate.EvaluableExpression, context *EnforcementContext) (*PolicyEvaluationResult, error) {
 	// Special case: eval() function requires policies
 	if context.HasEval && len(e.model["p"][context.PType].Policy) == 0 {
@@ -969,7 +969,7 @@ func (e *Enforcer) evaluateWithoutPolicies(expression *govaluate.EvaluableExpres
 	return result, nil
 }
 
-// validatePolicyFormat validates a single policy rule format
+// validatePolicyFormat validates a single policy rule format.
 func (e *Enforcer) validatePolicyFormat(context *EnforcementContext, pvals []string) error {
 	expectedLen := len(e.model["p"][context.PType].Tokens)
 	actualLen := len(pvals)
@@ -989,7 +989,7 @@ func (e *Enforcer) validatePolicyFormat(context *EnforcementContext, pvals []str
 	return nil
 }
 
-// evaluatePolicyRule evaluates a single policy rule against the request
+// evaluatePolicyRule evaluates a single policy rule against the request.
 func (e *Enforcer) evaluatePolicyRule(expression *govaluate.EvaluableExpression, context *EnforcementContext, pvals []string) (float64, error) {
 	context.Parameters.pVals = pvals
 
@@ -1026,7 +1026,7 @@ func (e *Enforcer) evaluatePolicyRule(expression *govaluate.EvaluableExpression,
 	}
 }
 
-// determinePolicyEffect determines the effect of a policy rule based on its configuration
+// determinePolicyEffect determines the effect of a policy rule based on its configuration.
 func (e *Enforcer) determinePolicyEffect(context *EnforcementContext, pvals []string) effector.Effect {
 	// Check if policy has effect token
 	if j, ok := context.Parameters.pTokens[context.PType+"_eft"]; ok {
@@ -1045,7 +1045,7 @@ func (e *Enforcer) determinePolicyEffect(context *EnforcementContext, pvals []st
 	return effector.Allow
 }
 
-// compileEnforcementResult compiles final enforcement result with explanations and logging
+// compileEnforcementResult compiles final enforcement result with explanations and logging.
 func (e *Enforcer) compileEnforcementResult(evalResult *PolicyEvaluationResult, context *EnforcementContext, explains *[]string) (bool, error) {
 	// Build explanations if requested
 	logExplains := e.buildExplanations(evalResult, context, explains)
@@ -1059,7 +1059,7 @@ func (e *Enforcer) compileEnforcementResult(evalResult *PolicyEvaluationResult, 
 	return result, nil
 }
 
-// buildExplanations constructs explanation data for enforcement decisions
+// buildExplanations constructs explanation data for enforcement decisions.
 func (e *Enforcer) buildExplanations(evalResult *PolicyEvaluationResult, context *EnforcementContext, explains *[]string) [][]string {
 	var logExplains [][]string
 
@@ -1088,8 +1088,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	}()
 
 	// Phase 1: Validate enforcement state
-	if err := e.validateEnforcementState(); err != nil {
-		return false, err
+	if validateErr := e.validateEnforcementState(); validateErr != nil {
+		return false, validateErr
 	}
 
 	// Early return if enforcer is disabled
