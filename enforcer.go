@@ -69,6 +69,50 @@ func (e EnforceContext) GetCacheKey() string {
 	return "EnforceContext{" + e.RType + "-" + e.PType + "-" + e.EType + "-" + e.MType + "}"
 }
 
+// EnforcementContext holds the execution context for policy evaluation
+type EnforcementContext struct {
+	RType        string
+	PType        string
+	EType        string
+	MType        string
+	RTokens      map[string]int
+	PTokens      map[string]int
+	RVals        []interface{}
+	Parameters   enforceParameters
+	ExpString    string
+	HasEval      bool
+}
+
+// PolicyEvaluationResult contains the result of policy evaluation
+type PolicyEvaluationResult struct {
+	Effect        effector.Effect
+	ExplainIndex  int
+	PolicyEffects []effector.Effect
+	MatchResults  []float64
+}
+
+// EnforcementError represents specific error types during enforcement
+type EnforcementError struct {
+	Type    EnforcementErrorType
+	Message string
+	Context map[string]interface{}
+}
+
+func (e EnforcementError) Error() string {
+	return e.Message
+}
+
+// EnforcementErrorType represents different types of enforcement errors
+type EnforcementErrorType int
+
+const (
+	ErrInvalidRequest EnforcementErrorType = iota
+	ErrInvalidPolicy
+	ErrExpressionCompilation
+	ErrEvaluationFailure
+	ErrConfigurationError
+)
+
 // NewEnforcer creates an enforcer via file or DB.
 //
 // File:
@@ -607,23 +651,170 @@ func (e *Enforcer) invalidateMatcherMap() {
 	e.matcherMap = sync.Map{}
 }
 
-// enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
-func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
-		}
-	}()
-
+// validateEnforcementState validates the enforcer's operational state before processing
+func (e *Enforcer) validateEnforcementState() error {
 	if !e.enabled {
-		return true, nil
+		return nil // Early return for disabled enforcer, not an error
 	}
 
+	if e.model == nil {
+		return &EnforcementError{
+			Type:    ErrConfigurationError,
+			Message: "model is not initialized",
+			Context: map[string]interface{}{"enabled": e.enabled},
+		}
+	}
+
+	// Validate required model sections exist
+	requiredSections := []string{"r", "p", "e", "m"}
+	for _, section := range requiredSections {
+		if _, exists := e.model[section]; !exists {
+			return &EnforcementError{
+				Type:    ErrConfigurationError,
+				Message: fmt.Sprintf("required model section '%s' is missing", section),
+				Context: map[string]interface{}{"section": section},
+			}
+		}
+	}
+
+	return nil
+}
+
+// prepareEnforcementContext prepares the execution context for policy evaluation
+func (e *Enforcer) prepareEnforcementContext(rvals []interface{}) (*EnforcementContext, error) {
+	context := &EnforcementContext{
+		RType: "r",
+		PType: "p",
+		EType: "e",
+		MType: "m",
+		RVals: rvals,
+	}
+
+	// Extract EnforceContext if present
+	if len(rvals) != 0 {
+		if enforceCtx, ok := rvals[0].(EnforceContext); ok {
+			context.RType = enforceCtx.RType
+			context.PType = enforceCtx.PType
+			context.EType = enforceCtx.EType
+			context.MType = enforceCtx.MType
+			context.RVals = rvals[1:] // Remove EnforceContext from rvals
+		}
+	}
+
+	// Validate that required types exist in model
+	if _, exists := e.model["r"][context.RType]; !exists {
+		return nil, &EnforcementError{
+			Type:    ErrConfigurationError,
+			Message: fmt.Sprintf("request type '%s' not found in model", context.RType),
+			Context: map[string]interface{}{"rType": context.RType},
+		}
+	}
+
+	if _, exists := e.model["p"][context.PType]; !exists {
+		return nil, &EnforcementError{
+			Type:    ErrConfigurationError,
+			Message: fmt.Sprintf("policy type '%s' not found in model", context.PType),
+			Context: map[string]interface{}{"pType": context.PType},
+		}
+	}
+
+	// Build request and policy token mappings
+	context.RTokens = make(map[string]int, len(e.model["r"][context.RType].Tokens))
+	for i, token := range e.model["r"][context.RType].Tokens {
+		context.RTokens[token] = i
+	}
+
+	context.PTokens = make(map[string]int, len(e.model["p"][context.PType].Tokens))
+	for i, token := range e.model["p"][context.PType].Tokens {
+		context.PTokens[token] = i
+	}
+
+	// Process JSON requests if enabled
+	if e.acceptJsonRequest {
+		if err := e.processJsonRequests(context); err != nil {
+			return nil, err
+		}
+	}
+
+	// Create enforcement parameters
+	context.Parameters = enforceParameters{
+		rTokens: context.RTokens,
+		rVals:   context.RVals,
+		pTokens: context.PTokens,
+	}
+
+	return context, nil
+}
+
+// processJsonRequests processes JSON request values if JSON support is enabled
+func (e *Enforcer) processJsonRequests(context *EnforcementContext) error {
+	// Try to parse all request values from json to map[string]interface{}
+	// Skip if there is an error
+	for i, rval := range context.RVals {
+		if rvalStr, ok := rval.(string); ok {
+			if mapValue, err := util.JsonToMap(rvalStr); err == nil {
+				context.RVals[i] = mapValue
+			}
+			// Note: We intentionally ignore JSON parsing errors as per original behavior
+		}
+	}
+	return nil
+}
+
+// buildMatcherExpression compiles and caches matcher expressions with functions
+func (e *Enforcer) buildMatcherExpression(matcher string, context *EnforcementContext) (*govaluate.EvaluableExpression, error) {
+	// Resolve matcher expression string
+	if err := e.resolveMatcherExpression(matcher, context); err != nil {
+		return nil, err
+	}
+
+	// Setup evaluation functions
+	functions, err := e.setupEvaluationFunctions(context)
+	if err != nil {
+		return nil, err
+	}
+
+	// Setup eval function if needed
+	if context.HasEval {
+		functions["eval"] = generateEvalFunction(functions, &context.Parameters)
+	}
+
+	// Get or compile expression
+	return e.getAndStoreMatcherExpression(context.HasEval, context.ExpString, functions)
+}
+
+// resolveMatcherExpression determines the matcher expression string to use
+func (e *Enforcer) resolveMatcherExpression(matcher string, context *EnforcementContext) error {
+	if matcher == "" {
+		// Use model matcher
+		if _, exists := e.model["m"][context.MType]; !exists {
+			return &EnforcementError{
+				Type:    ErrConfigurationError,
+				Message: fmt.Sprintf("matcher type '%s' not found in model", context.MType),
+				Context: map[string]interface{}{"mType": context.MType},
+			}
+		}
+		context.ExpString = e.model["m"][context.MType].Value
+	} else {
+		// Use custom matcher
+		context.ExpString = util.RemoveComments(util.EscapeAssertion(matcher))
+	}
+
+	// Check if expression contains eval function
+	context.HasEval = util.HasEval(context.ExpString)
+
+	return nil
+}
+
+// setupEvaluationFunctions sets up the function map for expression evaluation
+func (e *Enforcer) setupEvaluationFunctions(context *EnforcementContext) (map[string]govaluate.ExpressionFunction, error) {
 	functions := e.fm.GetFunctions()
+
+	// Setup role manager functions
 	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
 			// g must be a normal role definition (ast.RM != nil)
-			//   or a conditional role definition (ast.CondRM != nil)
+			// or a conditional role definition (ast.CondRM != nil)
 			// ast.RM and ast.CondRM shouldn't be nil at the same time
 			if ast.RM != nil {
 				functions[key] = util.GenerateGFunction(ast.RM)
@@ -634,201 +825,298 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 	}
 
-	var (
-		rType = "r"
-		pType = "p"
-		eType = "e"
-		mType = "m"
-	)
-	if len(rvals) != 0 {
-		switch rvals[0].(type) {
-		case EnforceContext:
-			enforceContext := rvals[0].(EnforceContext)
-			rType = enforceContext.RType
-			pType = enforceContext.PType
-			eType = enforceContext.EType
-			mType = enforceContext.MType
-			rvals = rvals[1:]
-		default:
+	return functions, nil
+}
+
+// evaluatePolicies executes policy evaluation logic with proper separation of concerns
+func (e *Enforcer) evaluatePolicies(expression *govaluate.EvaluableExpression, context *EnforcementContext) (*PolicyEvaluationResult, error) {
+	// Validate request format
+	if err := e.validateRequestFormat(context); err != nil {
+		return nil, err
+	}
+
+	policyLen := len(e.model["p"][context.PType].Policy)
+	hasValidPolicies := policyLen != 0 && strings.Contains(context.ExpString, context.PType+"_")
+
+	if hasValidPolicies {
+		return e.evaluateAgainstPolicies(expression, context, policyLen)
+	} else {
+		return e.evaluateWithoutPolicies(expression, context)
+	}
+}
+
+// validateRequestFormat validates the request format against model expectations
+func (e *Enforcer) validateRequestFormat(context *EnforcementContext) error {
+	expectedLen := len(e.model["r"][context.RType].Tokens)
+	actualLen := len(context.RVals)
+
+	if expectedLen != actualLen {
+		return &EnforcementError{
+			Type:    ErrInvalidRequest,
+			Message: fmt.Sprintf("invalid request size: expected %d, got %d", expectedLen, actualLen),
+			Context: map[string]interface{}{
+				"expected": expectedLen,
+				"actual":   actualLen,
+				"rvals":    context.RVals,
+			},
+		}
+	}
+
+	return nil
+}
+
+// evaluateAgainstPolicies evaluates request against all policies
+func (e *Enforcer) evaluateAgainstPolicies(expression *govaluate.EvaluableExpression, context *EnforcementContext, policyLen int) (*PolicyEvaluationResult, error) {
+	result := &PolicyEvaluationResult{
+		PolicyEffects: make([]effector.Effect, policyLen),
+		MatchResults:  make([]float64, policyLen),
+		ExplainIndex:  -1,
+	}
+
+	for policyIndex, pvals := range e.model["p"][context.PType].Policy {
+		// Validate policy format
+		if err := e.validatePolicyFormat(context, pvals); err != nil {
+			return nil, err
+		}
+
+		// Evaluate single policy rule
+		matchResult, err := e.evaluatePolicyRule(expression, context, pvals)
+		if err != nil {
+			return nil, err
+		}
+		result.MatchResults[policyIndex] = matchResult
+
+		// Determine policy effect
+		result.PolicyEffects[policyIndex] = e.determinePolicyEffect(context, pvals)
+
+		// Merge effects and check for early termination
+		effect, explainIndex, err := e.eft.MergeEffects(
+			e.model["e"][context.EType].Value,
+			result.PolicyEffects,
+			result.MatchResults,
+			policyIndex,
+			policyLen,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		result.Effect = effect
+		result.ExplainIndex = explainIndex
+
+		// Early termination if effect is determined
+		if effect != effector.Indeterminate {
 			break
 		}
 	}
 
-	var expString string
-	if matcher == "" {
-		expString = e.model["m"][mType].Value
-	} else {
-		expString = util.RemoveComments(util.EscapeAssertion(matcher))
-	}
+	return result, nil
+}
 
-	rTokens := make(map[string]int, len(e.model["r"][rType].Tokens))
-	for i, token := range e.model["r"][rType].Tokens {
-		rTokens[token] = i
-	}
-	pTokens := make(map[string]int, len(e.model["p"][pType].Tokens))
-	for i, token := range e.model["p"][pType].Tokens {
-		pTokens[token] = i
-	}
-
-	if e.acceptJsonRequest {
-		// try to parse all request values from json to map[string]interface{}
-		// skip if there is an error
-		for i, rval := range rvals {
-			switch rval := rval.(type) {
-			case string:
-				var mapValue map[string]interface{}
-				mapValue, err = util.JsonToMap(rval)
-				if err == nil {
-					rvals[i] = mapValue
-				}
-			}
+// evaluateWithoutPolicies evaluates request when no policies exist or don't apply
+func (e *Enforcer) evaluateWithoutPolicies(expression *govaluate.EvaluableExpression, context *EnforcementContext) (*PolicyEvaluationResult, error) {
+	// Special case: eval() function requires policies
+	if context.HasEval && len(e.model["p"][context.PType].Policy) == 0 {
+		return nil, &EnforcementError{
+			Type:    ErrEvaluationFailure,
+			Message: "please make sure rule exists in policy when using eval() in matcher",
+			Context: map[string]interface{}{"hasEval": context.HasEval},
 		}
 	}
 
-	parameters := enforceParameters{
-		rTokens: rTokens,
-		rVals:   rvals,
-
-		pTokens: pTokens,
+	result := &PolicyEvaluationResult{
+		PolicyEffects: make([]effector.Effect, 1),
+		MatchResults:  make([]float64, 1),
+		ExplainIndex:  -1,
 	}
+	result.MatchResults[0] = 1
 
-	hasEval := util.HasEval(expString)
-	if hasEval {
-		functions["eval"] = generateEvalFunction(functions, &parameters)
-	}
-	var expression *govaluate.EvaluableExpression
-	expression, err = e.getAndStoreMatcherExpression(hasEval, expString, functions)
+	// Create empty policy values for evaluation
+	context.Parameters.pVals = make([]string, len(context.Parameters.pTokens))
+
+	// Evaluate expression
+	evalResult, err := expression.Eval(context.Parameters)
 	if err != nil {
-		return false, err
-	}
-
-	if len(e.model["r"][rType].Tokens) != len(rvals) {
-		return false, fmt.Errorf(
-			"invalid request size: expected %d, got %d, rvals: %v",
-			len(e.model["r"][rType].Tokens),
-			len(rvals),
-			rvals)
-	}
-
-	var policyEffects []effector.Effect
-	var matcherResults []float64
-
-	var effect effector.Effect
-	var explainIndex int
-
-	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") { //nolint:nestif // TODO: reduce function complexity
-		policyEffects = make([]effector.Effect, policyLen)
-		matcherResults = make([]float64, policyLen)
-
-		for policyIndex, pvals := range e.model["p"][pType].Policy {
-			// log.LogPrint("Policy Rule: ", pvals)
-			if len(e.model["p"][pType].Tokens) != len(pvals) {
-				return false, fmt.Errorf(
-					"invalid policy size: expected %d, got %d, pvals: %v",
-					len(e.model["p"][pType].Tokens),
-					len(pvals),
-					pvals)
-			}
-
-			parameters.pVals = pvals
-
-			result, err := expression.Eval(parameters)
-			// log.LogPrint("Result: ", result)
-
-			if err != nil {
-				return false, err
-			}
-
-			// set to no-match at first
-			matcherResults[policyIndex] = 0
-			switch result := result.(type) {
-			case bool:
-				if result {
-					matcherResults[policyIndex] = 1
-				}
-			case float64:
-				if result != 0 {
-					matcherResults[policyIndex] = 1
-				}
-			default:
-				return false, errors.New("matcher result should be bool, int or float")
-			}
-
-			if j, ok := parameters.pTokens[pType+"_eft"]; ok {
-				eft := parameters.pVals[j]
-				if eft == "allow" {
-					policyEffects[policyIndex] = effector.Allow
-				} else if eft == "deny" {
-					policyEffects[policyIndex] = effector.Deny
-				} else {
-					policyEffects[policyIndex] = effector.Indeterminate
-				}
-			} else {
-				policyEffects[policyIndex] = effector.Allow
-			}
-
-			// if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
-			//	break
-			// }
-
-			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, policyIndex, policyLen)
-			if err != nil {
-				return false, err
-			}
-			if effect != effector.Indeterminate {
-				break
-			}
+		return nil, &EnforcementError{
+			Type:    ErrEvaluationFailure,
+			Message: fmt.Sprintf("expression evaluation failed: %v", err),
+			Context: map[string]interface{}{"error": err.Error()},
 		}
+	}
+
+	// Convert result to effect
+	if boolResult, ok := evalResult.(bool); ok && boolResult {
+		result.PolicyEffects[0] = effector.Allow
 	} else {
-		if hasEval && len(e.model["p"][pType].Policy) == 0 {
-			return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
-		}
+		result.PolicyEffects[0] = effector.Indeterminate
+	}
 
-		policyEffects = make([]effector.Effect, 1)
-		matcherResults = make([]float64, 1)
-		matcherResults[0] = 1
+	// Merge effects
+	effect, explainIndex, err := e.eft.MergeEffects(
+		e.model["e"][context.EType].Value,
+		result.PolicyEffects,
+		result.MatchResults,
+		0,
+		1,
+	)
+	if err != nil {
+		return nil, err
+	}
 
-		parameters.pVals = make([]string, len(parameters.pTokens))
+	result.Effect = effect
+	result.ExplainIndex = explainIndex
 
-		result, err := expression.Eval(parameters)
+	return result, nil
+}
 
-		if err != nil {
-			return false, err
-		}
+// validatePolicyFormat validates a single policy rule format
+func (e *Enforcer) validatePolicyFormat(context *EnforcementContext, pvals []string) error {
+	expectedLen := len(e.model["p"][context.PType].Tokens)
+	actualLen := len(pvals)
 
-		if result.(bool) {
-			policyEffects[0] = effector.Allow
-		} else {
-			policyEffects[0] = effector.Indeterminate
-		}
-
-		effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, 0, 1)
-		if err != nil {
-			return false, err
+	if expectedLen != actualLen {
+		return &EnforcementError{
+			Type:    ErrInvalidPolicy,
+			Message: fmt.Sprintf("invalid policy size: expected %d, got %d", expectedLen, actualLen),
+			Context: map[string]interface{}{
+				"expected": expectedLen,
+				"actual":   actualLen,
+				"pvals":    pvals,
+			},
 		}
 	}
 
+	return nil
+}
+
+// evaluatePolicyRule evaluates a single policy rule against the request
+func (e *Enforcer) evaluatePolicyRule(expression *govaluate.EvaluableExpression, context *EnforcementContext, pvals []string) (float64, error) {
+	context.Parameters.pVals = pvals
+
+	evalResult, err := expression.Eval(context.Parameters)
+	if err != nil {
+		return 0, &EnforcementError{
+			Type:    ErrEvaluationFailure,
+			Message: fmt.Sprintf("policy rule evaluation failed: %v", err),
+			Context: map[string]interface{}{
+				"error": err.Error(),
+				"pvals": pvals,
+			},
+		}
+	}
+
+	// Convert result to match value (0 or 1)
+	switch result := evalResult.(type) {
+	case bool:
+		if result {
+			return 1, nil
+		}
+		return 0, nil
+	case float64:
+		if result != 0 {
+			return 1, nil
+		}
+		return 0, nil
+	default:
+		return 0, &EnforcementError{
+			Type:    ErrEvaluationFailure,
+			Message: "matcher result should be bool, int or float",
+			Context: map[string]interface{}{"result": result, "type": fmt.Sprintf("%T", result)},
+		}
+	}
+}
+
+// determinePolicyEffect determines the effect of a policy rule based on its configuration
+func (e *Enforcer) determinePolicyEffect(context *EnforcementContext, pvals []string) effector.Effect {
+	// Check if policy has effect token
+	if j, ok := context.Parameters.pTokens[context.PType+"_eft"]; ok {
+		eft := pvals[j]
+		switch eft {
+		case "allow":
+			return effector.Allow
+		case "deny":
+			return effector.Deny
+		default:
+			return effector.Indeterminate
+		}
+	}
+
+	// Default effect is allow if no effect token is present
+	return effector.Allow
+}
+
+// compileEnforcementResult compiles final enforcement result with explanations and logging
+func (e *Enforcer) compileEnforcementResult(evalResult *PolicyEvaluationResult, context *EnforcementContext, explains *[]string) (bool, error) {
+	// Build explanations if requested
+	logExplains := e.buildExplanations(evalResult, context, explains)
+
+	// Convert effect to boolean result
+	result := evalResult.Effect == effector.Allow
+
+	// Log enforcement decision
+	e.logger.LogEnforce(context.ExpString, context.RVals, result, logExplains)
+
+	return result, nil
+}
+
+// buildExplanations constructs explanation data for enforcement decisions
+func (e *Enforcer) buildExplanations(evalResult *PolicyEvaluationResult, context *EnforcementContext, explains *[]string) [][]string {
 	var logExplains [][]string
 
 	if explains != nil {
+		// Include existing explanations
 		if len(*explains) > 0 {
 			logExplains = append(logExplains, *explains)
 		}
 
-		if explainIndex != -1 && len(e.model["p"][pType].Policy) > explainIndex {
-			*explains = e.model["p"][pType].Policy[explainIndex]
+		// Add policy explanation if available
+		if evalResult.ExplainIndex != -1 && len(e.model["p"][context.PType].Policy) > evalResult.ExplainIndex {
+			*explains = e.model["p"][context.PType].Policy[evalResult.ExplainIndex]
 			logExplains = append(logExplains, *explains)
 		}
 	}
 
-	// effect -> result
-	result := false
-	if effect == effector.Allow {
-		result = true
-	}
-	e.logger.LogEnforce(expString, rvals, result, logExplains)
+	return logExplains
+}
 
-	return result, nil
+// enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
+func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
+		}
+	}()
+
+	// Phase 1: Validate enforcement state
+	if err := e.validateEnforcementState(); err != nil {
+		return false, err
+	}
+
+	// Early return if enforcer is disabled
+	if !e.enabled {
+		return true, nil
+	}
+
+	// Phase 2: Prepare enforcement context
+	context, err := e.prepareEnforcementContext(rvals)
+	if err != nil {
+		return false, err
+	}
+
+	// Phase 3: Build matcher expression
+	expression, err := e.buildMatcherExpression(matcher, context)
+	if err != nil {
+		return false, err
+	}
+
+	// Phase 4: Evaluate policies
+	evalResult, err := e.evaluatePolicies(expression, context)
+	if err != nil {
+		return false, err
+	}
+
+	// Phase 5: Compile enforcement result
+	return e.compileEnforcementResult(evalResult, context, explains)
 }
 
 func (e *Enforcer) getAndStoreMatcherExpression(hasEval bool, expString string, functions map[string]govaluate.ExpressionFunction) (*govaluate.EvaluableExpression, error) {
