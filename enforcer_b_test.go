@@ -20,7 +20,7 @@ import (
 
 func BenchmarkBatchEnforce(b *testing.B) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", false)
-	
+
 	// Create a batch of 100 requests
 	requests := make([][]interface{}, 100)
 	for i := 0; i < 100; i++ {
@@ -41,7 +41,7 @@ func BenchmarkBatchEnforce(b *testing.B) {
 
 func BenchmarkBatchEnforceSmall(b *testing.B) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", false)
-	
+
 	// Create a batch of 10 requests
 	requests := make([][]interface{}, 10)
 	for i := 0; i < 10; i++ {
@@ -62,7 +62,7 @@ func BenchmarkBatchEnforceSmall(b *testing.B) {
 
 func BenchmarkBatchEnforceLarge(b *testing.B) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", false)
-	
+
 	// Create a batch of 1000 requests
 	requests := make([][]interface{}, 1000)
 	for i := 0; i < 1000; i++ {
@@ -84,7 +84,7 @@ func BenchmarkBatchEnforceLarge(b *testing.B) {
 // Baseline comparison: individual Enforce calls
 func BenchmarkEnforceLoop(b *testing.B) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", false)
-	
+
 	requests := make([][]interface{}, 100)
 	for i := 0; i < 100; i++ {
 		if i%3 == 0 {
@@ -102,4 +102,27 @@ func BenchmarkEnforceLoop(b *testing.B) {
 			_, _ = e.Enforce(req...)
 		}
 	}
+}
+
+// BenchmarkBatchEnforceParallel benchmarks parallel batch enforcement
+func BenchmarkBatchEnforceParallel(b *testing.B) {
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", false)
+
+	requests := make([][]interface{}, 100)
+	for i := 0; i < 100; i++ {
+		if i%3 == 0 {
+			requests[i] = []interface{}{"alice", "data1", "read"}
+		} else if i%3 == 1 {
+			requests[i] = []interface{}{"alice", "data1", "write"}
+		} else {
+			requests[i] = []interface{}{"bob", "data2", "read"}
+		}
+	}
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			_, _ = e.BatchEnforce(requests)
+		}
+	})
 }
