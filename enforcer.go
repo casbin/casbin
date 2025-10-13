@@ -872,30 +872,251 @@ func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (b
 	return result, explain, err
 }
 
+// batchEnforceInternal is an optimized internal function for batch enforcement.
+// It builds the expression and reusable structures once, then evaluates each request efficiently.
+func (e *Enforcer) batchEnforceInternal(matcher string, requests [][]interface{}) ([]bool, error) {
+	if !e.enabled {
+		results := make([]bool, len(requests))
+		for i := range results {
+			results[i] = true
+		}
+		return results, nil
+	}
+
+	// Build functions map once (includes g functions)
+	functions := e.fm.GetFunctions()
+	if _, ok := e.model["g"]; ok {
+		for key, ast := range e.model["g"] {
+			if ast.RM != nil {
+				functions[key] = util.GenerateGFunction(ast.RM)
+			}
+			if ast.CondRM != nil {
+				functions[key] = util.GenerateConditionalGFunction(ast.CondRM)
+			}
+		}
+	}
+
+	// Determine types (r, p, e, m) - assume no EnforceContext for now in batch
+	var (
+		rType = "r"
+		pType = "p"
+		eType = "e"
+		mType = "m"
+	)
+
+	// Build expression string once
+	var expString string
+	if matcher == "" {
+		expString = e.model["m"][mType].Value
+	} else {
+		expString = util.RemoveComments(util.EscapeAssertion(matcher))
+	}
+
+	// Build token maps once
+	rTokens := make(map[string]int, len(e.model["r"][rType].Tokens))
+	for i, token := range e.model["r"][rType].Tokens {
+		rTokens[token] = i
+	}
+	pTokens := make(map[string]int, len(e.model["p"][pType].Tokens))
+	for i, token := range e.model["p"][pType].Tokens {
+		pTokens[token] = i
+	}
+
+	// Create reusable parameters structure
+	parameters := enforceParameters{
+		rTokens: rTokens,
+		pTokens: pTokens,
+	}
+
+	hasEval := util.HasEval(expString)
+	if hasEval {
+		functions["eval"] = generateEvalFunction(functions, &parameters)
+	}
+
+	// Compile expression once
+	expression, err := e.getAndStoreMatcherExpression(hasEval, expString, functions)
+	if err != nil {
+		return nil, err
+	}
+
+	expectedRTokens := len(e.model["r"][rType].Tokens)
+	policyLen := len(e.model["p"][pType].Policy)
+	hasPolicyCheck := policyLen != 0 && strings.Contains(expString, pType+"_")
+
+	// Process each request
+	results := make([]bool, len(requests))
+	for reqIndex, request := range requests {
+		rvals := request
+
+		// Handle JSON requests if enabled
+		if e.acceptJsonRequest {
+			for i, rval := range rvals {
+				if rvalStr, ok := rval.(string); ok {
+					if mapValue, err := util.JsonToMap(rvalStr); err == nil {
+						rvals[i] = mapValue
+					}
+				}
+			}
+		}
+
+		// Validate request size
+		if len(rvals) != expectedRTokens {
+			return results, fmt.Errorf(
+				"invalid request size: expected %d, got %d, rvals: %v",
+				expectedRTokens,
+				len(rvals),
+				rvals)
+		}
+
+		// Update parameters with current request values
+		parameters.rVals = rvals
+
+		var policyEffects []effector.Effect
+		var matcherResults []float64
+		var effect effector.Effect
+		var explainIndex int
+
+		if hasPolicyCheck {
+			policyEffects = make([]effector.Effect, policyLen)
+			matcherResults = make([]float64, policyLen)
+
+			for policyIndex, pvals := range e.model["p"][pType].Policy {
+				if len(e.model["p"][pType].Tokens) != len(pvals) {
+					return results, fmt.Errorf(
+						"invalid policy size: expected %d, got %d, pvals: %v",
+						len(e.model["p"][pType].Tokens),
+						len(pvals),
+						pvals)
+				}
+
+				parameters.pVals = pvals
+
+				result, err := expression.Eval(parameters)
+				if err != nil {
+					return results, err
+				}
+
+				// Set to no-match at first
+				matcherResults[policyIndex] = 0
+				switch result := result.(type) {
+				case bool:
+					if result {
+						matcherResults[policyIndex] = 1
+					}
+				case float64:
+					if result != 0 {
+						matcherResults[policyIndex] = 1
+					}
+				default:
+					return results, errors.New("matcher result should be bool, int or float")
+				}
+
+				if j, ok := parameters.pTokens[pType+"_eft"]; ok {
+					eft := parameters.pVals[j]
+					if eft == "allow" {
+						policyEffects[policyIndex] = effector.Allow
+					} else if eft == "deny" {
+						policyEffects[policyIndex] = effector.Deny
+					} else {
+						policyEffects[policyIndex] = effector.Indeterminate
+					}
+				} else {
+					policyEffects[policyIndex] = effector.Allow
+				}
+
+				effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, policyIndex, policyLen)
+				if err != nil {
+					return results, err
+				}
+				if effect != effector.Indeterminate {
+					break
+				}
+			}
+		} else {
+			if hasEval && policyLen == 0 {
+				return results, errors.New("please make sure rule exists in policy when using eval() in matcher")
+			}
+
+			policyEffects = make([]effector.Effect, 1)
+			matcherResults = make([]float64, 1)
+			matcherResults[0] = 1
+
+			parameters.pVals = make([]string, len(parameters.pTokens))
+
+			result, err := expression.Eval(parameters)
+			if err != nil {
+				return results, err
+			}
+
+			if result.(bool) {
+				policyEffects[0] = effector.Allow
+			} else {
+				policyEffects[0] = effector.Indeterminate
+			}
+
+			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, 0, 1)
+			if err != nil {
+				return results, err
+			}
+		}
+
+		// Convert effect to result
+		results[reqIndex] = effect == effector.Allow
+
+		// Log enforcement (simplified version without explains)
+		e.logger.LogEnforce(expString, rvals, results[reqIndex], nil)
+
+		// Suppress unused variable warning
+		_ = explainIndex
+	}
+
+	return results, nil
+}
+
 // BatchEnforce enforce in batches.
 func (e *Enforcer) BatchEnforce(requests [][]interface{}) ([]bool, error) {
-	var results []bool
+	// Check if any request contains EnforceContext - if so, fall back to individual enforcement
 	for _, request := range requests {
-		result, err := e.enforce("", nil, request...)
-		if err != nil {
-			return results, err
+		if len(request) > 0 {
+			if _, ok := request[0].(EnforceContext); ok {
+				// Fall back to individual enforcement for mixed contexts
+				var results []bool
+				for _, req := range requests {
+					result, err := e.enforce("", nil, req...)
+					if err != nil {
+						return results, err
+					}
+					results = append(results, result)
+				}
+				return results, nil
+			}
 		}
-		results = append(results, result)
 	}
-	return results, nil
+	// Use optimized batch enforcement for simple cases
+	return e.batchEnforceInternal("", requests)
 }
 
 // BatchEnforceWithMatcher enforce with matcher in batches.
 func (e *Enforcer) BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error) {
-	var results []bool
+	// Check if any request contains EnforceContext - if so, fall back to individual enforcement
 	for _, request := range requests {
-		result, err := e.enforce(matcher, nil, request...)
-		if err != nil {
-			return results, err
+		if len(request) > 0 {
+			if _, ok := request[0].(EnforceContext); ok {
+				// Fall back to individual enforcement for mixed contexts
+				var results []bool
+				for _, req := range requests {
+					result, err := e.enforce(matcher, nil, req...)
+					if err != nil {
+						return results, err
+					}
+					results = append(results, result)
+				}
+				return results, nil
+			}
 		}
-		results = append(results, result)
 	}
-	return results, nil
+	// Use optimized batch enforcement for simple cases
+	return e.batchEnforceInternal(matcher, requests)
 }
 
 // AddNamedMatchingFunc add MatchingFunc by ptype RoleManager.
