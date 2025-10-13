@@ -872,30 +872,241 @@ func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (b
 	return result, explain, err
 }
 
+// batchEnforce is an optimized version that processes multiple requests efficiently by reusing common setup.
+func (e *Enforcer) batchEnforce(matcher string, requests [][]interface{}) ([]bool, error) {
+	if len(requests) == 0 {
+		return []bool{}, nil
+	}
+
+	// Defer panic recovery
+	var err error
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
+		}
+	}()
+
+	if !e.enabled {
+		results := make([]bool, len(requests))
+		for i := range results {
+			results[i] = true
+		}
+		return results, nil
+	}
+
+	// Common setup - extracted from enforce() to avoid repetition
+	functions := e.fm.GetFunctions()
+	if _, ok := e.model["g"]; ok {
+		for key, ast := range e.model["g"] {
+			if ast.RM != nil {
+				functions[key] = util.GenerateGFunction(ast.RM)
+			}
+			if ast.CondRM != nil {
+				functions[key] = util.GenerateConditionalGFunction(ast.CondRM)
+			}
+		}
+	}
+
+	var (
+		rType = "r"
+		pType = "p"
+		eType = "e"
+		mType = "m"
+	)
+
+	// Check if first request has EnforceContext
+	if len(requests[0]) != 0 {
+		switch requests[0][0].(type) {
+		case EnforceContext:
+			enforceContext := requests[0][0].(EnforceContext)
+			rType = enforceContext.RType
+			pType = enforceContext.PType
+			eType = enforceContext.EType
+			mType = enforceContext.MType
+		}
+	}
+
+	var expString string
+	if matcher == "" {
+		expString = e.model["m"][mType].Value
+	} else {
+		expString = util.RemoveComments(util.EscapeAssertion(matcher))
+	}
+
+	rTokens := make(map[string]int, len(e.model["r"][rType].Tokens))
+	for i, token := range e.model["r"][rType].Tokens {
+		rTokens[token] = i
+	}
+	pTokens := make(map[string]int, len(e.model["p"][pType].Tokens))
+	for i, token := range e.model["p"][pType].Tokens {
+		pTokens[token] = i
+	}
+
+	hasEval := util.HasEval(expString)
+	
+	// Pre-allocate results slice
+	results := make([]bool, len(requests))
+
+	// Process each request
+	for idx, request := range requests {
+		rvals := request
+		
+		// Handle EnforceContext
+		if len(rvals) != 0 {
+			switch rvals[0].(type) {
+			case EnforceContext:
+				rvals = rvals[1:]
+			}
+		}
+
+		// JSON request handling
+		if e.acceptJsonRequest {
+			for i, rval := range rvals {
+				switch rval := rval.(type) {
+				case string:
+					var mapValue map[string]interface{}
+					mapValue, err = util.JsonToMap(rval)
+					if err == nil {
+						rvals[i] = mapValue
+					}
+				}
+			}
+		}
+
+		parameters := enforceParameters{
+			rTokens: rTokens,
+			rVals:   rvals,
+			pTokens: pTokens,
+		}
+
+		if hasEval {
+			functions["eval"] = generateEvalFunction(functions, &parameters)
+		}
+
+		var expression *govaluate.EvaluableExpression
+		expression, err = e.getAndStoreMatcherExpression(hasEval, expString, functions)
+		if err != nil {
+			return results[:idx], err
+		}
+
+		if len(e.model["r"][rType].Tokens) != len(rvals) {
+			return results[:idx], fmt.Errorf(
+				"invalid request size: expected %d, got %d, rvals: %v",
+				len(e.model["r"][rType].Tokens),
+				len(rvals),
+				rvals)
+		}
+
+		var policyEffects []effector.Effect
+		var matcherResults []float64
+		var effect effector.Effect
+		var explainIndex int
+
+		if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") {
+			policyEffects = make([]effector.Effect, policyLen)
+			matcherResults = make([]float64, policyLen)
+
+			for policyIndex, pvals := range e.model["p"][pType].Policy {
+				if len(e.model["p"][pType].Tokens) != len(pvals) {
+					return results[:idx], fmt.Errorf(
+						"invalid policy size: expected %d, got %d, pvals: %v",
+						len(e.model["p"][pType].Tokens),
+						len(pvals),
+						pvals)
+				}
+
+				parameters.pVals = pvals
+
+				result, err := expression.Eval(parameters)
+				if err != nil {
+					return results[:idx], err
+				}
+
+				matcherResults[policyIndex] = 0
+				switch result := result.(type) {
+				case bool:
+					if result {
+						matcherResults[policyIndex] = 1
+					}
+				case float64:
+					if result != 0 {
+						matcherResults[policyIndex] = 1
+					}
+				default:
+					return results[:idx], errors.New("matcher result should be bool, int or float")
+				}
+
+				if j, ok := parameters.pTokens[pType+"_eft"]; ok {
+					eft := parameters.pVals[j]
+					if eft == "allow" {
+						policyEffects[policyIndex] = effector.Allow
+					} else if eft == "deny" {
+						policyEffects[policyIndex] = effector.Deny
+					} else {
+						policyEffects[policyIndex] = effector.Indeterminate
+					}
+				} else {
+					policyEffects[policyIndex] = effector.Allow
+				}
+
+				effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, policyIndex, policyLen)
+				if err != nil {
+					return results[:idx], err
+				}
+				if effect != effector.Indeterminate {
+					break
+				}
+			}
+		} else {
+			if hasEval && len(e.model["p"][pType].Policy) == 0 {
+				return results[:idx], errors.New("please make sure rule exists in policy when using eval() in matcher")
+			}
+
+			policyEffects = make([]effector.Effect, 1)
+			matcherResults = make([]float64, 1)
+			matcherResults[0] = 1
+
+			parameters.pVals = make([]string, len(parameters.pTokens))
+
+			result, err := expression.Eval(parameters)
+			if err != nil {
+				return results[:idx], err
+			}
+
+			if result.(bool) {
+				policyEffects[0] = effector.Allow
+			} else {
+				policyEffects[0] = effector.Indeterminate
+			}
+
+			effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, 0, 1)
+			if err != nil {
+				return results[:idx], err
+			}
+		}
+
+		// Store result
+		results[idx] = effect == effector.Allow
+
+		// Log for this request
+		var logExplains [][]string
+		if explainIndex != -1 && len(e.model["p"][pType].Policy) > explainIndex {
+			logExplains = append(logExplains, e.model["p"][pType].Policy[explainIndex])
+		}
+		e.logger.LogEnforce(expString, rvals, results[idx], logExplains)
+	}
+
+	return results, err
+}
+
 // BatchEnforce enforce in batches.
 func (e *Enforcer) BatchEnforce(requests [][]interface{}) ([]bool, error) {
-	var results []bool
-	for _, request := range requests {
-		result, err := e.enforce("", nil, request...)
-		if err != nil {
-			return results, err
-		}
-		results = append(results, result)
-	}
-	return results, nil
+	return e.batchEnforce("", requests)
 }
 
 // BatchEnforceWithMatcher enforce with matcher in batches.
 func (e *Enforcer) BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error) {
-	var results []bool
-	for _, request := range requests {
-		result, err := e.enforce(matcher, nil, request...)
-		if err != nil {
-			return results, err
-		}
-		results = append(results, result)
-	}
-	return results, nil
+	return e.batchEnforce(matcher, requests)
 }
 
 // AddNamedMatchingFunc add MatchingFunc by ptype RoleManager.
