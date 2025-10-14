@@ -730,41 +730,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 					pvals)
 			}
 
-			parameters.pVals = pvals
-
-			result, err := expression.Eval(parameters)
-			// log.LogPrint("Result: ", result)
-
-			if err != nil {
+			if err := evaluatePolicyEffect(expression, &parameters, pvals, pType, policyIndex, policyEffects, matcherResults); err != nil {
 				return false, err
-			}
-
-			// set to no-match at first
-			matcherResults[policyIndex] = 0
-			switch result := result.(type) {
-			case bool:
-				if result {
-					matcherResults[policyIndex] = 1
-				}
-			case float64:
-				if result != 0 {
-					matcherResults[policyIndex] = 1
-				}
-			default:
-				return false, errors.New("matcher result should be bool, int or float")
-			}
-
-			if j, ok := parameters.pTokens[pType+"_eft"]; ok {
-				eft := parameters.pVals[j]
-				if eft == "allow" {
-					policyEffects[policyIndex] = effector.Allow
-				} else if eft == "deny" {
-					policyEffects[policyIndex] = effector.Deny
-				} else {
-					policyEffects[policyIndex] = effector.Indeterminate
-				}
-			} else {
-				policyEffects[policyIndex] = effector.Allow
 			}
 
 			// if e.model["e"]["e"].Value == "priority(p_eft) || deny" {
@@ -872,6 +839,54 @@ func (e *Enforcer) EnforceExWithMatcher(matcher string, rvals ...interface{}) (b
 	return result, explain, err
 }
 
+// evaluatePolicyEffect evaluates a single policy against parameters and updates effects and results.
+func evaluatePolicyEffect(
+	expression *govaluate.EvaluableExpression,
+	parameters *enforceParameters,
+	pvals []string,
+	pType string,
+	policyIndex int,
+	policyEffects []effector.Effect,
+	matcherResults []float64,
+) error {
+	parameters.pVals = pvals
+
+	result, err := expression.Eval(parameters)
+	if err != nil {
+		return err
+	}
+
+	// Set to no-match at first.
+	matcherResults[policyIndex] = 0
+	switch result := result.(type) {
+	case bool:
+		if result {
+			matcherResults[policyIndex] = 1
+		}
+	case float64:
+		if result != 0 {
+			matcherResults[policyIndex] = 1
+		}
+	default:
+		return errors.New("matcher result should be bool, int or float")
+	}
+
+	if j, ok := parameters.pTokens[pType+"_eft"]; ok {
+		eft := parameters.pVals[j]
+		if eft == "allow" {
+			policyEffects[policyIndex] = effector.Allow
+		} else if eft == "deny" {
+			policyEffects[policyIndex] = effector.Deny
+		} else {
+			policyEffects[policyIndex] = effector.Indeterminate
+		}
+	} else {
+		policyEffects[policyIndex] = effector.Allow
+	}
+
+	return nil
+}
+
 // batchEnforceInternal is an optimized internal function for batch enforcement.
 // It builds the expression and reusable structures once, then evaluates each request efficiently.
 func (e *Enforcer) batchEnforceInternal(matcher string, requests [][]interface{}) ([]bool, error) {
@@ -883,7 +898,7 @@ func (e *Enforcer) batchEnforceInternal(matcher string, requests [][]interface{}
 		return results, nil
 	}
 
-	// Build functions map once (includes g functions)
+	// Build functions map once (includes g functions).
 	functions := e.fm.GetFunctions()
 	if _, ok := e.model["g"]; ok {
 		for key, ast := range e.model["g"] {
@@ -896,7 +911,7 @@ func (e *Enforcer) batchEnforceInternal(matcher string, requests [][]interface{}
 		}
 	}
 
-	// Determine types (r, p, e, m) - assume no EnforceContext for now in batch
+	// Determine types (r, p, e, m) - assume no EnforceContext for now in batch.
 	var (
 		rType = "r"
 		pType = "p"
@@ -989,39 +1004,8 @@ func (e *Enforcer) batchEnforceInternal(matcher string, requests [][]interface{}
 						pvals)
 				}
 
-				parameters.pVals = pvals
-
-				result, err := expression.Eval(parameters)
-				if err != nil {
+				if err := evaluatePolicyEffect(expression, &parameters, pvals, pType, policyIndex, policyEffects, matcherResults); err != nil {
 					return results, err
-				}
-
-				// Set to no-match at first
-				matcherResults[policyIndex] = 0
-				switch result := result.(type) {
-				case bool:
-					if result {
-						matcherResults[policyIndex] = 1
-					}
-				case float64:
-					if result != 0 {
-						matcherResults[policyIndex] = 1
-					}
-				default:
-					return results, errors.New("matcher result should be bool, int or float")
-				}
-
-				if j, ok := parameters.pTokens[pType+"_eft"]; ok {
-					eft := parameters.pVals[j]
-					if eft == "allow" {
-						policyEffects[policyIndex] = effector.Allow
-					} else if eft == "deny" {
-						policyEffects[policyIndex] = effector.Deny
-					} else {
-						policyEffects[policyIndex] = effector.Indeterminate
-					}
-				} else {
-					policyEffects[policyIndex] = effector.Allow
 				}
 
 				effect, explainIndex, err = e.eft.MergeEffects(e.model["e"][eType].Value, policyEffects, matcherResults, policyIndex, policyLen)
