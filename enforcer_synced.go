@@ -144,19 +144,9 @@ func (e *SyncedEnforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *SyncedEnforcer) LoadPolicy() error {
-	e.m.RLock()
-	newModel, err := e.loadPolicyFromAdapter(e.model)
-	e.m.RUnlock()
-	if err != nil {
-		return err
-	}
 	e.m.Lock()
-	err = e.applyModifiedModel(newModel)
-	e.m.Unlock()
-	if err != nil {
-		return err
-	}
-	return nil
+	defer e.m.Unlock()
+	return e.Enforcer.LoadPolicy()
 }
 
 // LoadFilteredPolicy reloads a filtered policy from file/database.
