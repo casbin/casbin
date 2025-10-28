@@ -132,6 +132,11 @@ func (e *CachedEnforcer) getCachedResult(key string) (res bool, err error) {
 	return e.cache.Get(key)
 }
 
+// SetExpireTime sets the cache expiration time (TTL).
+// Use 0 or negative duration to make cache entries never expire.
+// This is useful in multi-instance scenarios where you want to avoid lock contention
+// and recalculation overhead, and instead manually trigger LoadPolicy() or InvalidateCache()
+// when policies change.
 func (e *CachedEnforcer) SetExpireTime(expireTime time.Duration) {
 	e.expireTime = expireTime
 }

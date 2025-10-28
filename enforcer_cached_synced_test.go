@@ -80,3 +80,43 @@ func TestSyncCache(t *testing.T) {
 	testSyncEnforceCache(t, e, "alice", "data2", "read", true)
 	testSyncEnforceCache(t, e, "alice", "data2", "write", true)
 }
+
+// TestSyncedCacheNeverExpires verifies that cache entries never expire when expireTime is set to 0 or negative
+// in a thread-safe manner.
+func TestSyncedCacheNeverExpires(t *testing.T) {
+	e, _ := NewSyncedCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	
+	// Set cache to never expire (0 or negative duration)
+	e.SetExpireTime(0)
+	
+	// Test with concurrent access
+	g := sync.WaitGroup{}
+	goThread := 100
+	g.Add(goThread)
+	for i := 0; i < goThread; i++ {
+		go func() {
+			// First enforcement creates cache entry
+			testSyncEnforceCache(t, e, "alice", "data1", "read", true)
+			g.Done()
+		}()
+	}
+	g.Wait()
+	
+	// Wait a bit to ensure time has passed
+	time.Sleep(10 * time.Millisecond)
+	
+	// Cache should still be valid (never expires)
+	testSyncEnforceCache(t, e, "alice", "data1", "read", true)
+	
+	// Remove the policy from the underlying model
+	_, _ = e.SyncedEnforcer.RemovePolicy("alice", "data1", "read")
+	
+	// Cache still returns true because it hasn't been invalidated
+	testSyncEnforceCache(t, e, "alice", "data1", "read", true)
+	
+	// Manually invalidate cache (simulating notification from another instance)
+	_ = e.InvalidateCache()
+	
+	// Now the cache is cleared, so it should return false
+	testSyncEnforceCache(t, e, "alice", "data1", "read", false)
+}
