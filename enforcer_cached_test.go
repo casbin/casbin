@@ -80,28 +80,28 @@ func TestCache(t *testing.T) {
 // and instead manually trigger LoadPolicy() to refresh cache when policies change.
 func TestCacheNeverExpires(t *testing.T) {
 	e, _ := NewCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-	
+
 	// Set cache to never expire (0 or negative duration)
 	e.SetExpireTime(0)
-	
+
 	// First enforcement creates cache entry
 	testEnforceCache(t, e, "alice", "data1", "read", true)
-	
+
 	// Wait a bit to ensure time has passed
 	time.Sleep(10 * time.Millisecond)
-	
+
 	// Cache should still be valid (never expires)
 	testEnforceCache(t, e, "alice", "data1", "read", true)
-	
+
 	// Remove the policy from the underlying model
 	_, _ = e.Enforcer.RemovePolicy("alice", "data1", "read")
-	
+
 	// Cache still returns true because it hasn't been invalidated
 	testEnforceCache(t, e, "alice", "data1", "read", true)
-	
+
 	// Manually invalidate cache (simulating notification from another instance)
 	_ = e.InvalidateCache()
-	
+
 	// Now the cache is cleared, so it should return false
 	testEnforceCache(t, e, "alice", "data1", "read", false)
 }
@@ -109,22 +109,22 @@ func TestCacheNeverExpires(t *testing.T) {
 // TestCacheWithExpiration verifies that cache entries expire after the specified duration.
 func TestCacheWithExpiration(t *testing.T) {
 	e, _ := NewCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-	
+
 	// Set cache to expire after 50ms
 	e.SetExpireTime(50 * time.Millisecond)
-	
+
 	// First enforcement creates cache entry
 	testEnforceCache(t, e, "alice", "data1", "read", true)
-	
+
 	// Immediately check - should hit cache
 	testEnforceCache(t, e, "alice", "data1", "read", true)
-	
+
 	// Wait for cache to expire
 	time.Sleep(60 * time.Millisecond)
-	
+
 	// Remove the policy from the underlying model
 	_, _ = e.Enforcer.RemovePolicy("alice", "data1", "read")
-	
+
 	// Cache has expired, so it should re-evaluate and return false
 	testEnforceCache(t, e, "alice", "data1", "read", false)
 }
@@ -134,27 +134,27 @@ func TestCacheWithExpiration(t *testing.T) {
 // to reload policies when changes occur.
 func TestCacheLoadPolicyClearsCache(t *testing.T) {
 	e, _ := NewCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-	
+
 	// Set cache to never expire
 	e.SetExpireTime(0)
-	
+
 	// Create cache entries
 	testEnforceCache(t, e, "alice", "data1", "read", true)
 	testEnforceCache(t, e, "alice", "data1", "write", false)
-	
+
 	// Add a new policy
 	_, _ = e.AddPolicy("alice", "data2", "read")
-	
+
 	// Cache doesn't have this entry yet
 	testEnforceCache(t, e, "alice", "data2", "read", true)
-	
+
 	// LoadPolicy clears cache and reloads from source (which doesn't have alice,data2,read)
 	_ = e.LoadPolicy()
-	
+
 	// After reload, the added policy is gone (since it wasn't in the file)
 	// and cache is cleared, so it re-evaluates
 	testEnforceCache(t, e, "alice", "data2", "read", false)
-	
+
 	// Original policies still work
 	testEnforceCache(t, e, "alice", "data1", "read", true)
 }
