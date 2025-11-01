@@ -18,6 +18,17 @@ import (
 	"testing"
 )
 
+// TestOrBACModel tests the Organization-Based Access Control (OrBAC) model.
+// OrBAC extends RBAC with abstraction layers:
+// - Empower (g): Maps subjects to roles within organizations
+// - Use (g2): Maps concrete actions to abstract activities within organizations
+// - Consider (g3): Maps concrete objects to abstract views within organizations
+// - Permission (p): Grants role-activity-view permissions within organizations
+//
+// This separates concrete entities (subjects, actions, objects) from
+// abstract security entities (roles, activities, views), allowing more
+// flexible and maintainable access control policies.
+
 func testEnforceOrBAC(t *testing.T, e *Enforcer, sub string, org string, obj string, act string, res bool) {
 	t.Helper()
 	if myRes, err := e.Enforce(sub, org, obj, act); err != nil {
