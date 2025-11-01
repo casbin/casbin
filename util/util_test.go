@@ -47,6 +47,9 @@ func TestEscapeAssertion(t *testing.T) {
 	testEscapeAssertion(t, "g(r.sub, p.sub) == p.attr", "g(r_sub, p_sub) == p_attr")
 	testEscapeAssertion(t, "g(r.sub,p.sub) == p.attr", "g(r_sub,p_sub) == p_attr")
 	testEscapeAssertion(t, "(r.attp.value || p.attr)p.u", "(r_attp.value || p_attr)p_u")
+	// Test that patterns inside strings are not escaped
+	testEscapeAssertion(t, `r.sub == "a.p.p.l.e"`, `r_sub == "a.p.p.l.e"`)
+	testEscapeAssertion(t, `r.sub == "test.p.value"`, `r_sub == "test.p.value"`)
 }
 
 func testRemoveComments(t *testing.T, s string, res string) {

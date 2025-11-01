@@ -24,7 +24,7 @@ import (
 
 var evalReg = regexp.MustCompile(`\beval\((?P<rule>[^)]*)\)`)
 
-var escapeAssertionRegex = regexp.MustCompile(`\b((r|p)[0-9]*)\.`)
+var escapeAssertionRegex = regexp.MustCompile(`(\(|\)|\s|^|\||&|,|=|!|>|<|\+|-|\*|/)((r|p)[0-9]*)\.`)
 
 func JsonToMap(jsonStr string) (map[string]interface{}, error) {
 	result := make(map[string]interface{})
@@ -38,7 +38,12 @@ func JsonToMap(jsonStr string) (map[string]interface{}, error) {
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
 func EscapeAssertion(s string) string {
 	s = escapeAssertionRegex.ReplaceAllStringFunc(s, func(m string) string {
-		return strings.Replace(m, ".", "_", 1)
+		// Replace only the last dot with underscore (preserve the prefix character)
+		lastDotIdx := strings.LastIndex(m, ".")
+		if lastDotIdx > 0 {
+			return m[:lastDotIdx] + "_"
+		}
+		return m
 	})
 	return s
 }
