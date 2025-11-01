@@ -706,3 +706,11 @@ func TestReBACModel(t *testing.T) {
 	testEnforce(t, e, "bob", "doc3", "read", false)
 	testEnforce(t, e, "bob", "doc3", "write", false)
 }
+
+func TestMatcherWithPatternP(t *testing.T) {
+e, err := NewEnforcer("/tmp/test_model.conf")
+if err != nil {
+t.Fatalf("Error: %v\n", err)
+}
+testEnforce(t, e, "a.p.p.l.e", "file", "read", true)
+}
