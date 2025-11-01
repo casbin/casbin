@@ -24,7 +24,7 @@ import (
 
 var evalReg = regexp.MustCompile(`\beval\((?P<rule>[^)]*)\)`)
 
-var escapeAssertionRegex = regexp.MustCompile(`(\(|\)|\s|^|\||&|,|=|!|>|<|\+|-|\*|/)((r|p)[0-9]*)\.`)
+var escapeAssertionRegex = regexp.MustCompile(`([()\s|&,=!><+\-*/]|^)((r|p)[0-9]*)\.`)
 
 func JsonToMap(jsonStr string) (map[string]interface{}, error) {
 	result := make(map[string]interface{})
