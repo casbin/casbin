@@ -708,9 +708,9 @@ func TestReBACModel(t *testing.T) {
 }
 
 func TestMatcherWithPatternP(t *testing.T) {
-e, err := NewEnforcer("/tmp/test_model.conf")
-if err != nil {
-t.Fatalf("Error: %v\n", err)
-}
-testEnforce(t, e, "a.p.p.l.e", "file", "read", true)
+	e, err := NewEnforcer("/tmp/test_model.conf")
+	if err != nil {
+		t.Fatalf("Error: %v\n", err)
+	}
+	testEnforce(t, e, "a.p.p.l.e", "file", "read", true)
 }
