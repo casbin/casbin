@@ -28,7 +28,10 @@ func testEnforceOrBAC(t *testing.T, e *Enforcer, sub string, org string, obj str
 }
 
 func TestOrBACModel(t *testing.T) {
-	e, _ := NewEnforcer("examples/orbac_model.conf", "examples/orbac_policy.csv")
+	e, err := NewEnforcer("examples/orbac_model.conf", "examples/orbac_policy.csv")
+	if err != nil {
+		t.Fatalf("Failed to create enforcer: %v", err)
+	}
 
 	// Test alice as manager in org1
 	testEnforceOrBAC(t, e, "alice", "org1", "data1", "read", true)
