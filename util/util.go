@@ -35,12 +35,69 @@ func JsonToMap(jsonStr string) (map[string]interface{}, error) {
 	return result, nil
 }
 
+// findStringLiterals finds all positions of string literals (both single and double quoted) in the input string.
+func findStringLiterals(s string) [][]int {
+	var positions [][]int
+	inString := false
+	stringStart := -1
+	quote := byte(0)
+
+	for i := 0; i < len(s); i++ {
+		if !inString && (s[i] == '"' || s[i] == '\'') {
+			inString = true
+			stringStart = i
+			quote = s[i]
+		} else if inString && s[i] == quote {
+			// Check if the quote is escaped
+			if i > 0 && s[i-1] == '\\' {
+				continue
+			}
+			inString = false
+			positions = append(positions, []int{stringStart, i + 1})
+		}
+	}
+
+	return positions
+}
+
+// isInsideStringLiteral checks if a position is inside any of the string literal positions.
+func isInsideStringLiteral(pos int, stringPositions [][]int) bool {
+	for _, p := range stringPositions {
+		if pos >= p[0] && pos < p[1] {
+			return true
+		}
+	}
+	return false
+}
+
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
+// It avoids escaping dots inside string literals (both single and double quoted strings).
 func EscapeAssertion(s string) string {
-	s = escapeAssertionRegex.ReplaceAllStringFunc(s, func(m string) string {
-		return strings.Replace(m, ".", "_", 1)
-	})
-	return s
+	// Find all string literal positions to avoid modifying content inside quotes
+	stringPositions := findStringLiterals(s)
+
+	result := ""
+	lastIndex := 0
+
+	// Find all matches of the pattern
+	matches := escapeAssertionRegex.FindAllStringIndex(s, -1)
+	for _, match := range matches {
+		start, end := match[0], match[1]
+
+		// Only replace if the match is NOT inside a string literal
+		if !isInsideStringLiteral(start, stringPositions) {
+			// Add everything before the match
+			result += s[lastIndex:start]
+			// Add the escaped match (replace . with _)
+			result += strings.Replace(s[start:end], ".", "_", 1)
+			lastIndex = end
+		}
+	}
+
+	// Add any remaining part of the string
+	result += s[lastIndex:]
+
+	return result
 }
 
 // RemoveComments removes the comments starting with # in the text.

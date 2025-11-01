@@ -47,6 +47,14 @@ func TestEscapeAssertion(t *testing.T) {
 	testEscapeAssertion(t, "g(r.sub, p.sub) == p.attr", "g(r_sub, p_sub) == p_attr")
 	testEscapeAssertion(t, "g(r.sub,p.sub) == p.attr", "g(r_sub,p_sub) == p_attr")
 	testEscapeAssertion(t, "(r.attp.value || p.attr)p.u", "(r_attp.value || p_attr)p_u")
+	// Test cases for string literals with patterns like "p.*" - these should NOT be escaped
+	testEscapeAssertion(t, `r.sub == "a.p.p.l.e"`, `r_sub == "a.p.p.l.e"`)
+	testEscapeAssertion(t, `r.sub == "test.p.test"`, `r_sub == "test.p.test"`)
+	testEscapeAssertion(t, `r.obj == "data.p.csv"`, `r_obj == "data.p.csv"`)
+	testEscapeAssertion(t, `r.sub == 'a.p.p.l.e'`, `r_sub == 'a.p.p.l.e'`)
+	testEscapeAssertion(t, `r.sub == "p.test"`, `r_sub == "p.test"`)
+	testEscapeAssertion(t, `r.sub == 'p.test'`, `r_sub == 'p.test'`)
+	testEscapeAssertion(t, `r.sub == "r.test"`, `r_sub == "r.test"`)
 }
 
 func testRemoveComments(t *testing.T, s string, res string) {
