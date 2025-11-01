@@ -33,29 +33,37 @@ func TestOrBACModel(t *testing.T) {
 		t.Fatalf("Failed to create enforcer: %v", err)
 	}
 
-	// Test alice as manager in org1
+	// Test alice as manager in org1 - can consult (read) and modify (write) documents
 	testEnforceOrBAC(t, e, "alice", "org1", "data1", "read", true)
 	testEnforceOrBAC(t, e, "alice", "org1", "data1", "write", true)
+	testEnforceOrBAC(t, e, "alice", "org1", "data2", "read", true)
+	testEnforceOrBAC(t, e, "alice", "org1", "data2", "write", true)
 
-	// Test bob as employee in org1
+	// Test bob as employee in org1 - can only consult (read) documents
 	testEnforceOrBAC(t, e, "bob", "org1", "data1", "read", true)
 	testEnforceOrBAC(t, e, "bob", "org1", "data1", "write", false)
+	testEnforceOrBAC(t, e, "bob", "org1", "data2", "read", true)
+	testEnforceOrBAC(t, e, "bob", "org1", "data2", "write", false)
 
-	// Test charlie as manager in org2
-	testEnforceOrBAC(t, e, "charlie", "org2", "data2", "read", true)
-	testEnforceOrBAC(t, e, "charlie", "org2", "data2", "write", true)
+	// Test charlie as manager in org2 - can consult and modify reports
+	testEnforceOrBAC(t, e, "charlie", "org2", "report1", "read", true)
+	testEnforceOrBAC(t, e, "charlie", "org2", "report1", "write", true)
+	testEnforceOrBAC(t, e, "charlie", "org2", "report2", "read", true)
+	testEnforceOrBAC(t, e, "charlie", "org2", "report2", "write", true)
 
-	// Test david as employee in org2
-	testEnforceOrBAC(t, e, "david", "org2", "data2", "read", true)
-	testEnforceOrBAC(t, e, "david", "org2", "data2", "write", false)
+	// Test david as employee in org2 - can only consult reports
+	testEnforceOrBAC(t, e, "david", "org2", "report1", "read", true)
+	testEnforceOrBAC(t, e, "david", "org2", "report1", "write", false)
+	testEnforceOrBAC(t, e, "david", "org2", "report2", "read", true)
+	testEnforceOrBAC(t, e, "david", "org2", "report2", "write", false)
 
 	// Test cross-organization access (should be denied)
-	testEnforceOrBAC(t, e, "alice", "org2", "data2", "read", false)
-	testEnforceOrBAC(t, e, "alice", "org2", "data2", "write", false)
+	testEnforceOrBAC(t, e, "alice", "org2", "report1", "read", false)
+	testEnforceOrBAC(t, e, "alice", "org2", "report1", "write", false)
 	testEnforceOrBAC(t, e, "charlie", "org1", "data1", "read", false)
 	testEnforceOrBAC(t, e, "charlie", "org1", "data1", "write", false)
 
-	// Test access to non-existent resources
-	testEnforceOrBAC(t, e, "alice", "org1", "data2", "read", false)
-	testEnforceOrBAC(t, e, "bob", "org1", "data2", "write", false)
+	// Test access to objects not in the organization's view
+	testEnforceOrBAC(t, e, "alice", "org1", "report1", "read", false)
+	testEnforceOrBAC(t, e, "charlie", "org2", "data1", "read", false)
 }
