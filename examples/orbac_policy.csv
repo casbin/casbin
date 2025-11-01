@@ -1,0 +1,25 @@
+# Permission rules: role, activity, view, organization
+p, manager, modify, document, org1
+p, manager, consult, document, org1
+p, employee, consult, document, org1
+p, manager, modify, report, org2
+p, manager, consult, report, org2
+p, employee, consult, report, org2
+
+# Empower: subject, role, organization
+g, alice, manager, org1
+g, bob, employee, org1
+g, charlie, manager, org2
+g, david, employee, org2
+
+# Use: action, activity, organization
+g2, write, modify, org1
+g2, read, consult, org1
+g2, write, modify, org2
+g2, read, consult, org2
+
+# Consider: object, view, organization
+g3, data1, document, org1
+g3, data2, document, org1
+g3, report1, report, org2
+g3, report2, report, org2
