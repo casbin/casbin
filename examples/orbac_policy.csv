@@ -1,0 +1,11 @@
+p, manager, org1, data1, read
+p, manager, org1, data1, write
+p, employee, org1, data1, read
+p, manager, org2, data2, read
+p, manager, org2, data2, write
+p, employee, org2, data2, read
+
+g, alice, manager, org1
+g, bob, employee, org1
+g, charlie, manager, org2
+g, david, employee, org2
