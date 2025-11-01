@@ -91,7 +91,7 @@ func EscapeAssertion(s string) string {
 
 		// Add everything before the match
 		result += s[lastIndex:start]
-		
+
 		// Only replace if the match is NOT inside a string literal
 		if !isInsideStringLiteral(start, stringPositions) {
 			// Add the escaped match (replace . with _)
@@ -100,7 +100,7 @@ func EscapeAssertion(s string) string {
 			// Keep the original match if it's inside a string literal
 			result += s[start:end]
 		}
-		
+
 		lastIndex = end
 	}
 
