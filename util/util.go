@@ -48,8 +48,13 @@ func findStringLiterals(s string) [][]int {
 			stringStart = i
 			quote = s[i]
 		} else if inString && s[i] == quote {
-			// Check if the quote is escaped
-			if i > 0 && s[i-1] == '\\' {
+			// Check if the quote is escaped by counting consecutive backslashes before it
+			numBackslashes := 0
+			for j := i - 1; j >= 0 && s[j] == '\\'; j-- {
+				numBackslashes++
+			}
+			// If there's an odd number of backslashes, the quote is escaped
+			if numBackslashes%2 == 1 {
 				continue
 			}
 			inString = false
@@ -84,14 +89,19 @@ func EscapeAssertion(s string) string {
 	for _, match := range matches {
 		start, end := match[0], match[1]
 
+		// Add everything before the match
+		result += s[lastIndex:start]
+		
 		// Only replace if the match is NOT inside a string literal
 		if !isInsideStringLiteral(start, stringPositions) {
-			// Add everything before the match
-			result += s[lastIndex:start]
 			// Add the escaped match (replace . with _)
 			result += strings.Replace(s[start:end], ".", "_", 1)
-			lastIndex = end
+		} else {
+			// Keep the original match if it's inside a string literal
+			result += s[start:end]
 		}
+		
+		lastIndex = end
 	}
 
 	// Add any remaining part of the string
