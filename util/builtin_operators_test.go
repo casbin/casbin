@@ -284,7 +284,7 @@ func testRegexMatch(t *testing.T, key1 string, key2 string, res bool) {
 
 func TestRegexMatch(t *testing.T) {
 	testRegexMatch(t, "/topic/create", "/topic/create", true)
-	testRegexMatch(t, "/topic/create/123", "/topic/create", true)
+	testRegexMatch(t, "/topic/create/123", "/topic/create", false) // Now expects full match
 	testRegexMatch(t, "/topic/delete", "/topic/create", false)
 	testRegexMatch(t, "/topic/edit", "/topic/edit/[0-9]+", false)
 	testRegexMatch(t, "/topic/edit/123", "/topic/edit/[0-9]+", true)
@@ -292,6 +292,12 @@ func TestRegexMatch(t *testing.T) {
 	testRegexMatch(t, "/foo/delete/123", "/topic/delete/[0-9]+", false)
 	testRegexMatch(t, "/topic/delete/0", "/topic/delete/[0-9]+", true)
 	testRegexMatch(t, "/topic/edit/123s", "/topic/delete/[0-9]+", false)
+	
+	// Test case from bug report: [0-9]+ should only match strings consisting entirely of digits
+	testRegexMatch(t, "alice123", "[0-9]+", false)
+	testRegexMatch(t, "123", "[0-9]+", true)
+	testRegexMatch(t, "123alice", "[0-9]+", false)
+	testRegexMatch(t, "abc", "[0-9]+", false)
 }
 
 func testIPMatch(t *testing.T, ip1 string, ip2 string, res bool) {
@@ -416,7 +422,7 @@ func TestRegexMatchFunc(t *testing.T) {
 	testRegexMatchFunc(t, false, "regexMatch: expected 2 arguments, but got 1", "/topic/create")
 	testRegexMatchFunc(t, false, "regexMatch: expected 2 arguments, but got 3", "/topic/create/123", "/topic/create", "/topic/update")
 	testRegexMatchFunc(t, false, "regexMatch: argument must be a string", "/topic/create", false)
-	testRegexMatchFunc(t, true, "", "/topic/create/123", "/topic/create")
+	testRegexMatchFunc(t, false, "", "/topic/create/123", "/topic/create") // Now expects full match
 }
 
 func TestKeyMatchFunc(t *testing.T) {

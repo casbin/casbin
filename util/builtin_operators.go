@@ -332,7 +332,16 @@ func KeyMatch5Func(args ...interface{}) (interface{}, error) {
 
 // RegexMatch determines whether key1 matches the pattern of key2 in regular expression.
 func RegexMatch(key1 string, key2 string) bool {
-	res, err := regexp.MatchString(key2, key1)
+	// Add anchors to ensure full string match unless already present
+	pattern := key2
+	if !strings.HasPrefix(pattern, "^") {
+		pattern = "^" + pattern
+	}
+	if !strings.HasSuffix(pattern, "$") {
+		pattern = pattern + "$"
+	}
+	
+	res, err := regexp.MatchString(pattern, key1)
 	if err != nil {
 		panic(err)
 	}
