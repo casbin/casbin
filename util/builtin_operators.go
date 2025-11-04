@@ -330,7 +330,9 @@ func KeyMatch5Func(args ...interface{}) (interface{}, error) {
 	return KeyMatch5(name1, name2), nil
 }
 
-// RegexMatch determines whether key1 matches the pattern of key2 in regular expression.
+// RegexMatch determines whether key1 fully matches the pattern of key2 in regular expression.
+// The pattern is automatically anchored with ^ and $ to ensure full string matching.
+// If you need partial matching, include .* in your pattern or add anchors explicitly.
 func RegexMatch(key1 string, key2 string) bool {
 	// Add anchors to ensure full string match unless already present
 	pattern := key2
