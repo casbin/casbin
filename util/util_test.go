@@ -226,3 +226,46 @@ func TestLRUCache(t *testing.T) {
 	testCacheGet(t, cache, "two", nil, false)
 	testCacheEqual(t, cache, []int{1, 3, 4})
 }
+
+func testEscapeStringLiterals(t *testing.T, input string, expected string) {
+	t.Helper()
+	result := EscapeStringLiterals(input)
+	t.Logf("Input: %q", input)
+	t.Logf("Expected: %q", expected)
+	t.Logf("Got: %q", result)
+	
+	if result != expected {
+		t.Errorf("EscapeStringLiterals(%q) = %q, expected %q", input, result, expected)
+	}
+}
+
+func TestEscapeStringLiterals(t *testing.T) {
+	// Test single-quoted strings
+	testEscapeStringLiterals(t, `'\1\2'`, `'\\1\\2'`)
+	testEscapeStringLiterals(t, `'\n\t'`, `'\\n\\t'`)
+	testEscapeStringLiterals(t, `'\\already\\escaped'`, `'\\\\already\\\\escaped'`)
+	
+	// Test double-quoted strings
+	testEscapeStringLiterals(t, `"\1\2"`, `"\\1\\2"`)
+	testEscapeStringLiterals(t, `"\n\t"`, `"\\n\\t"`)
+	
+	// Test expressions with string literals
+	testEscapeStringLiterals(t, `regexMatch('\1\2', p.obj)`, `regexMatch('\\1\\2', p.obj)`)
+	testEscapeStringLiterals(t, `regexMatch("\1\2", p.obj)`, `regexMatch("\\1\\2", p.obj)`)
+	testEscapeStringLiterals(t, `r.sub == '\test'`, `r.sub == '\\test'`)
+	
+	// Test expressions without string literals
+	testEscapeStringLiterals(t, `r.sub == p.sub`, `r.sub == p.sub`)
+	testEscapeStringLiterals(t, `keyMatch(r.obj, p.obj)`, `keyMatch(r.obj, p.obj)`)
+	
+	// Test multiple strings in one expression
+	testEscapeStringLiterals(t, `regexMatch('\1', '\2')`, `regexMatch('\\1', '\\2')`)
+	
+	// Test empty strings
+	testEscapeStringLiterals(t, `''`, `''`)
+	testEscapeStringLiterals(t, `""`, `""`)
+	
+	// Test strings with no backslashes
+	testEscapeStringLiterals(t, `'hello'`, `'hello'`)
+	testEscapeStringLiterals(t, `"world"`, `"world"`)
+}
