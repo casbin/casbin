@@ -73,9 +73,9 @@ func TestCachedGFunctionWithMultipleEnforceCalls(t *testing.T) {
 
 	// Make multiple enforce calls to ensure the g() function closure is cached
 	for i := 0; i < 5; i++ {
-		ok, err := e.Enforce("charlie", "data2", "read")
-		if err != nil {
-			t.Fatalf("Enforce failed on iteration %d: %v", i, err)
+		ok, enforceErr := e.Enforce("charlie", "data2", "read")
+		if enforceErr != nil {
+			t.Fatalf("Enforce failed on iteration %d: %v", i, enforceErr)
 		}
 		if ok {
 			t.Errorf("charlie should not have read access to data2 on iteration %d", i)
@@ -99,9 +99,9 @@ func TestCachedGFunctionWithMultipleEnforceCalls(t *testing.T) {
 
 	// Make multiple calls to ensure it stays consistent
 	for i := 0; i < 5; i++ {
-		ok, err := e.Enforce("charlie", "data2", "read")
-		if err != nil {
-			t.Fatalf("Enforce failed on iteration %d after policy change: %v", i, err)
+		ok, enforceErr := e.Enforce("charlie", "data2", "read")
+		if enforceErr != nil {
+			t.Fatalf("Enforce failed on iteration %d after policy change: %v", i, enforceErr)
 		}
 		if !ok {
 			t.Errorf("charlie should have read access to data2 on iteration %d after policy change", i)
@@ -162,9 +162,9 @@ func TestCachedGFunctionAfterBuildRoleLinks(t *testing.T) {
 	// First, make some enforce calls to ensure the g() function closure is created and cached
 	// This will cache "bob" NOT having data2_admin role in the g() function's sync.Map
 	for i := 0; i < 3; i++ {
-		ok, err := e.Enforce("bob", "data2", "read")
-		if err != nil {
-			t.Fatalf("Enforce failed on iteration %d: %v", i, err)
+		ok, enforceErr := e.Enforce("bob", "data2", "read")
+		if enforceErr != nil {
+			t.Fatalf("Enforce failed on iteration %d: %v", i, enforceErr)
 		}
 		if ok {
 			t.Errorf("bob should not have read access to data2 on iteration %d (before adding role)", i)
