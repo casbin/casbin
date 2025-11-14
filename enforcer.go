@@ -568,6 +568,7 @@ func (e *Enforcer) EnableAcceptJsonRequest(acceptJsonRequest bool) {
 
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *Enforcer) BuildRoleLinks() error {
+	e.invalidateMatcherMap()
 	if e.rmMap == nil {
 		return errors.New("rmMap is nil")
 	}
