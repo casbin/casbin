@@ -95,7 +95,7 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 	if sec == "m" {
 		// Escape backslashes in string literals to match CSV parsing behavior
 		ast.Value = util.EscapeStringLiterals(ast.Value)
-		
+
 		if strings.Contains(ast.Value, "in") {
 			ast.Value = strings.Replace(strings.Replace(ast.Value, "[", "(", -1), "]", ")", -1)
 		}

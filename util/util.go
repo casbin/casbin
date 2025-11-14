@@ -284,39 +284,30 @@ func EscapeStringLiterals(expr string) string {
 	var result strings.Builder
 	inString := false
 	var quote rune
-	i := 0
-	
-	for i < len(expr) {
+
+	for i := 0; i < len(expr); i++ {
 		ch := rune(expr[i])
-		
-		if !inString {
-			// Not inside a string literal
-			if ch == '\'' || ch == '"' {
-				inString = true
-				quote = ch
-			}
+
+		if inString {
 			result.WriteRune(ch)
-			i++
-		} else {
-			// Inside a string literal
 			if ch == '\\' {
 				// Found a backslash inside a string - double it
 				result.WriteRune('\\')
-				result.WriteRune('\\')
-				i++
 			} else if ch == quote {
 				// End of string literal
 				inString = false
-				result.WriteRune(ch)
-				i++
-			} else {
-				// Regular character
-				result.WriteRune(ch)
-				i++
 			}
+			continue
 		}
+
+		// Not inside a string literal
+		if ch == '\'' || ch == '"' {
+			inString = true
+			quote = ch
+		}
+		result.WriteRune(ch)
 	}
-	
+
 	return result.String()
 }
 
