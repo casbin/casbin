@@ -276,6 +276,41 @@ func GetEvalValue(s string) []string {
 	return rules
 }
 
+// EscapeStringLiterals escapes backslashes in string literals within an expression
+// to ensure consistent handling between govaluate (which interprets escape sequences)
+// and CSV parsing (which treats backslashes as literal characters).
+// This function doubles all backslashes within single-quoted and double-quoted strings.
+func EscapeStringLiterals(expr string) string {
+	var result strings.Builder
+	inString := false
+	var quote rune
+
+	for i := 0; i < len(expr); i++ {
+		ch := rune(expr[i])
+
+		if inString {
+			result.WriteRune(ch)
+			if ch == '\\' {
+				// Found a backslash inside a string - double it
+				result.WriteRune('\\')
+			} else if ch == quote {
+				// End of string literal
+				inString = false
+			}
+			continue
+		}
+
+		// Not inside a string literal
+		if ch == '\'' || ch == '"' {
+			inString = true
+			quote = ch
+		}
+		result.WriteRune(ch)
+	}
+
+	return result.String()
+}
+
 func RemoveDuplicateElement(s []string) []string {
 	result := make([]string, 0, len(s))
 	temp := map[string]struct{}{}
