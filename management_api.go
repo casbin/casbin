@@ -305,6 +305,15 @@ func (e *Enforcer) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) (
 	return e.RemoveFilteredNamedPolicy("p", fieldIndex, fieldValues...)
 }
 
+// RemoveFilteredPolicies is used to remove all rules from the current policy that match the specified field in the filter.
+// So please use it with caution.
+func (e *Enforcer) RemoveFilteredPolicies(fieldValues ...string) (bool, error) {
+	e.removeSpecificMark = true
+	filter := [][]string{}
+	filter = append(filter, fieldValues)
+	return e.removePolicies("p", "p", filter)
+}
+
 // RemoveNamedPolicy removes an authorization rule from the current named policy.
 func (e *Enforcer) RemoveNamedPolicy(ptype string, params ...interface{}) (bool, error) {
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {

@@ -209,10 +209,11 @@ func (e *Enforcer) updatePoliciesWithoutNotify(sec string, ptype string, oldRule
 
 // removePolicies removes rules from the current policy.
 func (e *Enforcer) removePoliciesWithoutNotify(sec string, ptype string, rules [][]string) (bool, error) {
-	if hasPolicies, err := e.model.HasPolicies(sec, ptype, rules); !hasPolicies || err != nil {
-		return hasPolicies, err
+	if !e.removeSpecificMark {
+		if hasPolicies, err := e.model.HasPolicies(sec, ptype, rules); !hasPolicies || err != nil {
+			return hasPolicies, err
+		}
 	}
-
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return true, e.dispatcher.RemovePolicies(sec, ptype, rules)
 	}
@@ -225,7 +226,7 @@ func (e *Enforcer) removePoliciesWithoutNotify(sec string, ptype string, rules [
 		}
 	}
 
-	rulesRemoved, err := e.model.RemovePolicies(sec, ptype, rules)
+	rulesRemoved, err := e.model.RemovePolicies(sec, ptype, rules, e.removeSpecificMark)
 	if !rulesRemoved || err != nil {
 		return rulesRemoved, err
 	}
@@ -304,7 +305,7 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 		oldRules = append(oldRules, fieldValues)
 	}
 
-	ruleChanged, err := e.model.RemovePolicies(sec, ptype, oldRules)
+	ruleChanged, err := e.model.RemovePolicies(sec, ptype, oldRules, false)
 	if err != nil {
 		return oldRules, err
 	}

@@ -77,7 +77,7 @@ func (d *DistributedEnforcer) RemovePoliciesSelf(shouldPersist func() bool, sec 
 		}
 	}
 
-	affected, err = d.model.RemovePoliciesWithAffected(sec, ptype, rules)
+	affected, err = d.model.RemovePoliciesWithAffected(sec, ptype, rules, false)
 	if err != nil {
 		return affected, err
 	}
@@ -211,7 +211,7 @@ func (d *DistributedEnforcer) UpdateFilteredPoliciesSelf(shouldPersist func() bo
 		}
 	}
 
-	ruleChanged, err := d.model.RemovePolicies(sec, ptype, oldRules)
+	ruleChanged, err := d.model.RemovePolicies(sec, ptype, oldRules, false)
 	if err != nil {
 		return ruleChanged, err
 	}
