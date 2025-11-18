@@ -363,32 +363,115 @@ func (model Model) UpdatePolicies(sec string, ptype string, oldRules, newRules [
 }
 
 // RemovePolicies removes policy rules from the model.
-func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	affected, err := model.RemovePoliciesWithAffected(sec, ptype, rules)
+func (model Model) RemovePolicies(sec string, ptype string, rules [][]string, mark bool) (bool, error) {
+	affected, err := model.RemovePoliciesWithAffected(sec, ptype, rules, mark)
 	return len(affected) != 0, err
 }
 
-// RemovePoliciesWithAffected removes policy rules from the model, and returns affected rules.
-func (model Model) RemovePoliciesWithAffected(sec string, ptype string, rules [][]string) ([][]string, error) {
-	_, err := model.GetAssertion(sec, ptype)
-	if err != nil {
-		return nil, err
+// determining whether any entries in the policy match the filter conditions
+func matches(rule []string, policy []string) bool {
+	if len(rule) > len(policy) {
+		return false
 	}
+
+	for i, v := range rule {
+		if v != "" && policy[i] != v {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Remove the corresponding index from the map
+func deleteIndexFromMap(model Model, sec, ptype string, idx int) {
+	for key, v := range model[sec][ptype].PolicyMap {
+		if v == idx {
+			delete(model[sec][ptype].PolicyMap, key)
+			return
+		}
+	}
+}
+
+// Reindex
+func reindexPolicyMap(model Model, sec, ptype string, from int) {
+	for i := from; i < len(model[sec][ptype].Policy); i++ {
+		key := strings.Join(model[sec][ptype].Policy[i], DefaultSep)
+		model[sec][ptype].PolicyMap[key] = i
+	}
+}
+
+// mark branch logic
+func (model Model) removeMarkedPolicies(sec string, ptype string, rule []string) ([][]string, error) {
+
 	var affected [][]string
+	policy := model[sec][ptype].Policy
+
+	for i := 0; i < len(policy); i++ {
+
+		if !matches(rule, policy[i]) {
+			continue
+		}
+
+		// record
+		affected = append(affected, policy[i])
+
+		// delete policy
+		model[sec][ptype].Policy =
+			append(policy[:i], policy[i+1:]...)
+		targetIndex := i
+
+		// update policyMap
+		deleteIndexFromMap(model, sec, ptype, targetIndex)
+
+		// reindex
+		reindexPolicyMap(model, sec, ptype, i)
+
+		// step back after deletion
+		i--
+	}
+
+	return affected, nil
+}
+
+// Unmark branch logic
+func (model Model) removeUnmarkedPolicies(sec string, ptype string, rules [][]string) ([][]string, error) {
+
+	var affected [][]string
+
 	for _, rule := range rules {
-		index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
+		key := strings.Join(rule, DefaultSep)
+		idx, ok := model[sec][ptype].PolicyMap[key]
 		if !ok {
 			continue
 		}
 
 		affected = append(affected, rule)
-		model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
-		delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
-		for i := index; i < len(model[sec][ptype].Policy); i++ {
-			model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
-		}
+
+		// delete policy
+		model[sec][ptype].Policy = append(model[sec][ptype].Policy[:idx], model[sec][ptype].Policy[idx+1:]...)
+
+		delete(model[sec][ptype].PolicyMap, key)
+
+		// reindex
+		reindexPolicyMap(model, sec, ptype, idx)
 	}
+
 	return affected, nil
+}
+
+// RemovePoliciesWithAffected removes policy rules from the model, and returns affected rules.
+func (model Model) RemovePoliciesWithAffected(sec string, ptype string, rules [][]string, mark bool) ([][]string, error) {
+
+	if _, err := model.GetAssertion(sec, ptype); err != nil {
+		return nil, err
+	}
+
+	if mark {
+		return model.removeMarkedPolicies(sec, ptype, rules[0])
+	}
+
+	return model.removeUnmarkedPolicies(sec, ptype, rules)
 }
 
 // RemoveFilteredPolicy removes policy rules based on field filters from the model.

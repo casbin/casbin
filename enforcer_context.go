@@ -533,7 +533,7 @@ func (e *ContextEnforcer) removePoliciesWithoutNotifyCtx(ctx context.Context, se
 		}
 	}
 
-	rulesRemoved, err := e.model.RemovePolicies(sec, ptype, rules)
+	rulesRemoved, err := e.model.RemovePolicies(sec, ptype, rules, false)
 	if !rulesRemoved || err != nil {
 		return rulesRemoved, err
 	}
@@ -830,7 +830,7 @@ func (e *ContextEnforcer) updateFilteredPoliciesWithoutNotifyCtx(ctx context.Con
 		return oldRules, e.dispatcher.UpdateFilteredPolicies(sec, ptype, oldRules, newRules)
 	}
 
-	ruleChanged, err := e.model.RemovePolicies(sec, ptype, oldRules)
+	ruleChanged, err := e.model.RemovePolicies(sec, ptype, oldRules, false)
 	if err != nil {
 		return oldRules, err
 	}

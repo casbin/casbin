@@ -53,6 +53,7 @@ type Enforcer struct {
 	autoNotifyWatcher    bool
 	autoNotifyDispatcher bool
 	acceptJsonRequest    bool
+	removeSpecificMark   bool
 
 	logger log.Logger
 }
