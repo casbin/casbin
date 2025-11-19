@@ -20,6 +20,8 @@ import (
 	"strings"
 
 	"github.com/casbin/casbin/v2/constant"
+	"github.com/casbin/casbin/v2/model"
+	"github.com/casbin/casbin/v2/persist"
 	"github.com/casbin/casbin/v2/util"
 	"github.com/casbin/govaluate"
 )
@@ -468,15 +470,126 @@ func (e *Enforcer) AddFunction(name string, function govaluate.ExpressionFunctio
 }
 
 func (e *Enforcer) SelfAddPolicy(sec string, ptype string, rule []string) (bool, error) {
-	return e.addPolicyWithoutNotify(sec, ptype, rule)
+	// SelfAddPolicy is typically used in watcher callbacks where another instance
+	// has already persisted the policy. To handle cases where the database has
+	// unique constraints, we need to be more lenient with persistence errors.
+	
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.AddPolicies(sec, ptype, [][]string{rule})
+	}
+
+	hasPolicy, err := e.model.HasPolicy(sec, ptype, rule)
+	if hasPolicy || err != nil {
+		return false, err
+	}
+
+	// Try to persist, but don't fail if persistence errors occur.
+	// This handles the case where the policy already exists in the database
+	// (e.g., due to unique constraints) but not in this instance's memory.
+	if e.shouldPersist() {
+		if err = e.adapter.AddPolicy(sec, ptype, rule); err != nil {
+			if err.Error() != notImplemented {
+				// Log or ignore persistence error in watcher callback scenario
+				// The important thing is to keep the in-memory model in sync
+			}
+		}
+	}
+
+	err = e.model.AddPolicy(sec, ptype, rule)
+	if err != nil {
+		return false, err
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{rule})
+		if err != nil {
+			return true, err
+		}
+	}
+
+	return true, nil
 }
 
 func (e *Enforcer) SelfAddPolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	return e.addPoliciesWithoutNotify(sec, ptype, rules, false)
+	// SelfAddPolicies is typically used in watcher callbacks where another instance
+	// has already persisted the policies. To handle cases where the database has
+	// unique constraints, we need to be more lenient with persistence errors.
+	
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
+	}
+
+	hasPolicies, err := e.model.HasPolicies(sec, ptype, rules)
+	if hasPolicies || err != nil {
+		return false, err
+	}
+
+	// Try to persist, but don't fail if persistence errors occur.
+	if e.shouldPersist() {
+		if err := e.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, rules); err != nil {
+			if err.Error() != notImplemented {
+				// Log or ignore persistence error in watcher callback scenario
+			}
+		}
+	}
+
+	err = e.model.AddPolicies(sec, ptype, rules)
+	if err != nil {
+		return false, err
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
+		if err != nil {
+			return true, err
+		}
+
+		err = e.BuildIncrementalConditionalRoleLinks(model.PolicyAdd, ptype, rules)
+		if err != nil {
+			return true, err
+		}
+	}
+
+	return true, nil
 }
 
 func (e *Enforcer) SelfAddPoliciesEx(sec string, ptype string, rules [][]string) (bool, error) {
-	return e.addPoliciesWithoutNotify(sec, ptype, rules, true)
+	// SelfAddPoliciesEx is typically used in watcher callbacks with auto-filtering of duplicates.
+	// Similar to SelfAddPolicies, we need to be lenient with persistence errors.
+	
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.AddPolicies(sec, ptype, rules)
+	}
+
+	// autoRemoveRepeat is true, so we skip the HasPolicies check
+
+	// Try to persist, but don't fail if persistence errors occur.
+	if e.shouldPersist() {
+		if err := e.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, rules); err != nil {
+			if err.Error() != notImplemented {
+				// Log or ignore persistence error in watcher callback scenario
+			}
+		}
+	}
+
+	err := e.model.AddPolicies(sec, ptype, rules)
+	if err != nil {
+		return false, err
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
+		if err != nil {
+			return true, err
+		}
+
+		err = e.BuildIncrementalConditionalRoleLinks(model.PolicyAdd, ptype, rules)
+		if err != nil {
+			return true, err
+		}
+	}
+
+	return true, nil
 }
 
 func (e *Enforcer) SelfRemovePolicy(sec string, ptype string, rule []string) (bool, error) {
