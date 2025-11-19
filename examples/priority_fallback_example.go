@@ -31,7 +31,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("=== Priority-Based Fallback Policy Example ===\n")
+	fmt.Println("=== Priority-Based Fallback Policy Example ===")
+	fmt.Println()
 
 	// Test Case 1: Direct policy match (priority 10)
 	fmt.Println("Case 1: Direct Policy Match (Highest Priority)")
@@ -62,7 +63,8 @@ func main() {
 	fmt.Println()
 
 	// Demonstrate dynamic policy addition
-	fmt.Println("=== Dynamic Policy Management ===\n")
+	fmt.Println("=== Dynamic Policy Management ===")
+	fmt.Println()
 	fmt.Println("Adding high priority policy for charlie...")
 	_, err = e.AddPolicy("5", "charlie", "data1", "read", "allow")
 	if err != nil {
@@ -72,7 +74,8 @@ func main() {
 	fmt.Println()
 
 	// Show which policy matched using EnforceEx
-	fmt.Println("=== Detailed Explanation (EnforceEx) ===\n")
+	fmt.Println("=== Detailed Explanation (EnforceEx) ===")
+	fmt.Println()
 	allowed, explain, _ := e.EnforceEx("alice", "data1", "read")
 	fmt.Printf("Request: alice, data1, read\n")
 	fmt.Printf("Result: %v\n", allowed)
