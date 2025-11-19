@@ -1,0 +1,12 @@
+p, 10, alice, data1, read, allow
+p, 10, alice, data1, write, allow
+p, 10, bob, data2, read, allow
+p, 10, bob, data2, write, deny
+
+p, 100, fallback_admin, data1, read, allow
+p, 100, fallback_admin, data1, write, allow
+p, 100, fallback_admin, data2, read, allow
+p, 100, fallback_admin, data2, write, allow
+
+g, alice, fallback_admin
+g, bob, fallback_admin

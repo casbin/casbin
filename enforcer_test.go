@@ -602,6 +602,38 @@ func TestPriorityExplicit(t *testing.T) {
 	})
 }
 
+func TestPriorityFallback(t *testing.T) {
+	// This test demonstrates how to use priority-based enforcer for fallback policy matching
+	// Lower priority numbers are evaluated first (highest priority)
+	// If a high priority rule matches, it takes precedence
+	// If no high priority rule matches, fallback to lower priority rules
+	e, _ := NewEnforcer("examples/priority_fallback_model.conf", "examples/priority_fallback_policy.csv")
+	
+	// Test normal policies (priority 10) - these are evaluated first
+	// alice has explicit allow for read, allow for write
+	testEnforce(t, e, "alice", "data1", "read", true)   // Matches priority 10 rule
+	testEnforce(t, e, "alice", "data1", "write", true)  // Matches priority 10 rule
+	
+	// bob has explicit allow for read, deny for write
+	testEnforce(t, e, "bob", "data2", "read", true)   // Matches priority 10 rule
+	testEnforce(t, e, "bob", "data2", "write", false) // Matches priority 10 deny rule
+	
+	// Test fallback policies (priority 100) - these are evaluated when no higher priority matches
+	// alice doesn't have explicit rule for data2, so falls back to fallback_admin role
+	testEnforce(t, e, "alice", "data2", "read", true)   // Falls back to priority 100 rule via role
+	testEnforce(t, e, "alice", "data2", "write", true)  // Falls back to priority 100 rule via role
+	
+	// bob doesn't have explicit rule for data1, so falls back to fallback_admin role
+	testEnforce(t, e, "bob", "data1", "read", true)   // Falls back to priority 100 rule via role
+	testEnforce(t, e, "bob", "data1", "write", true)  // Falls back to priority 100 rule via role
+	
+	// Test that priority 10 overrides priority 100 when both match
+	// bob has explicit deny for data2 write at priority 10
+	// bob also has allow via fallback_admin at priority 100
+	// Priority 10 takes precedence, so result is deny
+	testEnforce(t, e, "bob", "data2", "write", false) // Priority 10 deny overrides priority 100 allow
+}
+
 func TestFailedToLoadPolicy(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
 	e.AddNamedMatchingFunc("g2", "matchingFunc", util.KeyMatch2)
