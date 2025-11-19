@@ -22,7 +22,7 @@ import (
 	"github.com/casbin/casbin/v2/persist"
 )
 
-// FailingAdapter is an adapter that fails AddPolicy to simulate database unique constraint errors
+// FailingAdapter is an adapter that fails AddPolicy to simulate database unique constraint errors.
 type FailingAdapter struct {
 	persist.Adapter
 	failOnAdd bool
@@ -105,7 +105,7 @@ func TestWatcherWithFailingAdapter(t *testing.T) {
 	}
 }
 
-// TestWatcherWithFailingAdapterGrouping tests the same scenario but for grouping policies
+// TestWatcherWithFailingAdapterGrouping tests the same scenario but for grouping policies.
 func TestWatcherWithFailingAdapterGrouping(t *testing.T) {
 	e, err := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	if err != nil {
