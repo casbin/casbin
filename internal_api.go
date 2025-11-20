@@ -274,8 +274,9 @@ func (e *Enforcer) removeFilteredPolicyWithoutNotify(sec string, ptype string, f
 
 func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string, newRules [][]string, fieldIndex int, fieldValues ...string) ([][]string, error) {
 	var (
-		oldRules [][]string
-		err      error
+		oldRules    [][]string
+		err         error
+		ruleChanged bool
 	)
 
 	if _, err = e.model.GetAssertion(sec, ptype); err != nil {
@@ -300,9 +301,11 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 		return oldRules, e.dispatcher.UpdateFilteredPolicies(sec, ptype, oldRules, newRules)
 	}
 	if len(oldRules) == 0 {
-		oldRules = append(oldRules, fieldValues)
+		ruleChanged, oldRules, err = e.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+		if err != nil {
+			return oldRules, err
+		}
 	}
-	ruleChanged, err := e.model.RemovePolicies(sec, ptype, oldRules)
 	if err != nil {
 		return oldRules, err
 	}
