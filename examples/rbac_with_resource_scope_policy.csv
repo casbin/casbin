@@ -1,0 +1,8 @@
+p, reader, resource1, read
+p, reader, resource2, read
+p, writer, resource1, write
+p, writer, resource2, write
+
+g, user1, reader, resource1
+g, user2, reader, resource2
+g, user3, writer, resource1

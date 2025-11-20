@@ -1,0 +1,13 @@
+p, reader, tenant1, resource1, read
+p, reader, tenant1, resource2, read
+p, reader, tenant2, resource1, read
+p, reader, tenant2, resource2, read
+p, writer, tenant1, resource1, write
+p, writer, tenant1, resource2, write
+p, writer, tenant2, resource1, write
+p, writer, tenant2, resource2, write
+
+g, user1, reader, tenant1::resource1
+g, user2, reader, tenant1::resource2
+g, user3, reader, tenant2::resource1
+g, user4, writer, tenant1::resource1

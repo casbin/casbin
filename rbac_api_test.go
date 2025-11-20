@@ -881,3 +881,312 @@ func TestGetImplicitObjectPatternsForUser(t *testing.T) {
 	// Test case 5: non-existent action
 	testGetImplicitObjectPatternsForUser(t, e, "admin", "domain1", "non_existent", []string{})
 }
+
+func TestRBACWithResourceScope(t *testing.T) {
+	e, err := NewEnforcer("examples/rbac_with_resource_scope_model.conf", "examples/rbac_with_resource_scope_policy.csv")
+	if err != nil {
+		t.Fatalf("Failed to create enforcer: %v", err)
+	}
+
+	// Test 1: user1 should have reader role for resource1 only
+	has, err := e.Enforce("user1", "resource1", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if !has {
+		t.Error("user1 should have read access to resource1")
+	}
+
+	// Test 2: user1 should NOT have access to resource2 (different resource scope)
+	has, err = e.Enforce("user1", "resource2", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if has {
+		t.Error("user1 should NOT have read access to resource2")
+	}
+
+	// Test 3: user2 should have reader role for resource2 only
+	has, err = e.Enforce("user2", "resource2", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if !has {
+		t.Error("user2 should have read access to resource2")
+	}
+
+	// Test 4: user2 should NOT have access to resource1 (different resource scope)
+	has, err = e.Enforce("user2", "resource1", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if has {
+		t.Error("user2 should NOT have read access to resource1")
+	}
+
+	// Test 5: user3 should have writer role for resource1
+	has, err = e.Enforce("user3", "resource1", "write")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if !has {
+		t.Error("user3 should have write access to resource1")
+	}
+
+	// Test 6: user3 should NOT have write access to resource2
+	has, err = e.Enforce("user3", "resource2", "write")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if has {
+		t.Error("user3 should NOT have write access to resource2")
+	}
+
+	// Test 7: Verify role assignments with resource scope
+	roles, err := e.GetRolesForUser("user1", "resource1")
+	if err != nil {
+		t.Fatalf("GetRolesForUser failed: %v", err)
+	}
+	if len(roles) != 1 || roles[0] != "reader" {
+		t.Errorf("user1 should have reader role for resource1, got: %v", roles)
+	}
+
+	// Test 8: Verify user1 has no roles for resource2
+	roles, err = e.GetRolesForUser("user1", "resource2")
+	if err != nil {
+		t.Fatalf("GetRolesForUser failed: %v", err)
+	}
+	if len(roles) != 0 {
+		t.Errorf("user1 should have no roles for resource2, got: %v", roles)
+	}
+
+	// Test 9: Get users for reader role in resource1 scope
+	users, err := e.GetUsersForRole("reader", "resource1")
+	if err != nil {
+		t.Fatalf("GetUsersForRole failed: %v", err)
+	}
+	if len(users) != 1 || users[0] != "user1" {
+		t.Errorf("reader role for resource1 should have user1, got: %v", users)
+	}
+
+	// Test 10: Get users for reader role in resource2 scope
+	users, err = e.GetUsersForRole("reader", "resource2")
+	if err != nil {
+		t.Fatalf("GetUsersForRole failed: %v", err)
+	}
+	if len(users) != 1 || users[0] != "user2" {
+		t.Errorf("reader role for resource2 should have user2, got: %v", users)
+	}
+}
+
+func TestRBACWithResourceScopeAndTenant(t *testing.T) {
+	e, err := NewEnforcer("examples/rbac_with_resource_scope_and_tenant_model.conf", "examples/rbac_with_resource_scope_and_tenant_policy.csv")
+	if err != nil {
+		t.Fatalf("Failed to create enforcer: %v", err)
+	}
+
+	// Test 1: user1 should have reader role for resource1
+	has, err := e.Enforce("user1", "resource1", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if !has {
+		t.Error("user1 should have read access to resource1")
+	}
+
+	// Test 2: user1 should NOT have access to resource2 (different resource scope)
+	has, err = e.Enforce("user1", "resource2", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if has {
+		t.Error("user1 should NOT have read access to resource2")
+	}
+
+	// Test 3: user2 should have reader role for resource2
+	has, err = e.Enforce("user2", "resource2", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if !has {
+		t.Error("user2 should have read access to resource2")
+	}
+
+	// Test 4: user2 should NOT have access to resource1 (different resource scope)
+	has, err = e.Enforce("user2", "resource1", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if has {
+		t.Error("user2 should NOT have read access to resource1")
+	}
+
+	// Test 5: Verify role assignments with resource scope
+	roles, err := e.GetRolesForUser("user1", "resource1")
+	if err != nil {
+		t.Fatalf("GetRolesForUser failed: %v", err)
+	}
+	if len(roles) != 1 || roles[0] != "reader" {
+		t.Errorf("user1 should have reader role for resource1, got: %v", roles)
+	}
+
+	// Test 6: Verify user1 has no roles for resource2
+	roles, err = e.GetRolesForUser("user1", "resource2")
+	if err != nil {
+		t.Fatalf("GetRolesForUser failed: %v", err)
+	}
+	if len(roles) != 0 {
+		t.Errorf("user1 should have no roles for resource2, got: %v", roles)
+	}
+
+	// Test 7: Get users for reader role in resource1 scope
+	users, err := e.GetUsersForRole("reader", "resource1")
+	if err != nil {
+		t.Fatalf("GetUsersForRole failed: %v", err)
+	}
+	if len(users) != 1 || users[0] != "user1" {
+		t.Errorf("reader role for resource1 should have user1, got: %v", users)
+	}
+
+	// Test 8: Get users for reader role in resource2 scope
+	users, err = e.GetUsersForRole("reader", "resource2")
+	if err != nil {
+		t.Fatalf("GetUsersForRole failed: %v", err)
+	}
+	if len(users) != 1 || users[0] != "user2" {
+		t.Errorf("reader role for resource2 should have user2, got: %v", users)
+	}
+
+	// Test 9: Verify adding a new role assignment with resource scope
+	added, err := e.AddRoleForUser("user3", "writer", "resource1")
+	if err != nil {
+		t.Fatalf("AddRoleForUser failed: %v", err)
+	}
+	if !added {
+		t.Error("Failed to add writer role for user3")
+	}
+
+	// Test 10: Verify user3 can now write to resource1
+	has, err = e.Enforce("user3", "resource1", "write")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if !has {
+		t.Error("user3 should have write access to resource1 after role assignment")
+	}
+}
+
+func TestRBACWithResourceScopeMultitenancy(t *testing.T) {
+	e, err := NewEnforcer("examples/rbac_with_resource_scope_multitenancy_model.conf", "examples/rbac_with_resource_scope_multitenancy_policy.csv")
+	if err != nil {
+		t.Fatalf("Failed to create enforcer: %v", err)
+	}
+
+	// Test 1: user1 has reader role for resource1 in tenant1
+	has, err := e.Enforce("user1", "tenant1", "resource1", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if !has {
+		t.Error("user1 should have read access to resource1 in tenant1")
+	}
+
+	// Test 2: user1 should NOT have access to resource2 in tenant1 (different resource)
+	has, err = e.Enforce("user1", "tenant1", "resource2", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if has {
+		t.Error("user1 should NOT have read access to resource2 in tenant1")
+	}
+
+	// Test 3: user1 should NOT have access to resource1 in tenant2 (different tenant)
+	has, err = e.Enforce("user1", "tenant2", "resource1", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if has {
+		t.Error("user1 should NOT have read access to resource1 in tenant2")
+	}
+
+	// Test 4: user2 has reader role for resource2 in tenant1
+	has, err = e.Enforce("user2", "tenant1", "resource2", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if !has {
+		t.Error("user2 should have read access to resource2 in tenant1")
+	}
+
+	// Test 5: user3 has reader role for resource1 in tenant2
+	has, err = e.Enforce("user3", "tenant2", "resource1", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if !has {
+		t.Error("user3 should have read access to resource1 in tenant2")
+	}
+
+	// Test 6: user3 should NOT have access to resource1 in tenant1 (different tenant)
+	has, err = e.Enforce("user3", "tenant1", "resource1", "read")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if has {
+		t.Error("user3 should NOT have read access to resource1 in tenant1")
+	}
+
+	// Test 7: user4 has writer role for resource1 in tenant1
+	has, err = e.Enforce("user4", "tenant1", "resource1", "write")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if !has {
+		t.Error("user4 should have write access to resource1 in tenant1")
+	}
+
+	// Test 8: user4 should NOT have write access to resource2 in tenant1 (different resource)
+	has, err = e.Enforce("user4", "tenant1", "resource2", "write")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
+	if has {
+		t.Error("user4 should NOT have write access to resource2 in tenant1")
+	}
+
+	// Test 9: Verify role assignments - user1 should have reader role for resource1 in tenant1
+	roles, err := e.GetRolesForUser("user1", "tenant1::resource1")
+	if err != nil {
+		t.Fatalf("GetRolesForUser failed: %v", err)
+	}
+	if len(roles) != 1 || roles[0] != "reader" {
+		t.Errorf("user1 should have reader role for tenant1::resource1, got: %v", roles)
+	}
+
+	// Test 10: Verify user1 has no roles for resource1 in tenant2
+	roles, err = e.GetRolesForUser("user1", "tenant2::resource1")
+	if err != nil {
+		t.Fatalf("GetRolesForUser failed: %v", err)
+	}
+	if len(roles) != 0 {
+		t.Errorf("user1 should have no roles for tenant2::resource1, got: %v", roles)
+	}
+
+	// Test 11: Get users for reader role in tenant1 resource1 scope
+	users, err := e.GetUsersForRole("reader", "tenant1::resource1")
+	if err != nil {
+		t.Fatalf("GetUsersForRole failed: %v", err)
+	}
+	if len(users) != 1 || users[0] != "user1" {
+		t.Errorf("reader role for tenant1::resource1 should have user1, got: %v", users)
+	}
+
+	// Test 12: Get users for reader role in tenant2 resource1 scope
+	users, err = e.GetUsersForRole("reader", "tenant2::resource1")
+	if err != nil {
+		t.Fatalf("GetUsersForRole failed: %v", err)
+	}
+	if len(users) != 1 || users[0] != "user3" {
+		t.Errorf("reader role for tenant2::resource1 should have user3, got: %v", users)
+	}
+}
