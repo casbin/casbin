@@ -299,7 +299,9 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
 		return oldRules, e.dispatcher.UpdateFilteredPolicies(sec, ptype, oldRules, newRules)
 	}
-
+	if len(oldRules) == 0 {
+		oldRules = append(oldRules, fieldValues)
+	}
 	ruleChanged, err := e.model.RemovePolicies(sec, ptype, oldRules)
 	if err != nil {
 		return oldRules, err
