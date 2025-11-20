@@ -368,7 +368,7 @@ func (model Model) RemovePolicies(sec string, ptype string, rules [][]string, ma
 	return len(affected) != 0, err
 }
 
-// determining whether any entries in the policy match the filter conditions
+// determining whether any entries in the policy match the filter conditions.
 func matches(rule []string, policy []string) bool {
 	if len(rule) > len(policy) {
 		return false
@@ -383,7 +383,7 @@ func matches(rule []string, policy []string) bool {
 	return true
 }
 
-// Remove the corresponding index from the map
+// Remove the corresponding index from the map.
 func deleteIndexFromMap(model Model, sec, ptype string, idx int) {
 	for key, v := range model[sec][ptype].PolicyMap {
 		if v == idx {
@@ -393,7 +393,7 @@ func deleteIndexFromMap(model Model, sec, ptype string, idx int) {
 	}
 }
 
-// Reindex
+// Reindex.
 func reindexPolicyMap(model Model, sec, ptype string, from int) {
 	for i := from; i < len(model[sec][ptype].Policy); i++ {
 		key := strings.Join(model[sec][ptype].Policy[i], DefaultSep)
@@ -401,14 +401,12 @@ func reindexPolicyMap(model Model, sec, ptype string, from int) {
 	}
 }
 
-// mark branch logic
+// mark branch logic.
 func (model Model) removeMarkedPolicies(sec string, ptype string, rule []string) ([][]string, error) {
-
 	var affected [][]string
 	policy := model[sec][ptype].Policy
 
 	for i := 0; i < len(policy); i++ {
-
 		if !matches(rule, policy[i]) {
 			continue
 		}
@@ -434,9 +432,8 @@ func (model Model) removeMarkedPolicies(sec string, ptype string, rule []string)
 	return affected, nil
 }
 
-// Unmark branch logic
+// Unmark branch logic.
 func (model Model) removeUnmarkedPolicies(sec string, ptype string, rules [][]string) ([][]string, error) {
-
 	var affected [][]string
 
 	for _, rule := range rules {
@@ -462,7 +459,6 @@ func (model Model) removeUnmarkedPolicies(sec string, ptype string, rules [][]st
 
 // RemovePoliciesWithAffected removes policy rules from the model, and returns affected rules.
 func (model Model) RemovePoliciesWithAffected(sec string, ptype string, rules [][]string, mark bool) ([][]string, error) {
-
 	if _, err := model.GetAssertion(sec, ptype); err != nil {
 		return nil, err
 	}
