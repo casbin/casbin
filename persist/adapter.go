@@ -60,6 +60,44 @@ func LoadPolicyArray(rule []string, m model.Model) error {
 	return nil
 }
 
+// NullableString represents a string value that can be stored in databases.
+// It is designed to preserve empty strings as distinct from NULL values.
+// This is important because empty strings have semantic meaning in policies
+// (e.g., to denote omitted/irrelevant fields), which is different from NULL
+// or wildcard values.
+//
+// Usage for database adapters:
+//   - When saving to database: use StringToNullable(value)
+//   - When loading from database: use NullableToString(dbValue, valid)
+type NullableString struct {
+	Value string
+	Valid bool
+}
+
+// StringToNullable converts a string to NullableString for database storage.
+// Empty strings are preserved with Valid=true, ensuring they are stored as
+// empty strings rather than NULL in the database.
+// This function should be used by database adapters when storing policy rules.
+func StringToNullable(s string) NullableString {
+	// Empty strings are valid and should be preserved as empty strings, not NULL
+	return NullableString{
+		Value: s,
+		Valid: true,
+	}
+}
+
+// NullableToString converts a database value to string for policy loading.
+// If valid is false (NULL in database), it returns an empty string.
+// If valid is true, it returns the actual value (which may be an empty string).
+// This function should be used by database adapters when loading policy rules.
+func NullableToString(value string, valid bool) string {
+	if !valid {
+		// NULL from database becomes empty string
+		return ""
+	}
+	return value
+}
+
 // Adapter is the interface for Casbin adapters.
 type Adapter interface {
 	// LoadPolicy loads all policy rules from the storage.
