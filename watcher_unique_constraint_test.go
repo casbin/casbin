@@ -16,12 +16,13 @@ package casbin
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/casbin/casbin/v2/model"
 )
 
-// MockAdapterWithUniqueConstraint simulates a database adapter with unique constraints
+// MockAdapterWithUniqueConstraint simulates a database adapter with unique constraints.
 type MockAdapterWithUniqueConstraint struct {
 	alreadyAdded map[string]bool
 }
@@ -79,18 +80,14 @@ func (a *MockAdapterWithUniqueConstraint) RemovePolicies(sec string, ptype strin
 }
 
 func toString(rule []string) string {
-	result := ""
-	for _, r := range rule {
-		result += r + ","
-	}
-	return result
+	return strings.Join(rule, ",")
 }
 
 // TestWatcherNotifyWithUniqueConstraint simulates the scenario where:
-// 1. Instance A adds a policy and notifies via watcher
-// 2. Instance B receives the notification and tries to add the same policy
-// 3. Instance B's adapter fails with unique constraint error
-// 4. Instance B should still have the policy in its in-memory model
+// 1. Instance A adds a policy and notifies via watcher.
+// 2. Instance B receives the notification and tries to add the same policy.
+// 3. Instance B's adapter fails with unique constraint error.
+// 4. Instance B should still have the policy in its in-memory model.
 func TestWatcherNotifyWithUniqueConstraint(t *testing.T) {
 	// Instance A - the one that originally adds the policy
 	adapterA := NewMockAdapterWithUniqueConstraint()
@@ -122,7 +119,7 @@ func TestWatcherNotifyWithUniqueConstraint(t *testing.T) {
 
 	// Instance B receives notification and tries to add the same policy
 	// This simulates the watcher callback (SelfAddPolicy is typically used in watcher callbacks)
-	ok, err = enforcerB.SelfAddPolicy("p", "p", []string{"alice", "data1", "read"})
+	_, err = enforcerB.SelfAddPolicy("p", "p", []string{"alice", "data1", "read"})
 
 	// The current implementation will:
 	// 1. Check if policy exists in memory (it doesn't in B)
@@ -142,7 +139,7 @@ func TestWatcherNotifyWithUniqueConstraint(t *testing.T) {
 	}
 }
 
-// TestWatcherNotifyBatchWithUniqueConstraint tests the batch version
+// TestWatcherNotifyBatchWithUniqueConstraint tests the batch version.
 func TestWatcherNotifyBatchWithUniqueConstraint(t *testing.T) {
 	// Instance A - the one that originally adds the policies
 	adapterA := NewMockAdapterWithUniqueConstraint()
@@ -180,7 +177,7 @@ func TestWatcherNotifyBatchWithUniqueConstraint(t *testing.T) {
 	}
 
 	// Instance B receives notification and tries to add the same policies
-	ok, err = enforcerB.SelfAddPolicies("p", "p", rules)
+	_, err = enforcerB.SelfAddPolicies("p", "p", rules)
 
 	if err != nil {
 		t.Logf("Expected: Instance B got error from adapter: %v", err)
