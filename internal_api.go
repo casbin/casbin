@@ -118,29 +118,34 @@ func (e *Enforcer) addPoliciesWithoutNotify(sec string, ptype string, rules [][]
 		return false, err
 	}
 
-	if sec == "g" {
-		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
-		if err != nil {
-			// Role link building failed - remove the policies from model if we had an adapter error
-			if adapterErr != nil {
-				e.model.RemovePolicies(sec, ptype, rules)
-				return false, adapterErr
-			}
-			return true, err
-		}
-
-		err = e.BuildIncrementalConditionalRoleLinks(model.PolicyAdd, ptype, rules)
-		if err != nil {
-			// Conditional role link building failed - remove the policies from model if we had an adapter error
-			if adapterErr != nil {
-				e.model.RemovePolicies(sec, ptype, rules)
-				return false, adapterErr
-			}
-			return true, err
-		}
+	if sec != "g" {
+		// Successfully added to model, ignore adapter error (if it was a duplicate)
+		return true, nil
 	}
 
-	// Successfully added to model (and role links if applicable), ignore adapter error (if it was a duplicate)
+	// Build incremental role links for grouping policies
+	err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
+	if err != nil && adapterErr != nil {
+		// Role link building failed and we had an adapter error - rollback
+		e.model.RemovePolicies(sec, ptype, rules)
+		return false, adapterErr
+	}
+	if err != nil {
+		return true, err
+	}
+
+	// Build conditional role links
+	err = e.BuildIncrementalConditionalRoleLinks(model.PolicyAdd, ptype, rules)
+	if err != nil && adapterErr != nil {
+		// Conditional role link building failed and we had an adapter error - rollback
+		e.model.RemovePolicies(sec, ptype, rules)
+		return false, adapterErr
+	}
+	if err != nil {
+		return true, err
+	}
+
+	// Successfully added to model and role links, ignore adapter error (if it was a duplicate)
 	return true, nil
 }
 
