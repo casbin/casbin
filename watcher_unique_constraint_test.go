@@ -60,6 +60,24 @@ func (a *MockAdapterWithUniqueConstraint) RemoveFilteredPolicy(sec string, ptype
 	return nil
 }
 
+func (a *MockAdapterWithUniqueConstraint) AddPolicies(sec string, ptype string, rules [][]string) error {
+	for _, rule := range rules {
+		if err := a.AddPolicy(sec, ptype, rule); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (a *MockAdapterWithUniqueConstraint) RemovePolicies(sec string, ptype string, rules [][]string) error {
+	for _, rule := range rules {
+		if err := a.RemovePolicy(sec, ptype, rule); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func toString(rule []string) string {
 	result := ""
 	for _, r := range rule {
@@ -121,5 +139,60 @@ func TestWatcherNotifyWithUniqueConstraint(t *testing.T) {
 	hasPolicy, _ = enforcerB.HasPolicy("alice", "data1", "read")
 	if !hasPolicy {
 		t.Fatal("BUG: Instance B should have the policy in memory even if adapter fails with unique constraint")
+	}
+}
+
+// TestWatcherNotifyBatchWithUniqueConstraint tests the batch version
+func TestWatcherNotifyBatchWithUniqueConstraint(t *testing.T) {
+	// Instance A - the one that originally adds the policies
+	adapterA := NewMockAdapterWithUniqueConstraint()
+	enforcerA, _ := NewEnforcer("examples/rbac_model.conf", adapterA)
+	enforcerA.EnableAutoSave(true)
+
+	// Instance B - another instance that receives the notification
+	adapterB := &MockAdapterWithUniqueConstraint{
+		alreadyAdded: adapterA.alreadyAdded, // Share the same "database"
+	}
+	enforcerB, _ := NewEnforcer("examples/rbac_model.conf", adapterB)
+	enforcerB.EnableAutoSave(true)
+
+	// Instance A adds policies successfully
+	rules := [][]string{
+		{"alice", "data1", "read"},
+		{"bob", "data2", "write"},
+	}
+	ok, err := enforcerA.AddPolicies(rules)
+	if err != nil {
+		t.Fatalf("Instance A should add policies successfully: %v", err)
+	}
+	if !ok {
+		t.Fatal("Instance A should return true when adding new policies")
+	}
+
+	// Verify Instance A has the policies in memory
+	hasPolicy, _ := enforcerA.HasPolicy("alice", "data1", "read")
+	if !hasPolicy {
+		t.Fatal("Instance A should have first policy in memory")
+	}
+	hasPolicy, _ = enforcerA.HasPolicy("bob", "data2", "write")
+	if !hasPolicy {
+		t.Fatal("Instance A should have second policy in memory")
+	}
+
+	// Instance B receives notification and tries to add the same policies
+	ok, err = enforcerB.SelfAddPolicies("p", "p", rules)
+
+	if err != nil {
+		t.Logf("Expected: Instance B got error from adapter: %v", err)
+	}
+
+	// Instance B should have the policies in its in-memory model even if adapter failed
+	hasPolicy, _ = enforcerB.HasPolicy("alice", "data1", "read")
+	if !hasPolicy {
+		t.Fatal("Instance B should have first policy in memory even if adapter fails")
+	}
+	hasPolicy, _ = enforcerB.HasPolicy("bob", "data2", "write")
+	if !hasPolicy {
+		t.Fatal("Instance B should have second policy in memory even if adapter fails")
 	}
 }
