@@ -17,7 +17,7 @@ package fileadapter
 import (
 	"context"
 
-	"github.com/casbin/casbin/v2/model"
+	"github.com/casbin/casbin/v3/model"
 )
 
 func (a *Adapter) UpdatePolicyCtx(ctx context.Context, sec string, ptype string, oldRule, newRule []string) error {

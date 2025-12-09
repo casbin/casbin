@@ -17,8 +17,8 @@ package casbin
 import (
 	"testing"
 
-	"github.com/casbin/casbin/v2/model"
-	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
+	"github.com/casbin/casbin/v3/model"
+	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
 )
 
 // TestBackslashHandlingConsistency tests that backslashes in string literals

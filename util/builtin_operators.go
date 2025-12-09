@@ -25,7 +25,7 @@ import (
 
 	"github.com/bmatcuk/doublestar/v4"
 
-	"github.com/casbin/casbin/v2/rbac"
+	"github.com/casbin/casbin/v3/rbac"
 
 	"github.com/casbin/govaluate"
 )

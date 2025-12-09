@@ -17,7 +17,7 @@ package casbin
 import (
 	"fmt"
 
-	"github.com/casbin/casbin/v2/constant"
+	"github.com/casbin/casbin/v3/constant"
 )
 
 // GetUsersForRoleInDomain gets the users that has a role inside a domain. Add by Gordon.

@@ -14,7 +14,7 @@
 
 package log
 
-//go:generate mockgen -destination=./mocks/mock_logger.go -package=mocks github.com/casbin/casbin/v2/log Logger
+//go:generate mockgen -destination=./mocks/mock_logger.go -package=mocks github.com/casbin/casbin/v3/log Logger
 
 // Logger is the logging interface implementation.
 type Logger interface {

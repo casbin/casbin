@@ -19,9 +19,9 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/casbin/casbin/v2/model"
-	"github.com/casbin/casbin/v2/persist"
-	"github.com/casbin/casbin/v2/util"
+	"github.com/casbin/casbin/v3/model"
+	"github.com/casbin/casbin/v3/persist"
+	"github.com/casbin/casbin/v3/util"
 )
 
 // Adapter is the string adapter for Casbin.

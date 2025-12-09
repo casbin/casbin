@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/casbin/casbin/v2/constant"
+	"github.com/casbin/casbin/v3/constant"
 )
 
 // AddRoleForUserInDomainCtx adds a role for a user inside a domain with context support.
