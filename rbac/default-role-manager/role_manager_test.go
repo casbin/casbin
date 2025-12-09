@@ -20,8 +20,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/casbin/casbin/v2/rbac"
-	"github.com/casbin/casbin/v2/util"
+	"github.com/casbin/casbin/v3/rbac"
+	"github.com/casbin/casbin/v3/util"
 )
 
 func testRole(t *testing.T, rm rbac.RoleManager, name1 string, name2 string, res bool) {

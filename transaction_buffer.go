@@ -17,8 +17,8 @@ package casbin
 import (
 	"sync"
 
-	"github.com/casbin/casbin/v2/model"
-	"github.com/casbin/casbin/v2/persist"
+	"github.com/casbin/casbin/v3/model"
+	"github.com/casbin/casbin/v3/persist"
 )
 
 // TransactionBuffer holds all policy changes made within a transaction.

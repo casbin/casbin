@@ -17,7 +17,7 @@ package log
 import (
 	"testing"
 
-	"github.com/casbin/casbin/v2/log/mocks"
+	"github.com/casbin/casbin/v3/log/mocks"
 
 	"github.com/golang/mock/gomock"
 )

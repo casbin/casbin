@@ -17,7 +17,7 @@ package model
 import (
 	"sync"
 
-	"github.com/casbin/casbin/v2/util"
+	"github.com/casbin/casbin/v3/util"
 	"github.com/casbin/govaluate"
 )
 

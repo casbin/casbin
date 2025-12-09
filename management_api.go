@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/casbin/casbin/v2/constant"
-	"github.com/casbin/casbin/v2/util"
+	"github.com/casbin/casbin/v3/constant"
+	"github.com/casbin/casbin/v3/util"
 	"github.com/casbin/govaluate"
 )
 
