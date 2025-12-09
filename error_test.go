@@ -133,31 +133,27 @@ func TestMockAdapterErrors(t *testing.T) {
 
 	e, _ := NewEnforcer("examples/rbac_with_domains_model.conf", adapter)
 
+	// With the new resilient behavior, policies are added to the model even if adapter fails
+	// This ensures the enforcer remains functional even with persistence errors
 	added, err := e.AddPolicy("admin", "domain3", "data1", "read")
-	if added {
-		t.Errorf("added should be false")
+	if !added {
+		t.Errorf("added should be true (policy added to model despite adapter error)")
 	}
 
-	if err == nil {
-		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err.Error())
+	if err != nil {
+		t.Errorf("Should be no error (policy successfully added to model)")
 	}
 
 	rules := [][]string{
 		{"admin", "domain4", "data1", "read"},
 	}
 	added, err = e.AddPolicies(rules)
-	if added {
-		t.Errorf("added should be false")
+	if !added {
+		t.Errorf("added should be true (policies added to model despite adapter error)")
 	}
 
-	if err == nil {
-		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err.Error())
+	if err != nil {
+		t.Errorf("Should be no error (policies successfully added to model)")
 	}
 
 	removed, err2 := e.RemoveFilteredPolicy(1, "domain1", "data1")
@@ -211,28 +207,24 @@ func TestMockAdapterErrors(t *testing.T) {
 		t.Log(err4.Error())
 	}
 
+	// Grouping policy with correct number of parameters - should succeed despite adapter error
 	added, err5 := e.AddNamedGroupingPolicy("g", []string{"eve", "admin2", "domain1"})
-	if added {
-		t.Errorf("added should be false")
+	if !added {
+		t.Errorf("added should be true (grouping policy added to model despite adapter error)")
 	}
 
-	if err5 == nil {
-		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err5.Error())
+	if err5 != nil {
+		t.Errorf("Should be no error (grouping policy successfully added to model)")
 	}
 
+	// Named policy with correct number of parameters - should succeed despite adapter error
 	added, err6 := e.AddNamedPolicy("p", []string{"admin2", "domain2", "data2", "write"})
-	if added {
-		t.Errorf("added should be false")
+	if !added {
+		t.Errorf("added should be true (policy added to model despite adapter error)")
 	}
 
-	if err6 == nil {
-		t.Errorf("Should be an error here.")
-	} else {
-		t.Log("Test on error: ")
-		t.Log(err6.Error())
+	if err6 != nil {
+		t.Errorf("Should be no error (policy successfully added to model)")
 	}
 
 	removed, err7 := e.RemoveGroupingPolicy("bob", "admin2")

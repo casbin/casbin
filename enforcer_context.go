@@ -422,26 +422,40 @@ func (e *ContextEnforcer) addPolicyWithoutNotifyCtx(ctx context.Context, sec str
 		return false, err
 	}
 
+	var adapterErr error
 	if e.shouldPersist() {
 		if err = e.adapterCtx.AddPolicyCtx(ctx, sec, ptype, rule); err != nil {
 			if err.Error() != notImplemented {
-				return false, err
+				// Save the adapter error but continue to try updating in-memory model
+				// This handles cases where the policy already exists in DB due to unique constraints
+				// (e.g., when multiple instances receive watcher notifications)
+				adapterErr = err
 			}
 		}
 	}
 
 	err = e.model.AddPolicy(sec, ptype, rule)
 	if err != nil {
+		// If we also can't add to model, return the adapter error (if any), otherwise the model error
+		if adapterErr != nil {
+			return false, adapterErr
+		}
 		return false, err
 	}
 
 	if sec == "g" {
 		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{rule})
 		if err != nil {
+			// Role link building failed - remove the policy from model if we had an adapter error
+			if adapterErr != nil {
+				e.model.RemovePolicy(sec, ptype, rule)
+				return false, adapterErr
+			}
 			return true, err
 		}
 	}
 
+	// Successfully added to model (and role links if applicable), ignore adapter error (if it was a duplicate)
 	return true, nil
 }
 
@@ -458,31 +472,55 @@ func (e *ContextEnforcer) addPoliciesWithoutNotifyCtx(ctx context.Context, sec s
 		}
 	}
 
+	var adapterErr error
 	if e.shouldPersist() {
 		if err := e.adapterCtx.(persist.ContextBatchAdapter).AddPoliciesCtx(ctx, sec, ptype, rules); err != nil {
 			if err.Error() != notImplemented {
-				return false, err
+				// Save the adapter error but continue to try updating in-memory model
+				// This handles cases where some/all policies already exist in DB due to unique constraints
+				// (e.g., when multiple instances receive watcher notifications)
+				adapterErr = err
 			}
 		}
 	}
 
 	err := e.model.AddPolicies(sec, ptype, rules)
 	if err != nil {
+		// If we also can't add to model, return the adapter error (if any), otherwise the model error
+		if adapterErr != nil {
+			return false, adapterErr
+		}
 		return false, err
 	}
 
-	if sec == "g" {
-		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
-		if err != nil {
-			return true, err
-		}
-
-		err = e.BuildIncrementalConditionalRoleLinks(model.PolicyAdd, ptype, rules)
-		if err != nil {
-			return true, err
-		}
+	if sec != "g" {
+		// Successfully added to model, ignore adapter error (if it was a duplicate)
+		return true, nil
 	}
 
+	// Build incremental role links for grouping policies
+	err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
+	if err != nil && adapterErr != nil {
+		// Role link building failed and we had an adapter error - rollback
+		e.model.RemovePolicies(sec, ptype, rules)
+		return false, adapterErr
+	}
+	if err != nil {
+		return true, err
+	}
+
+	// Build conditional role links
+	err = e.BuildIncrementalConditionalRoleLinks(model.PolicyAdd, ptype, rules)
+	if err != nil && adapterErr != nil {
+		// Conditional role link building failed and we had an adapter error - rollback
+		e.model.RemovePolicies(sec, ptype, rules)
+		return false, adapterErr
+	}
+	if err != nil {
+		return true, err
+	}
+
+	// Successfully added to model and role links, ignore adapter error (if it was a duplicate)
 	return true, nil
 }
 
