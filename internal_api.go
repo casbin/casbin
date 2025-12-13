@@ -34,6 +34,12 @@ func (e *Enforcer) shouldNotify() bool {
 	return e.watcher != nil && e.autoNotifyWatcher
 }
 
+// validateConstraintsForGroupingPolicy validates constraints for grouping policy changes.
+// It returns an error if constraint validation fails.
+func (e *Enforcer) validateConstraintsForGroupingPolicy() error {
+	return e.model.ValidateConstraints()
+}
+
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicyWithoutNotify(sec string, ptype string, rule []string) (bool, error) {
 	if e.dispatcher != nil && e.autoNotifyDispatcher {
@@ -62,6 +68,11 @@ func (e *Enforcer) addPolicyWithoutNotify(sec string, ptype string, rule []strin
 		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{rule})
 		if err != nil {
 			return true, err
+		}
+
+		// Validate constraints after adding grouping policy
+		if err := e.validateConstraintsForGroupingPolicy(); err != nil {
+			return false, err
 		}
 	}
 
@@ -106,6 +117,11 @@ func (e *Enforcer) addPoliciesWithoutNotify(sec string, ptype string, rules [][]
 		if err != nil {
 			return true, err
 		}
+
+		// Validate constraints after adding grouping policies
+		if err := e.validateConstraintsForGroupingPolicy(); err != nil {
+			return false, err
+		}
 	}
 
 	return true, nil
@@ -134,6 +150,11 @@ func (e *Enforcer) removePolicyWithoutNotify(sec string, ptype string, rule []st
 		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{rule})
 		if err != nil {
 			return ruleRemoved, err
+		}
+
+		// Validate constraints after removing grouping policy
+		if err := e.validateConstraintsForGroupingPolicy(); err != nil {
+			return false, err
 		}
 	}
 
@@ -165,6 +186,11 @@ func (e *Enforcer) updatePolicyWithoutNotify(sec string, ptype string, oldRule [
 		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{newRule}) // add the new rule
 		if err != nil {
 			return ruleUpdated, err
+		}
+
+		// Validate constraints after updating grouping policy
+		if err := e.validateConstraintsForGroupingPolicy(); err != nil {
+			return false, err
 		}
 	}
 
@@ -202,6 +228,11 @@ func (e *Enforcer) updatePoliciesWithoutNotify(sec string, ptype string, oldRule
 		if err != nil {
 			return ruleUpdated, err
 		}
+
+		// Validate constraints after updating grouping policies
+		if err := e.validateConstraintsForGroupingPolicy(); err != nil {
+			return false, err
+		}
 	}
 
 	return ruleUpdated, nil
@@ -235,6 +266,11 @@ func (e *Enforcer) removePoliciesWithoutNotify(sec string, ptype string, rules [
 		if err != nil {
 			return rulesRemoved, err
 		}
+
+		// Validate constraints after removing grouping policies
+		if err := e.validateConstraintsForGroupingPolicy(); err != nil {
+			return false, err
+		}
 	}
 	return rulesRemoved, nil
 }
@@ -266,6 +302,11 @@ func (e *Enforcer) removeFilteredPolicyWithoutNotify(sec string, ptype string, f
 		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effects)
 		if err != nil {
 			return ruleRemoved, err
+		}
+
+		// Validate constraints after removing filtered grouping policies
+		if err := e.validateConstraintsForGroupingPolicy(); err != nil {
+			return false, err
 		}
 	}
 
@@ -320,6 +361,11 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 		}
 		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, newRules) // add the new rules
 		if err != nil {
+			return oldRules, err
+		}
+
+		// Validate constraints after updating filtered grouping policies
+		if err := e.validateConstraintsForGroupingPolicy(); err != nil {
 			return oldRules, err
 		}
 	}
