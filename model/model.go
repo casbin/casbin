@@ -215,12 +215,12 @@ func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	if len(ms) > 0 {
 		return fmt.Errorf("missing required sections: %s", strings.Join(ms, ","))
 	}
-	
+
 	// Validate constraints after model is loaded
 	if err := model.ValidateConstraints(); err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 

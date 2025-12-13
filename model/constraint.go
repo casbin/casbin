@@ -44,7 +44,7 @@ type Constraint struct {
 }
 
 var (
-	// Regex patterns for parsing constraints (compiled once at package initialization)
+	// Regex patterns for parsing constraints (compiled once at package initialization).
 	sodPattern     = regexp.MustCompile(`^sod\s*\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*\)$`)
 	sodMaxPattern  = regexp.MustCompile(`^sodMax\s*\(\s*\[([^\]]+)\]\s*,\s*(\d+)\s*\)$`)
 	roleMaxPattern = regexp.MustCompile(`^roleMax\s*\(\s*"([^"]+)"\s*,\s*(\d+)\s*\)$`)
@@ -61,11 +61,11 @@ func parseRolesArray(rolesStr string) ([]string, error) {
 			roles = append(roles, role)
 		}
 	}
-	
+
 	if len(roles) == 0 {
 		return nil, fmt.Errorf("no roles found in role array")
 	}
-	
+
 	return roles, nil
 }
 
@@ -88,12 +88,12 @@ func parseConstraint(key, value string) (*Constraint, error) {
 		if err != nil {
 			return nil, fmt.Errorf("invalid max count in sodMax: %w", err)
 		}
-		
+
 		roles, err := parseRolesArray(matches[1])
 		if err != nil {
 			return nil, fmt.Errorf("sodMax: %w", err)
 		}
-		
+
 		return &Constraint{
 			Key:      key,
 			Type:     ConstraintTypeSODMax,
@@ -188,7 +188,7 @@ func buildUserRoleMap(groupingPolicy [][]string) map[string]map[string]bool {
 		}
 		user := rule[0]
 		role := rule[1]
-		
+
 		if userRoles[user] == nil {
 			userRoles[user] = make(map[string]bool)
 		}
@@ -210,7 +210,7 @@ func (model Model) validateSOD(constraint *Constraint, groupingPolicy [][]string
 	// Check if any user has both roles
 	for user, roles := range userRoles {
 		if roles[role1] && roles[role2] {
-			return errors.NewConstraintViolationError(constraint.Key, 
+			return errors.NewConstraintViolationError(constraint.Key,
 				fmt.Sprintf("user '%s' cannot have both roles '%s' and '%s'", user, role1, role2))
 		}
 	}
@@ -232,7 +232,7 @@ func (model Model) validateSODMax(constraint *Constraint, groupingPolicy [][]str
 		}
 		if count > constraint.MaxCount {
 			return errors.NewConstraintViolationError(constraint.Key,
-				fmt.Sprintf("user '%s' has %d roles from %v, exceeds maximum of %d", 
+				fmt.Sprintf("user '%s' has %d roles from %v, exceeds maximum of %d",
 					user, count, constraint.Roles, constraint.MaxCount))
 		}
 	}
@@ -250,7 +250,7 @@ func (model Model) validateRoleMax(constraint *Constraint, groupingPolicy [][]st
 			continue
 		}
 		role := rule[1]
-		
+
 		if role == constraint.Role {
 			roleCount++
 		}
@@ -258,7 +258,7 @@ func (model Model) validateRoleMax(constraint *Constraint, groupingPolicy [][]st
 
 	if roleCount > constraint.MaxCount {
 		return errors.NewConstraintViolationError(constraint.Key,
-			fmt.Sprintf("role '%s' assigned to %d users, exceeds maximum of %d", 
+			fmt.Sprintf("role '%s' assigned to %d users, exceeds maximum of %d",
 				constraint.Role, roleCount, constraint.MaxCount))
 	}
 
@@ -273,7 +273,7 @@ func (model Model) validateRolePre(constraint *Constraint, groupingPolicy [][]st
 	for user, roles := range userRoles {
 		if roles[constraint.Role] && !roles[constraint.PreReqRole] {
 			return errors.NewConstraintViolationError(constraint.Key,
-				fmt.Sprintf("user '%s' has role '%s' but lacks prerequisite role '%s'", 
+				fmt.Sprintf("user '%s' has role '%s' but lacks prerequisite role '%s'",
 					user, constraint.Role, constraint.PreReqRole))
 		}
 	}

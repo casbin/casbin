@@ -63,7 +63,7 @@ func (e *Enforcer) addPolicyWithoutNotify(sec string, ptype string, rule []strin
 		if err != nil {
 			return true, err
 		}
-		
+
 		// Validate constraints after adding grouping policy
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy addition
@@ -118,7 +118,7 @@ func (e *Enforcer) addPoliciesWithoutNotify(sec string, ptype string, rules [][]
 		if err != nil {
 			return true, err
 		}
-		
+
 		// Validate constraints after adding grouping policies
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy additions
@@ -162,7 +162,7 @@ func (e *Enforcer) removePolicyWithoutNotify(sec string, ptype string, rule []st
 		if err != nil {
 			return ruleRemoved, err
 		}
-		
+
 		// Validate constraints after removing grouping policy
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy removal
@@ -205,7 +205,7 @@ func (e *Enforcer) updatePolicyWithoutNotify(sec string, ptype string, oldRule [
 		if err != nil {
 			return ruleUpdated, err
 		}
-		
+
 		// Validate constraints after updating grouping policy
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy update
@@ -256,7 +256,7 @@ func (e *Enforcer) updatePoliciesWithoutNotify(sec string, ptype string, oldRule
 		if err != nil {
 			return ruleUpdated, err
 		}
-		
+
 		// Validate constraints after updating grouping policies
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy updates
@@ -304,7 +304,7 @@ func (e *Enforcer) removePoliciesWithoutNotify(sec string, ptype string, rules [
 		if err != nil {
 			return rulesRemoved, err
 		}
-		
+
 		// Validate constraints after removing grouping policies
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy removals
@@ -348,7 +348,7 @@ func (e *Enforcer) removeFilteredPolicyWithoutNotify(sec string, ptype string, f
 		if err != nil {
 			return ruleRemoved, err
 		}
-		
+
 		// Validate constraints after removing filtered grouping policies
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy removals
@@ -415,7 +415,7 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 		if err != nil {
 			return oldRules, err
 		}
-		
+
 		// Validate constraints after updating filtered grouping policies
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy updates
