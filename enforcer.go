@@ -224,8 +224,8 @@ func (e *Enforcer) updateSubscribeCache() {
 	}
 
 	events := e.eventLogger.Subscribe()
+	// Both nil and empty slice mean subscribe to all events
 	if len(events) == 0 {
-		// Empty means subscribe to all
 		e.subscribeCache = nil
 		return
 	}
@@ -389,7 +389,7 @@ func (e *Enforcer) LoadPolicy() error {
 	newModel, err := e.loadPolicyFromAdapter(e.model)
 	if err != nil {
 		if shouldLog {
-			entry.Duration = time.Since(entry.Timestamp)
+			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
 			e.eventLogger.OnAfterEvent(handle, entry)
 		}
@@ -398,7 +398,7 @@ func (e *Enforcer) LoadPolicy() error {
 	err = e.applyModifiedModel(newModel)
 	if err != nil {
 		if shouldLog {
-			entry.Duration = time.Since(entry.Timestamp)
+			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
 			e.eventLogger.OnAfterEvent(handle, entry)
 		}
@@ -406,7 +406,7 @@ func (e *Enforcer) LoadPolicy() error {
 	}
 
 	if shouldLog {
-		entry.Duration = time.Since(entry.Timestamp)
+		entry.Duration = time.Since(handle.StartTime)
 		entry.RuleCount = e.GetPolicyCount()
 		e.eventLogger.OnAfterEvent(handle, entry)
 	}
@@ -573,7 +573,7 @@ func (e *Enforcer) SavePolicy() error {
 	if e.IsFiltered() {
 		err := errors.New("cannot save a filtered policy")
 		if shouldLog {
-			entry.Duration = time.Since(entry.Timestamp)
+			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
 			e.eventLogger.OnAfterEvent(handle, entry)
 		}
@@ -581,7 +581,7 @@ func (e *Enforcer) SavePolicy() error {
 	}
 	if err := e.adapter.SavePolicy(e.model); err != nil {
 		if shouldLog {
-			entry.Duration = time.Since(entry.Timestamp)
+			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
 			e.eventLogger.OnAfterEvent(handle, entry)
 		}
@@ -595,7 +595,7 @@ func (e *Enforcer) SavePolicy() error {
 			err = e.watcher.Update()
 		}
 		if shouldLog {
-			entry.Duration = time.Since(entry.Timestamp)
+			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
 			e.eventLogger.OnAfterEvent(handle, entry)
 		}
@@ -603,7 +603,7 @@ func (e *Enforcer) SavePolicy() error {
 	}
 
 	if shouldLog {
-		entry.Duration = time.Since(entry.Timestamp)
+		entry.Duration = time.Since(handle.StartTime)
 		e.eventLogger.OnAfterEvent(handle, entry)
 	}
 
@@ -757,7 +757,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	defer func() {
 		if shouldLog && entry != nil && handle != nil {
-			entry.Duration = time.Since(entry.Timestamp)
+			entry.Duration = time.Since(handle.StartTime)
 			entry.Allowed = ok
 			entry.Matched = logExplains
 			entry.Error = err
@@ -1171,5 +1171,5 @@ func toString(v interface{}) string {
 	if s, ok := v.(string); ok {
 		return s
 	}
-	return ""
+	return fmt.Sprintf("%v", v)
 }

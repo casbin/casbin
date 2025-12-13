@@ -40,10 +40,6 @@ func (l *DefaultEventLogger) Subscribe() []EventType {
 	return l.subscribe
 }
 
-func (l *DefaultEventLogger) SetSubscribe(events []EventType) {
-	l.subscribe = events
-}
-
 func (l *DefaultEventLogger) OnBeforeEvent(entry *LogEntry) *Handle {
 	return NewHandle()
 }
