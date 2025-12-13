@@ -20,6 +20,7 @@ import (
 	"runtime/debug"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/casbin/casbin/v3/effector"
 	"github.com/casbin/casbin/v3/log"
@@ -54,7 +55,9 @@ type Enforcer struct {
 	autoNotifyDispatcher bool
 	acceptJsonRequest    bool
 
-	logger log.Logger
+	logger         log.Logger
+	eventLogger    log.EventLogger
+	subscribeCache map[log.EventType]bool
 }
 
 // EnforceContext is used as the first element of the parameter "rvals" in method "enforce".
@@ -205,6 +208,47 @@ func (e *Enforcer) SetLogger(logger log.Logger) {
 		e.condRmMap[k].SetLogger(e.logger)
 	}
 }
+
+// SetEventLogger sets the event logger for the enforcer.
+func (e *Enforcer) SetEventLogger(logger log.EventLogger) {
+	e.eventLogger = logger
+	e.updateSubscribeCache()
+}
+
+// updateSubscribeCache updates the subscription cache for quick event type lookup
+func (e *Enforcer) updateSubscribeCache() {
+	e.subscribeCache = make(map[log.EventType]bool)
+
+	if e.eventLogger == nil {
+		return
+	}
+
+	events := e.eventLogger.Subscribe()
+	if len(events) == 0 {
+		// Empty means subscribe to all
+		e.subscribeCache = nil
+		return
+	}
+
+	for _, event := range events {
+		e.subscribeCache[event] = true
+	}
+}
+
+// shouldLog checks if we should log this event type
+func (e *Enforcer) shouldLog(eventType log.EventType) bool {
+	if e.eventLogger == nil || !e.eventLogger.IsEnabled() {
+		return false
+	}
+
+	// nil cache means subscribe to all events
+	if e.subscribeCache == nil {
+		return true
+	}
+
+	return e.subscribeCache[eventType]
+}
+
 
 func (e *Enforcer) initialize() {
 	e.rmMap = map[string]rbac.RoleManager{}
@@ -610,6 +654,47 @@ func (e *Enforcer) invalidateMatcherMap() {
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
+	// Event logging setup
+	var entry *log.LogEntry
+	var handle *log.Handle
+	var logExplains [][]string
+	shouldLog := e.shouldLog(log.EventEnforce)
+
+	if shouldLog {
+		entry = &log.LogEntry{
+			Type:       log.EventEnforce,
+			Timestamp:  time.Now(),
+			Request:    rvals,
+			Attributes: make(map[string]interface{}),
+		}
+
+		// Parse request parameters
+		if len(rvals) >= 1 {
+			entry.Subject = toString(rvals[0])
+		}
+		if len(rvals) >= 2 {
+			entry.Object = toString(rvals[1])
+		}
+		if len(rvals) >= 3 {
+			entry.Action = toString(rvals[2])
+		}
+		if len(rvals) >= 4 {
+			entry.Domain = toString(rvals[3])
+		}
+
+		handle = e.eventLogger.OnBeforeEvent(entry)
+	}
+
+	defer func() {
+		if shouldLog && entry != nil && handle != nil {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Allowed = ok
+			entry.Matched = logExplains
+			entry.Error = err
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
+	}()
+
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
@@ -810,8 +895,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 	}
 
-	var logExplains [][]string
-
 	if explains != nil {
 		if len(*explains) > 0 {
 			logExplains = append(logExplains, *explains)
@@ -1011,4 +1094,12 @@ func generateEvalFunction(functions map[string]govaluate.ExpressionFunction, par
 		}
 		return expr.Eval(parameters)
 	}
+}
+
+// toString converts an interface{} to string for logging
+func toString(v interface{}) string {
+	if s, ok := v.(string); ok {
+		return s
+	}
+	return ""
 }
