@@ -371,14 +371,46 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
+	// Event logging setup
+	var entry *log.LogEntry
+	var handle *log.Handle
+	shouldLog := e.shouldLog(log.EventPolicyLoad)
+
+	if shouldLog {
+		entry = &log.LogEntry{
+			Type:       log.EventPolicyLoad,
+			Timestamp:  time.Now(),
+			Operation:  "load",
+			Attributes: make(map[string]interface{}),
+		}
+		handle = e.eventLogger.OnBeforeEvent(entry)
+	}
+
 	newModel, err := e.loadPolicyFromAdapter(e.model)
 	if err != nil {
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = err
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
 		return err
 	}
 	err = e.applyModifiedModel(newModel)
 	if err != nil {
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = err
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
 		return err
 	}
+
+	if shouldLog {
+		entry.Duration = time.Since(entry.Timestamp)
+		entry.RuleCount = e.GetPolicyCount()
+		e.eventLogger.OnAfterEvent(handle, entry)
+	}
+
 	return nil
 }
 
@@ -522,10 +554,37 @@ func (e *Enforcer) IsFiltered() bool {
 
 // SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() error {
+	// Event logging setup
+	var entry *log.LogEntry
+	var handle *log.Handle
+	shouldLog := e.shouldLog(log.EventPolicySave)
+
+	if shouldLog {
+		entry = &log.LogEntry{
+			Type:       log.EventPolicySave,
+			Timestamp:  time.Now(),
+			Operation:  "save",
+			RuleCount:  e.GetPolicyCount(),
+			Attributes: make(map[string]interface{}),
+		}
+		handle = e.eventLogger.OnBeforeEvent(entry)
+	}
+
 	if e.IsFiltered() {
-		return errors.New("cannot save a filtered policy")
+		err := errors.New("cannot save a filtered policy")
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = err
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
+		return err
 	}
 	if err := e.adapter.SavePolicy(e.model); err != nil {
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = err
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
 		return err
 	}
 	if e.watcher != nil {
@@ -535,8 +594,19 @@ func (e *Enforcer) SavePolicy() error {
 		} else {
 			err = e.watcher.Update()
 		}
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = err
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
 		return err
 	}
+
+	if shouldLog {
+		entry.Duration = time.Since(entry.Timestamp)
+		e.eventLogger.OnAfterEvent(handle, entry)
+	}
+
 	return nil
 }
 

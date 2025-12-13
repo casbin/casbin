@@ -16,8 +16,10 @@ package casbin
 
 import (
 	"fmt"
+	"time"
 
 	Err "github.com/casbin/casbin/v3/errors"
+	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
 )
@@ -329,19 +331,51 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
+	// Event logging setup
+	var entry *log.LogEntry
+	var handle *log.Handle
+	shouldLog := e.shouldLog(log.EventPolicyAdd)
+
+	if shouldLog {
+		entry = &log.LogEntry{
+			Type:       log.EventPolicyAdd,
+			Timestamp:  time.Now(),
+			Operation:  "add",
+			Rules:      [][]string{rule},
+			RuleCount:  1,
+			Attributes: make(map[string]interface{}),
+		}
+		handle = e.eventLogger.OnBeforeEvent(entry)
+	}
+
 	ok, err := e.addPolicyWithoutNotify(sec, ptype, rule)
 	if !ok || err != nil {
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = err
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
+		var notifyErr error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForAddPolicy(sec, ptype, rule...)
+			notifyErr = watcher.UpdateForAddPolicy(sec, ptype, rule...)
 		} else {
-			err = e.watcher.Update()
+			notifyErr = e.watcher.Update()
 		}
-		return true, err
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = notifyErr
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
+		return true, notifyErr
+	}
+
+	if shouldLog {
+		entry.Duration = time.Since(entry.Timestamp)
+		e.eventLogger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil
@@ -351,19 +385,51 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 // If autoRemoveRepeat == true, existing rules are automatically filtered
 // Otherwise, false is returned directly.
 func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoRemoveRepeat bool) (bool, error) {
+	// Event logging setup
+	var entry *log.LogEntry
+	var handle *log.Handle
+	shouldLog := e.shouldLog(log.EventPolicyAdd)
+
+	if shouldLog {
+		entry = &log.LogEntry{
+			Type:       log.EventPolicyAdd,
+			Timestamp:  time.Now(),
+			Operation:  "add",
+			Rules:      rules,
+			RuleCount:  len(rules),
+			Attributes: make(map[string]interface{}),
+		}
+		handle = e.eventLogger.OnBeforeEvent(entry)
+	}
+
 	ok, err := e.addPoliciesWithoutNotify(sec, ptype, rules, autoRemoveRepeat)
 	if !ok || err != nil {
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = err
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
+		var notifyErr error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForAddPolicies(sec, ptype, rules...)
+			notifyErr = watcher.UpdateForAddPolicies(sec, ptype, rules...)
 		} else {
-			err = e.watcher.Update()
+			notifyErr = e.watcher.Update()
 		}
-		return true, err
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = notifyErr
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
+		return true, notifyErr
+	}
+
+	if shouldLog {
+		entry.Duration = time.Since(entry.Timestamp)
+		e.eventLogger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil
@@ -371,38 +437,102 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoR
 
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
+	// Event logging setup
+	var entry *log.LogEntry
+	var handle *log.Handle
+	shouldLog := e.shouldLog(log.EventPolicyRemove)
+
+	if shouldLog {
+		entry = &log.LogEntry{
+			Type:       log.EventPolicyRemove,
+			Timestamp:  time.Now(),
+			Operation:  "remove",
+			Rules:      [][]string{rule},
+			RuleCount:  1,
+			Attributes: make(map[string]interface{}),
+		}
+		handle = e.eventLogger.OnBeforeEvent(entry)
+	}
+
 	ok, err := e.removePolicyWithoutNotify(sec, ptype, rule)
 	if !ok || err != nil {
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = err
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
+		var notifyErr error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForRemovePolicy(sec, ptype, rule...)
+			notifyErr = watcher.UpdateForRemovePolicy(sec, ptype, rule...)
 		} else {
-			err = e.watcher.Update()
+			notifyErr = e.watcher.Update()
 		}
-		return true, err
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = notifyErr
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
+		return true, notifyErr
+	}
+
+	if shouldLog {
+		entry.Duration = time.Since(entry.Timestamp)
+		e.eventLogger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil
 }
 
 func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
+	// Event logging setup
+	var entry *log.LogEntry
+	var handle *log.Handle
+	shouldLog := e.shouldLog(log.EventPolicyUpdate)
+
+	if shouldLog {
+		entry = &log.LogEntry{
+			Type:       log.EventPolicyUpdate,
+			Timestamp:  time.Now(),
+			Operation:  "update",
+			Rules:      [][]string{oldRule, newRule},
+			RuleCount:  1,
+			Attributes: make(map[string]interface{}),
+		}
+		handle = e.eventLogger.OnBeforeEvent(entry)
+	}
+
 	ok, err := e.updatePolicyWithoutNotify(sec, ptype, oldRule, newRule)
 	if !ok || err != nil {
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = err
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
+		var notifyErr error
 		if watcher, ok := e.watcher.(persist.UpdatableWatcher); ok {
-			err = watcher.UpdateForUpdatePolicy(sec, ptype, oldRule, newRule)
+			notifyErr = watcher.UpdateForUpdatePolicy(sec, ptype, oldRule, newRule)
 		} else {
-			err = e.watcher.Update()
+			notifyErr = e.watcher.Update()
 		}
-		return true, err
+		if shouldLog {
+			entry.Duration = time.Since(entry.Timestamp)
+			entry.Error = notifyErr
+			e.eventLogger.OnAfterEvent(handle, entry)
+		}
+		return true, notifyErr
+	}
+
+	if shouldLog {
+		entry.Duration = time.Since(entry.Timestamp)
+		e.eventLogger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil

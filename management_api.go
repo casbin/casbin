@@ -81,6 +81,17 @@ func (e *Enforcer) GetPolicy() ([][]string, error) {
 	return e.GetNamedPolicy("p")
 }
 
+// GetPolicyCount gets the count of all authorization rules in the policy.
+func (e *Enforcer) GetPolicyCount() int {
+	count := 0
+	if e.model != nil && e.model["p"] != nil {
+		for _, ast := range e.model["p"] {
+			count += len(ast.Policy)
+		}
+	}
+	return count
+}
+
 // GetFilteredPolicy gets all the authorization rules in the policy, field filters can be specified.
 func (e *Enforcer) GetFilteredPolicy(fieldIndex int, fieldValues ...string) ([][]string, error) {
 	return e.GetFilteredNamedPolicy("p", fieldIndex, fieldValues...)
