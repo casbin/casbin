@@ -63,6 +63,14 @@ func (e *Enforcer) addPolicyWithoutNotify(sec string, ptype string, rule []strin
 		if err != nil {
 			return true, err
 		}
+		
+		// Validate constraints after adding grouping policy
+		if err := e.model.ValidateConstraints(); err != nil {
+			// Rollback the policy addition
+			_, _ = e.model.RemovePolicy(sec, ptype, rule)
+			_ = e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{rule})
+			return false, err
+		}
 	}
 
 	return true, nil
@@ -106,6 +114,15 @@ func (e *Enforcer) addPoliciesWithoutNotify(sec string, ptype string, rules [][]
 		if err != nil {
 			return true, err
 		}
+		
+		// Validate constraints after adding grouping policies
+		if err := e.model.ValidateConstraints(); err != nil {
+			// Rollback the policy additions
+			_, _ = e.model.RemovePolicies(sec, ptype, rules)
+			_ = e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, rules)
+			_ = e.BuildIncrementalConditionalRoleLinks(model.PolicyRemove, ptype, rules)
+			return false, err
+		}
 	}
 
 	return true, nil
@@ -134,6 +151,14 @@ func (e *Enforcer) removePolicyWithoutNotify(sec string, ptype string, rule []st
 		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{rule})
 		if err != nil {
 			return ruleRemoved, err
+		}
+		
+		// Validate constraints after removing grouping policy
+		if err := e.model.ValidateConstraints(); err != nil {
+			// Rollback the policy removal
+			_ = e.model.AddPolicy(sec, ptype, rule)
+			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{rule})
+			return false, err
 		}
 	}
 
@@ -165,6 +190,15 @@ func (e *Enforcer) updatePolicyWithoutNotify(sec string, ptype string, oldRule [
 		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{newRule}) // add the new rule
 		if err != nil {
 			return ruleUpdated, err
+		}
+		
+		// Validate constraints after updating grouping policy
+		if err := e.model.ValidateConstraints(); err != nil {
+			// Rollback the policy update
+			_, _ = e.model.UpdatePolicy(sec, ptype, newRule, oldRule)
+			_ = e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{newRule})
+			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{oldRule})
+			return false, err
 		}
 	}
 
@@ -202,6 +236,15 @@ func (e *Enforcer) updatePoliciesWithoutNotify(sec string, ptype string, oldRule
 		if err != nil {
 			return ruleUpdated, err
 		}
+		
+		// Validate constraints after updating grouping policies
+		if err := e.model.ValidateConstraints(); err != nil {
+			// Rollback the policy updates
+			_, _ = e.model.UpdatePolicies(sec, ptype, newRules, oldRules)
+			_ = e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, newRules)
+			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, oldRules)
+			return false, err
+		}
 	}
 
 	return ruleUpdated, nil
@@ -235,6 +278,14 @@ func (e *Enforcer) removePoliciesWithoutNotify(sec string, ptype string, rules [
 		if err != nil {
 			return rulesRemoved, err
 		}
+		
+		// Validate constraints after removing grouping policies
+		if err := e.model.ValidateConstraints(); err != nil {
+			// Rollback the policy removals
+			_ = e.model.AddPolicies(sec, ptype, rules)
+			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
+			return false, err
+		}
 	}
 	return rulesRemoved, nil
 }
@@ -266,6 +317,14 @@ func (e *Enforcer) removeFilteredPolicyWithoutNotify(sec string, ptype string, f
 		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effects)
 		if err != nil {
 			return ruleRemoved, err
+		}
+		
+		// Validate constraints after removing filtered grouping policies
+		if err := e.model.ValidateConstraints(); err != nil {
+			// Rollback the policy removals
+			_ = e.model.AddPolicies(sec, ptype, effects)
+			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, effects)
+			return false, err
 		}
 	}
 
@@ -320,6 +379,16 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 		}
 		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, newRules) // add the new rules
 		if err != nil {
+			return oldRules, err
+		}
+		
+		// Validate constraints after updating filtered grouping policies
+		if err := e.model.ValidateConstraints(); err != nil {
+			// Rollback the policy updates
+			_, _ = e.model.RemovePolicies(sec, ptype, newRules)
+			_ = e.model.AddPolicies(sec, ptype, oldRules)
+			_ = e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, newRules)
+			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, oldRules)
 			return oldRules, err
 		}
 	}

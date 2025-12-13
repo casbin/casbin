@@ -44,6 +44,7 @@ var sectionNameMap = map[string]string{
 	"g": "role_definition",
 	"e": "policy_effect",
 	"m": "matchers",
+	"c": "constraint_definition",
 }
 
 // Minimal required sections for a model to be valid.
@@ -209,6 +210,12 @@ func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	if len(ms) > 0 {
 		return fmt.Errorf("missing required sections: %s", strings.Join(ms, ","))
 	}
+	
+	// Validate constraints after model is loaded
+	if err := model.ValidateConstraints(); err != nil {
+		return err
+	}
+	
 	return nil
 }
 
@@ -398,6 +405,12 @@ func (model Model) ToText() string {
 		s.WriteString("[role_definition]\n")
 		for ptype := range model["g"] {
 			s.WriteString(fmt.Sprintf("%s = %s\n", ptype, model["g"][ptype].Value))
+		}
+	}
+	if _, ok := model["c"]; ok {
+		s.WriteString("[constraint_definition]\n")
+		for ptype := range model["c"] {
+			s.WriteString(fmt.Sprintf("%s = %s\n", ptype, model["c"][ptype].Value))
 		}
 	}
 	s.WriteString("[policy_effect]\n")
