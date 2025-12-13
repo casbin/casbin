@@ -91,7 +91,7 @@ func TestTransformBlockMatcher(t *testing.T) {
 			// Normalize whitespace for comparison
 			result = strings.Join(strings.Fields(result), " ")
 			expected := strings.Join(strings.Fields(tt.expected), " ")
-			
+
 			if result != expected {
 				t.Errorf("TransformBlockMatcher() = %v, want %v", result, expected)
 			}

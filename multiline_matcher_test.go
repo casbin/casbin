@@ -28,17 +28,17 @@ func TestMultiLineMatcherWithLetStatements(t *testing.T) {
 
 	// alice has direct permission on data1 for read
 	testEnforce(t, e, "alice", "data1", "read", true)
-	
+
 	// alice doesn't have direct permission on data1 for write, but has via role and resource hierarchy
 	testEnforce(t, e, "alice", "data1", "write", true)
-	
+
 	// bob has direct permission on data2 for write
 	testEnforce(t, e, "bob", "data2", "write", true)
-	
+
 	// bob doesn't have direct permission on data1
 	testEnforce(t, e, "bob", "data1", "read", false)
 	testEnforce(t, e, "bob", "data1", "write", false)
-	
+
 	// Test with inherited permissions through data_group
 	testEnforce(t, e, "alice", "data2", "write", true)
 }
@@ -51,17 +51,17 @@ func TestMultiLineMatcherWithEarlyReturn(t *testing.T) {
 
 	// alice has direct permission on data1 for read
 	testEnforce(t, e, "alice", "data1", "read", true)
-	
+
 	// alice doesn't have direct permission on data1 for write, but has via role
 	testEnforce(t, e, "alice", "data1", "write", true)
-	
+
 	// bob has direct permission on data2 for write
 	testEnforce(t, e, "bob", "data2", "write", true)
-	
+
 	// bob doesn't have permission on data1
 	testEnforce(t, e, "bob", "data1", "read", false)
 	testEnforce(t, e, "bob", "data1", "write", false)
-	
+
 	// alice can write to data2 through role and resource hierarchy
 	testEnforce(t, e, "alice", "data2", "write", true)
 }
@@ -120,15 +120,15 @@ func TestSimpleBlockMatcher(t *testing.T) {
 }
 
 func TestIssueExampleMatcher(t *testing.T) {
-// This test demonstrates the exact use case from the issue
-e, err := NewEnforcer("examples/issue_example_model.conf", "examples/rbac_with_hierarchy_multiline_policy.csv")
-if err != nil {
-t.Fatalf("Failed to create enforcer: %v", err)
-}
+	// This test demonstrates the exact use case from the issue
+	e, err := NewEnforcer("examples/issue_example_model.conf", "examples/rbac_with_hierarchy_multiline_policy.csv")
+	if err != nil {
+		t.Fatalf("Failed to create enforcer: %v", err)
+	}
 
-// Verify the multi-line matcher with let statements works correctly
-testEnforce(t, e, "alice", "data1", "read", true)
-testEnforce(t, e, "alice", "data1", "write", true)  // via role + resource hierarchy
-testEnforce(t, e, "bob", "data2", "write", true)
-testEnforce(t, e, "alice", "data2", "write", true)  // via role + resource hierarchy
+	// Verify the multi-line matcher with let statements works correctly
+	testEnforce(t, e, "alice", "data1", "read", true)
+	testEnforce(t, e, "alice", "data1", "write", true) // via role + resource hierarchy
+	testEnforce(t, e, "bob", "data2", "write", true)
+	testEnforce(t, e, "alice", "data2", "write", true) // via role + resource hierarchy
 }

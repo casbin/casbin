@@ -20,13 +20,13 @@ import (
 )
 
 var (
-	// Regex to detect block-style matcher (starts with {)
+	// Regex to detect block-style matcher (starts with {).
 	blockMatcherRegex = regexp.MustCompile(`^\s*\{`)
 )
 
 const (
 	// maxSubstitutionPasses defines the maximum number of variable substitution passes
-	// to prevent infinite loops in case of circular references
+	// to prevent infinite loops in case of circular references.
 	maxSubstitutionPasses = 10
 )
 
@@ -35,16 +35,19 @@ const (
 //
 // Example transformation:
 // Input:
-//   {
-//     let role_match = g(r.sub, p.sub)
-//     let obj_match = r.obj == p.obj
-//     return role_match && obj_match
-//   }
+//
+//	{
+//	  let role_match = g(r.sub, p.sub)
+//	  let obj_match = r.obj == p.obj
+//	  return role_match && obj_match
+//	}
+//
 // Output:
-//   g(r.sub, p.sub) && r.obj == p.obj
+//
+//	g(r.sub, p.sub) && r.obj == p.obj
 func TransformBlockMatcher(matcher string) string {
 	matcher = strings.TrimSpace(matcher)
-	
+
 	// Check if this is a block-style matcher
 	if !blockMatcherRegex.MatchString(matcher) {
 		return matcher
@@ -57,12 +60,12 @@ func TransformBlockMatcher(matcher string) string {
 
 	// Parse the block into statements
 	statements := parseStatements(matcher)
-	
+
 	// Build a map of variable substitutions from let statements
 	varMap := make(map[string]string)
 	var ifStatements []ifStatement
 	var finalReturn string
-	
+
 	for _, stmt := range statements {
 		if stmt.stmtType == stmtTypeLet {
 			varMap[stmt.varName] = stmt.expression
@@ -140,133 +143,152 @@ type ifStatement struct {
 
 func parseStatements(block string) []statement {
 	var statements []statement
-	
-	// Split by keywords: let, if, return
-	// We need to be careful about parsing
+
 	i := 0
 	for i < len(block) {
-		// Skip whitespace
-		for i < len(block) && (block[i] == ' ' || block[i] == '\t' || block[i] == '\n' || block[i] == '\r') {
-			i++
-		}
+		i = skipWhitespace(block, i)
 		if i >= len(block) {
 			break
 		}
-		
+
 		// Check for keywords
 		if strings.HasPrefix(block[i:], "let ") {
-			// Parse let statement
-			i += 4 // skip "let "
-			// Find variable name
-			varStart := i
-			for i < len(block) && (isLetterOrDigit(block[i]) || block[i] == '_') {
-				i++
-			}
-			varName := block[varStart:i]
-			
-			// Skip whitespace and '='
-			for i < len(block) && (block[i] == ' ' || block[i] == '\t' || block[i] == '=') {
-				i++
-			}
-			
-			// Find expression (until next keyword or end)
-			exprStart := i
-			depth := 0
-			for i < len(block) {
-				if block[i] == '(' || block[i] == '[' || block[i] == '{' {
-					depth++
-				} else if block[i] == ')' || block[i] == ']' || block[i] == '}' {
-					depth--
-				}
-				
-				if depth == 0 {
-					// Check if we're at the start of a keyword
-					remaining := block[i:]
-					if strings.HasPrefix(remaining, "let ") || 
-					   strings.HasPrefix(remaining, "if ") || 
-					   strings.HasPrefix(remaining, "return ") {
-						break
-					}
-				}
-				i++
-			}
-			expression := strings.TrimSpace(block[exprStart:i])
-			
-			statements = append(statements, statement{
-				stmtType:   stmtTypeLet,
-				varName:    varName,
-				expression: expression,
-			})
-			
+			stmt, newPos := parseLetStatement(block, i)
+			statements = append(statements, stmt)
+			i = newPos
 		} else if strings.HasPrefix(block[i:], "if ") {
-			// Parse if statement with return
-			i += 3 // skip "if "
-			
-			// Find condition (until '{')
-			condStart := i
-			for i < len(block) && block[i] != '{' {
-				i++
-			}
-			condition := strings.TrimSpace(block[condStart:i])
-			
-			// Skip '{'
-			if i < len(block) && block[i] == '{' {
-				i++
-			}
-			
-			// Skip whitespace and "return"
-			for i < len(block) && (block[i] == ' ' || block[i] == '\t' || block[i] == '\n' || block[i] == '\r') {
-				i++
-			}
-			if strings.HasPrefix(block[i:], "return ") {
-				i += 7 // skip "return "
-			}
-			
-			// Find return value (until '}')
-			valueStart := i
-			for i < len(block) && block[i] != '}' {
-				i++
-			}
-			returnValue := strings.TrimSpace(block[valueStart:i])
-			
-			// Skip '}'
-			if i < len(block) && block[i] == '}' {
-				i++
-			}
-			
-			statements = append(statements, statement{
-				stmtType:   stmtTypeIf,
-				condition:  condition,
-				expression: returnValue,
-			})
-			
+			stmt, newPos := parseIfStatement(block, i)
+			statements = append(statements, stmt)
+			i = newPos
 		} else if strings.HasPrefix(block[i:], "return ") {
-			// Parse return statement
-			i += 7 // skip "return "
-			
-			// Find expression (until end)
-			exprStart := i
-			i = len(block)
-			expression := strings.TrimSpace(block[exprStart:i])
-			
-			statements = append(statements, statement{
-				stmtType:   stmtTypeReturn,
-				expression: expression,
-			})
-			
+			stmt, newPos := parseReturnStatement(block, i)
+			statements = append(statements, stmt)
+			i = newPos
 		} else {
-			// Skip whitespace - this is expected
-			if i < len(block) && (block[i] == ' ' || block[i] == '\t' || block[i] == '\n' || block[i] == '\r') {
-				i++
-			} else if i < len(block) {
-				// Unknown token - this could indicate a syntax error
-				// Skip the character and continue parsing
-				i++
-			}
+			// Skip whitespace or unknown characters
+			i = skipUnknownToken(block, i)
 		}
 	}
-	
+
 	return statements
+}
+
+func skipWhitespace(block string, i int) int {
+	for i < len(block) && (block[i] == ' ' || block[i] == '\t' || block[i] == '\n' || block[i] == '\r') {
+		i++
+	}
+	return i
+}
+
+func skipUnknownToken(block string, i int) int {
+	if i < len(block) && (block[i] == ' ' || block[i] == '\t' || block[i] == '\n' || block[i] == '\r') {
+		return i + 1
+	}
+	if i < len(block) {
+		// Unknown token - skip the character and continue parsing
+		return i + 1
+	}
+	return i
+}
+
+func parseLetStatement(block string, i int) (statement, int) {
+	i += 4 // skip "let "
+
+	// Find variable name
+	varStart := i
+	for i < len(block) && (isLetterOrDigit(block[i]) || block[i] == '_') {
+		i++
+	}
+	varName := block[varStart:i]
+
+	// Skip whitespace and '='
+	for i < len(block) && (block[i] == ' ' || block[i] == '\t' || block[i] == '=') {
+		i++
+	}
+
+	// Find expression (until next keyword or end)
+	exprStart := i
+	depth := 0
+	for i < len(block) {
+		if block[i] == '(' || block[i] == '[' || block[i] == '{' {
+			depth++
+		} else if block[i] == ')' || block[i] == ']' || block[i] == '}' {
+			depth--
+		}
+
+		if depth == 0 && isAtKeyword(block, i) {
+			break
+		}
+		i++
+	}
+	expression := strings.TrimSpace(block[exprStart:i])
+
+	return statement{
+		stmtType:   stmtTypeLet,
+		varName:    varName,
+		expression: expression,
+	}, i
+}
+
+func parseIfStatement(block string, i int) (statement, int) {
+	i += 3 // skip "if "
+
+	// Find condition (until '{')
+	condStart := i
+	for i < len(block) && block[i] != '{' {
+		i++
+	}
+	condition := strings.TrimSpace(block[condStart:i])
+
+	// Skip '{'
+	if i < len(block) && block[i] == '{' {
+		i++
+	}
+
+	// Skip whitespace and "return"
+	i = skipWhitespace(block, i)
+	if strings.HasPrefix(block[i:], "return ") {
+		i += 7 // skip "return "
+	}
+
+	// Find return value (until '}')
+	valueStart := i
+	for i < len(block) && block[i] != '}' {
+		i++
+	}
+	returnValue := strings.TrimSpace(block[valueStart:i])
+
+	// Skip '}'
+	if i < len(block) && block[i] == '}' {
+		i++
+	}
+
+	return statement{
+		stmtType:   stmtTypeIf,
+		condition:  condition,
+		expression: returnValue,
+	}, i
+}
+
+func parseReturnStatement(block string, i int) (statement, int) {
+	i += 7 // skip "return "
+
+	// Find expression (until end)
+	exprStart := i
+	i = len(block)
+	expression := strings.TrimSpace(block[exprStart:i])
+
+	return statement{
+		stmtType:   stmtTypeReturn,
+		expression: expression,
+	}, i
+}
+
+func isAtKeyword(block string, i int) bool {
+	remaining := block[i:]
+	return strings.HasPrefix(remaining, "let ") ||
+		strings.HasPrefix(remaining, "if ") ||
+		strings.HasPrefix(remaining, "return ")
 }
 
 func isLetterOrDigit(c byte) bool {
