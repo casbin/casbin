@@ -118,3 +118,17 @@ func TestSimpleBlockMatcher(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", true)
 	testEnforce(t, e, "bob", "data1", "read", false)
 }
+
+func TestIssueExampleMatcher(t *testing.T) {
+// This test demonstrates the exact use case from the issue
+e, err := NewEnforcer("examples/issue_example_model.conf", "examples/rbac_with_hierarchy_multiline_policy.csv")
+if err != nil {
+t.Fatalf("Failed to create enforcer: %v", err)
+}
+
+// Verify the multi-line matcher with let statements works correctly
+testEnforce(t, e, "alice", "data1", "read", true)
+testEnforce(t, e, "alice", "data1", "write", true)  // via role + resource hierarchy
+testEnforce(t, e, "bob", "data2", "write", true)
+testEnforce(t, e, "alice", "data2", "write", true)  // via role + resource hierarchy
+}
