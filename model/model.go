@@ -93,6 +93,9 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 	}
 
 	if sec == "m" {
+		// Transform block-style matchers to single-line expressions
+		ast.Value = util.TransformBlockMatcher(ast.Value)
+		
 		// Escape backslashes in string literals to match CSV parsing behavior
 		ast.Value = util.EscapeStringLiterals(ast.Value)
 
