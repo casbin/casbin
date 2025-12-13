@@ -24,6 +24,12 @@ var (
 	blockMatcherRegex = regexp.MustCompile(`^\s*\{`)
 )
 
+const (
+	// maxSubstitutionPasses defines the maximum number of variable substitution passes
+	// to prevent infinite loops in case of circular references
+	maxSubstitutionPasses = 10
+)
+
 // TransformBlockMatcher transforms a block-style matcher to a single-line expression
 // that can be evaluated by govaluate.
 //
@@ -73,8 +79,7 @@ func TransformBlockMatcher(matcher string) string {
 	// Substitute variables in all expressions
 	substituteVars := func(expr string) string {
 		// Perform multiple passes to handle nested variable references
-		maxPasses := 10
-		for i := 0; i < maxPasses; i++ {
+		for i := 0; i < maxSubstitutionPasses; i++ {
 			changed := false
 			for varName, varExpr := range varMap {
 				// Use word boundaries to avoid partial matches
@@ -250,8 +255,14 @@ func parseStatements(block string) []statement {
 			})
 			
 		} else {
-			// Unknown, skip character
-			i++
+			// Skip whitespace - this is expected
+			if i < len(block) && (block[i] == ' ' || block[i] == '\t' || block[i] == '\n' || block[i] == '\r') {
+				i++
+			} else if i < len(block) {
+				// Unknown token - this could indicate a syntax error
+				// Skip the character and continue parsing
+				i++
+			}
 		}
 	}
 	
