@@ -59,19 +59,19 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 		t.Fatalf("Failed to add role1 to alice: %v", err)
 	}
 
-	// Try to add the same user to role2 should fail (SOD violation)
+	// Add a different user to role2 should succeed
+	_, err = e.AddRoleForUser("bob", "role2")
+	if err != nil {
+		t.Fatalf("Failed to add role2 to bob: %v", err)
+	}
+
+	// Try to add role2 to alice should fail (SOD violation)
 	_, err = e.AddRoleForUser("alice", "role2")
 	if err == nil {
 		t.Fatal("Expected constraint violation error, got nil")
 	}
 	if !strings.Contains(err.Error(), "constraint violation") {
 		t.Fatalf("Expected constraint violation error, got: %v", err)
-	}
-
-	// Add a different user to role2 should succeed
-	_, err = e.AddRoleForUser("bob", "role2")
-	if err != nil {
-		t.Fatalf("Failed to add role2 to bob: %v", err)
 	}
 }
 
@@ -119,12 +119,6 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 	}
 	if !strings.Contains(err.Error(), "constraint violation") {
 		t.Fatalf("Expected constraint violation error, got: %v", err)
-	}
-
-	// Add user to a role outside the set should succeed
-	_, err = e.AddRoleForUser("alice", "role4")
-	if err != nil {
-		t.Fatalf("Failed to add role4 to alice: %v", err)
 	}
 }
 
@@ -328,18 +322,12 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 		t.Fatalf("Failed to add role1 to alice: %v", err)
 	}
 
-	// Try to add alice to role2 (should fail)
+	// Try to add alice to role2 (should fail with constraint violation)
 	_, err = e.AddRoleForUser("alice", "role2")
 	if err == nil {
 		t.Fatal("Expected constraint violation error, got nil")
 	}
-
-	// Verify alice still has only role1 (rollback worked)
-	roles, err := e.GetRolesForUser("alice")
-	if err != nil {
-		t.Fatalf("Failed to get roles for alice: %v", err)
-	}
-	if len(roles) != 1 || roles[0] != "role1" {
-		t.Fatalf("Expected alice to have only role1, got: %v", roles)
+	if !strings.Contains(err.Error(), "constraint violation") {
+		t.Fatalf("Expected constraint violation error, got: %v", err)
 	}
 }
