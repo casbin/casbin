@@ -249,7 +249,6 @@ func (e *Enforcer) shouldLog(eventType log.EventType) bool {
 	return e.subscribeCache[eventType]
 }
 
-
 func (e *Enforcer) initialize() {
 	e.rmMap = map[string]rbac.RoleManager{}
 	e.condRmMap = map[string]rbac.ConditionalRoleManager{}
