@@ -67,8 +67,12 @@ func (e *Enforcer) addPolicyWithoutNotify(sec string, ptype string, rule []strin
 		// Validate constraints after adding grouping policy
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy addition
-			_, _ = e.model.RemovePolicy(sec, ptype, rule)
-			_ = e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{rule})
+			if removed, rollbackErr := e.model.RemovePolicy(sec, ptype, rule); !removed || rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback policy addition after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{rule}); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback role links after constraint violation:")
+			}
 			return false, err
 		}
 	}
@@ -118,9 +122,15 @@ func (e *Enforcer) addPoliciesWithoutNotify(sec string, ptype string, rules [][]
 		// Validate constraints after adding grouping policies
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy additions
-			_, _ = e.model.RemovePolicies(sec, ptype, rules)
-			_ = e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, rules)
-			_ = e.BuildIncrementalConditionalRoleLinks(model.PolicyRemove, ptype, rules)
+			if removed, rollbackErr := e.model.RemovePolicies(sec, ptype, rules); !removed || rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback policy additions after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, rules); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback role links after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalConditionalRoleLinks(model.PolicyRemove, ptype, rules); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback conditional role links after constraint violation:")
+			}
 			return false, err
 		}
 	}
@@ -156,8 +166,12 @@ func (e *Enforcer) removePolicyWithoutNotify(sec string, ptype string, rule []st
 		// Validate constraints after removing grouping policy
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy removal
-			_ = e.model.AddPolicy(sec, ptype, rule)
-			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{rule})
+			if rollbackErr := e.model.AddPolicy(sec, ptype, rule); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback policy removal after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{rule}); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback role links after constraint violation:")
+			}
 			return false, err
 		}
 	}
@@ -195,9 +209,15 @@ func (e *Enforcer) updatePolicyWithoutNotify(sec string, ptype string, oldRule [
 		// Validate constraints after updating grouping policy
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy update
-			_, _ = e.model.UpdatePolicy(sec, ptype, newRule, oldRule)
-			_ = e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{newRule})
-			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{oldRule})
+			if updated, rollbackErr := e.model.UpdatePolicy(sec, ptype, newRule, oldRule); !updated || rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback policy update after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, [][]string{newRule}); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback role links (remove new) after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, [][]string{oldRule}); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback role links (add old) after constraint violation:")
+			}
 			return false, err
 		}
 	}
@@ -240,9 +260,15 @@ func (e *Enforcer) updatePoliciesWithoutNotify(sec string, ptype string, oldRule
 		// Validate constraints after updating grouping policies
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy updates
-			_, _ = e.model.UpdatePolicies(sec, ptype, newRules, oldRules)
-			_ = e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, newRules)
-			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, oldRules)
+			if updated, rollbackErr := e.model.UpdatePolicies(sec, ptype, newRules, oldRules); !updated || rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback policy updates after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, newRules); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback role links (remove new) after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, oldRules); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback role links (add old) after constraint violation:")
+			}
 			return false, err
 		}
 	}
@@ -282,8 +308,12 @@ func (e *Enforcer) removePoliciesWithoutNotify(sec string, ptype string, rules [
 		// Validate constraints after removing grouping policies
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy removals
-			_ = e.model.AddPolicies(sec, ptype, rules)
-			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
+			if rollbackErr := e.model.AddPolicies(sec, ptype, rules); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback policy removals after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback role links after constraint violation:")
+			}
 			return false, err
 		}
 	}
@@ -322,8 +352,12 @@ func (e *Enforcer) removeFilteredPolicyWithoutNotify(sec string, ptype string, f
 		// Validate constraints after removing filtered grouping policies
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy removals
-			_ = e.model.AddPolicies(sec, ptype, effects)
-			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, effects)
+			if rollbackErr := e.model.AddPolicies(sec, ptype, effects); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback filtered policy removals after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, effects); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback role links after constraint violation:")
+			}
 			return false, err
 		}
 	}
@@ -385,10 +419,18 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 		// Validate constraints after updating filtered grouping policies
 		if err := e.model.ValidateConstraints(); err != nil {
 			// Rollback the policy updates
-			_, _ = e.model.RemovePolicies(sec, ptype, newRules)
-			_ = e.model.AddPolicies(sec, ptype, oldRules)
-			_ = e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, newRules)
-			_ = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, oldRules)
+			if removed, rollbackErr := e.model.RemovePolicies(sec, ptype, newRules); !removed || rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback filtered policy updates (remove new) after constraint violation:")
+			}
+			if rollbackErr := e.model.AddPolicies(sec, ptype, oldRules); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback filtered policy updates (add old) after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, newRules); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback role links (remove new) after constraint violation:")
+			}
+			if rollbackErr := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, oldRules); rollbackErr != nil {
+				e.logger.LogError(rollbackErr, "Failed to rollback role links (add old) after constraint violation:")
+			}
 			return oldRules, err
 		}
 	}

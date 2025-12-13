@@ -44,12 +44,30 @@ type Constraint struct {
 }
 
 var (
-	// Regex patterns for parsing constraints
+	// Regex patterns for parsing constraints (compiled once at package initialization)
 	sodPattern     = regexp.MustCompile(`^sod\s*\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*\)$`)
 	sodMaxPattern  = regexp.MustCompile(`^sodMax\s*\(\s*\[([^\]]+)\]\s*,\s*(\d+)\s*\)$`)
 	roleMaxPattern = regexp.MustCompile(`^roleMax\s*\(\s*"([^"]+)"\s*,\s*(\d+)\s*\)$`)
 	rolePrePattern = regexp.MustCompile(`^rolePre\s*\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*\)$`)
 )
+
+// parseRolesArray parses a comma-separated string of quoted role names.
+func parseRolesArray(rolesStr string) ([]string, error) {
+	var roles []string
+	for _, role := range strings.Split(rolesStr, ",") {
+		role = strings.TrimSpace(role)
+		role = strings.Trim(role, `"`)
+		if role != "" {
+			roles = append(roles, role)
+		}
+	}
+	
+	if len(roles) == 0 {
+		return nil, fmt.Errorf("no roles found in role array")
+	}
+	
+	return roles, nil
+}
 
 // parseConstraint parses a constraint definition string.
 func parseConstraint(key, value string) (*Constraint, error) {
@@ -66,24 +84,14 @@ func parseConstraint(key, value string) (*Constraint, error) {
 
 	// Try to match sodMax pattern
 	if matches := sodMaxPattern.FindStringSubmatch(value); matches != nil {
-		rolesStr := matches[1]
 		maxCount, err := strconv.Atoi(matches[2])
 		if err != nil {
 			return nil, fmt.Errorf("invalid max count in sodMax: %w", err)
 		}
 		
-		// Parse the roles array
-		var roles []string
-		for _, role := range strings.Split(rolesStr, ",") {
-			role = strings.TrimSpace(role)
-			role = strings.Trim(role, `"`)
-			if role != "" {
-				roles = append(roles, role)
-			}
-		}
-		
-		if len(roles) == 0 {
-			return nil, fmt.Errorf("sodMax requires at least one role")
+		roles, err := parseRolesArray(matches[1])
+		if err != nil {
+			return nil, fmt.Errorf("sodMax: %w", err)
 		}
 		
 		return &Constraint{
@@ -170,16 +178,10 @@ func (model Model) validateConstraint(constraint *Constraint, groupingPolicy [][
 	}
 }
 
-// validateSOD validates a Separation of Duties constraint.
-func (model Model) validateSOD(constraint *Constraint, groupingPolicy [][]string) error {
-	if len(constraint.Roles) != 2 {
-		return errors.NewConstraintViolationError(constraint.Key, "sod requires exactly 2 roles")
-	}
-
-	role1, role2 := constraint.Roles[0], constraint.Roles[1]
+// buildUserRoleMap builds a map of users to their assigned roles from grouping policy.
+func buildUserRoleMap(groupingPolicy [][]string) map[string]map[string]bool {
 	userRoles := make(map[string]map[string]bool)
 
-	// Build a map of users to their roles
 	for _, rule := range groupingPolicy {
 		if len(rule) < 2 {
 			continue
@@ -192,6 +194,18 @@ func (model Model) validateSOD(constraint *Constraint, groupingPolicy [][]string
 		}
 		userRoles[user][role] = true
 	}
+
+	return userRoles
+}
+
+// validateSOD validates a Separation of Duties constraint.
+func (model Model) validateSOD(constraint *Constraint, groupingPolicy [][]string) error {
+	if len(constraint.Roles) != 2 {
+		return errors.NewConstraintViolationError(constraint.Key, "sod requires exactly 2 roles")
+	}
+
+	role1, role2 := constraint.Roles[0], constraint.Roles[1]
+	userRoles := buildUserRoleMap(groupingPolicy)
 
 	// Check if any user has both roles
 	for user, roles := range userRoles {
@@ -206,21 +220,7 @@ func (model Model) validateSOD(constraint *Constraint, groupingPolicy [][]string
 
 // validateSODMax validates a maximum role count constraint for a role set.
 func (model Model) validateSODMax(constraint *Constraint, groupingPolicy [][]string) error {
-	userRoles := make(map[string]map[string]bool)
-
-	// Build a map of users to their roles
-	for _, rule := range groupingPolicy {
-		if len(rule) < 2 {
-			continue
-		}
-		user := rule[0]
-		role := rule[1]
-		
-		if userRoles[user] == nil {
-			userRoles[user] = make(map[string]bool)
-		}
-		userRoles[user][role] = true
-	}
+	userRoles := buildUserRoleMap(groupingPolicy)
 
 	// Check if any user has more than maxCount roles from the role set
 	for user, roles := range userRoles {
@@ -267,21 +267,7 @@ func (model Model) validateRoleMax(constraint *Constraint, groupingPolicy [][]st
 
 // validateRolePre validates a prerequisite role constraint.
 func (model Model) validateRolePre(constraint *Constraint, groupingPolicy [][]string) error {
-	userRoles := make(map[string]map[string]bool)
-
-	// Build a map of users to their roles
-	for _, rule := range groupingPolicy {
-		if len(rule) < 2 {
-			continue
-		}
-		user := rule[0]
-		role := rule[1]
-		
-		if userRoles[user] == nil {
-			userRoles[user] = make(map[string]bool)
-		}
-		userRoles[user][role] = true
-	}
+	userRoles := buildUserRoleMap(groupingPolicy)
 
 	// Check if any user has the main role without the prerequisite role
 	for user, roles := range userRoles {

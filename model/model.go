@@ -197,6 +197,11 @@ func (model Model) LoadModelFromText(text string) error {
 	return model.loadModelFromConfig(cfg)
 }
 
+// loadModelFromConfig loads the model from a config interface.
+// It loads all sections defined in sectionNameMap and validates that required sections are present.
+// If constraint_definition section exists, it validates all constraints against the current policy.
+// Note: Constraint validation is performed during model loading, which may affect loading performance
+// and can cause model loading to fail if constraints are violated or invalid.
 func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	for s := range sectionNameMap {
 		loadSection(model, cfg, s)
