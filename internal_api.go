@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	Err "github.com/casbin/casbin/v3/errors"
+	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
 )
@@ -374,14 +375,20 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 }
 
 // addPolicy adds a rule to the current policy.
-func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
-	ok, err := e.addPolicyWithoutNotify(sec, ptype, rule)
+func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (ok bool, err error) {
+	// Use EventRoleAdd for grouping policies, EventPolicyAdd for regular policies
+	eventType := log.EventPolicyAdd
+	if sec == "g" {
+		eventType = log.EventRoleAdd
+	}
+	defer e.LogPolicyEvent(eventType, "add", [][]string{rule}, &err)()
+
+	ok, err = e.addPolicyWithoutNotify(sec, ptype, rule)
 	if !ok || err != nil {
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
 			err = watcher.UpdateForAddPolicy(sec, ptype, rule...)
 		} else {
@@ -396,14 +403,20 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 // addPolicies adds rules to the current policy.
 // If autoRemoveRepeat == true, existing rules are automatically filtered
 // Otherwise, false is returned directly.
-func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoRemoveRepeat bool) (bool, error) {
-	ok, err := e.addPoliciesWithoutNotify(sec, ptype, rules, autoRemoveRepeat)
+func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoRemoveRepeat bool) (ok bool, err error) {
+	// Use EventRoleAdd for grouping policies, EventPolicyAdd for regular policies
+	eventType := log.EventPolicyAdd
+	if sec == "g" {
+		eventType = log.EventRoleAdd
+	}
+	defer e.LogPolicyEvent(eventType, "add", rules, &err)()
+
+	ok, err = e.addPoliciesWithoutNotify(sec, ptype, rules, autoRemoveRepeat)
 	if !ok || err != nil {
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
 			err = watcher.UpdateForAddPolicies(sec, ptype, rules...)
 		} else {
@@ -416,14 +429,20 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoR
 }
 
 // removePolicy removes a rule from the current policy.
-func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
-	ok, err := e.removePolicyWithoutNotify(sec, ptype, rule)
+func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (ok bool, err error) {
+	// Use EventRoleRemove for grouping policies, EventPolicyRemove for regular policies
+	eventType := log.EventPolicyRemove
+	if sec == "g" {
+		eventType = log.EventRoleRemove
+	}
+	defer e.LogPolicyEvent(eventType, "remove", [][]string{rule}, &err)()
+
+	ok, err = e.removePolicyWithoutNotify(sec, ptype, rule)
 	if !ok || err != nil {
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
 			err = watcher.UpdateForRemovePolicy(sec, ptype, rule...)
 		} else {
@@ -435,14 +454,15 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 	return true, nil
 }
 
-func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
-	ok, err := e.updatePolicyWithoutNotify(sec, ptype, oldRule, newRule)
+func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newRule []string) (ok bool, err error) {
+	defer e.LogPolicyEvent(log.EventPolicyUpdate, "update", [][]string{oldRule, newRule}, &err)()
+
+	ok, err = e.updatePolicyWithoutNotify(sec, ptype, oldRule, newRule)
 	if !ok || err != nil {
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
 		if watcher, ok := e.watcher.(persist.UpdatableWatcher); ok {
 			err = watcher.UpdateForUpdatePolicy(sec, ptype, oldRule, newRule)
 		} else {
@@ -454,14 +474,17 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 	return true, nil
 }
 
-func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
-	ok, err := e.updatePoliciesWithoutNotify(sec, ptype, oldRules, newRules)
+func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string, newRules [][]string) (ok bool, err error) {
+	// Combine old and new rules for logging
+	allRules := append(oldRules, newRules...)
+	defer e.LogPolicyEvent(log.EventPolicyUpdate, "update", allRules, &err)()
+
+	ok, err = e.updatePoliciesWithoutNotify(sec, ptype, oldRules, newRules)
 	if !ok || err != nil {
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
 		if watcher, ok := e.watcher.(persist.UpdatableWatcher); ok {
 			err = watcher.UpdateForUpdatePolicies(sec, ptype, oldRules, newRules)
 		} else {
@@ -474,14 +497,20 @@ func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string,
 }
 
 // removePolicies removes rules from the current policy.
-func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (bool, error) {
-	ok, err := e.removePoliciesWithoutNotify(sec, ptype, rules)
+func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (ok bool, err error) {
+	// Use EventRoleRemove for grouping policies, EventPolicyRemove for regular policies
+	eventType := log.EventPolicyRemove
+	if sec == "g" {
+		eventType = log.EventRoleRemove
+	}
+	defer e.LogPolicyEvent(eventType, "remove", rules, &err)()
+
+	ok, err = e.removePoliciesWithoutNotify(sec, ptype, rules)
 	if !ok || err != nil {
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
 			err = watcher.UpdateForRemovePolicies(sec, ptype, rules...)
 		} else {

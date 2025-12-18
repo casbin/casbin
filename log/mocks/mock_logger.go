@@ -6,9 +6,38 @@ package mocks
 
 import (
 	reflect "reflect"
+	time "time"
 
 	gomock "github.com/golang/mock/gomock"
 )
+
+// EventType represents the type of event being logged (mirror of log.EventType).
+type EventType string
+
+// Handle is passed from OnBeforeEvent to OnAfterEvent (mirror of log.Handle).
+type Handle struct {
+	StartTime time.Time
+	Store     map[string]interface{}
+}
+
+// LogEntry contains all information about an event (mirror of log.LogEntry).
+type LogEntry struct {
+	Type       EventType
+	Timestamp  time.Time
+	Duration   time.Duration
+	Request    []interface{}
+	Subject    string
+	Object     string
+	Action     string
+	Domain     string
+	Allowed    bool
+	Matched    [][]string
+	Operation  string
+	Rules      [][]string
+	RuleCount  int
+	Error      error
+	Attributes map[string]interface{}
+}
 
 // MockLogger is a mock of Logger interface.
 type MockLogger struct {
@@ -122,4 +151,43 @@ func (m *MockLogger) LogRole(arg0 []string) {
 func (mr *MockLoggerMockRecorder) LogRole(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LogRole", reflect.TypeOf((*MockLogger)(nil).LogRole), arg0)
+}
+
+// Subscribe mocks base method.
+func (m *MockLogger) Subscribe() []EventType {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Subscribe")
+	ret0, _ := ret[0].([]EventType)
+	return ret0
+}
+
+// Subscribe indicates an expected call of Subscribe.
+func (mr *MockLoggerMockRecorder) Subscribe() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockLogger)(nil).Subscribe))
+}
+
+// OnBeforeEvent mocks base method.
+func (m *MockLogger) OnBeforeEvent(arg0 interface{}) interface{} {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "OnBeforeEvent", arg0)
+	return ret[0]
+}
+
+// OnBeforeEvent indicates an expected call of OnBeforeEvent.
+func (mr *MockLoggerMockRecorder) OnBeforeEvent(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OnBeforeEvent", reflect.TypeOf((*MockLogger)(nil).OnBeforeEvent), arg0)
+}
+
+// OnAfterEvent mocks base method.
+func (m *MockLogger) OnAfterEvent(arg0 interface{}, arg1 interface{}) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "OnAfterEvent", arg0, arg1)
+}
+
+// OnAfterEvent indicates an expected call of OnAfterEvent.
+func (mr *MockLoggerMockRecorder) OnAfterEvent(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OnAfterEvent", reflect.TypeOf((*MockLogger)(nil).OnAfterEvent), arg0, arg1)
 }

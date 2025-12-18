@@ -22,7 +22,8 @@ import (
 
 // DefaultLogger is the implementation for a Logger using golang log.
 type DefaultLogger struct {
-	enabled bool
+	enabled   bool
+	subscribe []EventType
 }
 
 func (l *DefaultLogger) EnableLog(enable bool) {
@@ -101,4 +102,21 @@ func (l *DefaultLogger) LogError(err error, msg ...string) {
 		return
 	}
 	log.Println(msg, err)
+}
+
+func (l *DefaultLogger) Subscribe() []EventType {
+	return l.subscribe
+}
+
+func (l *DefaultLogger) SetSubscribe(events []EventType) {
+	l.subscribe = events
+}
+
+func (l *DefaultLogger) OnBeforeEvent(entry *LogEntry) *Handle {
+	return NewHandle()
+}
+
+func (l *DefaultLogger) OnAfterEvent(handle *Handle, entry *LogEntry) {
+	// Default implementation does nothing.
+	// Custom loggers can override this to log events.
 }

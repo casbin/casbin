@@ -54,7 +54,8 @@ type Enforcer struct {
 	autoNotifyDispatcher bool
 	acceptJsonRequest    bool
 
-	logger log.Logger
+	logger         log.Logger
+	subscribeCache map[log.EventType]bool
 }
 
 // EnforceContext is used as the first element of the parameter "rvals" in method "enforce".
@@ -197,6 +198,7 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 // SetLogger changes the current enforcer's logger.
 func (e *Enforcer) SetLogger(logger log.Logger) {
 	e.logger = logger
+	e.updateSubscribeCache()
 	e.model.SetLogger(e.logger)
 	for k := range e.rmMap {
 		e.rmMap[k].SetLogger(e.logger)
@@ -204,6 +206,40 @@ func (e *Enforcer) SetLogger(logger log.Logger) {
 	for k := range e.condRmMap {
 		e.condRmMap[k].SetLogger(e.logger)
 	}
+}
+
+// updateSubscribeCache updates the subscribe cache based on the logger's subscriptions.
+func (e *Enforcer) updateSubscribeCache() {
+	e.subscribeCache = make(map[log.EventType]bool)
+
+	if e.logger == nil {
+		return
+	}
+
+	events := e.logger.Subscribe()
+	if len(events) == 0 {
+		// Empty means subscribe to all
+		e.subscribeCache = nil
+		return
+	}
+
+	for _, event := range events {
+		e.subscribeCache[event] = true
+	}
+}
+
+// shouldLog checks if we should log this event type.
+func (e *Enforcer) shouldLog(eventType log.EventType) bool {
+	if e.logger == nil || !e.logger.IsEnabled() {
+		return false
+	}
+
+	// nil cache means subscribe to all events
+	if e.subscribeCache == nil {
+		return true
+	}
+
+	return e.subscribeCache[eventType]
 }
 
 func (e *Enforcer) initialize() {
@@ -223,8 +259,9 @@ func (e *Enforcer) initialize() {
 
 // LoadModel reloads the model from the model CONF file.
 // Because the policy is attached to a model, so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
-func (e *Enforcer) LoadModel() error {
-	var err error
+func (e *Enforcer) LoadModel() (err error) {
+	defer e.LogModelEvent(log.EventModelLoad, &err)()
+
 	e.model, err = model.NewModelFromFile(e.modelPath)
 	if err != nil {
 		return err
@@ -326,7 +363,10 @@ func (e *Enforcer) ClearPolicy() {
 }
 
 // LoadPolicy reloads the policy from file/database.
-func (e *Enforcer) LoadPolicy() error {
+func (e *Enforcer) LoadPolicy() (err error) {
+	var ruleCount int
+	defer e.LogPolicyEventWithCount(log.EventPolicyLoad, "load", nil, &err, &ruleCount)()
+
 	newModel, err := e.loadPolicyFromAdapter(e.model)
 	if err != nil {
 		return err
@@ -335,6 +375,12 @@ func (e *Enforcer) LoadPolicy() error {
 	if err != nil {
 		return err
 	}
+
+	// Get policy count for logging
+	if policy, policyErr := e.GetPolicy(); policyErr == nil {
+		ruleCount = len(policy)
+	}
+
 	return nil
 }
 
@@ -477,10 +523,19 @@ func (e *Enforcer) IsFiltered() bool {
 }
 
 // SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
-func (e *Enforcer) SavePolicy() error {
+func (e *Enforcer) SavePolicy() (err error) {
+	var ruleCount int
+	defer e.LogPolicyEventWithCount(log.EventPolicySave, "save", nil, &err, &ruleCount)()
+
 	if e.IsFiltered() {
 		return errors.New("cannot save a filtered policy")
 	}
+
+	// Get policy count for logging
+	if policy, policyErr := e.GetPolicy(); policyErr == nil {
+		ruleCount = len(policy)
+	}
+
 	if err := e.adapter.SavePolicy(e.model); err != nil {
 		return err
 	}
@@ -734,11 +789,11 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 			parameters.pVals = pvals
 
-			result, err := expression.Eval(parameters)
+			result, evalErr := expression.Eval(parameters)
 			// log.LogPrint("Result: ", result)
 
-			if err != nil {
-				return false, err
+			if evalErr != nil {
+				return false, evalErr
 			}
 
 			// set to no-match at first
@@ -792,10 +847,10 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 		parameters.pVals = make([]string, len(parameters.pTokens))
 
-		result, err := expression.Eval(parameters)
+		result, evalErr := expression.Eval(parameters)
 
-		if err != nil {
-			return false, err
+		if evalErr != nil {
+			return false, evalErr
 		}
 
 		if result.(bool) {
@@ -829,6 +884,11 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		result = true
 	}
 	e.logger.LogEnforce(expString, rvals, result, logExplains)
+
+	// Event logging (new unified logging system)
+	finish, setResult := e.LogEnforceEvent(rvals)
+	setResult(result, logExplains, err)
+	finish()
 
 	return result, nil
 }

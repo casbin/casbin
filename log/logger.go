@@ -38,4 +38,17 @@ type Logger interface {
 
 	// LogError log info relate to error
 	LogError(err error, msg ...string)
+
+	// Subscribe returns the list of event types this logger is interested in.
+	// Return nil or empty slice to subscribe to all events.
+	// Return specific event types to filter events.
+	Subscribe() []EventType
+
+	// OnBeforeEvent is called before an event occurs.
+	// Returns a Handle that will be passed to OnAfterEvent.
+	OnBeforeEvent(entry *LogEntry) *Handle
+
+	// OnAfterEvent is called after an event completes.
+	// The Handle from OnBeforeEvent is passed back along with the updated entry.
+	OnAfterEvent(handle *Handle, entry *LogEntry)
 }

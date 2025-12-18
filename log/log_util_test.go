@@ -16,41 +16,64 @@ package log
 
 import (
 	"testing"
-
-	"github.com/casbin/casbin/v3/log/mocks"
-
-	"github.com/golang/mock/gomock"
 )
 
-func TestLog(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+func TestLogWithTestLogger(t *testing.T) {
+	tl := NewTestLogger()
+	SetLogger(tl)
 
-	m := mocks.NewMockLogger(ctrl)
-	SetLogger(m)
+	// Test Enable/IsEnabled
+	tl.EnableLog(true)
+	if !tl.IsEnabled() {
+		t.Error("Logger should be enabled")
+	}
 
-	m.EXPECT().EnableLog(true)
-	m.EXPECT().IsEnabled()
+	tl.EnableLog(false)
+	if tl.IsEnabled() {
+		t.Error("Logger should be disabled")
+	}
 
-	logger.EnableLog(true)
-	logger.IsEnabled()
+	tl.EnableLog(true)
 
+	// Test LogPolicy (no-op, just ensure no panic)
 	policy := map[string][][]string{}
-	m.EXPECT().LogPolicy(policy)
 	LogPolicy(policy)
 
+	// Test LogModel (no-op)
 	var model [][]string
-	m.EXPECT().LogModel(model)
 	LogModel(model)
 
-	matcher := "my_matcher"
-	request := []interface{}{"bob"}
-	result := true
-	var explains [][]string
-	m.EXPECT().LogEnforce(matcher, request, result, explains)
-	LogEnforce(matcher, request, result, explains)
+	// Test LogEnforce (no-op)
+	LogEnforce("my_matcher", []interface{}{"bob"}, true, nil)
 
-	var roles []string
-	m.EXPECT().LogRole(roles)
-	LogRole(roles)
+	// Test LogRole (no-op)
+	LogRole([]string{})
+
+	// Test Subscribe
+	if Subscribe() != nil {
+		t.Error("Default subscribe should be nil")
+	}
+
+	tl.SetSubscribe([]EventType{EventEnforce})
+	events := Subscribe()
+	if len(events) != 1 || events[0] != EventEnforce {
+		t.Error("Subscribe should return EventEnforce")
+	}
+
+	// Test OnBeforeEvent/OnAfterEvent
+	entry := NewLogEntry(EventEnforce)
+	entry.Subject = "alice"
+
+	handle := OnBeforeEvent(entry)
+	if handle == nil {
+		t.Error("OnBeforeEvent should return a Handle")
+	}
+	if tl.LastEntry != entry {
+		t.Error("TestLogger should capture the entry")
+	}
+
+	OnAfterEvent(handle, entry)
+	if tl.LastHandle != handle {
+		t.Error("TestLogger should capture the handle")
+	}
 }

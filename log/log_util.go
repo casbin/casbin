@@ -50,3 +50,18 @@ func LogPolicy(policy map[string][][]string) {
 func LogError(err error, msg ...string) {
 	logger.LogError(err, msg...)
 }
+
+// Subscribe returns the list of event types the logger is interested in.
+func Subscribe() []EventType {
+	return logger.Subscribe()
+}
+
+// OnBeforeEvent is called before an event occurs.
+func OnBeforeEvent(entry *LogEntry) *Handle {
+	return logger.OnBeforeEvent(entry)
+}
+
+// OnAfterEvent is called after an event completes.
+func OnAfterEvent(handle *Handle, entry *LogEntry) {
+	logger.OnAfterEvent(handle, entry)
+}
