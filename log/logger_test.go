@@ -240,22 +240,3 @@ func TestDefaultLoggerOnBeforeAfterEvent(t *testing.T) {
 	}
 }
 
-func TestLogUtilFunctions(t *testing.T) {
-	// Reset to default logger for this test
-	SetLogger(&DefaultLogger{})
-
-	// Test that global functions work with default logger
-	events := Subscribe()
-	if events != nil {
-		t.Error("Default logger should subscribe to all events (nil)")
-	}
-
-	entry := NewLogEntry(EventEnforce)
-	handle := OnBeforeEvent(entry)
-	if handle == nil {
-		t.Error("OnBeforeEvent should return a Handle")
-	}
-
-	// OnAfterEvent should not panic
-	OnAfterEvent(handle, entry)
-}

@@ -14,7 +14,80 @@
 
 package log
 
+import "time"
+
 //go:generate mockgen -destination=./mocks/mock_logger.go -package=mocks github.com/casbin/casbin/v3/log Logger
+
+// EventType represents the type of event being logged.
+type EventType string
+
+const (
+	EventEnforce      EventType = "enforce"
+	EventPolicyAdd    EventType = "policy.add"
+	EventPolicyRemove EventType = "policy.remove"
+	EventPolicyUpdate EventType = "policy.update"
+	EventPolicyLoad   EventType = "policy.load"
+	EventPolicySave   EventType = "policy.save"
+	EventModelLoad    EventType = "model.load"
+	EventRoleAdd      EventType = "role.add"
+	EventRoleRemove   EventType = "role.remove"
+)
+
+// Handle is passed from OnBeforeEvent to OnAfterEvent.
+// Logger implementations can store custom data in the Store field.
+type Handle struct {
+	// StartTime records when the event started.
+	StartTime time.Time
+
+	// Store allows logger implementations to attach custom data.
+	// e.g., OpenTelemetry can store Span, context, etc.
+	Store map[string]interface{}
+}
+
+// NewHandle creates a new Handle with initialized fields.
+func NewHandle() *Handle {
+	return &Handle{
+		StartTime: time.Now(),
+		Store:     make(map[string]interface{}),
+	}
+}
+
+// LogEntry contains all information about an event.
+type LogEntry struct {
+	// Event info
+	Type      EventType
+	Timestamp time.Time
+	Duration  time.Duration // Filled in OnAfterEvent
+
+	// Enforce related
+	Request []interface{}
+	Subject string
+	Object  string
+	Action  string
+	Domain  string
+	Allowed bool
+	Matched [][]string
+
+	// Policy/Role related
+	Operation string
+	Rules     [][]string
+	RuleCount int
+
+	// Error info
+	Error error
+
+	// Custom attributes (can store context.Context, trace IDs, etc.)
+	Attributes map[string]interface{}
+}
+
+// NewLogEntry creates a new LogEntry with initialized fields.
+func NewLogEntry(eventType EventType) *LogEntry {
+	return &LogEntry{
+		Type:       eventType,
+		Timestamp:  time.Now(),
+		Attributes: make(map[string]interface{}),
+	}
+}
 
 // Logger is the logging interface implementation.
 type Logger interface {

@@ -6,38 +6,10 @@ package mocks
 
 import (
 	reflect "reflect"
-	time "time"
 
+	log "github.com/casbin/casbin/v3/log"
 	gomock "github.com/golang/mock/gomock"
 )
-
-// EventType represents the type of event being logged (mirror of log.EventType).
-type EventType string
-
-// Handle is passed from OnBeforeEvent to OnAfterEvent (mirror of log.Handle).
-type Handle struct {
-	StartTime time.Time
-	Store     map[string]interface{}
-}
-
-// LogEntry contains all information about an event (mirror of log.LogEntry).
-type LogEntry struct {
-	Type       EventType
-	Timestamp  time.Time
-	Duration   time.Duration
-	Request    []interface{}
-	Subject    string
-	Object     string
-	Action     string
-	Domain     string
-	Allowed    bool
-	Matched    [][]string
-	Operation  string
-	Rules      [][]string
-	RuleCount  int
-	Error      error
-	Attributes map[string]interface{}
-}
 
 // MockLogger is a mock of Logger interface.
 type MockLogger struct {
@@ -154,10 +126,10 @@ func (mr *MockLoggerMockRecorder) LogRole(arg0 interface{}) *gomock.Call {
 }
 
 // Subscribe mocks base method.
-func (m *MockLogger) Subscribe() []EventType {
+func (m *MockLogger) Subscribe() []log.EventType {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Subscribe")
-	ret0, _ := ret[0].([]EventType)
+	ret0, _ := ret[0].([]log.EventType)
 	return ret0
 }
 
@@ -168,10 +140,11 @@ func (mr *MockLoggerMockRecorder) Subscribe() *gomock.Call {
 }
 
 // OnBeforeEvent mocks base method.
-func (m *MockLogger) OnBeforeEvent(arg0 interface{}) interface{} {
+func (m *MockLogger) OnBeforeEvent(arg0 *log.LogEntry) *log.Handle {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "OnBeforeEvent", arg0)
-	return ret[0]
+	ret0, _ := ret[0].(*log.Handle)
+	return ret0
 }
 
 // OnBeforeEvent indicates an expected call of OnBeforeEvent.
@@ -181,7 +154,7 @@ func (mr *MockLoggerMockRecorder) OnBeforeEvent(arg0 interface{}) *gomock.Call {
 }
 
 // OnAfterEvent mocks base method.
-func (m *MockLogger) OnAfterEvent(arg0 interface{}, arg1 interface{}) {
+func (m *MockLogger) OnAfterEvent(arg0 *log.Handle, arg1 *log.LogEntry) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "OnAfterEvent", arg0, arg1)
 }
