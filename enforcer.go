@@ -729,13 +729,17 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	if e.acceptJsonRequest {
 		// try to parse all request values from json to map[string]interface{}
-		// skip if there is an error
 		for i, rval := range rvals {
 			switch rval := rval.(type) {
 			case string:
-				var mapValue map[string]interface{}
-				mapValue, err = util.JsonToMap(rval)
-				if err == nil {
+				// Only attempt JSON parsing for strings that look like JSON objects or arrays
+				if len(rval) > 0 && (rval[0] == '{' || rval[0] == '[') {
+					var mapValue map[string]interface{}
+					mapValue, err = util.JsonToMap(rval)
+					if err != nil {
+						// Return a clear error when JSON-like string fails to parse
+						return false, fmt.Errorf("failed to parse JSON parameter at index %d: %w", i, err)
+					}
 					rvals[i] = mapValue
 				}
 			}
