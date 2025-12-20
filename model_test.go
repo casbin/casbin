@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/casbin/casbin/v3/log"
+	"github.com/casbin/casbin/v3/model"
 	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
 	"github.com/casbin/casbin/v3/rbac"
 	"github.com/casbin/casbin/v3/util"
@@ -239,6 +240,87 @@ func TestRBACModelWithDomainsAtRuntimeMockAdapter(t *testing.T) {
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
 	_, _ = e.RemovePolicy("admin", "domain2", "data2", "read")
 	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", false)
+}
+
+func TestRBACModelWithDomainTokenRename(t *testing.T) {
+	// Test that renaming the domain token from "dom" to another name (e.g., "dom1")
+	// still works correctly. This is a regression test for the issue where the
+	// hardcoded "r_dom" and "p_dom" strings prevented proper domain matching.
+	
+	// Test with standard "dom" token
+	modelText1 := `
+[request_definition]
+r = sub, dom, obj, act
+
+[policy_definition]
+p = sub, dom, obj, act
+
+[role_definition]
+g = _, _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub, r.dom) && keyMatch(r.dom, p.dom) && r.obj == p.obj && r.act == p.act
+`
+	m1, _ := model.NewModelFromString(modelText1)
+	e1, _ := NewEnforcer(m1)
+	_, _ = e1.AddPolicy("admin", "domain1", "data1", "read")
+	_, _ = e1.AddGroupingPolicy("alice", "admin", "domain*")
+	
+	testDomainEnforce(t, e1, "alice", "domain1", "data1", "read", true)
+	testDomainEnforce(t, e1, "alice", "domain2", "data1", "read", false)
+
+	// Test with renamed "dom1" token
+	modelText2 := `
+[request_definition]
+r = sub, dom1, obj, act
+
+[policy_definition]
+p = sub, dom1, obj, act
+
+[role_definition]
+g = _, _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub, r.dom1) && keyMatch(r.dom1, p.dom1) && r.obj == p.obj && r.act == p.act
+`
+	m2, _ := model.NewModelFromString(modelText2)
+	e2, _ := NewEnforcer(m2)
+	_, _ = e2.AddPolicy("admin", "domain1", "data1", "read")
+	_, _ = e2.AddGroupingPolicy("alice", "admin", "domain*")
+	
+	testDomainEnforce(t, e2, "alice", "domain1", "data1", "read", true)
+	testDomainEnforce(t, e2, "alice", "domain2", "data1", "read", false)
+
+	// Test with renamed "tenant" token
+	modelText3 := `
+[request_definition]
+r = sub, tenant, obj, act
+
+[policy_definition]
+p = sub, tenant, obj, act
+
+[role_definition]
+g = _, _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub, r.tenant) && keyMatch(r.tenant, p.tenant) && r.obj == p.obj && r.act == p.act
+`
+	m3, _ := model.NewModelFromString(modelText3)
+	e3, _ := NewEnforcer(m3)
+	_, _ = e3.AddPolicy("admin", "domain1", "data1", "read")
+	_, _ = e3.AddGroupingPolicy("alice", "admin", "domain*")
+	
+	testDomainEnforce(t, e3, "alice", "domain1", "data1", "read", true)
+	testDomainEnforce(t, e3, "alice", "domain2", "data1", "read", false)
 }
 
 func TestRBACModelWithDeny(t *testing.T) {

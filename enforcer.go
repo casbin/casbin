@@ -518,7 +518,17 @@ func (e *Enforcer) initRmMap() {
 				assertion.CondRM = defaultrolemanager.NewConditionalDomainManager(10)
 				e.condRmMap[ptype] = assertion.CondRM
 			}
-			matchFun := "keyMatch(r_dom, p_dom)"
+			// Dynamically detect the domain token name from the model definition
+			// Domain is typically the second parameter (index 1) in request/policy definitions
+			rDomainToken := "r_dom"
+			pDomainToken := "p_dom"
+			if len(e.model["r"]) > 0 && len(e.model["r"]["r"].Tokens) > 1 {
+				rDomainToken = e.model["r"]["r"].Tokens[1]
+			}
+			if len(e.model["p"]) > 0 && len(e.model["p"]["p"].Tokens) > 1 {
+				pDomainToken = e.model["p"]["p"].Tokens[1]
+			}
+			matchFun := fmt.Sprintf("keyMatch(%s, %s)", rDomainToken, pDomainToken)
 			if strings.Contains(e.model["m"]["m"].Value, matchFun) {
 				e.AddNamedDomainMatchingFunc(ptype, "g", util.KeyMatch)
 			}
