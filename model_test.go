@@ -246,7 +246,7 @@ func TestRBACModelWithDomainTokenRename(t *testing.T) {
 	// Test that renaming the domain token from "dom" to another name (e.g., "dom1")
 	// still works correctly. This is a regression test for the issue where the
 	// hardcoded "r_dom" and "p_dom" strings prevented proper domain matching.
-	
+
 	// Test with standard "dom" token
 	modelText1 := `
 [request_definition]
@@ -268,7 +268,7 @@ m = g(r.sub, p.sub, r.dom) && keyMatch(r.dom, p.dom) && r.obj == p.obj && r.act 
 	e1, _ := NewEnforcer(m1)
 	_, _ = e1.AddPolicy("admin", "domain1", "data1", "read")
 	_, _ = e1.AddGroupingPolicy("alice", "admin", "domain*")
-	
+
 	testDomainEnforce(t, e1, "alice", "domain1", "data1", "read", true)
 	testDomainEnforce(t, e1, "alice", "domain2", "data1", "read", false)
 
@@ -293,7 +293,7 @@ m = g(r.sub, p.sub, r.dom1) && keyMatch(r.dom1, p.dom1) && r.obj == p.obj && r.a
 	e2, _ := NewEnforcer(m2)
 	_, _ = e2.AddPolicy("admin", "domain1", "data1", "read")
 	_, _ = e2.AddGroupingPolicy("alice", "admin", "domain*")
-	
+
 	testDomainEnforce(t, e2, "alice", "domain1", "data1", "read", true)
 	testDomainEnforce(t, e2, "alice", "domain2", "data1", "read", false)
 
@@ -318,7 +318,7 @@ m = g(r.sub, p.sub, r.tenant) && keyMatch(r.tenant, p.tenant) && r.obj == p.obj 
 	e3, _ := NewEnforcer(m3)
 	_, _ = e3.AddPolicy("admin", "domain1", "data1", "read")
 	_, _ = e3.AddGroupingPolicy("alice", "admin", "domain*")
-	
+
 	testDomainEnforce(t, e3, "alice", "domain1", "data1", "read", true)
 	testDomainEnforce(t, e3, "alice", "domain2", "data1", "read", false)
 }
