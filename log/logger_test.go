@@ -19,47 +19,55 @@ import (
 	"time"
 )
 
-// TestEventLogger is a test logger implementation that captures events
-type TestEventLogger struct {
+// TestLogger is a test logger implementation that captures events.
+type TestLogger struct {
 	enabled   bool
 	subscribe []EventType
 	events    []*LogEntry
 }
 
-func NewTestEventLogger(subscribe ...EventType) *TestEventLogger {
-	return &TestEventLogger{
+// NewTestLogger creates a new TestLogger.
+func NewTestLogger(subscribe ...EventType) *TestLogger {
+	return &TestLogger{
 		enabled:   true,
 		subscribe: subscribe,
 		events:    make([]*LogEntry, 0),
 	}
 }
 
-func (l *TestEventLogger) Enable(enabled bool) {
+// Enable turns the logger on or off.
+func (l *TestLogger) Enable(enabled bool) {
 	l.enabled = enabled
 }
 
-func (l *TestEventLogger) IsEnabled() bool {
+// IsEnabled returns whether the logger is enabled.
+func (l *TestLogger) IsEnabled() bool {
 	return l.enabled
 }
 
-func (l *TestEventLogger) Subscribe() []EventType {
+// Subscribe returns the list of event types this logger is interested in.
+func (l *TestLogger) Subscribe() []EventType {
 	return l.subscribe
 }
 
-func (l *TestEventLogger) OnBeforeEvent(entry *LogEntry) *Handle {
+// OnBeforeEvent is called before an event occurs.
+func (l *TestLogger) OnBeforeEvent(entry *LogEntry) *Handle {
 	return NewHandle()
 }
 
-func (l *TestEventLogger) OnAfterEvent(handle *Handle, entry *LogEntry) {
-	// Store a copy of the entry
+// OnAfterEvent is called after an event completes.
+func (l *TestLogger) OnAfterEvent(handle *Handle, entry *LogEntry) {
+	// Store a copy of the entry.
 	l.events = append(l.events, entry)
 }
 
-func (l *TestEventLogger) GetEvents() []*LogEntry {
+// GetEvents returns all captured events.
+func (l *TestLogger) GetEvents() []*LogEntry {
 	return l.events
 }
 
-func (l *TestEventLogger) Clear() {
+// Clear clears all captured events.
+func (l *TestLogger) Clear() {
 	l.events = make([]*LogEntry, 0)
 }
 
@@ -76,23 +84,23 @@ func TestNewHandle(t *testing.T) {
 	}
 }
 
-func TestDefaultEventLogger(t *testing.T) {
-	logger := NewDefaultEventLogger()
-	
+func TestDefaultLogger(t *testing.T) {
+	logger := NewDefaultLogger()
+
 	if logger.IsEnabled() {
-		t.Error("DefaultEventLogger should be disabled by default")
+		t.Error("DefaultLogger should be disabled by default")
 	}
-	
+
 	logger.Enable(true)
 	if !logger.IsEnabled() {
-		t.Error("DefaultEventLogger should be enabled after Enable(true)")
+		t.Error("DefaultLogger should be enabled after Enable(true)")
 	}
-	
+
 	if logger.Subscribe() != nil {
-		t.Error("DefaultEventLogger should subscribe to all events by default (nil)")
+		t.Error("DefaultLogger should subscribe to all events by default (nil)")
 	}
-	
-	// Test that it doesn't panic when called
+
+	// Test that it doesn't panic when called.
 	entry := &LogEntry{
 		Type:      EventEnforce,
 		Timestamp: time.Now(),
@@ -101,23 +109,23 @@ func TestDefaultEventLogger(t *testing.T) {
 	if handle == nil {
 		t.Error("OnBeforeEvent should return a handle")
 	}
-	
+
 	logger.OnAfterEvent(handle, entry)
 }
 
-func TestTestEventLogger(t *testing.T) {
-	logger := NewTestEventLogger(EventEnforce, EventPolicyAdd)
-	
+func TestTestLogger(t *testing.T) {
+	logger := NewTestLogger(EventEnforce, EventPolicyAdd)
+
 	if !logger.IsEnabled() {
-		t.Error("TestEventLogger should be enabled by default")
+		t.Error("TestLogger should be enabled by default")
 	}
-	
+
 	subscribe := logger.Subscribe()
 	if len(subscribe) != 2 {
 		t.Errorf("Expected 2 subscriptions, got %d", len(subscribe))
 	}
-	
-	// Test event capture
+
+	// Test event capture.
 	entry := &LogEntry{
 		Type:      EventEnforce,
 		Timestamp: time.Now(),
@@ -126,20 +134,20 @@ func TestTestEventLogger(t *testing.T) {
 		Action:    "read",
 		Allowed:   true,
 	}
-	
+
 	handle := logger.OnBeforeEvent(entry)
 	entry.Duration = time.Since(handle.StartTime)
 	logger.OnAfterEvent(handle, entry)
-	
+
 	events := logger.GetEvents()
 	if len(events) != 1 {
 		t.Errorf("Expected 1 event, got %d", len(events))
 	}
-	
+
 	if events[0].Type != EventEnforce {
 		t.Errorf("Expected EventEnforce, got %v", events[0].Type)
 	}
-	
+
 	if events[0].Subject != "alice" {
 		t.Errorf("Expected subject 'alice', got %s", events[0].Subject)
 	}
@@ -157,7 +165,7 @@ func TestEventTypes(t *testing.T) {
 		EventRoleAdd,
 		EventRoleRemove,
 	}
-	
+
 	for _, eventType := range types {
 		if string(eventType) == "" {
 			t.Errorf("Event type should not be empty: %v", eventType)
@@ -182,19 +190,19 @@ func TestLogEntry(t *testing.T) {
 		Error:      nil,
 		Attributes: make(map[string]interface{}),
 	}
-	
+
 	if entry.Type != EventEnforce {
 		t.Error("Entry type mismatch")
 	}
-	
+
 	if entry.Subject != "alice" {
 		t.Error("Entry subject mismatch")
 	}
-	
+
 	if !entry.Allowed {
 		t.Error("Entry should be allowed")
 	}
-	
+
 	if entry.Duration < time.Millisecond {
 		t.Error("Entry duration too short")
 	}

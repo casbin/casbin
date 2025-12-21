@@ -20,55 +20,55 @@ import (
 	"github.com/casbin/casbin/v3/log"
 )
 
-// TestEventLogger is a test logger implementation that captures events
-type TestEventLogger struct {
+// TestLogger is a test logger implementation that captures events
+type TestLogger struct {
 	enabled   bool
 	subscribe []log.EventType
 	events    []*log.LogEntry
 }
 
-func NewTestEventLogger(subscribe ...log.EventType) *TestEventLogger {
-	return &TestEventLogger{
+func NewTestLogger(subscribe ...log.EventType) *TestLogger {
+	return &TestLogger{
 		enabled:   true,
 		subscribe: subscribe,
 		events:    make([]*log.LogEntry, 0),
 	}
 }
 
-func (l *TestEventLogger) Enable(enabled bool) {
+func (l *TestLogger) Enable(enabled bool) {
 	l.enabled = enabled
 }
 
-func (l *TestEventLogger) IsEnabled() bool {
+func (l *TestLogger) IsEnabled() bool {
 	return l.enabled
 }
 
-func (l *TestEventLogger) Subscribe() []log.EventType {
+func (l *TestLogger) Subscribe() []log.EventType {
 	return l.subscribe
 }
 
-func (l *TestEventLogger) OnBeforeEvent(entry *log.LogEntry) *log.Handle {
+func (l *TestLogger) OnBeforeEvent(entry *log.LogEntry) *log.Handle {
 	return log.NewHandle()
 }
 
-func (l *TestEventLogger) OnAfterEvent(handle *log.Handle, entry *log.LogEntry) {
+func (l *TestLogger) OnAfterEvent(handle *log.Handle, entry *log.LogEntry) {
 	// Store a copy of the entry
 	l.events = append(l.events, entry)
 }
 
-func (l *TestEventLogger) GetEvents() []*log.LogEntry {
+func (l *TestLogger) GetEvents() []*log.LogEntry {
 	return l.events
 }
 
-func (l *TestEventLogger) Clear() {
+func (l *TestLogger) Clear() {
 	l.events = make([]*log.LogEntry, 0)
 }
 
-func TestEnforcerWithEventLogger(t *testing.T) {
+func TestEnforcerWithLogger(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	
-	logger := NewTestEventLogger(log.EventEnforce)
-	e.SetEventLogger(logger)
+	logger := NewTestLogger(log.EventEnforce)
+	e.SetLogger(logger)
 	
 	// Test enforce
 	result, _ := e.Enforce("alice", "data1", "read")
@@ -114,8 +114,8 @@ func TestEnforcerWithEventLogger(t *testing.T) {
 func TestEnforcerPolicyAddEvent(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	
-	logger := NewTestEventLogger(log.EventPolicyAdd)
-	e.SetEventLogger(logger)
+	logger := NewTestLogger(log.EventPolicyAdd)
+	e.SetLogger(logger)
 	
 	// Test add policy
 	ok, _ := e.AddPolicy("eve", "data3", "read")
@@ -149,8 +149,8 @@ func TestEnforcerPolicyAddEvent(t *testing.T) {
 func TestEnforcerPolicyRemoveEvent(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	
-	logger := NewTestEventLogger(log.EventPolicyRemove)
-	e.SetEventLogger(logger)
+	logger := NewTestLogger(log.EventPolicyRemove)
+	e.SetLogger(logger)
 	
 	// Test remove policy
 	ok, _ := e.RemovePolicy("alice", "data1", "read")
@@ -176,8 +176,8 @@ func TestEnforcerPolicyRemoveEvent(t *testing.T) {
 func TestEnforcerLoadPolicyEvent(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	
-	logger := NewTestEventLogger(log.EventPolicyLoad)
-	e.SetEventLogger(logger)
+	logger := NewTestLogger(log.EventPolicyLoad)
+	e.SetLogger(logger)
 	
 	// Test load policy
 	err := e.LoadPolicy()
@@ -204,12 +204,12 @@ func TestEnforcerLoadPolicyEvent(t *testing.T) {
 	}
 }
 
-func TestEventLoggerSubscription(t *testing.T) {
+func TestLoggerSubscription(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	
 	// Subscribe only to enforce events
-	logger := NewTestEventLogger(log.EventEnforce)
-	e.SetEventLogger(logger)
+	logger := NewTestLogger(log.EventEnforce)
+	e.SetLogger(logger)
 	
 	// Enforce should be logged
 	e.Enforce("alice", "data1", "read")
@@ -227,12 +227,12 @@ func TestEventLoggerSubscription(t *testing.T) {
 	}
 }
 
-func TestEventLoggerSubscribeToAll(t *testing.T) {
+func TestLoggerSubscribeToAll(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	
 	// Subscribe to all events (pass no arguments)
-	logger := NewTestEventLogger()
-	e.SetEventLogger(logger)
+	logger := NewTestLogger()
+	e.SetLogger(logger)
 	
 	// Multiple operations
 	e.Enforce("alice", "data1", "read")
@@ -258,12 +258,12 @@ func TestEventLoggerSubscribeToAll(t *testing.T) {
 	}
 }
 
-func TestEventLoggerDisabled(t *testing.T) {
+func TestLoggerDisabled(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	
-	logger := NewTestEventLogger(log.EventEnforce)
+	logger := NewTestLogger(log.EventEnforce)
 	logger.Enable(false)
-	e.SetEventLogger(logger)
+	e.SetLogger(logger)
 	
 	// This should not be logged
 	e.Enforce("alice", "data1", "read")

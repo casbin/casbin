@@ -345,7 +345,7 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 			RuleCount:  1,
 			Attributes: make(map[string]interface{}),
 		}
-		handle = e.eventLogger.OnBeforeEvent(entry)
+		handle = e.logger.OnBeforeEvent(entry)
 	}
 
 	ok, err := e.addPolicyWithoutNotify(sec, ptype, rule)
@@ -353,7 +353,7 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return ok, err
 	}
@@ -368,14 +368,14 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = notifyErr
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return true, notifyErr
 	}
 
 	if shouldLog {
 		entry.Duration = time.Since(handle.StartTime)
-		e.eventLogger.OnAfterEvent(handle, entry)
+		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil
@@ -399,7 +399,7 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoR
 			RuleCount:  len(rules),
 			Attributes: make(map[string]interface{}),
 		}
-		handle = e.eventLogger.OnBeforeEvent(entry)
+		handle = e.logger.OnBeforeEvent(entry)
 	}
 
 	ok, err := e.addPoliciesWithoutNotify(sec, ptype, rules, autoRemoveRepeat)
@@ -407,7 +407,7 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoR
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return ok, err
 	}
@@ -422,14 +422,14 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoR
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = notifyErr
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return true, notifyErr
 	}
 
 	if shouldLog {
 		entry.Duration = time.Since(handle.StartTime)
-		e.eventLogger.OnAfterEvent(handle, entry)
+		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil
@@ -451,7 +451,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 			RuleCount:  1,
 			Attributes: make(map[string]interface{}),
 		}
-		handle = e.eventLogger.OnBeforeEvent(entry)
+		handle = e.logger.OnBeforeEvent(entry)
 	}
 
 	ok, err := e.removePolicyWithoutNotify(sec, ptype, rule)
@@ -459,7 +459,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return ok, err
 	}
@@ -474,14 +474,14 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = notifyErr
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return true, notifyErr
 	}
 
 	if shouldLog {
 		entry.Duration = time.Since(handle.StartTime)
-		e.eventLogger.OnAfterEvent(handle, entry)
+		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil
@@ -502,7 +502,7 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 			RuleCount:  1,
 			Attributes: make(map[string]interface{}),
 		}
-		handle = e.eventLogger.OnBeforeEvent(entry)
+		handle = e.logger.OnBeforeEvent(entry)
 	}
 
 	ok, err := e.updatePolicyWithoutNotify(sec, ptype, oldRule, newRule)
@@ -510,7 +510,7 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return ok, err
 	}
@@ -525,14 +525,14 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = notifyErr
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return true, notifyErr
 	}
 
 	if shouldLog {
 		entry.Duration = time.Since(handle.StartTime)
-		e.eventLogger.OnAfterEvent(handle, entry)
+		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil

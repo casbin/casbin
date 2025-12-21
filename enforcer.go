@@ -56,7 +56,6 @@ type Enforcer struct {
 	acceptJsonRequest    bool
 
 	logger         log.Logger
-	eventLogger    log.EventLogger
 	subscribeCache map[log.EventType]bool
 }
 
@@ -83,7 +82,7 @@ func (e EnforceContext) GetCacheKey() string {
 //	a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
 //	e := casbin.NewEnforcer("path/to/basic_model.conf", a)
 func NewEnforcer(params ...interface{}) (*Enforcer, error) {
-	e := &Enforcer{logger: &log.DefaultLogger{}}
+	e := &Enforcer{logger: log.NewDefaultLogger()}
 
 	parsedParamLen := 0
 	paramLen := len(params)
@@ -197,34 +196,22 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 	return nil
 }
 
-// SetLogger changes the current enforcer's logger.
+// SetLogger sets the logger for the enforcer.
 func (e *Enforcer) SetLogger(logger log.Logger) {
 	e.logger = logger
-	e.model.SetLogger(e.logger)
-	for k := range e.rmMap {
-		e.rmMap[k].SetLogger(e.logger)
-	}
-	for k := range e.condRmMap {
-		e.condRmMap[k].SetLogger(e.logger)
-	}
-}
-
-// SetEventLogger sets the event logger for the enforcer.
-func (e *Enforcer) SetEventLogger(logger log.EventLogger) {
-	e.eventLogger = logger
 	e.updateSubscribeCache()
 }
 
-// updateSubscribeCache updates the subscription cache for quick event type lookup
+// updateSubscribeCache updates the subscription cache for quick event type lookup.
 func (e *Enforcer) updateSubscribeCache() {
 	e.subscribeCache = make(map[log.EventType]bool)
 
-	if e.eventLogger == nil {
+	if e.logger == nil {
 		return
 	}
 
-	events := e.eventLogger.Subscribe()
-	// Both nil and empty slice mean subscribe to all events
+	events := e.logger.Subscribe()
+	// Both nil and empty slice mean subscribe to all events.
 	if len(events) == 0 {
 		e.subscribeCache = nil
 		return
@@ -235,13 +222,13 @@ func (e *Enforcer) updateSubscribeCache() {
 	}
 }
 
-// shouldLog checks if we should log this event type
+// shouldLog checks if we should log this event type.
 func (e *Enforcer) shouldLog(eventType log.EventType) bool {
-	if e.eventLogger == nil || !e.eventLogger.IsEnabled() {
+	if e.logger == nil || !e.logger.IsEnabled() {
 		return false
 	}
 
-	// nil cache means subscribe to all events
+	// nil cache means subscribe to all events.
 	if e.subscribeCache == nil {
 		return true
 	}
@@ -382,7 +369,7 @@ func (e *Enforcer) LoadPolicy() error {
 			Operation:  "load",
 			Attributes: make(map[string]interface{}),
 		}
-		handle = e.eventLogger.OnBeforeEvent(entry)
+		handle = e.logger.OnBeforeEvent(entry)
 	}
 
 	newModel, err := e.loadPolicyFromAdapter(e.model)
@@ -390,7 +377,7 @@ func (e *Enforcer) LoadPolicy() error {
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return err
 	}
@@ -399,7 +386,7 @@ func (e *Enforcer) LoadPolicy() error {
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return err
 	}
@@ -407,7 +394,7 @@ func (e *Enforcer) LoadPolicy() error {
 	if shouldLog {
 		entry.Duration = time.Since(handle.StartTime)
 		entry.RuleCount = e.GetPolicyCount()
-		e.eventLogger.OnAfterEvent(handle, entry)
+		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return nil
@@ -566,7 +553,7 @@ func (e *Enforcer) SavePolicy() error {
 			RuleCount:  e.GetPolicyCount(),
 			Attributes: make(map[string]interface{}),
 		}
-		handle = e.eventLogger.OnBeforeEvent(entry)
+		handle = e.logger.OnBeforeEvent(entry)
 	}
 
 	if e.IsFiltered() {
@@ -574,7 +561,7 @@ func (e *Enforcer) SavePolicy() error {
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return err
 	}
@@ -582,7 +569,7 @@ func (e *Enforcer) SavePolicy() error {
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return err
 	}
@@ -596,14 +583,14 @@ func (e *Enforcer) SavePolicy() error {
 		if shouldLog {
 			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 		return err
 	}
 
 	if shouldLog {
 		entry.Duration = time.Since(handle.StartTime)
-		e.eventLogger.OnAfterEvent(handle, entry)
+		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return nil
@@ -646,7 +633,7 @@ func (e *Enforcer) EnableEnforce(enable bool) {
 
 // EnableLog changes whether Casbin will log messages to the Logger.
 func (e *Enforcer) EnableLog(enable bool) {
-	e.logger.EnableLog(enable)
+	e.logger.Enable(enable)
 }
 
 // IsLogEnabled returns the current logger's enabled status.
@@ -751,7 +738,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			entry.Domain = toString(rvals[3])
 		}
 
-		handle = e.eventLogger.OnBeforeEvent(entry)
+		handle = e.logger.OnBeforeEvent(entry)
 	}
 
 	defer func() {
@@ -760,7 +747,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			entry.Allowed = ok
 			entry.Matched = logExplains
 			entry.Error = err
-			e.eventLogger.OnAfterEvent(handle, entry)
+			e.logger.OnAfterEvent(handle, entry)
 		}
 	}()
 
@@ -980,7 +967,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	if effect == effector.Allow {
 		result = true
 	}
-	e.logger.LogEnforce(expString, rvals, result, logExplains)
+	// Note: LogEnforce was removed as enforcement is now logged via OnBeforeEvent/OnAfterEvent.
 
 	return result, nil
 }
@@ -1165,7 +1152,32 @@ func generateEvalFunction(functions map[string]govaluate.ExpressionFunction, par
 	}
 }
 
-// toString converts an interface{} to string for logging
+// logEventStart initializes event logging for a given event type.
+// Returns entry, handle, and shouldLog flag.
+func (e *Enforcer) logEventStart(eventType log.EventType) (*log.LogEntry, *log.Handle, bool) {
+	shouldLog := e.shouldLog(eventType)
+	if !shouldLog {
+		return nil, nil, false
+	}
+
+	entry := &log.LogEntry{
+		Type:       eventType,
+		Timestamp:  time.Now(),
+		Attributes: make(map[string]interface{}),
+	}
+	handle := e.logger.OnBeforeEvent(entry)
+	return entry, handle, true
+}
+
+// logEventEnd finalizes event logging.
+func (e *Enforcer) logEventEnd(handle *log.Handle, entry *log.LogEntry, shouldLog bool) {
+	if shouldLog && entry != nil && handle != nil {
+		entry.Duration = time.Since(handle.StartTime)
+		e.logger.OnAfterEvent(handle, entry)
+	}
+}
+
+// toString converts an interface{} to string for logging.
 func toString(v interface{}) string {
 	if s, ok := v.(string); ok {
 		return s
