@@ -34,7 +34,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # Enable alert commit comment
           comment-on-alert: true
-          comment-always: true
+          comment-always: false
           gh-pages-branch: gh-pages
           # alert-comment-cc-users: '@XXX'
           auto-push: true
