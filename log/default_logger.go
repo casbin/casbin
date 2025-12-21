@@ -1,4 +1,4 @@
-// Copyright 2018 The casbin Authors. All Rights Reserved.
+// Copyright 2024 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,91 +14,41 @@
 
 package log
 
-import (
-	"fmt"
-	"log"
-	"strings"
-)
-
-// DefaultLogger is the implementation for a Logger using golang log.
+// DefaultLogger is a no-op logger implementation.
 type DefaultLogger struct {
-	enabled bool
+	enabled   bool
+	subscribe []EventType
 }
 
-func (l *DefaultLogger) EnableLog(enable bool) {
-	l.enabled = enable
+// NewDefaultLogger creates a new DefaultLogger.
+func NewDefaultLogger() *DefaultLogger {
+	return &DefaultLogger{
+		enabled:   false,
+		subscribe: nil, // nil means subscribe to all events.
+	}
 }
 
+// Enable turns the logger on or off.
+func (l *DefaultLogger) Enable(enabled bool) {
+	l.enabled = enabled
+}
+
+// IsEnabled returns whether the logger is enabled.
 func (l *DefaultLogger) IsEnabled() bool {
 	return l.enabled
 }
 
-func (l *DefaultLogger) LogModel(model [][]string) {
-	if !l.enabled {
-		return
-	}
-	var str strings.Builder
-	str.WriteString("Model: ")
-	for _, v := range model {
-		str.WriteString(fmt.Sprintf("%v\n", v))
-	}
-
-	log.Println(str.String())
+// Subscribe returns the list of event types this logger is interested in.
+func (l *DefaultLogger) Subscribe() []EventType {
+	return l.subscribe
 }
 
-func (l *DefaultLogger) LogEnforce(matcher string, request []interface{}, result bool, explains [][]string) {
-	if !l.enabled {
-		return
-	}
-
-	var reqStr strings.Builder
-	reqStr.WriteString("Request: ")
-	for i, rval := range request {
-		if i != len(request)-1 {
-			reqStr.WriteString(fmt.Sprintf("%v, ", rval))
-		} else {
-			reqStr.WriteString(fmt.Sprintf("%v", rval))
-		}
-	}
-	reqStr.WriteString(fmt.Sprintf(" ---> %t\n", result))
-
-	reqStr.WriteString("Hit Policy: ")
-	for i, pval := range explains {
-		if i != len(explains)-1 {
-			reqStr.WriteString(fmt.Sprintf("%v, ", pval))
-		} else {
-			reqStr.WriteString(fmt.Sprintf("%v \n", pval))
-		}
-	}
-
-	log.Println(reqStr.String())
+// OnBeforeEvent is called before an event occurs.
+func (l *DefaultLogger) OnBeforeEvent(entry *LogEntry) *Handle {
+	return NewHandle()
 }
 
-func (l *DefaultLogger) LogPolicy(policy map[string][][]string) {
-	if !l.enabled {
-		return
-	}
-
-	var str strings.Builder
-	str.WriteString("Policy: ")
-	for k, v := range policy {
-		str.WriteString(fmt.Sprintf("%s : %v\n", k, v))
-	}
-
-	log.Println(str.String())
-}
-
-func (l *DefaultLogger) LogRole(roles []string) {
-	if !l.enabled {
-		return
-	}
-
-	log.Println("Roles: ", strings.Join(roles, "\n"))
-}
-
-func (l *DefaultLogger) LogError(err error, msg ...string) {
-	if !l.enabled {
-		return
-	}
-	log.Println(msg, err)
+// OnAfterEvent is called after an event completes.
+func (l *DefaultLogger) OnAfterEvent(handle *Handle, entry *LogEntry) {
+	// Default implementation does nothing.
 }
