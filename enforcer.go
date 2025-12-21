@@ -496,6 +496,35 @@ func (e *Enforcer) SavePolicy() error {
 	return nil
 }
 
+// getDomainTokens extracts domain token names from request and policy definitions.
+// Returns empty strings if tokens cannot be found.
+func (e *Enforcer) getDomainTokens() (rDomainToken, pDomainToken string) {
+	if rAssertion, ok := e.model["r"]["r"]; ok && len(rAssertion.Tokens) > 1 {
+		rDomainToken = rAssertion.Tokens[1]
+	}
+	if pAssertion, ok := e.model["p"]["p"]; ok && len(pAssertion.Tokens) > 1 {
+		pDomainToken = pAssertion.Tokens[1]
+	}
+	return rDomainToken, pDomainToken
+}
+
+// registerDomainMatchingFunc registers domain matching function if the matcher uses keyMatch for domains.
+func (e *Enforcer) registerDomainMatchingFunc(ptype string) {
+	// Dynamically detect the domain token name from the model definition.
+	// In RBAC with domains, the domain is typically the second parameter (index 1)
+	// in both request and policy definitions (e.g., r = sub, dom, obj, act).
+	// We extract the actual token names to support arbitrary domain parameter names.
+	rDomainToken, pDomainToken := e.getDomainTokens()
+	if rDomainToken == "" || pDomainToken == "" {
+		return
+	}
+
+	matchFun := fmt.Sprintf("keyMatch(%s, %s)", rDomainToken, pDomainToken)
+	if strings.Contains(e.model["m"]["m"].Value, matchFun) {
+		e.AddNamedDomainMatchingFunc(ptype, "g", util.KeyMatch)
+	}
+}
+
 func (e *Enforcer) initRmMap() {
 	for ptype, assertion := range e.model["g"] {
 		if rm, ok := e.rmMap[ptype]; ok {
@@ -518,10 +547,7 @@ func (e *Enforcer) initRmMap() {
 				assertion.CondRM = defaultrolemanager.NewConditionalDomainManager(10)
 				e.condRmMap[ptype] = assertion.CondRM
 			}
-			matchFun := "keyMatch(r_dom, p_dom)"
-			if strings.Contains(e.model["m"]["m"].Value, matchFun) {
-				e.AddNamedDomainMatchingFunc(ptype, "g", util.KeyMatch)
-			}
+			e.registerDomainMatchingFunc(ptype)
 		}
 	}
 }
