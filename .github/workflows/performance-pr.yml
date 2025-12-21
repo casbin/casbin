@@ -23,6 +23,17 @@ jobs:
         with:
           go-version: '1.21'
 
+      # Save commit SHAs for display
+      - name: Save commit info
+        id: commits
+        run: |
+          echo "base_short=$(echo \
+            ${{ github.event.pull_request.base.sha }} | cut -c1-7)" \
+            >> $GITHUB_OUTPUT
+          echo "head_short=$(echo \
+            ${{ github.event.pull_request.head.sha }} | cut -c1-7)" \
+            >> $GITHUB_OUTPUT
+
       # Run benchmark on PR branch
       - name: Run benchmark on PR branch
         run: |
@@ -53,11 +64,9 @@ jobs:
           echo "## Benchmark Comparison" > comparison.md
           echo "" >> comparison.md
           echo "Comparing base branch \
-          ($(git rev-parse \
-          --short ${{ github.event.pull_request.base.sha }})) \
+          (\`${{ steps.commits.outputs.base_short }}\`) \
           vs PR branch \
-          ($(git rev-parse \
-          --short ${{ github.event.pull_request.head.sha }}))" \
+          (\`${{ steps.commits.outputs.head_short }}\`)" \
             >> comparison.md
           echo "" >> comparison.md
           echo '```' >> comparison.md
