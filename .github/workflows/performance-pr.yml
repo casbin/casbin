@@ -1,0 +1,108 @@
+name: Performance Comparison for Pull Requests
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  benchmark-pr:
+    name: Performance benchmark comparison
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      # Run benchmark on PR branch
+      - name: Run benchmark on PR branch
+        run: |
+          go test -bench '.' -benchtime=2s -benchmem ./... | tee pr-bench.txt
+
+      # Checkout base branch and run benchmark
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          clean: false
+          path: base
+
+      - name: Run benchmark on base branch
+        working-directory: base
+        run: |
+          go test -bench '.' -benchtime=2s -benchmem ./... | \
+            tee ../base-bench.txt
+
+      # Install benchstat for comparison
+      - name: Install benchstat
+        run: go install golang.org/x/perf/cmd/benchstat@latest
+
+      # Compare benchmarks using benchstat
+      - name: Compare benchmarks with benchstat
+        id: benchstat
+        run: |
+          echo "## Benchmark Comparison" > comparison.md
+          echo "" >> comparison.md
+          echo "Comparing base branch \
+          ($(git rev-parse \
+          --short ${{ github.event.pull_request.base.sha }})) \
+          vs PR branch \
+          ($(git rev-parse \
+          --short ${{ github.event.pull_request.head.sha }}))" \
+            >> comparison.md
+          echo "" >> comparison.md
+          echo '```' >> comparison.md
+          benchstat base-bench.txt pr-bench.txt >> comparison.md || \
+            echo "benchstat completed with differences"
+          echo '```' >> comparison.md
+        continue-on-error: true
+
+      # Post comment with results
+      - name: Post benchmark comparison comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const comparison = fs.readFileSync('comparison.md', 'utf8');
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Benchmark Comparison')
+            );
+
+            const commentBody = `${comparison}
+
+            <sub>🤖 This comment will be automatically updated with \
+            the latest benchmark results.</sub>`;
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
