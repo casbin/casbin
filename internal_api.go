@@ -16,7 +16,6 @@ package casbin
 
 import (
 	"fmt"
-	"time"
 
 	Err "github.com/casbin/casbin/v3/errors"
 	"github.com/casbin/casbin/v3/log"
@@ -331,29 +330,18 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
-	// Event logging setup
-	var entry *log.LogEntry
-	var handle *log.Handle
-	shouldLog := e.shouldLog(log.EventPolicyAdd)
-
+	entry, handle, shouldLog := e.logEventStart(log.EventPolicyAdd)
 	if shouldLog {
-		entry = &log.LogEntry{
-			Type:       log.EventPolicyAdd,
-			Timestamp:  time.Now(),
-			Operation:  "add",
-			Rules:      [][]string{rule},
-			RuleCount:  1,
-			Attributes: make(map[string]interface{}),
-		}
-		handle = e.logger.OnBeforeEvent(entry)
+		entry.Operation = "add"
+		entry.Rules = [][]string{rule}
+		entry.RuleCount = 1
+		defer e.logEventEnd(handle, entry, shouldLog)
 	}
 
 	ok, err := e.addPolicyWithoutNotify(sec, ptype, rule)
 	if !ok || err != nil {
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return ok, err
 	}
@@ -366,16 +354,9 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 			notifyErr = e.watcher.Update()
 		}
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = notifyErr
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return true, notifyErr
-	}
-
-	if shouldLog {
-		entry.Duration = time.Since(handle.StartTime)
-		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil
@@ -385,29 +366,18 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 // If autoRemoveRepeat == true, existing rules are automatically filtered
 // Otherwise, false is returned directly.
 func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoRemoveRepeat bool) (bool, error) {
-	// Event logging setup
-	var entry *log.LogEntry
-	var handle *log.Handle
-	shouldLog := e.shouldLog(log.EventPolicyAdd)
-
+	entry, handle, shouldLog := e.logEventStart(log.EventPolicyAdd)
 	if shouldLog {
-		entry = &log.LogEntry{
-			Type:       log.EventPolicyAdd,
-			Timestamp:  time.Now(),
-			Operation:  "add",
-			Rules:      rules,
-			RuleCount:  len(rules),
-			Attributes: make(map[string]interface{}),
-		}
-		handle = e.logger.OnBeforeEvent(entry)
+		entry.Operation = "add"
+		entry.Rules = rules
+		entry.RuleCount = len(rules)
+		defer e.logEventEnd(handle, entry, shouldLog)
 	}
 
 	ok, err := e.addPoliciesWithoutNotify(sec, ptype, rules, autoRemoveRepeat)
 	if !ok || err != nil {
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return ok, err
 	}
@@ -420,16 +390,9 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoR
 			notifyErr = e.watcher.Update()
 		}
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = notifyErr
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return true, notifyErr
-	}
-
-	if shouldLog {
-		entry.Duration = time.Since(handle.StartTime)
-		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil
@@ -437,29 +400,18 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoR
 
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
-	// Event logging setup
-	var entry *log.LogEntry
-	var handle *log.Handle
-	shouldLog := e.shouldLog(log.EventPolicyRemove)
-
+	entry, handle, shouldLog := e.logEventStart(log.EventPolicyRemove)
 	if shouldLog {
-		entry = &log.LogEntry{
-			Type:       log.EventPolicyRemove,
-			Timestamp:  time.Now(),
-			Operation:  "remove",
-			Rules:      [][]string{rule},
-			RuleCount:  1,
-			Attributes: make(map[string]interface{}),
-		}
-		handle = e.logger.OnBeforeEvent(entry)
+		entry.Operation = "remove"
+		entry.Rules = [][]string{rule}
+		entry.RuleCount = 1
+		defer e.logEventEnd(handle, entry, shouldLog)
 	}
 
 	ok, err := e.removePolicyWithoutNotify(sec, ptype, rule)
 	if !ok || err != nil {
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return ok, err
 	}
@@ -472,45 +424,27 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 			notifyErr = e.watcher.Update()
 		}
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = notifyErr
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return true, notifyErr
-	}
-
-	if shouldLog {
-		entry.Duration = time.Since(handle.StartTime)
-		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil
 }
 
 func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newRule []string) (bool, error) {
-	// Event logging setup
-	var entry *log.LogEntry
-	var handle *log.Handle
-	shouldLog := e.shouldLog(log.EventPolicyUpdate)
-
+	entry, handle, shouldLog := e.logEventStart(log.EventPolicyUpdate)
 	if shouldLog {
-		entry = &log.LogEntry{
-			Type:       log.EventPolicyUpdate,
-			Timestamp:  time.Now(),
-			Operation:  "update",
-			Rules:      [][]string{oldRule, newRule},
-			RuleCount:  1,
-			Attributes: make(map[string]interface{}),
-		}
-		handle = e.logger.OnBeforeEvent(entry)
+		entry.Operation = "update"
+		entry.Rules = [][]string{oldRule, newRule}
+		entry.RuleCount = 1
+		defer e.logEventEnd(handle, entry, shouldLog)
 	}
 
 	ok, err := e.updatePolicyWithoutNotify(sec, ptype, oldRule, newRule)
 	if !ok || err != nil {
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return ok, err
 	}
@@ -523,16 +457,9 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 			notifyErr = e.watcher.Update()
 		}
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = notifyErr
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return true, notifyErr
-	}
-
-	if shouldLog {
-		entry.Duration = time.Since(handle.StartTime)
-		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return true, nil

@@ -357,44 +357,30 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
-	// Event logging setup
-	var entry *log.LogEntry
-	var handle *log.Handle
-	shouldLog := e.shouldLog(log.EventPolicyLoad)
-
+	entry, handle, shouldLog := e.logEventStart(log.EventPolicyLoad)
 	if shouldLog {
-		entry = &log.LogEntry{
-			Type:       log.EventPolicyLoad,
-			Timestamp:  time.Now(),
-			Operation:  "load",
-			Attributes: make(map[string]interface{}),
-		}
-		handle = e.logger.OnBeforeEvent(entry)
+		entry.Operation = "load"
+		defer func() {
+			if shouldLog {
+				entry.RuleCount = e.GetPolicyCount()
+			}
+			e.logEventEnd(handle, entry, shouldLog)
+		}()
 	}
 
 	newModel, err := e.loadPolicyFromAdapter(e.model)
 	if err != nil {
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return err
 	}
 	err = e.applyModifiedModel(newModel)
 	if err != nil {
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return err
-	}
-
-	if shouldLog {
-		entry.Duration = time.Since(handle.StartTime)
-		entry.RuleCount = e.GetPolicyCount()
-		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return nil
@@ -540,36 +526,23 @@ func (e *Enforcer) IsFiltered() bool {
 
 // SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() error {
-	// Event logging setup
-	var entry *log.LogEntry
-	var handle *log.Handle
-	shouldLog := e.shouldLog(log.EventPolicySave)
-
+	entry, handle, shouldLog := e.logEventStart(log.EventPolicySave)
 	if shouldLog {
-		entry = &log.LogEntry{
-			Type:       log.EventPolicySave,
-			Timestamp:  time.Now(),
-			Operation:  "save",
-			RuleCount:  e.GetPolicyCount(),
-			Attributes: make(map[string]interface{}),
-		}
-		handle = e.logger.OnBeforeEvent(entry)
+		entry.Operation = "save"
+		entry.RuleCount = e.GetPolicyCount()
+		defer e.logEventEnd(handle, entry, shouldLog)
 	}
 
 	if e.IsFiltered() {
 		err := errors.New("cannot save a filtered policy")
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return err
 	}
 	if err := e.adapter.SavePolicy(e.model); err != nil {
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return err
 	}
@@ -581,16 +554,9 @@ func (e *Enforcer) SavePolicy() error {
 			err = e.watcher.Update()
 		}
 		if shouldLog {
-			entry.Duration = time.Since(handle.StartTime)
 			entry.Error = err
-			e.logger.OnAfterEvent(handle, entry)
 		}
 		return err
-	}
-
-	if shouldLog {
-		entry.Duration = time.Since(handle.StartTime)
-		e.logger.OnAfterEvent(handle, entry)
 	}
 
 	return nil
