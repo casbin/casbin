@@ -889,16 +889,16 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 func (e *Enforcer) getAndStoreMatcherExpression(expString string, rType, pType string, functions map[string]govaluate.ExpressionFunction) (*cachedMatcherExpression, error) {
 	cacheKey := buildMatcherCacheKey(expString, rType, pType)
-	
+
 	// Check if we have a cached expression for this matcher and context
 	if cached, ok := e.matcherMap.Load(cacheKey); ok {
 		cachedExpr := cached.(*cachedMatcherExpression)
 		return cachedExpr, nil
 	}
-	
+
 	// Check if expression contains eval() function
 	hasEval := util.HasEval(expString)
-	
+
 	// Build token maps for request and policy
 	rTokens := make(map[string]int, len(e.model["r"][rType].Tokens))
 	for i, token := range e.model["r"][rType].Tokens {
@@ -908,10 +908,10 @@ func (e *Enforcer) getAndStoreMatcherExpression(expString string, rType, pType s
 	for i, token := range e.model["p"][pType].Tokens {
 		pTokens[token] = i
 	}
-	
+
 	var expression *govaluate.EvaluableExpression
 	var err error
-	
+
 	// Only precompile if no eval() is present
 	// For eval() expressions, we'll compile on each request with the eval function
 	if !hasEval {
@@ -920,7 +920,7 @@ func (e *Enforcer) getAndStoreMatcherExpression(expString string, rType, pType s
 			return nil, err
 		}
 	}
-	
+
 	// Create cached structure
 	cached := &cachedMatcherExpression{
 		expression: expression,
@@ -928,10 +928,10 @@ func (e *Enforcer) getAndStoreMatcherExpression(expString string, rType, pType s
 		rTokens:    rTokens,
 		pTokens:    pTokens,
 	}
-	
+
 	// Store in cache
 	e.matcherMap.Store(cacheKey, cached)
-	
+
 	return cached, nil
 }
 
