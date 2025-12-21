@@ -27,12 +27,10 @@ jobs:
       - name: Save commit info
         id: commits
         run: |
-          echo "base_short=$(echo \
-            ${{ github.event.pull_request.base.sha }} | cut -c1-7)" \
-            >> $GITHUB_OUTPUT
-          echo "head_short=$(echo \
-            ${{ github.event.pull_request.head.sha }} | cut -c1-7)" \
-            >> $GITHUB_OUTPUT
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          echo "base_short=${BASE_SHA:0:7}" >> $GITHUB_OUTPUT
+          echo "head_short=${HEAD_SHA:0:7}" >> $GITHUB_OUTPUT
 
       # Run benchmark on PR branch
       - name: Run benchmark on PR branch
@@ -61,17 +59,15 @@ jobs:
       - name: Compare benchmarks with benchstat
         id: benchstat
         run: |
-          echo "## Benchmark Comparison" > comparison.md
-          echo "" >> comparison.md
-          echo "Comparing base branch \
-          (\`${{ steps.commits.outputs.base_short }}\`) \
-          vs PR branch \
-          (\`${{ steps.commits.outputs.head_short }}\`)" \
-            >> comparison.md
-          echo "" >> comparison.md
-          echo '```' >> comparison.md
-          benchstat base-bench.txt pr-bench.txt >> comparison.md || \
-            echo "benchstat completed with differences"
+          cat > comparison.md << 'EOF'
+          ## Benchmark Comparison
+
+          Comparing base branch (`${{ steps.commits.outputs.base_short }}`)
+          vs PR branch (`${{ steps.commits.outputs.head_short }}`)
+
+          ```
+          EOF
+          benchstat base-bench.txt pr-bench.txt >> comparison.md || true
           echo '```' >> comparison.md
         continue-on-error: true
 
@@ -95,10 +91,9 @@ jobs:
               comment.body.includes('Benchmark Comparison')
             );
 
-            const commentBody = `${comparison}
-
-            <sub>🤖 This comment will be automatically updated with \
-            the latest benchmark results.</sub>`;
+            const footer = '<sub>🤖 This comment will be ' +
+              'automatically updated with the latest benchmark results.</sub>';
+            const commentBody = `${comparison}\n\n${footer}`;
 
             if (botComment) {
               await github.rest.issues.updateComment({
