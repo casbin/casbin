@@ -792,6 +792,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 					policyEffects[policyIndex] = effector.Allow
 				} else if eft == "deny" {
 					policyEffects[policyIndex] = effector.Deny
+				} else if eft == "rate_limit" {
+					policyEffects[policyIndex] = effector.RateLimit
 				} else {
 					policyEffects[policyIndex] = effector.Indeterminate
 				}
@@ -855,7 +857,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	// effect -> result
 	result := false
-	if effect == effector.Allow {
+	if effect == effector.Allow || effect == effector.RateLimit {
 		result = true
 	}
 	e.logger.LogEnforce(expString, rvals, result, logExplains)

@@ -46,6 +46,11 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 			explainIndex = policyIndex
 			break
 		}
+		if effects[policyIndex] == RateLimit {
+			result = RateLimit
+			explainIndex = policyIndex
+			break
+		}
 	case constant.DenyOverrideEffect:
 		// only check the current policyIndex
 		if matches[policyIndex] != 0 && effects[policyIndex] == Deny {
@@ -83,6 +88,12 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 				explainIndex = i
 				break
 			}
+			if eft == RateLimit {
+				result = RateLimit
+				// set hit rule to first matched rate_limit rule
+				explainIndex = i
+				break
+			}
 		}
 	case constant.PriorityEffect, constant.SubjectPriorityEffect:
 		// reverse merge, short-circuit may be earlier
@@ -94,6 +105,8 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 			if effects[i] != Indeterminate {
 				if effects[i] == Allow {
 					result = Allow
+				} else if effects[i] == RateLimit {
+					result = RateLimit
 				} else {
 					result = Deny
 				}
