@@ -58,9 +58,36 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 			explainIndex = policyIndex
 			break
 		}
-		// if no deny rules are matched  at last, then allow
+		// if no deny rules are matched at last, check for allow or rate_limit
 		if policyIndex == policyLength-1 {
-			result = Allow
+			// Check all matched policies for allow first, then rate_limit
+			for i := range effects {
+				if matches[i] == 0 {
+					continue
+				}
+				if effects[i] == Allow {
+					result = Allow
+					explainIndex = i
+					break
+				}
+			}
+			// If no allow found, check for rate_limit
+			if result == Indeterminate {
+				for i := range effects {
+					if matches[i] == 0 {
+						continue
+					}
+					if effects[i] == RateLimit {
+						result = RateLimit
+						explainIndex = i
+						break
+					}
+				}
+			}
+			// If still no match, default to allow
+			if result == Indeterminate {
+				result = Allow
+			}
 		}
 	case constant.AllowAndDenyEffect:
 		// short-circuit if matched deny rule
