@@ -40,7 +40,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 		if matches[policyIndex] == 0 {
 			break
 		}
-		// only check the current policyIndex
+		// only check the current policyIndex (priority order: Allow > RateLimit)
 		if effects[policyIndex] == Allow {
 			result = Allow
 			explainIndex = policyIndex
@@ -60,7 +60,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 		}
 		// if no deny rules are matched at last, check for allow or rate_limit
 		if policyIndex == policyLength-1 {
-			// Check all matched policies for allow first, then rate_limit
+			// Check all matched policies for allow first, then rate_limit (priority order: Allow > RateLimit)
 			for i := range effects {
 				if matches[i] == 0 {
 					continue
@@ -84,7 +84,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 					}
 				}
 			}
-			// If still no match, default to allow
+			// DenyOverride defaults to Allow if no deny rules matched (matches original behavior)
 			if result == Indeterminate {
 				result = Allow
 			}
@@ -103,7 +103,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 			// choose not to short-circuit
 			return result, explainIndex, nil
 		}
-		// merge all effects at last
+		// merge all effects at last (priority order: Allow > RateLimit)
 		for i, eft := range effects {
 			if matches[i] == 0 {
 				continue
@@ -123,7 +123,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 			}
 		}
 	case constant.PriorityEffect, constant.SubjectPriorityEffect:
-		// reverse merge, short-circuit may be earlier
+		// reverse merge, short-circuit may be earlier (priority order: Allow > RateLimit > Deny)
 		for i := len(effects) - 1; i >= 0; i-- {
 			if matches[i] == 0 {
 				continue
