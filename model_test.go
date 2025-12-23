@@ -346,7 +346,7 @@ func TestRBACModelWithRateLimit(t *testing.T) {
 	e, _ := NewEnforcer("examples/rate_limit_model.conf", "examples/rate_limit_policy.csv")
 
 	testEnforce(t, e, "alice", "data1", "read", true)
-	testEnforce(t, e, "bob", "data2", "write", true) // rate_limit effect should return true
+	testEnforce(t, e, "bob", "data2", "write", true)    // rate_limit effect should return true
 	testEnforce(t, e, "charlie", "data3", "read", true) // rate_limit effect should return true
 	testEnforce(t, e, "alice", "data2", "read", true)
 	testEnforce(t, e, "alice", "data2", "write", true)
@@ -355,10 +355,10 @@ func TestRBACModelWithRateLimit(t *testing.T) {
 func TestRateLimitWithDenyOverride(t *testing.T) {
 	e, _ := NewEnforcer("examples/rate_limit_deny_override_model.conf", "examples/rate_limit_deny_override_policy.csv")
 
-	testEnforce(t, e, "alice", "data1", "read", true) // allow effect
-	testEnforce(t, e, "bob", "data2", "write", true) // rate_limit effect should return true
+	testEnforce(t, e, "alice", "data1", "read", true)    // allow effect
+	testEnforce(t, e, "bob", "data2", "write", true)     // rate_limit effect should return true
 	testEnforce(t, e, "charlie", "data3", "read", false) // deny effect should return false
-	testEnforce(t, e, "david", "data4", "write", true) // rate_limit effect should return true
+	testEnforce(t, e, "david", "data4", "write", true)   // rate_limit effect should return true
 }
 
 func TestRBACModelWithCustomData(t *testing.T) {
