@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package detector
+package detector_test
 
 import (
 	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/casbin/casbin/v3/detector"
 	defaultrolemanager "github.com/casbin/casbin/v3/rbac/default-role-manager"
 )
 
 func TestDefaultDetector_NilRoleManager(t *testing.T) {
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(nil)
 
 	if err == nil {
@@ -42,7 +43,7 @@ func TestDefaultDetector_NoCycle(t *testing.T) {
 	_ = rm.AddLink("bob", "user")
 	_ = rm.AddLink("admin", "superuser")
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err != nil {
@@ -55,7 +56,7 @@ func TestDefaultDetector_SimpleCycle(t *testing.T) {
 	_ = rm.AddLink("A", "B")
 	_ = rm.AddLink("B", "A")
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err == nil {
@@ -78,7 +79,7 @@ func TestDefaultDetector_ComplexCycle(t *testing.T) {
 	_ = rm.AddLink("B", "C")
 	_ = rm.AddLink("C", "A")
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err == nil {
@@ -99,7 +100,7 @@ func TestDefaultDetector_SelfLoop(t *testing.T) {
 	rm := defaultrolemanager.NewRoleManagerImpl(10)
 	_ = rm.AddLink("A", "A")
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err == nil {
@@ -121,7 +122,7 @@ func TestDefaultDetector_MultipleCycles(t *testing.T) {
 	_ = rm.AddLink("C", "D")
 	_ = rm.AddLink("D", "C")
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err == nil {
@@ -144,7 +145,7 @@ func TestDefaultDetector_DisconnectedComponents(t *testing.T) {
 	// Component 3: carol -> moderator
 	_ = rm.AddLink("carol", "moderator")
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err != nil {
@@ -162,7 +163,7 @@ func TestDefaultDetector_ComplexGraphWithCycle(t *testing.T) {
 	_ = rm.AddLink("g3", "g1") // Creates cycle: g1 -> g2 -> g3 -> g1
 	_ = rm.AddLink("u3", "g4")
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err == nil {
@@ -184,7 +185,7 @@ func TestDefaultDetector_LongCycle(t *testing.T) {
 	_ = rm.AddLink("D", "E")
 	_ = rm.AddLink("E", "A")
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err == nil {
@@ -200,7 +201,7 @@ func TestDefaultDetector_LongCycle(t *testing.T) {
 func TestDefaultDetector_EmptyRoleManager(t *testing.T) {
 	rm := defaultrolemanager.NewRoleManagerImpl(10)
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err != nil {
@@ -219,7 +220,7 @@ func TestDefaultDetector_LargeGraphNoCycle(t *testing.T) {
 		_ = rm.AddLink(user, role)
 	}
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err != nil {
@@ -240,7 +241,7 @@ func TestDefaultDetector_LargeGraphWithCycle(t *testing.T) {
 	// Add the cycle
 	_ = rm.AddLink("u99", "u0")
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err == nil {
@@ -282,7 +283,7 @@ func TestDefaultDetector_PerformanceLargeGraph(t *testing.T) {
 		}
 	}
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err != nil {
@@ -298,7 +299,7 @@ func TestDefaultDetector_MultipleInheritance(t *testing.T) {
 	_ = rm.AddLink("admin", "superuser")
 	_ = rm.AddLink("moderator", "user")
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err != nil {
@@ -314,7 +315,7 @@ func TestDefaultDetector_DiamondPattern(t *testing.T) {
 	_ = rm.AddLink("admin", "superuser")
 	_ = rm.AddLink("moderator", "superuser")
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err != nil {
@@ -331,7 +332,7 @@ func TestDefaultDetector_DiamondPatternWithCycle(t *testing.T) {
 	_ = rm.AddLink("moderator", "superuser")
 	_ = rm.AddLink("superuser", "alice") // Creates cycle
 
-	detector := NewDefaultDetector()
+	detector := detector.NewDefaultDetector()
 	err := detector.Check(rm)
 
 	if err == nil {
