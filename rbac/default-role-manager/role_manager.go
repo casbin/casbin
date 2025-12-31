@@ -583,6 +583,14 @@ func (dm *DomainManager) SetLogger(logger log.Logger) {
 	dm.logger = logger
 }
 
+// SetDetector sets the detector for all role managers in this domain manager.
+func (dm *DomainManager) SetDetector(detector detector.Detector) {
+	dm.rmMap.Range(func(key, value interface{}) bool {
+		value.(*RoleManagerImpl).SetDetector(detector)
+		return true
+	})
+}
+
 // AddMatchingFunc support use pattern in g.
 func (dm *DomainManager) AddMatchingFunc(name string, fn rbac.MatchingFunc) {
 	dm.matchingFunc = fn
@@ -697,7 +705,10 @@ func (dm *DomainManager) AddLink(name1 string, name2 string, domains ...string) 
 		return err
 	}
 	roleManager := dm.getRoleManager(domain, true) // create role manager if it does not exist
-	_ = roleManager.AddLink(name1, name2, domains...)
+	err = roleManager.AddLink(name1, name2, domains...)
+	if err != nil {
+		return err
+	}
 
 	dm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
 		_ = rm.AddLink(name1, name2, domains...)
@@ -1269,7 +1280,10 @@ func (cdm *ConditionalDomainManager) AddLink(name1 string, name2 string, domains
 		return err
 	}
 	conditionalRoleManager := cdm.getConditionalRoleManager(domain, true) // create role manager if it does not exist
-	_ = conditionalRoleManager.AddLink(name1, name2, domain)
+	err = conditionalRoleManager.AddLink(name1, name2, domain)
+	if err != nil {
+		return err
+	}
 
 	cdm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
 		_ = rm.AddLink(name1, name2, domain)
@@ -1333,6 +1347,14 @@ func (cdm *ConditionalDomainManager) AddDomainMatchingFunc(name string, fn rbac.
 		return true
 	})
 	cdm.rebuild()
+}
+
+// SetDetector sets the detector for all conditional role managers in this conditional domain manager.
+func (cdm *ConditionalDomainManager) SetDetector(detector detector.Detector) {
+	cdm.rmMap.Range(func(key, value interface{}) bool {
+		value.(*ConditionalRoleManager).SetDetector(detector)
+		return true
+	})
 }
 
 // rebuild clears the map of ConditionalRoleManagers.
