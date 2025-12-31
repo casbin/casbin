@@ -21,6 +21,12 @@ import (
 	"github.com/casbin/casbin/v3/rbac"
 )
 
+// rangeableRM is an interface for role managers that support iterating over all role links.
+// This is used to build the adjacency graph for cycle detection.
+type rangeableRM interface {
+	Range(func(name1, name2 string, domain ...string) bool)
+}
+
 // DefaultDetector is the default implementation of the Detector interface.
 // It uses depth-first search (DFS) to detect cycles in role inheritance.
 type DefaultDetector struct{}
@@ -60,34 +66,29 @@ func (d *DefaultDetector) Check(rm rbac.RoleManager) error {
 func (d *DefaultDetector) buildGraph(rm rbac.RoleManager) (map[string][]string, error) {
 	graph := make(map[string][]string)
 
-	// Define interface for role managers that support Range iteration
-	type rangeableRM interface {
-		Range(func(name1, name2 string, domain ...string) bool)
-	}
-
 	// Try to cast to a RoleManager implementation that supports Range
 	// This works with RoleManagerImpl and similar implementations
-	if rrm, ok := rm.(rangeableRM); ok {
-		// Use Range method to build the graph directly
-		rrm.Range(func(name1, name2 string, domain ...string) bool {
-			// Initialize empty slice for name1 if it doesn't exist
-			if graph[name1] == nil {
-				graph[name1] = []string{}
-			}
-			// Add the link: name1 -> name2
-			graph[name1] = append(graph[name1], name2)
-
-			// Ensure name2 exists in graph even if it has no outgoing edges
-			if graph[name2] == nil {
-				graph[name2] = []string{}
-			}
-			return true
-		})
-		return graph, nil
+	rrm, ok := rm.(rangeableRM)
+	if !ok {
+		// Return an error if the RoleManager doesn't support Range iteration
+		return nil, fmt.Errorf("RoleManager does not support Range iteration, cannot detect cycles")
 	}
 
-	// If the RoleManager doesn't support Range, return an empty graph
-	// This is a limitation of the RoleManager interface
+	// Use Range method to build the graph directly
+	rrm.Range(func(name1, name2 string, domain ...string) bool {
+		// Initialize empty slice for name1 if it doesn't exist
+		if graph[name1] == nil {
+			graph[name1] = []string{}
+		}
+		// Add the link: name1 -> name2
+		graph[name1] = append(graph[name1], name2)
+
+		// Ensure name2 exists in graph even if it has no outgoing edges
+		if graph[name2] == nil {
+			graph[name2] = []string{}
+		}
+		return true
+	})
 	return graph, nil
 }
 

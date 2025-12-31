@@ -245,7 +245,8 @@ func TestDefaultDetector_PerformanceLargeGraph(t *testing.T) {
 		t.Skip("Skipping performance test in short mode")
 	}
 
-	rm := defaultrolemanager.NewRoleManagerImpl(1000)
+	// Use a higher maxHierarchyLevel to support deep hierarchies
+	rm := defaultrolemanager.NewRoleManagerImpl(10000)
 
 	// Build a large tree structure with 10,000 roles
 	// Each role has up to 3 children
