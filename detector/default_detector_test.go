@@ -48,7 +48,7 @@ func TestDefaultDetector_SimpleCycle(t *testing.T) {
 		t.Error("Expected cycle detection error, but got nil")
 	} else {
 		errMsg := err.Error()
-		if !strings.Contains(errMsg, "Cycle detected") {
+		if !strings.Contains(errMsg, "cycle detected") {
 			t.Errorf("Expected error message to contain 'Cycle detected', got: %s", errMsg)
 		}
 		// Should contain both A and B in the cycle
@@ -71,7 +71,7 @@ func TestDefaultDetector_ComplexCycle(t *testing.T) {
 		t.Error("Expected cycle detection error, but got nil")
 	} else {
 		errMsg := err.Error()
-		if !strings.Contains(errMsg, "Cycle detected") {
+		if !strings.Contains(errMsg, "cycle detected") {
 			t.Errorf("Expected error message to contain 'Cycle detected', got: %s", errMsg)
 		}
 		// Should contain A, B, and C in the cycle
@@ -92,7 +92,7 @@ func TestDefaultDetector_SelfLoop(t *testing.T) {
 		t.Error("Expected cycle detection error for self-loop, but got nil")
 	} else {
 		errMsg := err.Error()
-		if !strings.Contains(errMsg, "Cycle detected") {
+		if !strings.Contains(errMsg, "cycle detected") {
 			t.Errorf("Expected error message to contain 'Cycle detected', got: %s", errMsg)
 		}
 	}
@@ -114,7 +114,7 @@ func TestDefaultDetector_MultipleCycles(t *testing.T) {
 		t.Error("Expected cycle detection error, but got nil")
 	} else {
 		errMsg := err.Error()
-		if !strings.Contains(errMsg, "Cycle detected") {
+		if !strings.Contains(errMsg, "cycle detected") {
 			t.Errorf("Expected error message to contain 'Cycle detected', got: %s", errMsg)
 		}
 	}
@@ -155,7 +155,7 @@ func TestDefaultDetector_ComplexGraphWithCycle(t *testing.T) {
 		t.Error("Expected cycle detection error, but got nil")
 	} else {
 		errMsg := err.Error()
-		if !strings.Contains(errMsg, "Cycle detected") {
+		if !strings.Contains(errMsg, "cycle detected") {
 			t.Errorf("Expected error message to contain 'Cycle detected', got: %s", errMsg)
 		}
 	}
@@ -177,7 +177,7 @@ func TestDefaultDetector_LongCycle(t *testing.T) {
 		t.Error("Expected cycle detection error, but got nil")
 	} else {
 		errMsg := err.Error()
-		if !strings.Contains(errMsg, "Cycle detected") {
+		if !strings.Contains(errMsg, "cycle detected") {
 			t.Errorf("Expected error message to contain 'Cycle detected', got: %s", errMsg)
 		}
 	}
@@ -233,13 +233,13 @@ func TestDefaultDetector_LargeGraphWithCycle(t *testing.T) {
 		t.Error("Expected cycle detection error in large graph, but got nil")
 	} else {
 		errMsg := err.Error()
-		if !strings.Contains(errMsg, "Cycle detected") {
+		if !strings.Contains(errMsg, "cycle detected") {
 			t.Errorf("Expected error message to contain 'Cycle detected', got: %s", errMsg)
 		}
 	}
 }
 
-// Performance test with 10,000 roles
+// Performance test with 10,000 roles.
 func TestDefaultDetector_PerformanceLargeGraph(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping performance test in short mode")
@@ -324,7 +324,7 @@ func TestDefaultDetector_DiamondPatternWithCycle(t *testing.T) {
 		t.Error("Expected cycle detection error in diamond pattern with cycle, but got nil")
 	} else {
 		errMsg := err.Error()
-		if !strings.Contains(errMsg, "Cycle detected") {
+		if !strings.Contains(errMsg, "cycle detected") {
 			t.Errorf("Expected error message to contain 'Cycle detected', got: %s", errMsg)
 		}
 	}

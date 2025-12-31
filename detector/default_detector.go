@@ -53,7 +53,7 @@ func (d *DefaultDetector) Check(rm rbac.RoleManager) error {
 	for role := range graph {
 		if !visited[role] {
 			if cycle := d.detectCycle(role, graph, visited, recursionStack, []string{}); cycle != nil {
-				return fmt.Errorf("Cycle detected: %s", strings.Join(cycle, " -> "))
+				return fmt.Errorf("cycle detected: %s", strings.Join(cycle, " -> "))
 			}
 		}
 	}
