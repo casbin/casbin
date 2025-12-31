@@ -316,8 +316,10 @@ func (rm *RoleManagerImpl) AddDomainMatchingFunc(name string, fn rbac.MatchingFu
 }
 
 // SetLogger sets role manager's logger.
+// Note: This method is kept for backward compatibility but no longer sets anything.
+// The new Logger interface is event-based and used only in the Enforcer.
 func (rm *RoleManagerImpl) SetLogger(logger log.Logger) {
-	rm.logger = logger
+	// No-op: The new Logger interface doesn't support role manager logging.
 }
 
 // Clear clears all stored data and resets the role manager to the initial state.
@@ -499,8 +501,7 @@ func (rm *RoleManagerImpl) PrintRoles() error {
 	if !(rm.logger).IsEnabled() {
 		return nil
 	}
-	roles := rm.toString()
-	rm.logger.LogRole(roles)
+	// Note: LogRole was removed as the new Logger interface is event-based.
 	return nil
 }
 
@@ -562,8 +563,10 @@ func NewDomainManager(maxHierarchyLevel int) *DomainManager {
 }
 
 // SetLogger sets role manager's logger.
+// Note: This method is kept for backward compatibility but no longer sets anything.
+// The new Logger interface is event-based and used only in the Enforcer.
 func (dm *DomainManager) SetLogger(logger log.Logger) {
-	dm.logger = logger
+	// No-op: The new Logger interface doesn't support role manager logging.
 }
 
 // AddMatchingFunc support use pattern in g.
@@ -774,8 +777,7 @@ func (dm *DomainManager) PrintRoles() error {
 		return nil
 	}
 
-	roles := dm.toString()
-	dm.logger.LogRole(roles)
+	// Note: LogRole was removed as the new Logger interface is event-based.
 	return nil
 }
 
@@ -908,7 +910,7 @@ func (crm *ConditionalRoleManager) getNextRoles(currentRole, nextRole *Role, dom
 	passLinkConditionFunc, err := crm.checkLinkCondition(currentRole.name, nextRole.name, domains)
 
 	if err != nil {
-		crm.logger.LogError(err, "hasLinkHelper LinkCondition Error")
+		// Note: LogError was removed as the new Logger interface is event-based.
 		return false
 	}
 
@@ -948,7 +950,7 @@ func (crm *ConditionalRoleManager) GetRoles(name string, domains ...string) ([]s
 		roleName := key.(string)
 		passLinkConditionFunc, err := crm.checkLinkCondition(name, roleName, domains)
 		if err != nil {
-			crm.logger.LogError(err, "getRoles LinkCondition Error")
+			// Note: LogError was removed as the new Logger interface is event-based.
 			return true
 		}
 
@@ -972,7 +974,7 @@ func (crm *ConditionalRoleManager) GetUsers(name string, domains ...string) ([]s
 
 		passLinkConditionFunc, err := crm.checkLinkCondition(userName, name, domains)
 		if err != nil {
-			crm.logger.LogError(err, "getUsers LinkCondition Error")
+			// Note: LogError was removed as the new Logger interface is event-based.
 			return true
 		}
 
@@ -1029,7 +1031,7 @@ func (crm *ConditionalRoleManager) getImplicitRolesHelper(roles map[string]*Role
 			if _, ok := roleSet[roleName]; !ok {
 				passLinkConditionFunc, err := crm.checkLinkCondition(role.name, roleName, domains)
 				if err != nil {
-					crm.logger.LogError(err, "getImplicitRoles LinkCondition Error")
+					// Note: LogError was removed as the new Logger interface is event-based.
 					return true
 				}
 
@@ -1059,7 +1061,7 @@ func (crm *ConditionalRoleManager) getImplicitUsersHelper(users map[string]*Role
 			if _, ok := userSet[userName]; !ok {
 				passLinkConditionFunc, err := crm.checkLinkCondition(userName, user.name, domains)
 				if err != nil {
-					crm.logger.LogError(err, "getImplicitUsers LinkCondition Error")
+					// Note: LogError was removed as the new Logger interface is event-based.
 					return true
 				}
 
