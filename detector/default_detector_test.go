@@ -22,6 +22,20 @@ import (
 	defaultrolemanager "github.com/casbin/casbin/v3/rbac/default-role-manager"
 )
 
+func TestDefaultDetector_NilRoleManager(t *testing.T) {
+	detector := NewDefaultDetector()
+	err := detector.Check(nil)
+
+	if err == nil {
+		t.Error("Expected error for nil role manager, but got nil")
+	} else {
+		errMsg := err.Error()
+		if !strings.Contains(errMsg, "role manager cannot be nil") {
+			t.Errorf("Expected error message to contain 'role manager cannot be nil', got: %s", errMsg)
+		}
+	}
+}
+
 func TestDefaultDetector_NoCycle(t *testing.T) {
 	rm := defaultrolemanager.NewRoleManagerImpl(10)
 	_ = rm.AddLink("alice", "admin")

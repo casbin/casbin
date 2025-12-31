@@ -40,6 +40,11 @@ func NewDefaultDetector() *DefaultDetector {
 // It uses DFS to traverse the role graph and detect cycles.
 // Returns nil if no cycle is found, otherwise returns an error with a description of the cycle.
 func (d *DefaultDetector) Check(rm rbac.RoleManager) error {
+	// Defensive nil check to prevent runtime panics
+	if rm == nil {
+		return fmt.Errorf("role manager cannot be nil")
+	}
+
 	// Build the adjacency graph by exploring all roles
 	graph, err := d.buildGraph(rm)
 	if err != nil {
