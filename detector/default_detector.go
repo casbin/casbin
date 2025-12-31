@@ -16,7 +16,6 @@ package detector
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/casbin/casbin/v3/rbac"
@@ -57,24 +56,28 @@ func (d *DefaultDetector) Check(rm rbac.RoleManager) error {
 }
 
 // buildGraph builds an adjacency list representation of the role inheritance graph.
-// It explores all roles by iterating through role links using available APIs.
+// It uses the Range method (via type assertion) to iterate through all role links.
 func (d *DefaultDetector) buildGraph(rm rbac.RoleManager) (map[string][]string, error) {
 	graph := make(map[string][]string)
 
-	// Try to cast to RoleManagerImpl which has the Range method
+	// Define interface for role managers that support Range iteration
 	type rangeableRM interface {
 		Range(func(name1, name2 string, domain ...string) bool)
 	}
 
+	// Try to cast to a RoleManager implementation that supports Range
+	// This works with RoleManagerImpl and similar implementations
 	if rrm, ok := rm.(rangeableRM); ok {
 		// Use Range method to build the graph directly
 		rrm.Range(func(name1, name2 string, domain ...string) bool {
+			// Initialize empty slice for name1 if it doesn't exist
 			if graph[name1] == nil {
 				graph[name1] = []string{}
 			}
+			// Add the link: name1 -> name2
 			graph[name1] = append(graph[name1], name2)
 
-			// Ensure name2 exists in graph even if it has no children
+			// Ensure name2 exists in graph even if it has no outgoing edges
 			if graph[name2] == nil {
 				graph[name2] = []string{}
 			}
@@ -83,46 +86,8 @@ func (d *DefaultDetector) buildGraph(rm rbac.RoleManager) (map[string][]string, 
 		return graph, nil
 	}
 
-	// For DomainManager-based implementations, try to access internal role managers
-	// Use reflection to access the unexported rmMap field in DomainManager
-	type domainManager interface {
-		GetAllDomains() ([]string, error)
-	}
-
-	if _, ok := rm.(domainManager); ok {
-		// Try to use reflection to access the rmMap and extract RoleManagerImpl instances
-		// This is necessary because the public API doesn't provide a way to iterate roles
-		rmValue := reflect.ValueOf(rm)
-
-		// Handle pointer types
-		if rmValue.Kind() == reflect.Ptr {
-			rmValue = rmValue.Elem()
-		}
-
-		// Try to access DomainManager field (it's embedded in RoleManager)
-		dmField := rmValue.FieldByName("DomainManager")
-		if dmField.IsValid() && dmField.Kind() == reflect.Ptr {
-			dmValue := dmField.Elem()
-
-			// Access the unexported rmMap field
-			rmMapField := dmValue.FieldByName("rmMap")
-			if rmMapField.IsValid() {
-				// We can't directly access unexported fields, so we'll use unsafe
-				// or find another approach
-				// For now, we'll try to iterate through domains and query each
-				domains, err := rm.GetAllDomains()
-				if err == nil {
-					// For each domain, try to build the graph using GetRoles
-					// This is still limited without access to all role names
-					for _, domain := range domains {
-						_ = domain
-						// We can't effectively build the graph without knowing all roles
-					}
-				}
-			}
-		}
-	}
-
+	// If the RoleManager doesn't support Range, return an empty graph
+	// This is a limitation of the RoleManager interface
 	return graph, nil
 }
 
