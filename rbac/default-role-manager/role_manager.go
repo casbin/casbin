@@ -20,6 +20,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/casbin/casbin/v3/detector"
 	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/rbac"
 	"github.com/casbin/casbin/v3/util"
@@ -205,6 +206,7 @@ type RoleManagerImpl struct {
 	logger             log.Logger
 	matchingFuncCache  *util.SyncLRUCache
 	mutex              sync.Mutex
+	detector           detector.Detector
 }
 
 // NewRoleManagerImpl is the constructor for creating an instance of the
@@ -320,6 +322,11 @@ func (rm *RoleManagerImpl) SetLogger(logger log.Logger) {
 	rm.logger = logger
 }
 
+// SetDetector sets the detector for the RoleManager.
+func (rm *RoleManagerImpl) SetDetector(detector detector.Detector) {
+	rm.detector = detector
+}
+
 // Clear clears all stored data and resets the role manager to the initial state.
 func (rm *RoleManagerImpl) Clear() error {
 	rm.matchingFuncCache = util.NewSyncLRUCache(100)
@@ -333,6 +340,16 @@ func (rm *RoleManagerImpl) AddLink(name1 string, name2 string, domains ...string
 	user, _ := rm.getRole(name1)
 	role, _ := rm.getRole(name2)
 	user.addRole(role)
+	
+	// If detector is set, check for cycles
+	if rm.detector != nil {
+		if err := rm.detector.Check(rm); err != nil {
+			// Rollback the operation by removing the link
+			user.removeRole(role)
+			return err
+		}
+	}
+	
 	return nil
 }
 
