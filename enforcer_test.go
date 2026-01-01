@@ -474,7 +474,9 @@ func TestEnforceEx(t *testing.T) {
 }
 
 func TestEnforceExLog(t *testing.T) {
-	e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv", true)
+	// This test was previously named for logging, but actually tests EnforceEx explain functionality
+	// Logger parameter has been removed, but the test still validates explain behavior
+	e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 
 	testEnforceEx(t, e, "alice", "data1", "read", []string{"alice", "data1", "read"})
 	testEnforceEx(t, e, "alice", "data1", "write", []string{})
