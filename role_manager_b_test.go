@@ -8,7 +8,7 @@ import (
 )
 
 func BenchmarkRoleManagerSmall(b *testing.B) {
-	e, _ := NewEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewEnforcer("examples/rbac_model.conf")
 	// Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
 	e.EnableAutoBuildRoleLinks(false)
 
@@ -45,7 +45,7 @@ func BenchmarkRoleManagerSmall(b *testing.B) {
 }
 
 func BenchmarkRoleManagerMedium(b *testing.B) {
-	e, _ := NewEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewEnforcer("examples/rbac_model.conf")
 	// Do not rebuild the role inheritance relations for every AddGroupingPolicy() call.
 	e.EnableAutoBuildRoleLinks(false)
 
@@ -86,7 +86,7 @@ func BenchmarkRoleManagerMedium(b *testing.B) {
 }
 
 func BenchmarkRoleManagerLarge(b *testing.B) {
-	e, _ := NewEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewEnforcer("examples/rbac_model.conf")
 
 	// 10000 roles, 1000 resources.
 	pPolicies := make([][]string, 0)
