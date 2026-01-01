@@ -21,6 +21,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/casbin/casbin/v3/detector"
 	"github.com/casbin/casbin/v3/effector"
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
@@ -499,7 +500,9 @@ func (e *Enforcer) initRmMap() {
 			continue
 		}
 		if len(assertion.Tokens) <= 2 && len(assertion.ParamsTokens) == 0 {
-			assertion.RM = defaultrolemanager.NewRoleManagerImpl(10)
+			rm := defaultrolemanager.NewRoleManagerImpl(10)
+			rm.SetDetector(detector.NewDefaultDetector()) // Auto-enable detection
+			assertion.RM = rm
 			e.rmMap[ptype] = assertion.RM
 		}
 		if len(assertion.Tokens) <= 2 && len(assertion.ParamsTokens) != 0 {
@@ -522,6 +525,25 @@ func (e *Enforcer) initRmMap() {
 // EnableEnforce changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
 func (e *Enforcer) EnableEnforce(enable bool) {
 	e.enabled = enable
+}
+
+// Detect checks for cycles in the role inheritance hierarchy.
+// It iterates over all role managers and runs cycle detection if a detector is configured.
+// Returns an error if a cycle is detected, nil otherwise.
+func (e *Enforcer) Detect() error {
+	for _, rm := range e.rmMap {
+		// Use type assertion to check if the RM is *defaultrolemanager.RoleManagerImpl
+		if rmImpl, ok := rm.(*defaultrolemanager.RoleManagerImpl); ok {
+			// Retrieve the detector
+			if detector := rmImpl.GetDetector(); detector != nil {
+				// Call Check and return any error found
+				if err := detector.Check(rm); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
 }
 
 // EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.

@@ -171,6 +171,7 @@ type RoleManagerImpl struct {
 	domainMatchingFunc rbac.MatchingFunc
 	matchingFuncCache  *util.SyncLRUCache
 	mutex              sync.Mutex
+	detector           interface{ Check(rbac.RoleManager) error }
 }
 
 // NewRoleManagerImpl is the constructor for creating an instance of the
@@ -180,6 +181,16 @@ func NewRoleManagerImpl(maxHierarchyLevel int) *RoleManagerImpl {
 	_ = rm.Clear() // init allRoles and matchingFuncCache
 	rm.maxHierarchyLevel = maxHierarchyLevel
 	return &rm
+}
+
+// SetDetector sets the detector for the RoleManager.
+func (rm *RoleManagerImpl) SetDetector(detector interface{ Check(rbac.RoleManager) error }) {
+	rm.detector = detector
+}
+
+// GetDetector returns the detector for the RoleManager.
+func (rm *RoleManagerImpl) GetDetector() interface{ Check(rbac.RoleManager) error } {
+	return rm.detector
 }
 
 // use this constructor to avoid rebuild of AddMatchingFunc.
@@ -293,6 +304,16 @@ func (rm *RoleManagerImpl) AddLink(name1 string, name2 string, domains ...string
 	user, _ := rm.getRole(name1)
 	role, _ := rm.getRole(name2)
 	user.addRole(role)
+	
+	// Check for cycles if detector is set
+	if rm.detector != nil {
+		if err := rm.detector.Check(rm); err != nil {
+			// Rollback the operation
+			user.removeRole(role)
+			return err
+		}
+	}
+	
 	return nil
 }
 
