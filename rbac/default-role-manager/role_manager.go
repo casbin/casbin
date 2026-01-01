@@ -16,8 +16,6 @@ package defaultrolemanager
 
 import (
 	"errors"
-	"fmt"
-	"strings"
 	"sync"
 
 	"github.com/casbin/casbin/v3/rbac"
@@ -116,36 +114,6 @@ func (r *Role) rangeUsers(fn func(key, value interface{}) bool) {
 		role.users.Range(fn)
 		return true
 	})
-}
-
-func (r *Role) toString() string {
-	roles := r.getRoles()
-
-	if len(roles) == 0 {
-		return ""
-	}
-
-	var sb strings.Builder
-	sb.WriteString(r.name)
-	sb.WriteString(" < ")
-	if len(roles) != 1 {
-		sb.WriteString("(")
-	}
-
-	for i, role := range roles {
-		if i == 0 {
-			sb.WriteString(role)
-		} else {
-			sb.WriteString(", ")
-			sb.WriteString(role)
-		}
-	}
-
-	if len(roles) != 1 {
-		sb.WriteString(")")
-	}
-
-	return sb.String()
 }
 
 func (r *Role) getRoles() []string {
@@ -472,20 +440,6 @@ func (rm *RoleManagerImpl) getImplicitUsersHelper(users map[string]*Role, userSe
 	return rm.getImplicitUsersHelper(nextUsers, userSet, res, level+1)
 }
 
-func (rm *RoleManagerImpl) toString() []string {
-	var roles []string
-
-	rm.allRoles.Range(func(key, value interface{}) bool {
-		role := value.(*Role)
-		if text := role.toString(); text != "" {
-			roles = append(roles, text)
-		}
-		return true
-	})
-
-	return roles
-}
-
 // PrintRoles prints all the roles to log.
 func (rm *RoleManagerImpl) PrintRoles() error {
 	// Logger has been removed - this is now a no-op
@@ -734,20 +688,6 @@ func (dm *DomainManager) GetImplicitUsers(name string, domains ...string) ([]str
 	}
 	rm := dm.getRoleManager(domain, false)
 	return rm.GetImplicitUsers(name, domains...)
-}
-
-func (dm *DomainManager) toString() []string {
-	var roles []string
-
-	dm.rmMap.Range(func(key, value interface{}) bool {
-		domain := key.(string)
-		rm := value.(*RoleManagerImpl)
-		domainRoles := rm.toString()
-		roles = append(roles, fmt.Sprintf("%s: %s", domain, strings.Join(domainRoles, ", ")))
-		return true
-	})
-
-	return roles
 }
 
 // PrintRoles prints all the roles to log.

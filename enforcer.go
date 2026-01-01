@@ -797,16 +797,9 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 	}
 
-	var logExplains [][]string
-
 	if explains != nil {
-		if len(*explains) > 0 {
-			logExplains = append(logExplains, *explains)
-		}
-
 		if explainIndex != -1 && len(e.model["p"][pType].Policy) > explainIndex {
 			*explains = e.model["p"][pType].Policy[explainIndex]
-			logExplains = append(logExplains, *explains)
 		}
 	}
 
@@ -815,7 +808,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	if effect == effector.Allow {
 		result = true
 	}
-	// Logger has been removed - logging is no-op
 
 	return result, nil
 }
