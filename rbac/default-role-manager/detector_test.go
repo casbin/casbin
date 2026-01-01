@@ -103,3 +103,75 @@ func TestEnforcer_DetectAPI(t *testing.T) {
 		t.Fatalf("Expected no cycle in valid hierarchy, but got error: %v", err)
 	}
 }
+
+// TestEnforcer_ComplexCycleDetection tests more complex cycle scenarios.
+func TestEnforcer_ComplexCycleDetection(t *testing.T) {
+	e, err := casbin.NewEnforcer("../../examples/rbac_model.conf", "")
+	if err != nil {
+		t.Fatalf("Failed to create enforcer: %v", err)
+	}
+
+	// Build a valid hierarchy: alice -> bob -> charlie
+	_, err = e.AddGroupingPolicy("alice", "bob")
+	if err != nil {
+		t.Fatalf("Failed to add alice -> bob: %v", err)
+	}
+	_, err = e.AddGroupingPolicy("bob", "charlie")
+	if err != nil {
+		t.Fatalf("Failed to add bob -> charlie: %v", err)
+	}
+
+	// Try to create a cycle: charlie -> alice
+	ok, err := e.AddGroupingPolicy("charlie", "alice")
+	if err == nil {
+		t.Fatalf("Expected error when creating cycle, but got none")
+	}
+	if !strings.Contains(err.Error(), "cycle detected") {
+		t.Fatalf("Expected 'cycle detected' error, got: %v", err)
+	}
+	if ok {
+		t.Fatalf("Expected AddGroupingPolicy to return false for cyclic policy")
+	}
+
+	// Verify all valid policies still exist
+	hasPolicy, _ := e.HasGroupingPolicy("alice", "bob")
+	if !hasPolicy {
+		t.Fatalf("Expected policy 'alice -> bob' to still exist")
+	}
+	hasPolicy, _ = e.HasGroupingPolicy("bob", "charlie")
+	if !hasPolicy {
+		t.Fatalf("Expected policy 'bob -> charlie' to still exist")
+	}
+
+	// Verify the cyclic policy was not added
+	hasPolicy, _ = e.HasGroupingPolicy("charlie", "alice")
+	if hasPolicy {
+		t.Fatalf("Expected cyclic policy 'charlie -> alice' to NOT exist")
+	}
+}
+
+// TestEnforcer_SelfLoopDetection tests detection of self-loops.
+func TestEnforcer_SelfLoopDetection(t *testing.T) {
+	e, err := casbin.NewEnforcer("../../examples/rbac_model.conf", "")
+	if err != nil {
+		t.Fatalf("Failed to create enforcer: %v", err)
+	}
+
+	// Try to create a self-loop: alice -> alice
+	ok, err := e.AddGroupingPolicy("alice", "alice")
+	if err == nil {
+		t.Fatalf("Expected error when creating self-loop, but got none")
+	}
+	if !strings.Contains(err.Error(), "cycle detected") {
+		t.Fatalf("Expected 'cycle detected' error, got: %v", err)
+	}
+	if ok {
+		t.Fatalf("Expected AddGroupingPolicy to return false for self-loop")
+	}
+
+	// Verify the self-loop was not added
+	hasPolicy, _ := e.HasGroupingPolicy("alice", "alice")
+	if hasPolicy {
+		t.Fatalf("Expected self-loop 'alice -> alice' to NOT exist")
+	}
+}

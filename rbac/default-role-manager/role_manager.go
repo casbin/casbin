@@ -304,7 +304,7 @@ func (rm *RoleManagerImpl) AddLink(name1 string, name2 string, domains ...string
 	user, _ := rm.getRole(name1)
 	role, _ := rm.getRole(name2)
 	user.addRole(role)
-	
+
 	// Check for cycles if detector is set
 	if rm.detector != nil {
 		if err := rm.detector.Check(rm); err != nil {
@@ -313,7 +313,7 @@ func (rm *RoleManagerImpl) AddLink(name1 string, name2 string, domains ...string
 			return err
 		}
 	}
-	
+
 	return nil
 }
 
