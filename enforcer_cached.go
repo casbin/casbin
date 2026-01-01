@@ -177,7 +177,7 @@ func GetCacheKey(params ...interface{}) (string, bool) {
 func (e *CachedEnforcer) ClearPolicy() {
 	if atomic.LoadInt32(&e.enableCache) != 0 {
 		if err := e.cache.Clear(); err != nil {
-			e.logger.LogError(err, "clear cache failed")
+			// Logger has been removed - error is ignored
 			return
 		}
 	}

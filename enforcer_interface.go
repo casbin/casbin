@@ -48,7 +48,6 @@ type IEnforcer interface {
 	IsFiltered() bool
 	SavePolicy() error
 	EnableEnforce(enable bool)
-	EnableLog(enable bool)
 	EnableAutoNotifyWatcher(enable bool)
 	EnableAutoSave(autoSave bool)
 	EnableAutoBuildRoleLinks(autoBuildRoleLinks bool)

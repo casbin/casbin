@@ -26,7 +26,7 @@ func BenchmarkCachedRaw(b *testing.B) {
 }
 
 func BenchmarkCachedBasicModel(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv", false)
+	e, _ := NewCachedEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -35,7 +35,7 @@ func BenchmarkCachedBasicModel(b *testing.B) {
 }
 
 func BenchmarkCachedRBACModel(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv", false)
+	e, _ := NewCachedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -44,7 +44,7 @@ func BenchmarkCachedRBACModel(b *testing.B) {
 }
 
 func BenchmarkCachedRBACModelSmall(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewCachedEnforcer("examples/rbac_model.conf")
 	// 100 roles, 10 resources.
 	for i := 0; i < 100; i++ {
 		_, err := e.AddPolicy(fmt.Sprintf("group%d", i), fmt.Sprintf("data%d", i/10), "read")
@@ -67,7 +67,7 @@ func BenchmarkCachedRBACModelSmall(b *testing.B) {
 }
 
 func BenchmarkCachedRBACModelMedium(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewCachedEnforcer("examples/rbac_model.conf")
 	// 1000 roles, 100 resources.
 	pPolicies := make([][]string, 0)
 	for i := 0; i < 1000; i++ {
@@ -97,7 +97,7 @@ func BenchmarkCachedRBACModelMedium(b *testing.B) {
 }
 
 func BenchmarkCachedRBACModelLarge(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewCachedEnforcer("examples/rbac_model.conf")
 
 	// 10000 roles, 1000 resources.
 	pPolicies := make([][]string, 0)
@@ -126,7 +126,7 @@ func BenchmarkCachedRBACModelLarge(b *testing.B) {
 }
 
 func BenchmarkCachedRBACModelWithResourceRoles(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv", false)
+	e, _ := NewCachedEnforcer("examples/rbac_with_resource_roles_model.conf", "examples/rbac_with_resource_roles_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -135,7 +135,7 @@ func BenchmarkCachedRBACModelWithResourceRoles(b *testing.B) {
 }
 
 func BenchmarkCachedRBACModelWithDomains(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv", false)
+	e, _ := NewCachedEnforcer("examples/rbac_with_domains_model.conf", "examples/rbac_with_domains_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -144,7 +144,7 @@ func BenchmarkCachedRBACModelWithDomains(b *testing.B) {
 }
 
 func BenchmarkCachedABACModel(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/abac_model.conf", false)
+	e, _ := NewCachedEnforcer("examples/abac_model.conf")
 	data1 := newTestResource("data1", "alice")
 
 	b.ResetTimer()
@@ -154,7 +154,7 @@ func BenchmarkCachedABACModel(b *testing.B) {
 }
 
 func BenchmarkCachedKeyMatchModel(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv", false)
+	e, _ := NewCachedEnforcer("examples/keymatch_model.conf", "examples/keymatch_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -163,7 +163,7 @@ func BenchmarkCachedKeyMatchModel(b *testing.B) {
 }
 
 func BenchmarkCachedRBACModelWithDeny(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv", false)
+	e, _ := NewCachedEnforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -172,7 +172,7 @@ func BenchmarkCachedRBACModelWithDeny(b *testing.B) {
 }
 
 func BenchmarkCachedPriorityModel(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/priority_model.conf", "examples/priority_policy.csv", false)
+	e, _ := NewCachedEnforcer("examples/priority_model.conf", "examples/priority_policy.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -181,7 +181,7 @@ func BenchmarkCachedPriorityModel(b *testing.B) {
 }
 
 func BenchmarkCachedWithEnforceContext(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/priority_model_enforce_context.conf", "examples/priority_policy_enforce_context.csv", false)
+	e, _ := NewCachedEnforcer("examples/priority_model_enforce_context.conf", "examples/priority_policy_enforce_context.csv")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -190,7 +190,7 @@ func BenchmarkCachedWithEnforceContext(b *testing.B) {
 }
 
 func BenchmarkCachedRBACModelMediumParallel(b *testing.B) {
-	e, _ := NewCachedEnforcer("examples/rbac_model.conf", false)
+	e, _ := NewCachedEnforcer("examples/rbac_model.conf")
 
 	// 10000 roles, 1000 resources.
 	pPolicies := make([][]string, 0)

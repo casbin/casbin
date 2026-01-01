@@ -14,8 +14,6 @@
 
 package rbac
 
-import "github.com/casbin/casbin/v3/log"
-
 type MatchingFunc func(arg1 string, arg2 string) bool
 
 type LinkConditionFunc = func(args ...string) (bool, error)
@@ -53,8 +51,6 @@ type RoleManager interface {
 	GetAllDomains() ([]string, error)
 	// PrintRoles prints all the roles to log.
 	PrintRoles() error
-	// SetLogger sets role manager's logger.
-	SetLogger(logger log.Logger)
 	// Match matches the domain with the pattern
 	Match(str string, pattern string) bool
 	// AddMatchingFunc adds the matching function

@@ -91,33 +91,7 @@ func (model Model) BuildConditionalRoleLinks(condRmMap map[string]rbac.Condition
 
 // PrintPolicy prints the policy to log.
 func (model Model) PrintPolicy() {
-	if !model.GetLogger().IsEnabled() {
-		return
-	}
-
-	policy := make(map[string][][]string)
-
-	for key, ast := range model["p"] {
-		value, found := policy[key]
-		if found {
-			value = append(value, ast.Policy...)
-			policy[key] = value
-		} else {
-			policy[key] = ast.Policy
-		}
-	}
-
-	for key, ast := range model["g"] {
-		value, found := policy[key]
-		if found {
-			value = append(value, ast.Policy...)
-			policy[key] = value
-		} else {
-			policy[key] = ast.Policy
-		}
-	}
-
-	model.GetLogger().LogPolicy(policy)
+	// Logger has been removed - this is now a no-op
 }
 
 // ClearPolicy clears all current policy.

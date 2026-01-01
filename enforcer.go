@@ -22,7 +22,6 @@ import (
 	"sync"
 
 	"github.com/casbin/casbin/v3/effector"
-	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
 	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
@@ -53,8 +52,6 @@ type Enforcer struct {
 	autoNotifyWatcher    bool
 	autoNotifyDispatcher bool
 	acceptJsonRequest    bool
-
-	logger log.Logger
 }
 
 // EnforceContext is used as the first element of the parameter "rvals" in method "enforce".
@@ -80,25 +77,10 @@ func (e EnforceContext) GetCacheKey() string {
 //	a := mysqladapter.NewDBAdapter("mysql", "mysql_username:mysql_password@tcp(127.0.0.1:3306)/")
 //	e := casbin.NewEnforcer("path/to/basic_model.conf", a)
 func NewEnforcer(params ...interface{}) (*Enforcer, error) {
-	e := &Enforcer{logger: &log.DefaultLogger{}}
+	e := &Enforcer{}
 
 	parsedParamLen := 0
 	paramLen := len(params)
-	if paramLen >= 1 {
-		enableLog, ok := params[paramLen-1].(bool)
-		if ok {
-			e.EnableLog(enableLog)
-			parsedParamLen++
-		}
-	}
-
-	if paramLen-parsedParamLen >= 1 {
-		logger, ok := params[paramLen-parsedParamLen-1].(log.Logger)
-		if ok {
-			e.logger = logger
-			parsedParamLen++
-		}
-	}
 
 	switch paramLen - parsedParamLen {
 	case 2:
@@ -176,7 +158,6 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 	e.adapter = adapter
 
 	e.model = m
-	m.SetLogger(e.logger)
 	e.model.PrintModel()
 	e.fm = model.LoadFunctionMap()
 
@@ -192,18 +173,6 @@ func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapte
 	}
 
 	return nil
-}
-
-// SetLogger changes the current enforcer's logger.
-func (e *Enforcer) SetLogger(logger log.Logger) {
-	e.logger = logger
-	e.model.SetLogger(e.logger)
-	for k := range e.rmMap {
-		e.rmMap[k].SetLogger(e.logger)
-	}
-	for k := range e.condRmMap {
-		e.condRmMap[k].SetLogger(e.logger)
-	}
 }
 
 func (e *Enforcer) initialize() {
@@ -229,7 +198,6 @@ func (e *Enforcer) LoadModel() error {
 	if err != nil {
 		return err
 	}
-	e.model.SetLogger(e.logger)
 
 	e.model.PrintModel()
 	e.fm = model.LoadFunctionMap()
@@ -249,7 +217,6 @@ func (e *Enforcer) SetModel(m model.Model) {
 	e.model = m
 	e.fm = model.LoadFunctionMap()
 
-	e.model.SetLogger(e.logger)
 	e.initialize()
 }
 
@@ -557,16 +524,6 @@ func (e *Enforcer) EnableEnforce(enable bool) {
 	e.enabled = enable
 }
 
-// EnableLog changes whether Casbin will log messages to the Logger.
-func (e *Enforcer) EnableLog(enable bool) {
-	e.logger.EnableLog(enable)
-}
-
-// IsLogEnabled returns the current logger's enabled status.
-func (e *Enforcer) IsLogEnabled() bool {
-	return e.logger.IsEnabled()
-}
-
 // EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
 func (e *Enforcer) EnableAutoNotifyWatcher(enable bool) {
 	e.autoNotifyWatcher = enable
@@ -840,16 +797,9 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 	}
 
-	var logExplains [][]string
-
 	if explains != nil {
-		if len(*explains) > 0 {
-			logExplains = append(logExplains, *explains)
-		}
-
 		if explainIndex != -1 && len(e.model["p"][pType].Policy) > explainIndex {
 			*explains = e.model["p"][pType].Policy[explainIndex]
-			logExplains = append(logExplains, *explains)
 		}
 	}
 
@@ -858,7 +808,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	if effect == effector.Allow {
 		result = true
 	}
-	e.logger.LogEnforce(expString, rvals, result, logExplains)
 
 	return result, nil
 }
