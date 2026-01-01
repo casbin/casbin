@@ -21,6 +21,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/casbin/casbin/v3/detector"
 	"github.com/casbin/casbin/v3/effector"
 	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
@@ -532,7 +533,9 @@ func (e *Enforcer) initRmMap() {
 			continue
 		}
 		if len(assertion.Tokens) <= 2 && len(assertion.ParamsTokens) == 0 {
-			assertion.RM = defaultrolemanager.NewRoleManagerImpl(10)
+			rm := defaultrolemanager.NewRoleManagerImpl(10)
+			rm.SetDetector(detector.NewDefaultDetector()) // Battery Included: Auto-enable detection
+			assertion.RM = rm
 			e.rmMap[ptype] = assertion.RM
 		}
 		if len(assertion.Tokens) <= 2 && len(assertion.ParamsTokens) != 0 {
