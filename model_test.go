@@ -17,7 +17,6 @@ package casbin
 import (
 	"testing"
 
-	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
 	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
 	"github.com/casbin/casbin/v3/rbac"
@@ -477,8 +476,7 @@ func (rm *testCustomRoleManager) GetDomains(name string) ([]string, error) {
 func (rm *testCustomRoleManager) GetAllDomains() ([]string, error) {
 	return []string{}, nil
 }
-func (rm *testCustomRoleManager) PrintRoles() error           { return nil }
-func (rm *testCustomRoleManager) SetLogger(logger log.Logger) {}
+func (rm *testCustomRoleManager) PrintRoles() error { return nil }
 
 func (rm *testCustomRoleManager) Match(str string, pattern string) bool                   { return true }
 func (rm *testCustomRoleManager) AddMatchingFunc(name string, fn rbac.MatchingFunc)       {}

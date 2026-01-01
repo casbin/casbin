@@ -19,7 +19,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/rbac"
 )
 
@@ -36,8 +35,6 @@ type Assertion struct {
 	CondRM          rbac.ConditionalRoleManager
 	FieldIndexMap   map[string]int
 	FieldIndexMutex sync.RWMutex
-
-	logger log.Logger
 }
 
 func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
@@ -165,10 +162,6 @@ func (ast *Assertion) addConditionalRoleLink(rule []string, domainRule []string)
 		}
 	}
 	return err
-}
-
-func (ast *Assertion) setLogger(logger log.Logger) {
-	ast.logger = logger
 }
 
 func (ast *Assertion) copy() *Assertion {

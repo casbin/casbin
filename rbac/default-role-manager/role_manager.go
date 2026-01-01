@@ -20,7 +20,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/rbac"
 	"github.com/casbin/casbin/v3/util"
 )
@@ -202,7 +201,6 @@ type RoleManagerImpl struct {
 	maxHierarchyLevel  int
 	matchingFunc       rbac.MatchingFunc
 	domainMatchingFunc rbac.MatchingFunc
-	logger             log.Logger
 	matchingFuncCache  *util.SyncLRUCache
 	mutex              sync.Mutex
 }
@@ -213,7 +211,6 @@ func NewRoleManagerImpl(maxHierarchyLevel int) *RoleManagerImpl {
 	rm := RoleManagerImpl{}
 	_ = rm.Clear() // init allRoles and matchingFuncCache
 	rm.maxHierarchyLevel = maxHierarchyLevel
-	rm.SetLogger(&log.DefaultLogger{})
 	return &rm
 }
 
@@ -313,11 +310,6 @@ func (rm *RoleManagerImpl) AddMatchingFunc(name string, fn rbac.MatchingFunc) {
 // AddDomainMatchingFunc support use domain pattern in g.
 func (rm *RoleManagerImpl) AddDomainMatchingFunc(name string, fn rbac.MatchingFunc) {
 	rm.domainMatchingFunc = fn
-}
-
-// SetLogger sets role manager's logger.
-func (rm *RoleManagerImpl) SetLogger(logger log.Logger) {
-	rm.logger = logger
 }
 
 // Clear clears all stored data and resets the role manager to the initial state.
@@ -496,11 +488,7 @@ func (rm *RoleManagerImpl) toString() []string {
 
 // PrintRoles prints all the roles to log.
 func (rm *RoleManagerImpl) PrintRoles() error {
-	if !(rm.logger).IsEnabled() {
-		return nil
-	}
-	roles := rm.toString()
-	rm.logger.LogRole(roles)
+	// Logger has been removed - this is now a no-op
 	return nil
 }
 
@@ -548,7 +536,6 @@ type DomainManager struct {
 	maxHierarchyLevel  int
 	matchingFunc       rbac.MatchingFunc
 	domainMatchingFunc rbac.MatchingFunc
-	logger             log.Logger
 	matchingFuncCache  *util.SyncLRUCache
 }
 
@@ -559,11 +546,6 @@ func NewDomainManager(maxHierarchyLevel int) *DomainManager {
 	_ = dm.Clear() // init rmMap and rmCache
 	dm.maxHierarchyLevel = maxHierarchyLevel
 	return dm
-}
-
-// SetLogger sets role manager's logger.
-func (dm *DomainManager) SetLogger(logger log.Logger) {
-	dm.logger = logger
 }
 
 // AddMatchingFunc support use pattern in g.
@@ -770,12 +752,7 @@ func (dm *DomainManager) toString() []string {
 
 // PrintRoles prints all the roles to log.
 func (dm *DomainManager) PrintRoles() error {
-	if !(dm.logger).IsEnabled() {
-		return nil
-	}
-
-	roles := dm.toString()
-	dm.logger.LogRole(roles)
+	// Logger has been removed - this is now a no-op
 	return nil
 }
 
@@ -857,7 +834,6 @@ func NewConditionalRoleManager(maxHierarchyLevel int) *ConditionalRoleManager {
 	rm := ConditionalRoleManager{}
 	_ = rm.Clear() // init allRoles and matchingFuncCache
 	rm.maxHierarchyLevel = maxHierarchyLevel
-	rm.SetLogger(&log.DefaultLogger{})
 	return &rm
 }
 
@@ -908,7 +884,7 @@ func (crm *ConditionalRoleManager) getNextRoles(currentRole, nextRole *Role, dom
 	passLinkConditionFunc, err := crm.checkLinkCondition(currentRole.name, nextRole.name, domains)
 
 	if err != nil {
-		crm.logger.LogError(err, "hasLinkHelper LinkCondition Error")
+		// Logger has been removed - error is ignored
 		return false
 	}
 
@@ -948,7 +924,7 @@ func (crm *ConditionalRoleManager) GetRoles(name string, domains ...string) ([]s
 		roleName := key.(string)
 		passLinkConditionFunc, err := crm.checkLinkCondition(name, roleName, domains)
 		if err != nil {
-			crm.logger.LogError(err, "getRoles LinkCondition Error")
+			// Logger has been removed - error is ignored
 			return true
 		}
 
@@ -972,7 +948,7 @@ func (crm *ConditionalRoleManager) GetUsers(name string, domains ...string) ([]s
 
 		passLinkConditionFunc, err := crm.checkLinkCondition(userName, name, domains)
 		if err != nil {
-			crm.logger.LogError(err, "getUsers LinkCondition Error")
+			// Logger has been removed - error is ignored
 			return true
 		}
 
@@ -1029,7 +1005,7 @@ func (crm *ConditionalRoleManager) getImplicitRolesHelper(roles map[string]*Role
 			if _, ok := roleSet[roleName]; !ok {
 				passLinkConditionFunc, err := crm.checkLinkCondition(role.name, roleName, domains)
 				if err != nil {
-					crm.logger.LogError(err, "getImplicitRoles LinkCondition Error")
+					// Logger has been removed - error is ignored
 					return true
 				}
 
@@ -1059,7 +1035,7 @@ func (crm *ConditionalRoleManager) getImplicitUsersHelper(users map[string]*Role
 			if _, ok := userSet[userName]; !ok {
 				passLinkConditionFunc, err := crm.checkLinkCondition(userName, user.name, domains)
 				if err != nil {
-					crm.logger.LogError(err, "getImplicitUsers LinkCondition Error")
+					// Logger has been removed - error is ignored
 					return true
 				}
 
@@ -1163,7 +1139,6 @@ func NewConditionalDomainManager(maxHierarchyLevel int) *ConditionalDomainManage
 	rm := ConditionalDomainManager{}
 	_ = rm.Clear() // init allRoles and matchingFuncCache
 	rm.maxHierarchyLevel = maxHierarchyLevel
-	rm.SetLogger(&log.DefaultLogger{})
 	return &rm
 }
 

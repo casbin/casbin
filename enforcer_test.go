@@ -275,21 +275,10 @@ func TestEnableEnforce(t *testing.T) {
 }
 
 func TestEnableLog(t *testing.T) {
-	e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv", true)
-	// The log is enabled by default, so the above is the same with:
-	// e := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+	// This test is now a no-op since the logger has been removed
+	// Keeping it for backward compatibility, but it just tests enforcement
+	e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
 
-	testEnforce(t, e, "alice", "data1", "read", true)
-	testEnforce(t, e, "alice", "data1", "write", false)
-	testEnforce(t, e, "alice", "data2", "read", false)
-	testEnforce(t, e, "alice", "data2", "write", false)
-	testEnforce(t, e, "bob", "data1", "read", false)
-	testEnforce(t, e, "bob", "data1", "write", false)
-	testEnforce(t, e, "bob", "data2", "read", false)
-	testEnforce(t, e, "bob", "data2", "write", true)
-
-	// The log can also be enabled or disabled at run-time.
-	e.EnableLog(false)
 	testEnforce(t, e, "alice", "data1", "read", true)
 	testEnforce(t, e, "alice", "data1", "write", false)
 	testEnforce(t, e, "alice", "data2", "read", false)
