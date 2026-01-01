@@ -108,12 +108,44 @@ func TestLogEntryStructure(t *testing.T) {
 		t.Errorf("Expected Subject to be 'alice', got %v", entry.Subject)
 	}
 
+	if entry.Object != "data1" {
+		t.Errorf("Expected Object to be 'data1', got %v", entry.Object)
+	}
+
+	if entry.Action != "read" {
+		t.Errorf("Expected Action to be 'read', got %v", entry.Action)
+	}
+
+	if entry.Domain != "domain1" {
+		t.Errorf("Expected Domain to be 'domain1', got %v", entry.Domain)
+	}
+
 	if entry.Allowed != true {
 		t.Errorf("Expected Allowed to be true, got %v", entry.Allowed)
 	}
 
+	if entry.Matched != "p, alice, data1, read" {
+		t.Errorf("Expected Matched to be 'p, alice, data1, read', got %v", entry.Matched)
+	}
+
+	if entry.Operation != "add" {
+		t.Errorf("Expected Operation to be 'add', got %v", entry.Operation)
+	}
+
+	if len(entry.Rules) != 1 || len(entry.Rules[0]) != 3 {
+		t.Errorf("Expected Rules to have 1 rule with 3 elements, got %v", entry.Rules)
+	}
+
 	if entry.RuleCount != 1 {
 		t.Errorf("Expected RuleCount to be 1, got %v", entry.RuleCount)
+	}
+
+	if entry.Error != nil {
+		t.Errorf("Expected Error to be nil, got %v", entry.Error)
+	}
+
+	if entry.Attributes["custom"] != "value" {
+		t.Errorf("Expected Attributes['custom'] to be 'value', got %v", entry.Attributes["custom"])
 	}
 }
 
