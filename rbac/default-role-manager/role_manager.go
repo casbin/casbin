@@ -327,6 +327,11 @@ func (rm *RoleManagerImpl) SetDetector(detector detector.Detector) {
 	rm.detector = detector
 }
 
+// GetDetector returns the detector for the RoleManager.
+func (rm *RoleManagerImpl) GetDetector() detector.Detector {
+	return rm.detector
+}
+
 // Clear clears all stored data and resets the role manager to the initial state.
 func (rm *RoleManagerImpl) Clear() error {
 	rm.matchingFuncCache = util.NewSyncLRUCache(100)
