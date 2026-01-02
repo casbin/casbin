@@ -36,22 +36,22 @@ func NewBuilder() *Builder {
 }
 
 // Request defines the request definition fields.
-// Example: Request("sub", "obj", "act")
+// Example: Request("sub", "obj", "act").
 func (b *Builder) Request(fields ...string) *Builder {
 	b.requestFields = fields
 	return b
 }
 
 // Policy defines the policy definition fields.
-// Example: Policy("sub", "obj", "act")
+// Example: Policy("sub", "obj", "act").
 func (b *Builder) Policy(fields ...string) *Builder {
 	b.policyFields = fields
 	return b
 }
 
 // RoleDefinition defines the role definition.
-// Example: RoleDefinition("_", "_") for basic RBAC
-// Example: RoleDefinition("_", "_", "_") for RBAC with domains
+// Example: RoleDefinition("_", "_") for basic RBAC.
+// Example: RoleDefinition("_", "_", "_") for RBAC with domains.
 func (b *Builder) RoleDefinition(fields ...string) *Builder {
 	b.roleFields = fields
 	return b
@@ -114,13 +114,13 @@ func (b *Builder) Build() (Model, error) {
 // Helper functions for building matcher expressions
 
 // Eq creates an equality matcher for a field.
-// Example: Eq("sub") generates "r.sub == p.sub"
+// Example: Eq("sub") generates "r.sub == p.sub".
 func Eq(field string) string {
 	return fmt.Sprintf("r.%s == p.%s", field, field)
 }
 
 // G creates a role matching expression.
-// Example: G("r.sub", "p.sub") generates "g(r.sub, p.sub)"
+// Example: G("r.sub", "p.sub") generates "g(r.sub, p.sub)".
 func G(role1, role2 string) string {
 	return fmt.Sprintf("g(%s, %s)", role1, role2)
 }
@@ -141,16 +141,16 @@ func Or(expressions ...string) string {
 	return strings.Join(expressions, " || ")
 }
 
-// Effect constants for convenience
+// Effect constants for convenience.
 const (
-	// AllowOverride allows if any policy allows (some(where (p.eft == allow)))
+	// AllowOverride allows if any policy allows (some(where (p.eft == allow))).
 	AllowOverride = constant.AllowOverrideEffect
-	// DenyOverride denies if any policy denies (!some(where (p.eft == deny)))
+	// DenyOverride denies if any policy denies (!some(where (p.eft == deny))).
 	DenyOverride = constant.DenyOverrideEffect
-	// AllowAndDeny allows only if at least one allows and none deny
+	// AllowAndDeny allows only if at least one allows and none deny.
 	AllowAndDeny = constant.AllowAndDenyEffect
-	// Priority uses priority-based effect (priority(p.eft) || deny)
+	// Priority uses priority-based effect (priority(p.eft) || deny).
 	Priority = constant.PriorityEffect
-	// SubjectPriority uses subject priority-based effect (subjectPriority(p.eft) || deny)
+	// SubjectPriority uses subject priority-based effect (subjectPriority(p.eft) || deny).
 	SubjectPriority = constant.SubjectPriorityEffect
 )
