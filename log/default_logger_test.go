@@ -92,6 +92,13 @@ func TestDefaultLogger_Subscribe(t *testing.T) {
 	if subs[0] != EventEnforce || subs[1] != EventPolicyAdd {
 		t.Error("Subscribe() should return the correct events")
 	}
+
+	// Test that Subscribe returns a copy (not the original slice)
+	subs[0] = EventPolicyRemove // Modify the returned slice
+	subs2 := logger3.Subscribe()
+	if subs2[0] != EventEnforce {
+		t.Error("Subscribe() should return a copy, not the original slice")
+	}
 }
 
 func TestDefaultLogger_OnBeforeEvent(t *testing.T) {

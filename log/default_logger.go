@@ -64,7 +64,13 @@ func (l *DefaultLogger) IsEnabled() bool {
 func (l *DefaultLogger) Subscribe() []EventType {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
-	return l.subscriptions
+	if l.subscriptions == nil {
+		return nil
+	}
+	// Return a copy to prevent external modification
+	result := make([]EventType, len(l.subscriptions))
+	copy(result, l.subscriptions)
+	return result
 }
 
 // OnBeforeEvent is called before an event occurs and returns a handle for context.
@@ -99,6 +105,8 @@ func (l *DefaultLogger) OnAfterEvent(handle *Handle, entry *LogEntry) {
 	}
 
 	// Write with lock protection to ensure thread-safety
+	// Note: Write errors are intentionally ignored as there's no safe way to report
+	// logging failures from within a logger without risking infinite recursion.
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.writer.Write(data)
