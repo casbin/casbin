@@ -112,12 +112,16 @@ func (e *Enforcer) addPoliciesWithoutNotify(sec string, ptype string, rules [][]
 	if sec == "g" {
 		err := e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, rules)
 		if err != nil {
-			return true, err
+			// Rollback: remove the policies from model since role link failed
+			_, _ = e.model.RemovePolicies(sec, ptype, rules)
+			return false, err
 		}
 
 		err = e.BuildIncrementalConditionalRoleLinks(model.PolicyAdd, ptype, rules)
 		if err != nil {
-			return true, err
+			// Rollback: remove the policies from model since role link failed
+			_, _ = e.model.RemovePolicies(sec, ptype, rules)
+			return false, err
 		}
 
 		// Validate constraints after adding grouping policies
