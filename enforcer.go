@@ -187,6 +187,11 @@ func (e *Enforcer) initialize() {
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
 	e.autoNotifyDispatcher = true
+
+	if e.model["g"] != nil && len(e.model["g"]) > 1 {
+		e.model.AddDef("g", "*", "_, _")
+	}
+
 	e.initRmMap()
 }
 
@@ -448,6 +453,11 @@ func (e *Enforcer) SavePolicy() error {
 	if e.IsFiltered() {
 		return errors.New("cannot save a filtered policy")
 	}
+
+	if e.model["g"] != nil && e.model["g"]["*"] != nil {
+		delete(e.model["g"], "*")
+	}
+
 	if err := e.adapter.SavePolicy(e.model); err != nil {
 		return err
 	}

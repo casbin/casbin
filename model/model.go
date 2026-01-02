@@ -188,6 +188,7 @@ func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	for s := range sectionNameMap {
 		loadSection(model, cfg, s)
 	}
+
 	ms := make([]string, 0)
 	for _, rs := range requiredSections {
 		if !model.hasSection(rs) {
@@ -376,6 +377,9 @@ func (model Model) ToText() string {
 	if _, ok := model["g"]; ok {
 		s.WriteString("[role_definition]\n")
 		for ptype := range model["g"] {
+			if ptype == "*" {
+				continue
+			}
 			s.WriteString(fmt.Sprintf("%s = %s\n", ptype, model["g"][ptype].Value))
 		}
 	}

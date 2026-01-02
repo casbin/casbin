@@ -285,6 +285,7 @@ func TestPermissionAPI(t *testing.T) {
 	e, _ = NewEnforcer("examples/rbac_with_multiple_policy_model.conf", "examples/rbac_with_multiple_policy_policy.csv")
 	testGetNamedPermissionsForUser(t, e, "p", "user", [][]string{{"user", "/data", "GET"}})
 	testGetNamedPermissionsForUser(t, e, "p2", "user", [][]string{{"user", "view"}})
+	testGetImplicitPermissionsForUserFromAllRoles(t, e, "alice", [][]string{{"user", "/data", "GET"}, {"admin", "/data", "POST"}})
 }
 
 func testGetImplicitRoles(t *testing.T, e *Enforcer, name string, res []string) {
@@ -330,6 +331,17 @@ func testGetImplicitPermissions(t *testing.T, e *Enforcer, name string, res [][]
 	t.Helper()
 	myRes, _ := e.GetImplicitPermissionsForUser(name, domain...)
 	t.Log("Implicit permissions for ", name, ": ", myRes)
+
+	if !util.Set2DEquals(res, myRes) {
+		t.Error("Implicit permissions for ", name, ": ", myRes, ", supposed to be ", res)
+	}
+}
+
+func testGetImplicitPermissionsForUserFromAllRoles(t *testing.T, e *Enforcer, name string, res [][]string, domain ...string) {
+	t.Helper()
+	myRes, _ := e.GetImplicitPermissionsForUserFromAllRoles(name, domain...)
+	fmt.Println(e.GetNamedImplicitRolesForUser("*", name))
+	t.Log("Implicit permissions for ", name, "from all roles", ": ", myRes)
 
 	if !util.Set2DEquals(res, myRes) {
 		t.Error("Implicit permissions for ", name, ": ", myRes, ", supposed to be ", res)
