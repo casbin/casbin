@@ -262,7 +262,10 @@ func TestBuilderHelperFunctions(t *testing.T) {
 			expected: "r.sub == p.sub || r.obj == p.obj",
 		},
 		{
-			name:     "Complex expression",
+			name: "Complex expression",
+			// Note: And() and Or() are simple string concatenators.
+			// Users should be aware of operator precedence when combining them.
+			// For explicit grouping, use custom matcher strings with parentheses.
 			fn:       func() string { return And(G("r.sub", "p.sub"), Or(Eq("obj"), Eq("act"))) },
 			expected: "g(r.sub, p.sub) && r.obj == p.obj || r.act == p.act",
 		},

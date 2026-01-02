@@ -127,12 +127,16 @@ func G(role1, role2 string) string {
 
 // And combines multiple expressions with logical AND.
 // Example: And(Eq("sub"), Eq("obj")) generates "r.sub == p.sub && r.obj == p.obj"
+// Note: This is a simple string concatenator. Be aware of operator precedence
+// when combining with Or(). For explicit grouping, use parentheses in custom matcher strings.
 func And(expressions ...string) string {
 	return strings.Join(expressions, " && ")
 }
 
 // Or combines multiple expressions with logical OR.
 // Example: Or(Eq("sub"), Eq("obj")) generates "r.sub == p.sub || r.obj == p.obj"
+// Note: This is a simple string concatenator. Be aware of operator precedence
+// when combining with And(). For explicit grouping, use parentheses in custom matcher strings.
 func Or(expressions ...string) string {
 	return strings.Join(expressions, " || ")
 }
