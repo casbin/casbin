@@ -301,47 +301,20 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
-	var logEntry *log.LogEntry
-	if e.logger != nil {
-		logEntry = &log.LogEntry{
-			EventType: log.EventLoadPolicy,
-		}
-		_ = e.logger.OnBeforeEvent(logEntry)
-	}
+	logEntry := e.onLogBeforeEventInLoadPolicy()
 
 	newModel, err := e.loadPolicyFromAdapter(e.model)
 	if err != nil {
-		if e.logger != nil && logEntry != nil {
-			logEntry.Error = err
-			_ = e.logger.OnAfterEvent(logEntry)
-		}
+		e.onLogAfterEventWithError(logEntry, err)
 		return err
 	}
 	err = e.applyModifiedModel(newModel)
 	if err != nil {
-		if e.logger != nil && logEntry != nil {
-			logEntry.Error = err
-			_ = e.logger.OnAfterEvent(logEntry)
-		}
+		e.onLogAfterEventWithError(logEntry, err)
 		return err
 	}
 
-	if e.logger != nil && logEntry != nil {
-		// Count the total number of policies loaded
-		ruleCount := 0
-		if pSection, ok := newModel["p"]; ok {
-			for _, ast := range pSection {
-				ruleCount += len(ast.Policy)
-			}
-		}
-		if gSection, ok := newModel["g"]; ok {
-			for _, ast := range gSection {
-				ruleCount += len(ast.Policy)
-			}
-		}
-		logEntry.RuleCount = ruleCount
-		_ = e.logger.OnAfterEvent(logEntry)
-	}
+	e.onLogAfterEventInLoadPolicy(logEntry, newModel)
 
 	return nil
 }
@@ -486,46 +459,19 @@ func (e *Enforcer) IsFiltered() bool {
 
 // SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() error {
-	var logEntry *log.LogEntry
-	if e.logger != nil {
-		logEntry = &log.LogEntry{
-			EventType: log.EventSavePolicy,
-		}
-		// Count the total number of policies to be saved
-		ruleCount := 0
-		if pSection, ok := e.model["p"]; ok {
-			for _, ast := range pSection {
-				ruleCount += len(ast.Policy)
-			}
-		}
-		if gSection, ok := e.model["g"]; ok {
-			for _, ast := range gSection {
-				ruleCount += len(ast.Policy)
-			}
-		}
-		logEntry.RuleCount = ruleCount
-		_ = e.logger.OnBeforeEvent(logEntry)
-	}
+	logEntry := e.onLogBeforeEventInSavePolicy()
 
 	if e.IsFiltered() {
 		err := errors.New("cannot save a filtered policy")
-		if e.logger != nil && logEntry != nil {
-			logEntry.Error = err
-			_ = e.logger.OnAfterEvent(logEntry)
-		}
+		e.onLogAfterEventWithError(logEntry, err)
 		return err
 	}
 	if err := e.adapter.SavePolicy(e.model); err != nil {
-		if e.logger != nil && logEntry != nil {
-			logEntry.Error = err
-			_ = e.logger.OnAfterEvent(logEntry)
-		}
+		e.onLogAfterEventWithError(logEntry, err)
 		return err
 	}
 
-	if e.logger != nil && logEntry != nil {
-		_ = e.logger.OnAfterEvent(logEntry)
-	}
+	e.onLogAfterEventInSavePolicy(logEntry)
 
 	if e.watcher != nil {
 		var err error
@@ -667,41 +613,9 @@ func (e *Enforcer) invalidateMatcherMap() {
 	e.matcherMap = sync.Map{}
 }
 
-// createEnforceLogEntry creates a log entry for enforce events with subject, object, action, and domain extracted from rvals.
-func (e *Enforcer) createEnforceLogEntry(rvals []interface{}) *log.LogEntry {
-	entry := &log.LogEntry{
-		EventType: log.EventEnforce,
-	}
-	if len(rvals) > 0 {
-		if s, isString := rvals[0].(string); isString {
-			entry.Subject = s
-		}
-	}
-	if len(rvals) > 1 {
-		if o, isString := rvals[1].(string); isString {
-			entry.Object = o
-		}
-	}
-	if len(rvals) > 2 {
-		if a, isString := rvals[2].(string); isString {
-			entry.Action = a
-		}
-	}
-	if len(rvals) > 3 {
-		if d, isString := rvals[3].(string); isString {
-			entry.Domain = d
-		}
-	}
-	return entry
-}
-
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
-	var logEntry *log.LogEntry
-	if e.logger != nil {
-		logEntry = e.createEnforceLogEntry(rvals)
-		_ = e.logger.OnBeforeEvent(logEntry)
-	}
+	logEntry := e.onLogBeforeEventInEnforce(rvals)
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -710,10 +624,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 				logEntry.Error = err
 			}
 		}
-		if e.logger != nil && logEntry != nil {
-			logEntry.Allowed = ok
-			_ = e.logger.OnAfterEvent(logEntry)
-		}
+		e.onLogAfterEventInEnforce(logEntry, ok)
 	}()
 
 	if !e.enabled {
