@@ -285,6 +285,27 @@ func (e *SyncedEnforcer) GetAllNamedRoles(ptype string) ([]string, error) {
 	return e.Enforcer.GetAllNamedRoles(ptype)
 }
 
+// GetAllUsers gets the list of users that show up in the current policy.
+func (e *SyncedEnforcer) GetAllUsers() ([]string, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetAllUsers()
+}
+
+// GetUsers is an alias for GetAllUsers for backward compatibility.
+func (e *SyncedEnforcer) GetUsers() ([]string, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetUsers()
+}
+
+// GetRoles is an alias for GetAllRoles for backward compatibility.
+func (e *SyncedEnforcer) GetRoles() ([]string, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetRoles()
+}
+
 // GetPolicy gets all the authorization rules in the policy.
 func (e *SyncedEnforcer) GetPolicy() ([][]string, error) {
 	e.m.RLock()

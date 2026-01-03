@@ -41,6 +41,9 @@ func TestGetList(t *testing.T) {
 	testStringList(t, "Objects", e.GetAllObjects, []string{"data1", "data2"})
 	testStringList(t, "Actions", e.GetAllActions, []string{"read", "write"})
 	testStringList(t, "Roles", e.GetAllRoles, []string{"data2_admin"})
+	testStringList(t, "Users", e.GetAllUsers, []string{"alice", "bob"})
+	testStringList(t, "Users (alias)", e.GetUsers, []string{"alice", "bob"})
+	testStringList(t, "Roles (alias)", e.GetRoles, []string{"data2_admin"})
 }
 
 func TestGetListWithDomains(t *testing.T) {
@@ -50,6 +53,9 @@ func TestGetListWithDomains(t *testing.T) {
 	testStringList(t, "Objects", e.GetAllObjects, []string{"data1", "data2"})
 	testStringList(t, "Actions", e.GetAllActions, []string{"read", "write"})
 	testStringList(t, "Roles", e.GetAllRoles, []string{"admin"})
+	testStringList(t, "Users", e.GetAllUsers, []string{})
+	testStringList(t, "Users (alias)", e.GetUsers, []string{})
+	testStringList(t, "Roles (alias)", e.GetRoles, []string{"admin"})
 }
 
 func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
