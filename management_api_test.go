@@ -41,6 +41,7 @@ func TestGetList(t *testing.T) {
 	testStringList(t, "Objects", e.GetAllObjects, []string{"data1", "data2"})
 	testStringList(t, "Actions", e.GetAllActions, []string{"read", "write"})
 	testStringList(t, "Roles", e.GetAllRoles, []string{"data2_admin"})
+	testStringList(t, "Users", e.GetUsers, []string{"alice", "bob"})
 }
 
 func TestGetListWithDomains(t *testing.T) {
@@ -50,6 +51,7 @@ func TestGetListWithDomains(t *testing.T) {
 	testStringList(t, "Objects", e.GetAllObjects, []string{"data1", "data2"})
 	testStringList(t, "Actions", e.GetAllActions, []string{"read", "write"})
 	testStringList(t, "Roles", e.GetAllRoles, []string{"admin"})
+	testStringList(t, "Users", e.GetUsers, []string{"alice", "bob"})
 }
 
 func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
@@ -359,4 +361,74 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 	// {"user1", "member"}, {"user2", "member"} repeated
 	_, _ = e.AddNamedGroupingPoliciesEx("g", [][]string{{"user1", "member"}, {"user2", "member"}, {"user3", "member"}})
 	testGetUsers(t, e, []string{"user1", "user2", "user3"}, "member")
+}
+
+func TestGetUsersAPI(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	
+	// Test GetUsers - should return subjects that are not roles
+	users, err := e.GetUsers()
+	if err != nil {
+		t.Error(err)
+	}
+	expectedUsers := []string{"alice", "bob"}
+	if !util.SetEquals(expectedUsers, users) {
+		t.Errorf("GetUsers(): got %v, want %v", users, expectedUsers)
+	}
+	
+	// Test GetAllSubjects for comparison
+	subjects, err := e.GetAllSubjects()
+	if err != nil {
+		t.Error(err)
+	}
+	expectedSubjects := []string{"alice", "bob", "data2_admin"}
+	if !util.SetEquals(expectedSubjects, subjects) {
+		t.Errorf("GetAllSubjects(): got %v, want %v", subjects, expectedSubjects)
+	}
+	
+	// Test GetAllRoles for comparison
+	roles, err := e.GetAllRoles()
+	if err != nil {
+		t.Error(err)
+	}
+	expectedRoles := []string{"data2_admin"}
+	if !util.SetEquals(expectedRoles, roles) {
+		t.Errorf("GetAllRoles(): got %v, want %v", roles, expectedRoles)
+	}
+	
+	// Add a new user without role
+	_, _ = e.AddPolicy("charlie", "data3", "read")
+	users, _ = e.GetUsers()
+	expectedUsers = []string{"alice", "bob", "charlie"}
+	if !util.SetEquals(expectedUsers, users) {
+		t.Errorf("After adding charlie - GetUsers(): got %v, want %v", users, expectedUsers)
+	}
+	
+	// Add charlie as a role
+	_, _ = e.AddGroupingPolicy("david", "charlie")
+	users, _ = e.GetUsers()
+	expectedUsers = []string{"alice", "bob", "david"}
+	if !util.SetEquals(expectedUsers, users) {
+		t.Errorf("After making charlie a role - GetUsers(): got %v, want %v", users, expectedUsers)
+	}
+	
+	roles, _ = e.GetAllRoles()
+	expectedRoles = []string{"data2_admin", "charlie"}
+	if !util.SetEquals(expectedRoles, roles) {
+		t.Errorf("After making charlie a role - GetAllRoles(): got %v, want %v", roles, expectedRoles)
+	}
+}
+
+func TestGetNamedUsersAPI(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+	
+	// Test GetNamedUsers with "p" policy
+	users, err := e.GetNamedUsers("p")
+	if err != nil {
+		t.Error(err)
+	}
+	expectedUsers := []string{"alice", "bob"}
+	if !util.SetEquals(expectedUsers, users) {
+		t.Errorf("GetNamedUsers('p'): got %v, want %v", users, expectedUsers)
+	}
 }

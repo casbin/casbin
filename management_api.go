@@ -76,6 +76,66 @@ func (e *Enforcer) GetAllNamedRoles(ptype string) ([]string, error) {
 	return e.model.GetValuesForFieldInPolicy("g", ptype, 1)
 }
 
+// GetUsers gets the list of users that show up in the current policy.
+// Users are subjects that are not roles.
+func (e *Enforcer) GetUsers() ([]string, error) {
+	// Get subjects from policy section "p"
+	pSubjects, err := e.GetAllSubjects()
+	if err != nil {
+		return nil, err
+	}
+	
+	// Get subjects from grouping section "g" (first field - users in grouping)
+	gSubjects, err := e.model.GetValuesForFieldInPolicyAllTypes("g", 0)
+	if err != nil {
+		return nil, err
+	}
+	
+	// Get roles from grouping section "g" (second field - roles)
+	roles, err := e.GetAllRoles()
+	if err != nil {
+		return nil, err
+	}
+	
+	// Combine all subjects and remove duplicates
+	subjects := append(pSubjects, gSubjects...)
+	util.ArrayRemoveDuplicates(&subjects)
+	
+	// Return subjects that are not roles
+	return util.SetSubtract(subjects, roles), nil
+}
+
+// GetNamedUsers gets the list of users that show up in the current named policy.
+// Users are subjects that are not roles.
+func (e *Enforcer) GetNamedUsers(ptype string) ([]string, error) {
+	fieldIndex, err := e.model.GetFieldIndex(ptype, constant.SubjectIndex)
+	if err != nil {
+		return nil, err
+	}
+	subjects, err := e.model.GetValuesForFieldInPolicy("p", ptype, fieldIndex)
+	if err != nil {
+		return nil, err
+	}
+	
+	// Get subjects from all grouping policies (first field - users in grouping)
+	gSubjects, err := e.model.GetValuesForFieldInPolicyAllTypes("g", 0)
+	if err != nil {
+		return nil, err
+	}
+	
+	// Get all roles from all grouping policies
+	roles, err := e.GetAllRoles()
+	if err != nil {
+		return nil, err
+	}
+	
+	// Combine subjects and remove duplicates
+	allSubjects := append(subjects, gSubjects...)
+	util.ArrayRemoveDuplicates(&allSubjects)
+	
+	return util.SetSubtract(allSubjects, roles), nil
+}
+
 // GetPolicy gets all the authorization rules in the policy.
 func (e *Enforcer) GetPolicy() ([][]string, error) {
 	return e.GetNamedPolicy("p")
