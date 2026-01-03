@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	Err "github.com/casbin/casbin/v3/errors"
+	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
 )
@@ -375,9 +376,32 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
+	var logEntry *log.LogEntry
+	if e.logger != nil && sec == "p" {
+		logEntry = &log.LogEntry{
+			EventType: log.EventAddPolicy,
+			Rules:     [][]string{rule},
+		}
+		_ = e.logger.OnBeforeEvent(logEntry)
+	}
+
 	ok, err := e.addPolicyWithoutNotify(sec, ptype, rule)
 	if !ok || err != nil {
+		if e.logger != nil && logEntry != nil {
+			logEntry.Error = err
+			logEntry.RuleCount = 0
+			_ = e.logger.OnAfterEvent(logEntry)
+		}
 		return ok, err
+	}
+
+	if e.logger != nil && logEntry != nil {
+		if ok {
+			logEntry.RuleCount = 1
+		} else {
+			logEntry.RuleCount = 0
+		}
+		_ = e.logger.OnAfterEvent(logEntry)
 	}
 
 	if e.shouldNotify() {
@@ -417,9 +441,32 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoR
 
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
+	var logEntry *log.LogEntry
+	if e.logger != nil && sec == "p" {
+		logEntry = &log.LogEntry{
+			EventType: log.EventRemovePolicy,
+			Rules:     [][]string{rule},
+		}
+		_ = e.logger.OnBeforeEvent(logEntry)
+	}
+
 	ok, err := e.removePolicyWithoutNotify(sec, ptype, rule)
 	if !ok || err != nil {
+		if e.logger != nil && logEntry != nil {
+			logEntry.Error = err
+			logEntry.RuleCount = 0
+			_ = e.logger.OnAfterEvent(logEntry)
+		}
 		return ok, err
+	}
+
+	if e.logger != nil && logEntry != nil {
+		if ok {
+			logEntry.RuleCount = 1
+		} else {
+			logEntry.RuleCount = 0
+		}
+		_ = e.logger.OnAfterEvent(logEntry)
 	}
 
 	if e.shouldNotify() {

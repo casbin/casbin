@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/casbin/casbin/v3/effector"
+	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
 	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
@@ -45,6 +46,7 @@ type Enforcer struct {
 	rmMap      map[string]rbac.RoleManager
 	condRmMap  map[string]rbac.ConditionalRoleManager
 	matcherMap sync.Map
+	logger     log.Logger
 
 	enabled              bool
 	autoSave             bool
@@ -281,6 +283,11 @@ func (e *Enforcer) SetEffector(eft effector.Effector) {
 	e.eft = eft
 }
 
+// SetLogger sets the logger for the enforcer.
+func (e *Enforcer) SetLogger(logger log.Logger) {
+	e.logger = logger
+}
+
 // ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() {
 	e.invalidateMatcherMap()
@@ -294,14 +301,48 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
+	var logEntry *log.LogEntry
+	if e.logger != nil {
+		logEntry = &log.LogEntry{
+			EventType: log.EventLoadPolicy,
+		}
+		_ = e.logger.OnBeforeEvent(logEntry)
+	}
+
 	newModel, err := e.loadPolicyFromAdapter(e.model)
 	if err != nil {
+		if e.logger != nil && logEntry != nil {
+			logEntry.Error = err
+			_ = e.logger.OnAfterEvent(logEntry)
+		}
 		return err
 	}
 	err = e.applyModifiedModel(newModel)
 	if err != nil {
+		if e.logger != nil && logEntry != nil {
+			logEntry.Error = err
+			_ = e.logger.OnAfterEvent(logEntry)
+		}
 		return err
 	}
+
+	if e.logger != nil && logEntry != nil {
+		// Count the total number of policies loaded
+		ruleCount := 0
+		if pSection, ok := newModel["p"]; ok {
+			for _, ast := range pSection {
+				ruleCount += len(ast.Policy)
+			}
+		}
+		if gSection, ok := newModel["g"]; ok {
+			for _, ast := range gSection {
+				ruleCount += len(ast.Policy)
+			}
+		}
+		logEntry.RuleCount = ruleCount
+		_ = e.logger.OnAfterEvent(logEntry)
+	}
+
 	return nil
 }
 
@@ -445,12 +486,47 @@ func (e *Enforcer) IsFiltered() bool {
 
 // SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() error {
-	if e.IsFiltered() {
-		return errors.New("cannot save a filtered policy")
+	var logEntry *log.LogEntry
+	if e.logger != nil {
+		logEntry = &log.LogEntry{
+			EventType: log.EventSavePolicy,
+		}
+		// Count the total number of policies to be saved
+		ruleCount := 0
+		if pSection, ok := e.model["p"]; ok {
+			for _, ast := range pSection {
+				ruleCount += len(ast.Policy)
+			}
+		}
+		if gSection, ok := e.model["g"]; ok {
+			for _, ast := range gSection {
+				ruleCount += len(ast.Policy)
+			}
+		}
+		logEntry.RuleCount = ruleCount
+		_ = e.logger.OnBeforeEvent(logEntry)
 	}
-	if err := e.adapter.SavePolicy(e.model); err != nil {
+
+	if e.IsFiltered() {
+		err := errors.New("cannot save a filtered policy")
+		if e.logger != nil && logEntry != nil {
+			logEntry.Error = err
+			_ = e.logger.OnAfterEvent(logEntry)
+		}
 		return err
 	}
+	if err := e.adapter.SavePolicy(e.model); err != nil {
+		if e.logger != nil && logEntry != nil {
+			logEntry.Error = err
+			_ = e.logger.OnAfterEvent(logEntry)
+		}
+		return err
+	}
+
+	if e.logger != nil && logEntry != nil {
+		_ = e.logger.OnAfterEvent(logEntry)
+	}
+
 	if e.watcher != nil {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
@@ -593,8 +669,43 @@ func (e *Enforcer) invalidateMatcherMap() {
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
+	var logEntry *log.LogEntry
+	if e.logger != nil {
+		logEntry = &log.LogEntry{
+			EventType: log.EventEnforce,
+		}
+		if len(rvals) > 0 {
+			if s, ok := rvals[0].(string); ok {
+				logEntry.Subject = s
+			}
+		}
+		if len(rvals) > 1 {
+			if o, ok := rvals[1].(string); ok {
+				logEntry.Object = o
+			}
+		}
+		if len(rvals) > 2 {
+			if a, ok := rvals[2].(string); ok {
+				logEntry.Action = a
+			}
+		}
+		if len(rvals) > 3 {
+			if d, ok := rvals[3].(string); ok {
+				logEntry.Domain = d
+			}
+		}
+		_ = e.logger.OnBeforeEvent(logEntry)
+	}
+
 	defer func() {
-		if r := recover(); r != nil {
+		if e.logger != nil && logEntry != nil {
+			if r := recover(); r != nil {
+				err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
+				logEntry.Error = err
+			}
+			logEntry.Allowed = ok
+			_ = e.logger.OnAfterEvent(logEntry)
+		} else if r := recover(); r != nil {
 			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
 		}
 	}()
