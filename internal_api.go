@@ -396,11 +396,7 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 	}
 
 	if e.logger != nil && logEntry != nil {
-		if ok {
-			logEntry.RuleCount = 1
-		} else {
-			logEntry.RuleCount = 0
-		}
+		logEntry.RuleCount = 1
 		_ = e.logger.OnAfterEvent(logEntry)
 	}
 
@@ -461,11 +457,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 	}
 
 	if e.logger != nil && logEntry != nil {
-		if ok {
-			logEntry.RuleCount = 1
-		} else {
-			logEntry.RuleCount = 0
-		}
+		logEntry.RuleCount = 1
 		_ = e.logger.OnAfterEvent(logEntry)
 	}
 

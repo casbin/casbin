@@ -698,15 +698,15 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	}
 
 	defer func() {
-		if e.logger != nil && logEntry != nil {
-			if r := recover(); r != nil {
-				err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
+			if e.logger != nil && logEntry != nil {
 				logEntry.Error = err
 			}
+		}
+		if e.logger != nil && logEntry != nil {
 			logEntry.Allowed = ok
 			_ = e.logger.OnAfterEvent(logEntry)
-		} else if r := recover(); r != nil {
-			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
 		}
 	}()
 
