@@ -1,4 +1,4 @@
-// Copyright 2017 The casbin Authors. All Rights Reserved.
+// Copyright 2026 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -109,6 +109,16 @@ func (b *Builder) Build() (Model, error) {
 	m.AddDef("m", "m", b.matcher)
 
 	return m, nil
+}
+
+// ToString builds the model and returns it as a text string.
+// This is a convenience method that calls Build() and then ToText() on the resulting model.
+func (b *Builder) ToString() (string, error) {
+	m, err := b.Build()
+	if err != nil {
+		return "", err
+	}
+	return m.ToText(), nil
 }
 
 // Helper functions for building matcher expressions
