@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -129,7 +130,8 @@ func (l *DefaultLogger) writeLog(entry *LogEntry) error {
 	}
 
 	if entry.Error != nil {
-		logMessage = fmt.Sprintf("%s Error: %v\n", logMessage[:len(logMessage)-1], entry.Error)
+		logMessage = strings.TrimSuffix(logMessage, "\n")
+		logMessage = fmt.Sprintf("%s Error: %v\n", logMessage, entry.Error)
 	}
 
 	_, err := l.output.Write([]byte(logMessage))
