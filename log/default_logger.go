@@ -38,6 +38,10 @@ func NewDefaultLogger(writer io.Writer, subscriptions []EventType) *DefaultLogge
 	if writer == nil {
 		writer = os.Stdout
 	}
+	// Normalize empty slice to nil to ensure consistent "all events" behavior
+	if len(subscriptions) == 0 {
+		subscriptions = nil
+	}
 	return &DefaultLogger{
 		enabled:       true,
 		subscriptions: subscriptions,

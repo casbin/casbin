@@ -78,8 +78,8 @@ func TestDefaultLogger_Subscribe(t *testing.T) {
 	// Test with empty subscriptions (all events)
 	logger2 := NewDefaultLogger(nil, []EventType{})
 	subs := logger2.Subscribe()
-	if subs == nil || len(subs) != 0 {
-		t.Error("Subscribe() should return empty slice for empty subscriptions")
+	if subs != nil {
+		t.Error("Subscribe() should return nil (all events) for empty subscriptions input")
 	}
 
 	// Test with specific subscriptions
