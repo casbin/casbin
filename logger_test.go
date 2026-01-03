@@ -129,7 +129,7 @@ func TestEnforcerWithDefaultLogger(t *testing.T) {
 
 	// Verify buffer output and callback entries
 	verifyBufferOutput(t, buf.String())
-	
+
 	if len(callbackEntries) == 0 {
 		t.Fatalf("Expected callback to be called, but got no entries")
 	}
