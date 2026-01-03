@@ -85,7 +85,7 @@ func (e *Enforcer) GetUsers() ([]string, error) {
 		return nil, err
 	}
 
-	// Get subjects from grouping section "g" (first field - users in grouping)
+	// Get users who have roles from grouping policies (first field in "g")
 	gSubjects, err := e.model.GetValuesForFieldInPolicyAllTypes("g", 0)
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func (e *Enforcer) GetNamedUsers(ptype string) ([]string, error) {
 		return nil, err
 	}
 
-	// Get subjects from all grouping policies (first field - users in grouping)
+	// Get users who have roles from grouping policies (first field in "g")
 	gSubjects, err := e.model.GetValuesForFieldInPolicyAllTypes("g", 0)
 	if err != nil {
 		return nil, err
