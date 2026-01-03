@@ -386,28 +386,29 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 	}
 
 	ok, err := e.addPolicyWithoutNotify(sec, ptype, rule)
-	if !ok || err != nil {
-		if e.logger != nil && logEntry != nil {
-			logEntry.Error = err
-			logEntry.RuleCount = 0
-			_ = e.logger.OnAfterEvent(logEntry)
-		}
-		return ok, err
-	}
-
+	
 	if e.logger != nil && logEntry != nil {
-		logEntry.RuleCount = 1
+		if ok && err == nil {
+			logEntry.RuleCount = 1
+		} else {
+			logEntry.RuleCount = 0
+			logEntry.Error = err
+		}
 		_ = e.logger.OnAfterEvent(logEntry)
 	}
 
+	if !ok || err != nil {
+		return ok, err
+	}
+
 	if e.shouldNotify() {
-		var err error
-		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForAddPolicy(sec, ptype, rule...)
+		var notifyErr error
+		if watcher, isWatcherEx := e.watcher.(persist.WatcherEx); isWatcherEx {
+			notifyErr = watcher.UpdateForAddPolicy(sec, ptype, rule...)
 		} else {
-			err = e.watcher.Update()
+			notifyErr = e.watcher.Update()
 		}
-		return true, err
+		return true, notifyErr
 	}
 
 	return true, nil
@@ -447,28 +448,29 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 	}
 
 	ok, err := e.removePolicyWithoutNotify(sec, ptype, rule)
-	if !ok || err != nil {
-		if e.logger != nil && logEntry != nil {
-			logEntry.Error = err
-			logEntry.RuleCount = 0
-			_ = e.logger.OnAfterEvent(logEntry)
-		}
-		return ok, err
-	}
-
+	
 	if e.logger != nil && logEntry != nil {
-		logEntry.RuleCount = 1
+		if ok && err == nil {
+			logEntry.RuleCount = 1
+		} else {
+			logEntry.RuleCount = 0
+			logEntry.Error = err
+		}
 		_ = e.logger.OnAfterEvent(logEntry)
 	}
 
+	if !ok || err != nil {
+		return ok, err
+	}
+
 	if e.shouldNotify() {
-		var err error
-		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForRemovePolicy(sec, ptype, rule...)
+		var notifyErr error
+		if watcher, isWatcherEx := e.watcher.(persist.WatcherEx); isWatcherEx {
+			notifyErr = watcher.UpdateForRemovePolicy(sec, ptype, rule...)
 		} else {
-			err = e.watcher.Update()
+			notifyErr = e.watcher.Update()
 		}
-		return true, err
+		return true, notifyErr
 	}
 
 	return true, nil

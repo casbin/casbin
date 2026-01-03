@@ -22,6 +22,49 @@ import (
 	"github.com/casbin/casbin/v3/log"
 )
 
+func verifyBufferOutput(t *testing.T, logOutput string) {
+	t.Helper()
+	expectedEvents := []string{"[enforce]", "[addPolicy]", "[removePolicy]", "[savePolicy]", "[loadPolicy]"}
+	for _, event := range expectedEvents {
+		if !strings.Contains(logOutput, event) {
+			t.Errorf("Expected log output to contain %s event", event)
+		}
+	}
+}
+
+func verifyCallbackEntries(t *testing.T, entries []*log.LogEntry) {
+	t.Helper()
+	found := map[log.EventType]bool{}
+	
+	for _, entry := range entries {
+		found[entry.EventType] = true
+		switch entry.EventType {
+		case log.EventEnforce:
+			if entry.Subject == "" && entry.Object == "" && entry.Action == "" {
+				t.Errorf("Expected enforce entry to have subject, object, and action")
+			}
+		case log.EventAddPolicy, log.EventRemovePolicy:
+			if entry.RuleCount != 1 {
+				t.Errorf("Expected %s entry to have RuleCount=1, got %d", entry.EventType, entry.RuleCount)
+			}
+		case log.EventSavePolicy, log.EventLoadPolicy:
+			if entry.RuleCount == 0 {
+				t.Errorf("Expected %s entry to have RuleCount>0", entry.EventType)
+			}
+		}
+	}
+
+	requiredEvents := []log.EventType{
+		log.EventEnforce, log.EventAddPolicy, log.EventRemovePolicy,
+		log.EventSavePolicy, log.EventLoadPolicy,
+	}
+	for _, eventType := range requiredEvents {
+		if !found[eventType] {
+			t.Errorf("Expected to find %s in callback entries", eventType)
+		}
+	}
+}
+
 func TestEnforcerWithDefaultLogger(t *testing.T) {
 	// Create enforcer with RBAC model and policy
 	e, err := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
@@ -50,127 +93,47 @@ func TestEnforcerWithDefaultLogger(t *testing.T) {
 	e.SetLogger(logger)
 
 	// Test Enforce events
-	result, err := e.Enforce("alice", "data1", "read")
-	if err != nil {
+	if result, err := e.Enforce("alice", "data1", "read"); err != nil {
 		t.Fatalf("Enforce failed: %v", err)
-	}
-	if !result {
+	} else if !result {
 		t.Errorf("Expected alice to have read access to data1")
 	}
 
-	result, err = e.Enforce("bob", "data2", "write")
-	if err != nil {
+	if result, err := e.Enforce("bob", "data2", "write"); err != nil {
 		t.Fatalf("Enforce failed: %v", err)
-	}
-	if !result {
+	} else if !result {
 		t.Errorf("Expected bob to have write access to data2")
 	}
 
 	// Test AddPolicy event
-	added, err := e.AddPolicy("charlie", "data3", "read")
-	if err != nil {
+	if added, err := e.AddPolicy("charlie", "data3", "read"); err != nil {
 		t.Fatalf("AddPolicy failed: %v", err)
-	}
-	if !added {
+	} else if !added {
 		t.Errorf("Expected policy to be added")
 	}
 
 	// Test RemovePolicy event
-	removed, err := e.RemovePolicy("charlie", "data3", "read")
-	if err != nil {
+	if removed, err := e.RemovePolicy("charlie", "data3", "read"); err != nil {
 		t.Fatalf("RemovePolicy failed: %v", err)
-	}
-	if !removed {
+	} else if !removed {
 		t.Errorf("Expected policy to be removed")
 	}
 
-	// Test SavePolicy event
-	err = e.SavePolicy()
-	if err != nil {
+	// Test SavePolicy and LoadPolicy events
+	if err := e.SavePolicy(); err != nil {
 		t.Fatalf("SavePolicy failed: %v", err)
 	}
-
-	// Test LoadPolicy event
-	err = e.LoadPolicy()
-	if err != nil {
+	if err := e.LoadPolicy(); err != nil {
 		t.Fatalf("LoadPolicy failed: %v", err)
 	}
 
-	// Verify buffer output
-	logOutput := buf.String()
-	if !strings.Contains(logOutput, "[enforce]") {
-		t.Errorf("Expected log output to contain enforce events")
-	}
-	if !strings.Contains(logOutput, "[addPolicy]") {
-		t.Errorf("Expected log output to contain addPolicy event")
-	}
-	if !strings.Contains(logOutput, "[removePolicy]") {
-		t.Errorf("Expected log output to contain removePolicy event")
-	}
-	if !strings.Contains(logOutput, "[savePolicy]") {
-		t.Errorf("Expected log output to contain savePolicy event")
-	}
-	if !strings.Contains(logOutput, "[loadPolicy]") {
-		t.Errorf("Expected log output to contain loadPolicy event")
-	}
-
-	// Verify callback was called
+	// Verify buffer output and callback entries
+	verifyBufferOutput(t, buf.String())
+	
 	if len(callbackEntries) == 0 {
 		t.Fatalf("Expected callback to be called, but got no entries")
 	}
-
-	// Verify callback entries contain the expected event types
-	foundEnforce := false
-	foundAddPolicy := false
-	foundRemovePolicy := false
-	foundSavePolicy := false
-	foundLoadPolicy := false
-
-	for _, entry := range callbackEntries {
-		switch entry.EventType {
-		case log.EventEnforce:
-			foundEnforce = true
-			if entry.Subject == "" && entry.Object == "" && entry.Action == "" {
-				t.Errorf("Expected enforce entry to have subject, object, and action")
-			}
-		case log.EventAddPolicy:
-			foundAddPolicy = true
-			if entry.RuleCount != 1 {
-				t.Errorf("Expected addPolicy entry to have RuleCount=1, got %d", entry.RuleCount)
-			}
-		case log.EventRemovePolicy:
-			foundRemovePolicy = true
-			if entry.RuleCount != 1 {
-				t.Errorf("Expected removePolicy entry to have RuleCount=1, got %d", entry.RuleCount)
-			}
-		case log.EventSavePolicy:
-			foundSavePolicy = true
-			if entry.RuleCount == 0 {
-				t.Errorf("Expected savePolicy entry to have RuleCount>0")
-			}
-		case log.EventLoadPolicy:
-			foundLoadPolicy = true
-			if entry.RuleCount == 0 {
-				t.Errorf("Expected loadPolicy entry to have RuleCount>0")
-			}
-		}
-	}
-
-	if !foundEnforce {
-		t.Errorf("Expected to find EventEnforce in callback entries")
-	}
-	if !foundAddPolicy {
-		t.Errorf("Expected to find EventAddPolicy in callback entries")
-	}
-	if !foundRemovePolicy {
-		t.Errorf("Expected to find EventRemovePolicy in callback entries")
-	}
-	if !foundSavePolicy {
-		t.Errorf("Expected to find EventSavePolicy in callback entries")
-	}
-	if !foundLoadPolicy {
-		t.Errorf("Expected to find EventLoadPolicy in callback entries")
-	}
+	verifyCallbackEntries(t, callbackEntries)
 }
 
 func TestSetEventTypes(t *testing.T) {
@@ -271,6 +234,8 @@ func TestSetEventTypes(t *testing.T) {
 			if entry.IsActive {
 				t.Errorf("Expected loadPolicy entry to be inactive")
 			}
+		case log.EventSavePolicy:
+			// SavePolicy event exists but we're not checking it in this test
 		}
 	}
 

@@ -667,33 +667,39 @@ func (e *Enforcer) invalidateMatcherMap() {
 	e.matcherMap = sync.Map{}
 }
 
+// createEnforceLogEntry creates a log entry for enforce events with subject, object, action, and domain extracted from rvals.
+func (e *Enforcer) createEnforceLogEntry(rvals []interface{}) *log.LogEntry {
+	entry := &log.LogEntry{
+		EventType: log.EventEnforce,
+	}
+	if len(rvals) > 0 {
+		if s, isString := rvals[0].(string); isString {
+			entry.Subject = s
+		}
+	}
+	if len(rvals) > 1 {
+		if o, isString := rvals[1].(string); isString {
+			entry.Object = o
+		}
+	}
+	if len(rvals) > 2 {
+		if a, isString := rvals[2].(string); isString {
+			entry.Action = a
+		}
+	}
+	if len(rvals) > 3 {
+		if d, isString := rvals[3].(string); isString {
+			entry.Domain = d
+		}
+	}
+	return entry
+}
+
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
 	var logEntry *log.LogEntry
 	if e.logger != nil {
-		logEntry = &log.LogEntry{
-			EventType: log.EventEnforce,
-		}
-		if len(rvals) > 0 {
-			if s, ok := rvals[0].(string); ok {
-				logEntry.Subject = s
-			}
-		}
-		if len(rvals) > 1 {
-			if o, ok := rvals[1].(string); ok {
-				logEntry.Object = o
-			}
-		}
-		if len(rvals) > 2 {
-			if a, ok := rvals[2].(string); ok {
-				logEntry.Action = a
-			}
-		}
-		if len(rvals) > 3 {
-			if d, ok := rvals[3].(string); ok {
-				logEntry.Domain = d
-			}
-		}
+		logEntry = e.createEnforceLogEntry(rvals)
 		_ = e.logger.OnBeforeEvent(logEntry)
 	}
 
