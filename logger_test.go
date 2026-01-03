@@ -35,7 +35,7 @@ func verifyBufferOutput(t *testing.T, logOutput string) {
 func verifyCallbackEntries(t *testing.T, entries []*log.LogEntry) {
 	t.Helper()
 	found := map[log.EventType]bool{}
-	
+
 	for _, entry := range entries {
 		found[entry.EventType] = true
 		switch entry.EventType {
@@ -185,13 +185,19 @@ func TestSetEventTypes(t *testing.T) {
 		t.Fatalf("RemovePolicy failed: %v", err)
 	}
 
-	err = e.LoadPolicy()
-	if err != nil {
+	if err := e.LoadPolicy(); err != nil {
 		t.Fatalf("LoadPolicy failed: %v", err)
 	}
 
 	// Verify buffer output only contains EventEnforce and EventAddPolicy
-	logOutput := buf.String()
+	verifySelectiveBufferOutput(t, buf.String())
+
+	// Verify callback entries
+	verifySelectiveCallbackEntries(t, callbackEntries)
+}
+
+func verifySelectiveBufferOutput(t *testing.T, logOutput string) {
+	t.Helper()
 	if !strings.Contains(logOutput, "[enforce]") {
 		t.Errorf("Expected log output to contain enforce events")
 	}
@@ -204,73 +210,39 @@ func TestSetEventTypes(t *testing.T) {
 	if strings.Contains(logOutput, "[loadPolicy]") {
 		t.Errorf("Did not expect log output to contain loadPolicy event")
 	}
+}
 
-	// Verify callback entries
-	foundEnforce := false
-	foundAddPolicy := false
-	foundRemovePolicy := false
-	foundLoadPolicy := false
+func verifySelectiveCallbackEntries(t *testing.T, entries []*log.LogEntry) {
+	t.Helper()
+	found := map[log.EventType]bool{}
 
-	for _, entry := range callbackEntries {
-		// All entries should be called back regardless of IsActive
-		switch entry.EventType {
-		case log.EventEnforce:
-			foundEnforce = true
-			if !entry.IsActive {
-				t.Errorf("Expected enforce entry to be active")
-			}
-		case log.EventAddPolicy:
-			foundAddPolicy = true
-			if !entry.IsActive {
-				t.Errorf("Expected addPolicy entry to be active")
-			}
-		case log.EventRemovePolicy:
-			foundRemovePolicy = true
-			if entry.IsActive {
-				t.Errorf("Expected removePolicy entry to be inactive")
-			}
-		case log.EventLoadPolicy:
-			foundLoadPolicy = true
-			if entry.IsActive {
-				t.Errorf("Expected loadPolicy entry to be inactive")
-			}
-		case log.EventSavePolicy:
-			// SavePolicy event exists but we're not checking it in this test
+	for _, entry := range entries {
+		found[entry.EventType] = true
+		checkEntryActiveStatus(t, entry)
+	}
+
+	requiredEvents := []log.EventType{
+		log.EventEnforce, log.EventAddPolicy, log.EventRemovePolicy, log.EventLoadPolicy,
+	}
+	for _, eventType := range requiredEvents {
+		if !found[eventType] {
+			t.Errorf("Expected to find %s in callback entries", eventType)
 		}
 	}
+}
 
-	if !foundEnforce {
-		t.Errorf("Expected to find EventEnforce in callback entries")
-	}
-	if !foundAddPolicy {
-		t.Errorf("Expected to find EventAddPolicy in callback entries")
-	}
-	if !foundRemovePolicy {
-		t.Errorf("Expected to find EventRemovePolicy in callback entries")
-	}
-	if !foundLoadPolicy {
-		t.Errorf("Expected to find EventLoadPolicy in callback entries")
-	}
-
-	// Verify that only active events were logged to buffer
-	activeCount := 0
-	for _, entry := range callbackEntries {
+func checkEntryActiveStatus(t *testing.T, entry *log.LogEntry) {
+	t.Helper()
+	switch entry.EventType {
+	case log.EventEnforce, log.EventAddPolicy:
+		if !entry.IsActive {
+			t.Errorf("Expected %s entry to be active", entry.EventType)
+		}
+	case log.EventRemovePolicy, log.EventLoadPolicy:
 		if entry.IsActive {
-			activeCount++
+			t.Errorf("Expected %s entry to be inactive", entry.EventType)
 		}
-	}
-
-	// Count lines in buffer output (rough approximation)
-	lines := strings.Split(strings.TrimSpace(logOutput), "\n")
-	nonEmptyLines := 0
-	for _, line := range lines {
-		if strings.TrimSpace(line) != "" {
-			nonEmptyLines++
-		}
-	}
-
-	// We should have log output for active events
-	if nonEmptyLines == 0 {
-		t.Errorf("Expected some log output for active events")
+	case log.EventSavePolicy:
+		// SavePolicy event exists but we're not checking it in this test
 	}
 }

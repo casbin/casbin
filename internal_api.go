@@ -35,6 +35,32 @@ func (e *Enforcer) shouldNotify() bool {
 	return e.watcher != nil && e.autoNotifyWatcher
 }
 
+// logPolicyOperation logs a policy operation (add or remove) with before and after events.
+func (e *Enforcer) logPolicyOperation(eventType log.EventType, sec string, rule []string, operation func() (bool, error)) (bool, error) {
+	var logEntry *log.LogEntry
+	if e.logger != nil && sec == "p" {
+		logEntry = &log.LogEntry{
+			EventType: eventType,
+			Rules:     [][]string{rule},
+		}
+		_ = e.logger.OnBeforeEvent(logEntry)
+	}
+
+	ok, err := operation()
+
+	if e.logger != nil && logEntry != nil {
+		if ok && err == nil {
+			logEntry.RuleCount = 1
+		} else {
+			logEntry.RuleCount = 0
+			logEntry.Error = err
+		}
+		_ = e.logger.OnAfterEvent(logEntry)
+	}
+
+	return ok, err
+}
+
 // validateConstraintsForGroupingPolicy validates constraints for grouping policy changes.
 // It returns an error if constraint validation fails.
 func (e *Enforcer) validateConstraintsForGroupingPolicy() error {
@@ -376,26 +402,9 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
-	var logEntry *log.LogEntry
-	if e.logger != nil && sec == "p" {
-		logEntry = &log.LogEntry{
-			EventType: log.EventAddPolicy,
-			Rules:     [][]string{rule},
-		}
-		_ = e.logger.OnBeforeEvent(logEntry)
-	}
-
-	ok, err := e.addPolicyWithoutNotify(sec, ptype, rule)
-	
-	if e.logger != nil && logEntry != nil {
-		if ok && err == nil {
-			logEntry.RuleCount = 1
-		} else {
-			logEntry.RuleCount = 0
-			logEntry.Error = err
-		}
-		_ = e.logger.OnAfterEvent(logEntry)
-	}
+	ok, err := e.logPolicyOperation(log.EventAddPolicy, sec, rule, func() (bool, error) {
+		return e.addPolicyWithoutNotify(sec, ptype, rule)
+	})
 
 	if !ok || err != nil {
 		return ok, err
@@ -438,26 +447,9 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoR
 
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
-	var logEntry *log.LogEntry
-	if e.logger != nil && sec == "p" {
-		logEntry = &log.LogEntry{
-			EventType: log.EventRemovePolicy,
-			Rules:     [][]string{rule},
-		}
-		_ = e.logger.OnBeforeEvent(logEntry)
-	}
-
-	ok, err := e.removePolicyWithoutNotify(sec, ptype, rule)
-	
-	if e.logger != nil && logEntry != nil {
-		if ok && err == nil {
-			logEntry.RuleCount = 1
-		} else {
-			logEntry.RuleCount = 0
-			logEntry.Error = err
-		}
-		_ = e.logger.OnAfterEvent(logEntry)
-	}
+	ok, err := e.logPolicyOperation(log.EventRemovePolicy, sec, rule, func() (bool, error) {
+		return e.removePolicyWithoutNotify(sec, ptype, rule)
+	})
 
 	if !ok || err != nil {
 		return ok, err
