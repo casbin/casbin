@@ -108,7 +108,7 @@ func TestDefaultLogger_OnBeforeEvent(t *testing.T) {
 	entry := &LogEntry{EventType: EventEnforce}
 	handle := logger.OnBeforeEvent(entry)
 	if handle == nil {
-		t.Error("OnBeforeEvent should return a handle when enabled")
+		t.Fatal("OnBeforeEvent should return a handle when enabled")
 	}
 	if handle.StartTime.IsZero() {
 		t.Error("Handle StartTime should be set")
