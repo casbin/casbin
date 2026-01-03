@@ -84,23 +84,23 @@ func (e *Enforcer) GetUsers() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Get subjects from grouping section "g" (first field - users in grouping)
 	gSubjects, err := e.model.GetValuesForFieldInPolicyAllTypes("g", 0)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Get roles from grouping section "g" (second field - roles)
 	roles, err := e.GetAllRoles()
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Combine all subjects and remove duplicates
 	subjects := append(pSubjects, gSubjects...)
 	util.ArrayRemoveDuplicates(&subjects)
-	
+
 	// Return subjects that are not roles
 	return util.SetSubtract(subjects, roles), nil
 }
@@ -116,23 +116,23 @@ func (e *Enforcer) GetNamedUsers(ptype string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Get subjects from all grouping policies (first field - users in grouping)
 	gSubjects, err := e.model.GetValuesForFieldInPolicyAllTypes("g", 0)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Get all roles from all grouping policies
 	roles, err := e.GetAllRoles()
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Combine subjects and remove duplicates
 	allSubjects := append(subjects, gSubjects...)
 	util.ArrayRemoveDuplicates(&allSubjects)
-	
+
 	return util.SetSubtract(allSubjects, roles), nil
 }
 

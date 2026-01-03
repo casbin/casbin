@@ -365,7 +365,7 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 
 func TestGetUsersAPI(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
-	
+
 	// Test GetUsers - should return subjects that are not roles
 	users, err := e.GetUsers()
 	if err != nil {
@@ -375,7 +375,7 @@ func TestGetUsersAPI(t *testing.T) {
 	if !util.SetEquals(expectedUsers, users) {
 		t.Errorf("GetUsers(): got %v, want %v", users, expectedUsers)
 	}
-	
+
 	// Test GetAllSubjects for comparison
 	subjects, err := e.GetAllSubjects()
 	if err != nil {
@@ -385,7 +385,7 @@ func TestGetUsersAPI(t *testing.T) {
 	if !util.SetEquals(expectedSubjects, subjects) {
 		t.Errorf("GetAllSubjects(): got %v, want %v", subjects, expectedSubjects)
 	}
-	
+
 	// Test GetAllRoles for comparison
 	roles, err := e.GetAllRoles()
 	if err != nil {
@@ -395,7 +395,7 @@ func TestGetUsersAPI(t *testing.T) {
 	if !util.SetEquals(expectedRoles, roles) {
 		t.Errorf("GetAllRoles(): got %v, want %v", roles, expectedRoles)
 	}
-	
+
 	// Add a new user without role
 	_, _ = e.AddPolicy("charlie", "data3", "read")
 	users, _ = e.GetUsers()
@@ -403,7 +403,7 @@ func TestGetUsersAPI(t *testing.T) {
 	if !util.SetEquals(expectedUsers, users) {
 		t.Errorf("After adding charlie - GetUsers(): got %v, want %v", users, expectedUsers)
 	}
-	
+
 	// Add charlie as a role
 	_, _ = e.AddGroupingPolicy("david", "charlie")
 	users, _ = e.GetUsers()
@@ -411,7 +411,7 @@ func TestGetUsersAPI(t *testing.T) {
 	if !util.SetEquals(expectedUsers, users) {
 		t.Errorf("After making charlie a role - GetUsers(): got %v, want %v", users, expectedUsers)
 	}
-	
+
 	roles, _ = e.GetAllRoles()
 	expectedRoles = []string{"data2_admin", "charlie"}
 	if !util.SetEquals(expectedRoles, roles) {
@@ -421,7 +421,7 @@ func TestGetUsersAPI(t *testing.T) {
 
 func TestGetNamedUsersAPI(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
-	
+
 	// Test GetNamedUsers with "p" policy
 	users, err := e.GetNamedUsers("p")
 	if err != nil {
