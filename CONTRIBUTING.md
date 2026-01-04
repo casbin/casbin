@@ -33,3 +33,19 @@ Good pull requests (e.g. patches, improvements, new features) are a fantastic he
 Please ask first before embarking on any significant pull request (e.g. implementing new features, refactoring code etc.), otherwise you risk spending a lot of time working on something that the maintainers might not want to merge into the project.
 
 First add an issue to the project to discuss the improvement. Please adhere to the coding conventions used throughout the project. If in doubt, consult the [Effective Go style guide](https://golang.org/doc/effective_go.html).
+
+## Releases
+
+This project uses snapshot versions for development commits. When you merge changes to the master branch, they become available as pseudo-versions that can be referenced using commit hashes.
+
+For users who want to use the latest development version:
+```bash
+go get github.com/casbin/casbin/v3@master
+```
+
+For users who want to use a specific commit:
+```bash
+go get github.com/casbin/casbin/v3@<commit-hash>
+```
+
+Official releases are created manually by maintainers through the [Release workflow](https://github.com/casbin/casbin/actions/workflows/release.yml) in GitHub Actions. This ensures that only stable, well-tested versions receive official version tags.
