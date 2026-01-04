@@ -19,6 +19,19 @@ import (
 )
 
 // Builder provides a programmatic way to construct Casbin models.
+// It allows creating models without needing a model.conf file.
+//
+// Example usage:
+//
+//	m, _ := model.New().
+//	    Request("sub", "obj", "act").
+//	    Policy("sub", "obj", "act").
+//	    Role("_", "_").
+//	    Effect("some(where (p.eft == allow))").
+//	    Matcher("g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act").
+//	    Build()
+//
+// The resulting model is equivalent to one loaded from a model.conf file.
 type Builder struct {
 	requestDef string
 	policyDef  string
@@ -70,34 +83,34 @@ func (b *Builder) Matcher(matcher string) *Builder {
 // Build creates a Model from the builder configuration.
 func (b *Builder) Build() (Model, error) {
 	m := NewModel()
-	
+
 	if b.requestDef != "" {
 		m.AddDef("r", "r", b.requestDef)
 	}
-	
+
 	if b.policyDef != "" {
 		m.AddDef("p", "p", b.policyDef)
 	}
-	
+
 	if b.roleDef != "" {
 		m.AddDef("g", "g", b.roleDef)
 	}
-	
+
 	if b.effectDef != "" {
 		m.AddDef("e", "e", b.effectDef)
 	}
-	
+
 	if b.matcherDef != "" {
 		m.AddDef("m", "m", b.matcherDef)
 	}
-	
+
 	return m, nil
 }
 
 // ToString returns the model as a string in CONF format.
 func (b *Builder) ToString() string {
 	var sb strings.Builder
-	
+
 	sb.WriteString("[request_definition]\n")
 	if b.requestDef != "" {
 		sb.WriteString("r = ")
@@ -105,7 +118,7 @@ func (b *Builder) ToString() string {
 		sb.WriteString("\n")
 	}
 	sb.WriteString("\n")
-	
+
 	sb.WriteString("[policy_definition]\n")
 	if b.policyDef != "" {
 		sb.WriteString("p = ")
@@ -113,14 +126,14 @@ func (b *Builder) ToString() string {
 		sb.WriteString("\n")
 	}
 	sb.WriteString("\n")
-	
+
 	if b.roleDef != "" {
 		sb.WriteString("[role_definition]\n")
 		sb.WriteString("g = ")
 		sb.WriteString(b.roleDef)
 		sb.WriteString("\n\n")
 	}
-	
+
 	sb.WriteString("[policy_effect]\n")
 	if b.effectDef != "" {
 		sb.WriteString("e = ")
@@ -128,13 +141,13 @@ func (b *Builder) ToString() string {
 		sb.WriteString("\n")
 	}
 	sb.WriteString("\n")
-	
+
 	sb.WriteString("[matchers]\n")
 	if b.matcherDef != "" {
 		sb.WriteString("m = ")
 		sb.WriteString(b.matcherDef)
 		sb.WriteString("\n")
 	}
-	
+
 	return sb.String()
 }
