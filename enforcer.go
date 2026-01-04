@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/casbin/casbin/v3/effector"
+	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
 	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
@@ -45,6 +46,7 @@ type Enforcer struct {
 	rmMap      map[string]rbac.RoleManager
 	condRmMap  map[string]rbac.ConditionalRoleManager
 	matcherMap sync.Map
+	logger     log.Logger
 
 	enabled              bool
 	autoSave             bool
@@ -281,6 +283,11 @@ func (e *Enforcer) SetEffector(eft effector.Effector) {
 	e.eft = eft
 }
 
+// SetLogger sets the logger for the enforcer.
+func (e *Enforcer) SetLogger(logger log.Logger) {
+	e.logger = logger
+}
+
 // ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() {
 	e.invalidateMatcherMap()
@@ -294,14 +301,21 @@ func (e *Enforcer) ClearPolicy() {
 
 // LoadPolicy reloads the policy from file/database.
 func (e *Enforcer) LoadPolicy() error {
+	logEntry := e.onLogBeforeEventInLoadPolicy()
+
 	newModel, err := e.loadPolicyFromAdapter(e.model)
 	if err != nil {
+		e.onLogAfterEventWithError(logEntry, err)
 		return err
 	}
 	err = e.applyModifiedModel(newModel)
 	if err != nil {
+		e.onLogAfterEventWithError(logEntry, err)
 		return err
 	}
+
+	e.onLogAfterEventInLoadPolicy(logEntry, newModel)
+
 	return nil
 }
 
@@ -445,12 +459,20 @@ func (e *Enforcer) IsFiltered() bool {
 
 // SavePolicy saves the current policy (usually after changed with Casbin API) back to file/database.
 func (e *Enforcer) SavePolicy() error {
+	logEntry := e.onLogBeforeEventInSavePolicy()
+
 	if e.IsFiltered() {
-		return errors.New("cannot save a filtered policy")
-	}
-	if err := e.adapter.SavePolicy(e.model); err != nil {
+		err := errors.New("cannot save a filtered policy")
+		e.onLogAfterEventWithError(logEntry, err)
 		return err
 	}
+	if err := e.adapter.SavePolicy(e.model); err != nil {
+		e.onLogAfterEventWithError(logEntry, err)
+		return err
+	}
+
+	e.onLogAfterEventInSavePolicy(logEntry)
+
 	if e.watcher != nil {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
@@ -593,10 +615,16 @@ func (e *Enforcer) invalidateMatcherMap() {
 
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
+	logEntry := e.onLogBeforeEventInEnforce(rvals)
+
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("panic: %v\n%s", r, debug.Stack())
+			if e.logger != nil && logEntry != nil {
+				logEntry.Error = err
+			}
 		}
+		e.onLogAfterEventInEnforce(logEntry, ok)
 	}()
 
 	if !e.enabled {

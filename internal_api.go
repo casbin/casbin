@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	Err "github.com/casbin/casbin/v3/errors"
+	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
 )
@@ -375,19 +376,22 @@ func (e *Enforcer) updateFilteredPoliciesWithoutNotify(sec string, ptype string,
 
 // addPolicy adds a rule to the current policy.
 func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, error) {
-	ok, err := e.addPolicyWithoutNotify(sec, ptype, rule)
+	ok, err := e.logPolicyOperation(log.EventAddPolicy, sec, rule, func() (bool, error) {
+		return e.addPolicyWithoutNotify(sec, ptype, rule)
+	})
+
 	if !ok || err != nil {
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
-		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForAddPolicy(sec, ptype, rule...)
+		var notifyErr error
+		if watcher, isWatcherEx := e.watcher.(persist.WatcherEx); isWatcherEx {
+			notifyErr = watcher.UpdateForAddPolicy(sec, ptype, rule...)
 		} else {
-			err = e.watcher.Update()
+			notifyErr = e.watcher.Update()
 		}
-		return true, err
+		return true, notifyErr
 	}
 
 	return true, nil
@@ -417,19 +421,22 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string, autoR
 
 // removePolicy removes a rule from the current policy.
 func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, error) {
-	ok, err := e.removePolicyWithoutNotify(sec, ptype, rule)
+	ok, err := e.logPolicyOperation(log.EventRemovePolicy, sec, rule, func() (bool, error) {
+		return e.removePolicyWithoutNotify(sec, ptype, rule)
+	})
+
 	if !ok || err != nil {
 		return ok, err
 	}
 
 	if e.shouldNotify() {
-		var err error
-		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForRemovePolicy(sec, ptype, rule...)
+		var notifyErr error
+		if watcher, isWatcherEx := e.watcher.(persist.WatcherEx); isWatcherEx {
+			notifyErr = watcher.UpdateForRemovePolicy(sec, ptype, rule...)
 		} else {
-			err = e.watcher.Update()
+			notifyErr = e.watcher.Update()
 		}
-		return true, err
+		return true, notifyErr
 	}
 
 	return true, nil
