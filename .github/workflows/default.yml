@@ -38,22 +38,3 @@ jobs:
 
       - name: Run go test bench
         run:  make benchmark
-
-  semantic-release:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: Run semantic-release
-        if: github.repository == 'casbin/casbin' && github.event_name == 'push'
-        run: make release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
