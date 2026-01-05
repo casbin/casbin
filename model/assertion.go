@@ -190,6 +190,8 @@ func (ast *Assertion) copy() *Assertion {
 		Tokens:        tokens,
 		Policy:        policy,
 		FieldIndexMap: fieldIndexMap,
+		RM:            ast.RM,
+		CondRM:        ast.CondRM,
 	}
 
 	return newAst
