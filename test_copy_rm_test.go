@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-// TestModelCopyPreservesRM tests that copying a model preserves RM and CondRM fields
+// TestModelCopyPreservesRM tests that copying a model preserves RM and CondRM fields.
 func TestModelCopyPreservesRM(t *testing.T) {
 	e, err := NewEnforcer("examples/rbac_model.conf")
 	if err != nil {
@@ -33,7 +33,7 @@ func TestModelCopyPreservesRM(t *testing.T) {
 }
 
 // TestEnforceAfterModelCopyWithoutBuildRoleLinks tests that enforce works
-// even if model is copied but BuildRoleLinks is not called
+// even if model is copied but BuildRoleLinks is not called.
 func TestEnforceAfterModelCopyWithoutBuildRoleLinks(t *testing.T) {
 	e, err := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 	if err != nil {
