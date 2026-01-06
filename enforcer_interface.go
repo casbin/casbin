@@ -101,6 +101,7 @@ type IEnforcer interface {
 	GetAllNamedActions(ptype string) ([]string, error)
 	GetAllRoles() ([]string, error)
 	GetAllNamedRoles(ptype string) ([]string, error)
+	GetAllUsers() ([]string, error)
 	GetPolicy() ([][]string, error)
 	GetFilteredPolicy(fieldIndex int, fieldValues ...string) ([][]string, error)
 	GetNamedPolicy(ptype string) ([][]string, error)

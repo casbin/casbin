@@ -76,6 +76,23 @@ func (e *Enforcer) GetAllNamedRoles(ptype string) ([]string, error) {
 	return e.model.GetValuesForFieldInPolicy("g", ptype, 1)
 }
 
+// GetAllUsers gets the list of users that show up in the current policy.
+// Users are subjects that are not roles (i.e., subjects that do not appear as the second element in any grouping policy).
+func (e *Enforcer) GetAllUsers() ([]string, error) {
+	subjects, err := e.GetAllSubjects()
+	if err != nil {
+		return nil, err
+	}
+
+	roles, err := e.GetAllRoles()
+	if err != nil {
+		return nil, err
+	}
+
+	users := util.SetSubtract(subjects, roles)
+	return users, nil
+}
+
 // GetPolicy gets all the authorization rules in the policy.
 func (e *Enforcer) GetPolicy() ([][]string, error) {
 	return e.GetNamedPolicy("p")
