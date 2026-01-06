@@ -69,6 +69,103 @@ jobs:
           EOF
           benchstat base-bench.txt pr-bench.txt >> comparison.md || true
           echo '```' >> comparison.md
+
+          # Post-process to append percentage + emoji column (🚀 faster < -10%, 🐌 slower > +10%, otherwise ➡️)
+          python3 - <<'PY'
+          import pathlib, re, sys
+
+          p = pathlib.Path("comparison.md")
+          lines = p.read_text(encoding="utf-8").splitlines()
+          out = []
+          in_code = False
+
+          # Pass 1: Find the alignment column index based on the header pipe
+          header_pipe_idx = 0
+          for line in lines:
+              if "vs base" in line and "│" in line:
+                  idx = line.rfind("│")
+                  if idx > header_pipe_idx:
+                      header_pipe_idx = idx
+
+          # Fallback
+          if header_pipe_idx == 0:
+              header_pipe_idx = 100
+
+          def strip_worker_suffix(text: str) -> str:
+              return re.sub(r'^(\S+?)-\d+(\s|$)', r'\1\2', text, count=1)
+
+          def decorate(line: str) -> str:
+              # Header detection
+              if "vs base" in line and "│" in line:
+                  return line + "   Delta"
+
+              line = strip_worker_suffix(line)
+
+              def get_icon(diff_val):
+                  if diff_val > 10: return "🐌"
+                  if diff_val < -10: return "🚀"
+                  return "➡️"
+
+              # 1. Existing percentage (skipped to prefer calculated consistency, or todo?)
+              # Benchstat output might contain percentage.
+              
+              # 2. Calculate from values
+              regex = r'(\d+(?:\.\d+)?)([nµmsuBKiMiGiTikM]*)\s*±'
+              matches = re.findall(regex, line)
+              if len(matches) >= 2:
+                  def parse_val(num_str, unit_str):
+                      v = float(num_str)
+                      if unit_str == 'n': return v * 1e-9
+                      if unit_str in ['µ', 'u']: return v * 1e-6
+                      if unit_str == 'm': return v * 1e-3
+                      if unit_str == 's': return v
+                      if unit_str == 'k': return v * 1e3
+                      if unit_str == 'M': return v * 1e6
+                      if unit_str == 'Ki': return v * 1024
+                      if unit_str == 'Mi': return v * 1024**2
+                      if unit_str == 'Gi': return v * 1024**3
+                      if unit_str == 'Ti': return v * 1024**4
+                      return v # B or empty
+
+                  v1 = parse_val(matches[0][0], matches[0][1])
+                  v2 = parse_val(matches[1][0], matches[1][1])
+
+                  diff = 0.0
+                  calculated = False
+
+                  if v1 != 0:
+                      diff = (v2 - v1) / v1 * 100
+                      calculated = True
+                  elif v1 == 0 and v2 == 0:
+                      diff = 0.0
+                      calculated = True
+
+                  if calculated:
+                      icon = get_icon(diff)
+                      diff_str = f"{diff:+.2f}% {icon}"
+                      
+                      # Padding
+                      current_len = len(line)
+                      padding_len = max(2, (header_pipe_idx + 3) - current_len)
+                      if current_len >= header_pipe_idx + 1:
+                          padding_len = 2
+
+                      return f"{line}{' ' * padding_len}{diff_str}"
+
+              return line
+
+          for line in lines:
+              if line.strip() == "```":
+                  in_code = not in_code
+                  out.append(line)
+                  continue
+              if not in_code:
+                  out.append(line)
+                  continue
+              out.append(decorate(line))
+
+          p.write_text("\n".join(out) + "\n", encoding="utf-8")
+          PY
         continue-on-error: true
 
       # Post comment with results
