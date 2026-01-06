@@ -93,16 +93,6 @@ func (e *Enforcer) GetAllUsers() ([]string, error) {
 	return users, nil
 }
 
-// GetUsers is an alias for GetAllUsers for backward compatibility.
-func (e *Enforcer) GetUsers() ([]string, error) {
-	return e.GetAllUsers()
-}
-
-// GetRoles is an alias for GetAllRoles for backward compatibility.
-func (e *Enforcer) GetRoles() ([]string, error) {
-	return e.GetAllRoles()
-}
-
 // GetPolicy gets all the authorization rules in the policy.
 func (e *Enforcer) GetPolicy() ([][]string, error) {
 	return e.GetNamedPolicy("p")

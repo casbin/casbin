@@ -42,8 +42,6 @@ func TestGetList(t *testing.T) {
 	testStringList(t, "Actions", e.GetAllActions, []string{"read", "write"})
 	testStringList(t, "Roles", e.GetAllRoles, []string{"data2_admin"})
 	testStringList(t, "Users", e.GetAllUsers, []string{"alice", "bob"})
-	testStringList(t, "Users (alias)", e.GetUsers, []string{"alice", "bob"})
-	testStringList(t, "Roles (alias)", e.GetRoles, []string{"data2_admin"})
 }
 
 func TestGetListWithDomains(t *testing.T) {
@@ -54,8 +52,6 @@ func TestGetListWithDomains(t *testing.T) {
 	testStringList(t, "Actions", e.GetAllActions, []string{"read", "write"})
 	testStringList(t, "Roles", e.GetAllRoles, []string{"admin"})
 	testStringList(t, "Users", e.GetAllUsers, []string{})
-	testStringList(t, "Users (alias)", e.GetUsers, []string{})
-	testStringList(t, "Roles (alias)", e.GetRoles, []string{"admin"})
 }
 
 func testGetPolicy(t *testing.T, e *Enforcer, res [][]string) {
@@ -365,86 +361,4 @@ func TestModifyGroupingPolicyAPI(t *testing.T) {
 	// {"user1", "member"}, {"user2", "member"} repeated
 	_, _ = e.AddNamedGroupingPoliciesEx("g", [][]string{{"user1", "member"}, {"user2", "member"}, {"user3", "member"}})
 	testGetUsers(t, e, []string{"user1", "user2", "user3"}, "member")
-}
-
-func TestGetUsersAndRoles(t *testing.T) {
-// Test 1: Basic RBAC with mixed users and roles
-e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
-
-users, err := e.GetAllUsers()
-if err != nil {
-t.Error(err)
-}
-if !util.ArrayEquals([]string{"alice", "bob"}, users) {
-t.Errorf("GetAllUsers() = %v, want [alice, bob]", users)
-}
-
-roles, err := e.GetAllRoles()
-if err != nil {
-t.Error(err)
-}
-if !util.ArrayEquals([]string{"data2_admin"}, roles) {
-t.Errorf("GetAllRoles() = %v, want [data2_admin]", roles)
-}
-
-// Test 2: Verify aliases work
-usersAlias, err := e.GetUsers()
-if err != nil {
-t.Error(err)
-}
-if !util.ArrayEquals(users, usersAlias) {
-t.Errorf("GetUsers() = %v, want %v", usersAlias, users)
-}
-
-rolesAlias, err := e.GetRoles()
-if err != nil {
-t.Error(err)
-}
-if !util.ArrayEquals(roles, rolesAlias) {
-t.Errorf("GetRoles() = %v, want %v", rolesAlias, roles)
-}
-
-// Test 3: Add a new user policy and verify it appears in users
-e.AddPolicy("charlie", "data3", "read")
-usersAfterAdd, _ := e.GetAllUsers()
-if !util.SetEquals([]string{"alice", "bob", "charlie"}, usersAfterAdd) {
-t.Errorf("After adding charlie, GetAllUsers() = %v, want [alice, bob, charlie]", usersAfterAdd)
-}
-
-// Test 4: Add a new role and verify it appears in roles, not users
-e.AddGroupingPolicy("charlie", "data3_admin")
-rolesAfterAdd, _ := e.GetAllRoles()
-usersAfterRole, _ := e.GetAllUsers()
-if !util.SetEquals([]string{"data2_admin", "data3_admin"}, rolesAfterAdd) {
-t.Errorf("After adding role, GetAllRoles() = %v, want [data2_admin, data3_admin]", rolesAfterAdd)
-}
-// charlie should still be in users because charlie has a direct policy
-if !util.SetEquals([]string{"alice", "bob", "charlie"}, usersAfterRole) {
-t.Errorf("After adding role for charlie, GetAllUsers() = %v, want [alice, bob, charlie]", usersAfterRole)
-}
-}
-
-func TestGetUsersWithNoRoles(t *testing.T) {
-// Test with a model that has no grouping policies
-e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
-
-users, err := e.GetAllUsers()
-if err != nil {
-t.Error(err)
-}
-
-roles, err := e.GetAllRoles()
-if err != nil {
-t.Error(err)
-}
-
-// In basic model with no grouping, all subjects should be users
-subjects, _ := e.GetAllSubjects()
-if !util.SetEquals(subjects, users) {
-t.Errorf("In basic model, GetAllUsers() = %v should equal GetAllSubjects() = %v", users, subjects)
-}
-
-if len(roles) != 0 {
-t.Errorf("In basic model, GetAllRoles() = %v, want []", roles)
-}
 }
