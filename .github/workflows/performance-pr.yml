@@ -4,10 +4,6 @@ on:
   pull_request:
     branches: [master]
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   benchmark-pr:
     name: Performance benchmark comparison
@@ -69,44 +65,77 @@ jobs:
           EOF
           benchstat base-bench.txt pr-bench.txt >> comparison.md || true
           echo '```' >> comparison.md
+
+          # Post-process to append percentage + emoji column (🚀 faster < -10%, 🐌 slower > +10%, otherwise ➡️)
+          python3 - <<'PY'
+          import pathlib, re, sys
+
+          p = pathlib.Path("comparison.md")
+          lines = p.read_text(encoding="utf-8").splitlines()
+          out = []
+          in_code = False
+
+          def strip_worker_suffix(text: str) -> str:
+              return re.sub(r'^(\S+?)-\d+(\s|$)', r'\1\2', text, count=1)
+
+          def decorate(line: str) -> str:
+              line = strip_worker_suffix(line)
+
+              def get_icon(diff_val):
+                  if diff_val > 10: return "🐌"
+                  if diff_val < -10: return "🚀"
+                  return "➡️"
+
+              # 1. Existing percentage
+              m = re.search(r'([+-]?\d+\.\d+)%', line)
+              if m:
+                  diff = float(m.group(1))
+                  icon = get_icon(diff)
+                  return line[:m.end()] + " " + icon + line[m.end():]
+
+              # 2. Calculate from values
+              matches = re.findall(r'(\d+(?:\.\d+)?)([nµmsu])', line)
+              if len(matches) >= 2:
+                  def parse_val(num_str, unit_str):
+                      v = float(num_str)
+                      if unit_str == 'n': return v * 1e-9
+                      if unit_str in ['µ', 'u']: return v * 1e-6
+                      if unit_str == 'm': return v * 1e-3
+                      return v # s
+
+                  v1 = parse_val(matches[0][0], matches[0][1])
+                  v2 = parse_val(matches[1][0], matches[1][1])
+
+                  if v1 != 0:
+                      diff = (v2 - v1) / v1 * 100
+                      icon = get_icon(diff)
+                      return f"{line}\t{diff:+.2f}% {icon}"
+
+              return line
+
+          for line in lines:
+              if line.strip() == "```":
+                  in_code = not in_code
+                  out.append(line)
+                  continue
+              if not in_code:
+                  out.append(line)
+                  continue
+              out.append(decorate(line))
+
+          p.write_text("\n".join(out) + "\n", encoding="utf-8")
+          PY
         continue-on-error: true
 
-      # Post comment with results
-      - name: Post benchmark comparison comment
-        uses: actions/github-script@v7
+      # Save PR number
+      - name: Save PR number
+        run: echo ${{ github.event.number }} > pr_number.txt
+
+      # Upload benchmark results
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            const fs = require('fs');
-            const comparison = fs.readFileSync('comparison.md', 'utf8');
-
-            // Find existing comment
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-
-            const botComment = comments.find(comment =>
-              comment.user.type === 'Bot' &&
-              comment.body.includes('Benchmark Comparison')
-            );
-
-            const footer = '<sub>🤖 This comment will be ' +
-              'automatically updated with the latest benchmark results.</sub>';
-            const commentBody = `${comparison}\n\n${footer}`;
-
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: commentBody
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: commentBody
-              });
-            }
+          name: benchmark-results
+          path: |
+            comparison.md
+            pr_number.txt
