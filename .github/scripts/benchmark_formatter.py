@@ -9,11 +9,6 @@ try:
     lines = p.read_text(encoding="utf-8").splitlines()
     processed_lines = []
     in_code = False
-    delta_col = None  # record "Diff" column start per table
-    align_hint = None  # derived from benchstat header last pipe position
-
-    ALIGN_COLUMN = 60  # fallback alignment when header not found
-
     def strip_worker_suffix(text: str) -> str:
         return re.sub(r'(\S+?)-\d+(\s|$)', r'\1\2', text)
 
