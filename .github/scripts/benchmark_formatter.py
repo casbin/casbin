@@ -122,6 +122,8 @@ try:
     # Diff column width ~12 chars (e.g. "+100.00% 🚀")
     right_boundary = diff_col_start + 14
 
+    # Reset code fence tracking state for Pass 1
+    in_code = False
     for line in lines:
 
         if line.strip() == "```":
