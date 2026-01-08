@@ -107,7 +107,7 @@ func (d *EffectConflictDetector) CheckModel(m model.Model, rm rbac.RoleManager) 
 			effect = policy[3]
 		}
 		
-		key := fmt.Sprintf("%s:%s:%s", subject, object, action)
+		key := makePolicyKey(subject, object, action)
 		policyEffects[key] = effect
 	}
 
@@ -116,7 +116,7 @@ func (d *EffectConflictDetector) CheckModel(m model.Model, rm rbac.RoleManager) 
 		for _, roleName := range roleList {
 			// Check all policy combinations
 			for policyKey, effect := range policyEffects {
-				parts := strings.Split(policyKey, ":")
+				parts := strings.Split(policyKey, policyKeySeparator)
 				if len(parts) != 3 {
 					continue
 				}
@@ -127,26 +127,18 @@ func (d *EffectConflictDetector) CheckModel(m model.Model, rm rbac.RoleManager) 
 				// Check if this is a user policy
 				if subject == user {
 					// Check if any role has opposite effect
-					roleKey := fmt.Sprintf("%s:%s:%s", roleName, object, action)
+					roleKey := makePolicyKey(roleName, object, action)
 					if roleEffect, exists := policyEffects[roleKey]; exists {
-						if (effect == "allow" && roleEffect == "deny") ||
-							(effect == "deny" && roleEffect == "allow") {
-							return fmt.Errorf(
-								"effect conflict detected: user '%s' has '%s' effect for (%s, %s), "+
-									"but role '%s' has '%s' effect for the same action",
-								user, effect, object, action, roleName, roleEffect)
+						if err := checkEffectConflict(user, roleName, object, action, effect, roleEffect); err != nil {
+							return err
 						}
 					}
 				} else if subject == roleName {
 					// Check if user has opposite effect
-					userKey := fmt.Sprintf("%s:%s:%s", user, object, action)
+					userKey := makePolicyKey(user, object, action)
 					if userEffect, exists := policyEffects[userKey]; exists {
-						if (effect == "allow" && userEffect == "deny") ||
-							(effect == "deny" && userEffect == "allow") {
-							return fmt.Errorf(
-								"effect conflict detected: user '%s' has '%s' effect for (%s, %s), "+
-									"but role '%s' has '%s' effect for the same action",
-								user, userEffect, object, action, roleName, effect)
+						if err := checkEffectConflict(user, roleName, object, action, userEffect, effect); err != nil {
+							return err
 						}
 					}
 				}
@@ -157,7 +149,26 @@ func (d *EffectConflictDetector) CheckModel(m model.Model, rm rbac.RoleManager) 
 	return nil
 }
 
+const policyKeySeparator = ":"
+
+// makePolicyKey creates a consistent key for a policy.
+func makePolicyKey(subject, object, action string) string {
+	return fmt.Sprintf("%s%s%s%s%s", subject, policyKeySeparator, object, policyKeySeparator, action)
+}
+
+// checkEffectConflict checks if two effects conflict and returns an error if they do.
+func checkEffectConflict(user, role, object, action, userEffect, roleEffect string) error {
+	if (userEffect == "allow" && roleEffect == "deny") ||
+		(userEffect == "deny" && roleEffect == "allow") {
+		return fmt.Errorf(
+			"effect conflict detected: user '%s' has '%s' effect for (%s, %s), "+
+				"but role '%s' has '%s' effect for the same action",
+			user, userEffect, object, action, role, roleEffect)
+	}
+	return nil
+}
+
 // Check implements the Detector interface by returning an error indicating this detector needs model access.
 func (d *EffectConflictDetector) Check(rm rbac.RoleManager) error {
-	return fmt.Errorf("EffectConflictDetector requires model access, use CheckModel instead")
+	return fmt.Errorf("EffectConflictDetector requires both model and role manager access. This detector should be used through CheckModel() method or the enforcer's RunDetections() method")
 }
