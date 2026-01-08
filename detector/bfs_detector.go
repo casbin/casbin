@@ -15,6 +15,7 @@
 package detector
 
 import (
+	"container/list"
 	"fmt"
 	"strings"
 
@@ -106,27 +107,28 @@ func (d *BFSDetector) detectCycle(graph map[string][]string) error {
 		}
 	}
 
-	// Queue for nodes with in-degree 0
-	queue := []string{}
+	// Use container/list for efficient O(1) enqueue/dequeue operations
+	queue := list.New()
 	for node, degree := range inDegree {
 		if degree == 0 {
-			queue = append(queue, node)
+			queue.PushBack(node)
 		}
 	}
 
 	// Process nodes with BFS
 	processedCount := 0
-	for len(queue) > 0 {
-		// Dequeue
-		current := queue[0]
-		queue = queue[1:]
+	for queue.Len() > 0 {
+		// Dequeue from front - O(1) operation
+		element := queue.Front()
+		current := element.Value.(string)
+		queue.Remove(element)
 		processedCount++
 
 		// Reduce in-degree of neighbors
 		for _, neighbor := range graph[current] {
 			inDegree[neighbor]--
 			if inDegree[neighbor] == 0 {
-				queue = append(queue, neighbor)
+				queue.PushBack(neighbor)
 			}
 		}
 	}

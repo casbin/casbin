@@ -818,7 +818,8 @@ func TestEnforcerWithBothDefaultDetectors(t *testing.T) {
 		t.Errorf("Expected no error adding policy, but got: %v", err)
 	}
 
-	// Create a cycle: carol -> alice (which creates alice -> bob -> carol -> alice)
+	// Intentionally create a cycle for testing - ignore the potential error from AddGroupingPolicy
+	// since we'll verify the cycle detection with RunDetections() below
 	_, _ = e.AddGroupingPolicy("carol", "alice")
 
 	// Manually run detections
