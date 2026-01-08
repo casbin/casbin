@@ -797,6 +797,34 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	var effect effector.Effect
 	var explainIndex int
 
+	// If using RateLimitEffector, set request context
+	if rateLimitEft, ok := e.eft.(*effector.RateLimitEffector); ok {
+		sub, obj, act := "", "", ""
+		
+		// Extract sub from request
+		if subIdx, ok := rTokens[rType+"_sub"]; ok && subIdx < len(rvals) {
+			if subVal, ok := rvals[subIdx].(string); ok {
+				sub = subVal
+			}
+		}
+		
+		// Extract obj from request
+		if objIdx, ok := rTokens[rType+"_obj"]; ok && objIdx < len(rvals) {
+			if objVal, ok := rvals[objIdx].(string); ok {
+				obj = objVal
+			}
+		}
+		
+		// Extract act from request
+		if actIdx, ok := rTokens[rType+"_act"]; ok && actIdx < len(rvals) {
+			if actVal, ok := rvals[actIdx].(string); ok {
+				act = actVal
+			}
+		}
+		
+		rateLimitEft.SetRequestContext(sub, obj, act)
+	}
+
 	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") { //nolint:nestif // TODO: reduce function complexity
 		policyEffects = make([]effector.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
