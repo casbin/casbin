@@ -1,4 +1,4 @@
-// Copyright 2026 The casbin Authors. All Rights Reserved.
+// Copyright 2024 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import (
 
 // mockProvider is a mock implementation of Provider for testing purposes.
 type mockProvider struct {
-	RoleManager
 	users           []string
 	roles           []string
 	permissions     map[string][][]string
@@ -35,6 +34,42 @@ func newMockProvider() *mockProvider {
 		rolePermissions: make(map[string][][]string),
 	}
 }
+
+// RoleManager interface methods - stub implementations for testing.
+func (m *mockProvider) Clear() error { return nil }
+func (m *mockProvider) AddLink(name1 string, name2 string, domain ...string) error {
+	return nil
+}
+func (m *mockProvider) BuildRelationship(name1 string, name2 string, domain ...string) error {
+	return nil
+}
+func (m *mockProvider) DeleteLink(name1 string, name2 string, domain ...string) error {
+	return nil
+}
+func (m *mockProvider) HasLink(name1 string, name2 string, domain ...string) (bool, error) {
+	return false, nil
+}
+func (m *mockProvider) GetRoles(name string, domain ...string) ([]string, error) {
+	return nil, nil
+}
+func (m *mockProvider) GetUsers(name string, domain ...string) ([]string, error) {
+	return nil, nil
+}
+func (m *mockProvider) GetImplicitRoles(name string, domain ...string) ([]string, error) {
+	return nil, nil
+}
+func (m *mockProvider) GetImplicitUsers(name string, domain ...string) ([]string, error) {
+	return nil, nil
+}
+func (m *mockProvider) GetDomains(name string) ([]string, error) { return nil, nil }
+func (m *mockProvider) GetAllDomains() ([]string, error)         { return nil, nil }
+func (m *mockProvider) PrintRoles() error                        { return nil }
+func (m *mockProvider) Match(str string, pattern string) bool    { return false }
+func (m *mockProvider) AddMatchingFunc(name string, fn MatchingFunc) {
+}
+func (m *mockProvider) AddDomainMatchingFunc(name string, fn MatchingFunc) {
+}
+func (m *mockProvider) DeleteDomain(domain string) error { return nil }
 
 func (m *mockProvider) GetAllUsers() ([]string, error) {
 	return m.users, nil
