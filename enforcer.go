@@ -21,6 +21,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/casbin/casbin/v3/detector"
 	"github.com/casbin/casbin/v3/effector"
 	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
@@ -47,6 +48,7 @@ type Enforcer struct {
 	condRmMap  map[string]rbac.ConditionalRoleManager
 	matcherMap sync.Map
 	logger     log.Logger
+	detectors  []detector.Detector
 
 	enabled              bool
 	autoSave             bool
@@ -190,6 +192,11 @@ func (e *Enforcer) initialize() {
 	e.autoNotifyWatcher = true
 	e.autoNotifyDispatcher = true
 	e.initRmMap()
+
+	// Initialize detectors with default detector if not already set
+	if e.detectors == nil {
+		e.detectors = []detector.Detector{detector.NewDefaultDetector()}
+	}
 }
 
 // LoadModel reloads the model from the model CONF file.
@@ -288,6 +295,57 @@ func (e *Enforcer) SetLogger(logger log.Logger) {
 	e.logger = logger
 }
 
+// SetDetector sets a single detector for the enforcer.
+func (e *Enforcer) SetDetector(d detector.Detector) {
+	e.detectors = []detector.Detector{d}
+}
+
+// SetDetectors sets multiple detectors for the enforcer.
+func (e *Enforcer) SetDetectors(detectors []detector.Detector) {
+	e.detectors = detectors
+}
+
+// RunDetections runs all detectors on all role managers.
+// Returns the first error encountered, or nil if all checks pass.
+// Silently skips role managers that don't support the required iteration methods.
+func (e *Enforcer) RunDetections() error {
+	if e.detectors == nil || len(e.detectors) == 0 {
+		return nil
+	}
+
+	// Run detectors on all role managers
+	for _, rm := range e.rmMap {
+		for _, d := range e.detectors {
+			err := d.Check(rm)
+			// Skip if the role manager doesn't support the required iteration or is not initialized
+			if err != nil && (strings.Contains(err.Error(), "does not support Range iteration") ||
+				strings.Contains(err.Error(), "not properly initialized")) {
+				continue
+			}
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// Run detectors on all conditional role managers
+	for _, crm := range e.condRmMap {
+		for _, d := range e.detectors {
+			err := d.Check(crm)
+			// Skip if the role manager doesn't support the required iteration or is not initialized
+			if err != nil && (strings.Contains(err.Error(), "does not support Range iteration") ||
+				strings.Contains(err.Error(), "not properly initialized")) {
+				continue
+			}
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 // ClearPolicy clears all policy.
 func (e *Enforcer) ClearPolicy() {
 	e.invalidateMatcherMap()
@@ -315,6 +373,12 @@ func (e *Enforcer) LoadPolicy() error {
 	}
 
 	e.onLogAfterEventInLoadPolicy(logEntry, newModel)
+
+	// Run detectors after all policy rules are loaded
+	err = e.RunDetections()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

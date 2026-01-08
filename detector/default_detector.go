@@ -68,8 +68,15 @@ func (d *DefaultDetector) Check(rm rbac.RoleManager) error {
 
 // buildGraph builds an adjacency list representation of the role inheritance graph.
 // It uses the Range method (via type assertion) to iterate through all role links.
-func (d *DefaultDetector) buildGraph(rm rbac.RoleManager) (map[string][]string, error) {
-	graph := make(map[string][]string)
+func (d *DefaultDetector) buildGraph(rm rbac.RoleManager) (graph map[string][]string, err error) {
+	graph = make(map[string][]string)
+
+	// Recover from any panics during Range iteration (e.g., nil pointer dereferences)
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("RoleManager is not properly initialized: %v", r)
+		}
+	}()
 
 	// Try to cast to a RoleManager implementation that supports Range
 	// This works with RoleManagerImpl and similar implementations
