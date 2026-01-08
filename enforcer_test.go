@@ -801,3 +801,34 @@ func TestEnforcerSetDetectors(t *testing.T) {
 		t.Errorf("Expected no error with multiple detectors, but got: %v", err)
 	}
 }
+
+func TestEnforcerWithBothDefaultDetectors(t *testing.T) {
+	// Test that enforcer initializes with both default detectors (DFS and BFS)
+	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
+
+	// Verify that detectors work correctly
+	// Both detectors should detect the same cycle
+	_, err := e.AddGroupingPolicy("alice", "bob")
+	if err != nil {
+		t.Errorf("Expected no error adding policy, but got: %v", err)
+	}
+
+	_, err = e.AddGroupingPolicy("bob", "carol")
+	if err != nil {
+		t.Errorf("Expected no error adding policy, but got: %v", err)
+	}
+
+	// Create a cycle: carol -> alice (which creates alice -> bob -> carol -> alice)
+	_, _ = e.AddGroupingPolicy("carol", "alice")
+
+	// Manually run detections
+	err = e.RunDetections()
+	if err == nil {
+		t.Error("Expected cycle detection error, but got nil")
+	} else {
+		errMsg := err.Error()
+		if !strings.Contains(errMsg, "cycle detected") {
+			t.Errorf("Expected error message to contain 'cycle detected', got: %s", errMsg)
+		}
+	}
+}
