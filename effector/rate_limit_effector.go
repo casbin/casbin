@@ -183,7 +183,7 @@ func (e *RateLimitEffector) SetRequestContext(sub, obj, act string) {
 }
 
 // generateBucketKeyLocked generates a bucket key based on the bucket type and request context
-// Must be called with e.mu held
+// IMPORTANT: Must be called with e.mu held to avoid race conditions
 func (e *RateLimitEffector) generateBucketKeyLocked(bucketType string) string {
 	switch bucketType {
 	case "all":

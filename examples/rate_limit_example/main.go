@@ -22,52 +22,52 @@ import (
 )
 
 func main() {
-// Create an enforcer with a rate limit model
-e, err := casbin.NewEnforcer("../rate_limit_model.conf", "../rate_limit_policy.csv")
-if err != nil {
-panic(err)
-}
+	// Create an enforcer with a rate limit model
+	e, err := casbin.NewEnforcer("../rate_limit_model.conf", "../rate_limit_policy.csv")
+	if err != nil {
+		panic(err)
+	}
 
-// Set the rate limit effector
-// This is required to enable rate limiting functionality
-rateLimitEft := effector.NewRateLimitEffector()
-e.SetEffector(rateLimitEft)
+	// Set the rate limit effector
+	// This is required to enable rate limiting functionality
+	rateLimitEft := effector.NewRateLimitEffector()
+	e.SetEffector(rateLimitEft)
 
-fmt.Println("Rate Limiting Example")
-fmt.Println("======================")
-fmt.Println("Policy: rate_limit(3, second, allow, sub)")
-fmt.Println("This means: Allow at most 3 requests per second, per subject")
-fmt.Println()
+	fmt.Println("Rate Limiting Example")
+	fmt.Println("======================")
+	fmt.Println("Policy: rate_limit(3, second, allow, sub)")
+	fmt.Println("This means: Allow at most 3 requests per second, per subject")
+	fmt.Println()
 
-// Alice tries to access data1 with read permission
-// The rate limit is 3 per second, so the first 3 should succeed
-for i := 1; i <= 5; i++ {
-ok, err := e.Enforce("alice", "data1", "read")
-if err != nil {
-fmt.Printf("Request %d error: %v\n", i, err)
-continue
-}
-if ok {
-fmt.Printf("Request %d: ✓ Allowed\n", i)
-} else {
-fmt.Printf("Request %d: ✗ Denied (rate limit exceeded)\n", i)
-}
-}
+	// Alice tries to access data1 with read permission
+	// The rate limit is 3 per second, so the first 3 should succeed
+	for i := 1; i <= 5; i++ {
+		ok, err := e.Enforce("alice", "data1", "read")
+		if err != nil {
+			fmt.Printf("Request %d error: %v\n", i, err)
+			continue
+		}
+		if ok {
+			fmt.Printf("Request %d: ✓ Allowed\n", i)
+		} else {
+			fmt.Printf("Request %d: ✗ Denied (rate limit exceeded)\n", i)
+		}
+	}
 
-fmt.Println()
-fmt.Println("Bob has a separate rate limit bucket:")
+	fmt.Println()
+	fmt.Println("Bob has a separate rate limit bucket:")
 
-// Bob should have a separate rate limit bucket
-for i := 1; i <= 3; i++ {
-ok, err := e.Enforce("bob", "data1", "read")
-if err != nil {
-fmt.Printf("Bob's request %d error: %v\n", i, err)
-continue
-}
-if ok {
-fmt.Printf("Bob's request %d: ✓ Allowed\n", i)
-} else {
-fmt.Printf("Bob's request %d: ✗ Denied\n", i)
-}
-}
+	// Bob should have a separate rate limit bucket
+	for i := 1; i <= 3; i++ {
+		ok, err := e.Enforce("bob", "data1", "read")
+		if err != nil {
+			fmt.Printf("Bob's request %d error: %v\n", i, err)
+			continue
+		}
+		if ok {
+			fmt.Printf("Bob's request %d: ✓ Allowed\n", i)
+		} else {
+			fmt.Printf("Bob's request %d: ✗ Denied\n", i)
+		}
+	}
 }

@@ -176,8 +176,14 @@ m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			m, _ := model.NewModelFromString(tc.modelText)
-			e, _ := NewEnforcer(m)
+			m, err := model.NewModelFromString(tc.modelText)
+			if err != nil {
+				t.Fatalf("Failed to create model: %v", err)
+			}
+			e, err := NewEnforcer(m)
+			if err != nil {
+				t.Fatalf("Failed to create enforcer: %v", err)
+			}
 			
 			// Add policies
 			e.AddPolicy("alice", "data1", "read")
@@ -220,8 +226,14 @@ e = rate_limit(2, second, all, sub)
 [matchers]
 m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
 `
-	m, _ := model.NewModelFromString(modelText)
-	e, _ := NewEnforcer(m)
+	m, err := model.NewModelFromString(modelText)
+	if err != nil {
+		t.Fatalf("Failed to create model: %v", err)
+	}
+	e, err := NewEnforcer(m)
+	if err != nil {
+		t.Fatalf("Failed to create enforcer: %v", err)
+	}
 
 	// Add policy only for alice/data1/read
 	e.AddPolicy("alice", "data1", "read")
