@@ -253,7 +253,6 @@ func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]s
 }
 
 // RemovePolicy removes a policy rule from the model.
-// Deprecated: Using AddPoliciesWithAffected instead.
 func (model Model) RemovePolicy(sec string, ptype string, rule []string) (bool, error) {
 	ast, err := model.GetAssertion(sec, ptype)
 	if err != nil {
