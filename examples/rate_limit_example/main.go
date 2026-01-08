@@ -15,10 +15,10 @@
 package main
 
 import (
-"fmt"
+	"fmt"
 
-"github.com/casbin/casbin/v3"
-"github.com/casbin/casbin/v3/effector"
+	"github.com/casbin/casbin/v3"
+	"github.com/casbin/casbin/v3/effector"
 )
 
 func main() {

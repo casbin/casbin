@@ -141,9 +141,6 @@ func (e *RateLimitEffector) MergeEffects(expr string, effects []Effect, matches 
 		shouldCount = true
 	}
 
-	// Generate bucket key based on bucket type and request context
-	bucketKey := e.generateBucketKey(bucketType)
-
 	// Check and update rate limit
 	if shouldCount {
 		now := time.Now()
@@ -151,6 +148,9 @@ func (e *RateLimitEffector) MergeEffects(expr string, effects []Effect, matches 
 
 		e.mu.Lock()
 		defer e.mu.Unlock()
+
+		// Generate bucket key inside lock to avoid race condition
+		bucketKey := e.generateBucketKeyLocked(bucketType)
 
 		bucket, exists := e.buckets[bucketKey]
 		if !exists || now.After(bucket.windowEnd) {
@@ -182,8 +182,9 @@ func (e *RateLimitEffector) SetRequestContext(sub, obj, act string) {
 	e.requestContext["act"] = act
 }
 
-// generateBucketKey generates a bucket key based on the bucket type and request context
-func (e *RateLimitEffector) generateBucketKey(bucketType string) string {
+// generateBucketKeyLocked generates a bucket key based on the bucket type and request context
+// Must be called with e.mu held
+func (e *RateLimitEffector) generateBucketKeyLocked(bucketType string) string {
 	switch bucketType {
 	case "all":
 		return "bucket:all"
