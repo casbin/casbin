@@ -801,3 +801,31 @@ func TestEnforcerSetDetectors(t *testing.T) {
 		t.Errorf("Expected no error with multiple detectors, but got: %v", err)
 	}
 }
+
+func TestEnforcerWithEffectConflictDetector(t *testing.T) {
+	// Test that effect conflict detector can be enabled and detects conflicts
+	e, err := NewEnforcer("examples/rbac_with_deny_model.conf", "examples/rbac_with_deny_policy.csv")
+	
+	// Without the detector, should work fine
+	if err != nil {
+		t.Errorf("Expected no error without effect conflict detector, but got: %v", err)
+		return
+	}
+	
+	// Now set the effect conflict detector
+	e.SetDetectors([]detector.Detector{
+		detector.NewDefaultDetector(),
+		detector.NewEffectConflictDetector(),
+	})
+	
+	// Run detections should now find the conflict
+	err = e.RunDetections()
+	if err == nil {
+		t.Error("Expected error for effect conflict in policy, but got nil")
+	} else {
+		errMsg := err.Error()
+		if !strings.Contains(errMsg, "effect conflict detected") {
+			t.Errorf("Expected error message to contain 'effect conflict detected', got: %s", errMsg)
+		}
+	}
+}
