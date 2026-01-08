@@ -22,8 +22,8 @@ import (
 	"github.com/casbin/casbin/v3/rbac"
 )
 
-// BFSDetector is a BFS-based implementation of the Detector interface.
-// It uses breadth-first search (BFS) with Kahn's algorithm to detect cycles in role inheritance.
+// BFSDetector is a topological sort-based implementation of the Detector interface.
+// It uses Kahn's algorithm (a topological sorting algorithm with BFS-like queue operations) to detect cycles in role inheritance.
 type BFSDetector struct{}
 
 // NewBFSDetector creates a new instance of BFSDetector.
@@ -32,7 +32,7 @@ func NewBFSDetector() *BFSDetector {
 }
 
 // Check checks whether the current status of the passed-in RoleManager contains logical errors (e.g., cycles in role inheritance).
-// It uses BFS with Kahn's algorithm (topological sort) to detect cycles.
+// It uses Kahn's algorithm (topological sort) to detect cycles.
 // Returns nil if no cycle is found, otherwise returns an error with a description of the cycle.
 func (d *BFSDetector) Check(rm rbac.RoleManager) error {
 	// Defensive nil check to prevent runtime panics
@@ -88,7 +88,7 @@ func (d *BFSDetector) buildGraph(rm rbac.RoleManager) (graph map[string][]string
 	return graph, nil
 }
 
-// detectCycle performs BFS-based cycle detection using Kahn's algorithm (topological sort).
+// detectCycle performs cycle detection using Kahn's algorithm (topological sort).
 // If a topological sort is possible, there's no cycle. If not all nodes are processed, there's a cycle.
 // Returns nil if no cycle is found, otherwise returns an error describing the cycle.
 func (d *BFSDetector) detectCycle(graph map[string][]string) error {
