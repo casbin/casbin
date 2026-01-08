@@ -34,9 +34,28 @@ type ModelDetector interface {
 // EffectConflictDetector detects conflicts between user policies and role policies.
 // It identifies cases where a user is explicitly allowed/denied to do something,
 // but their role has the opposite effect for the same action.
+//
+// Note: In Casbin, explicit user policies override role policies, so such conflicts
+// are not errors but might indicate policy design issues that should be reviewed.
+// This detector is opt-in and not enabled by default.
+//
+// Example conflict:
+//   p, alice, data2, write, deny
+//   p, admin, data2, write, allow
+//   g, alice, admin
+// Here alice is explicitly denied but her role allows it - this might be intentional
+// (to override the role permission) or it might be a mistake.
 type EffectConflictDetector struct{}
 
 // NewEffectConflictDetector creates a new instance of EffectConflictDetector.
+//
+// Usage example:
+//   e, _ := casbin.NewEnforcer("model.conf", "policy.csv")
+//   e.SetDetectors([]detector.Detector{
+//       detector.NewDefaultDetector(),
+//       detector.NewEffectConflictDetector(),
+//   })
+//   err := e.RunDetections()
 func NewEffectConflictDetector() *EffectConflictDetector {
 	return &EffectConflictDetector{}
 }

@@ -193,12 +193,9 @@ func (e *Enforcer) initialize() {
 	e.autoNotifyDispatcher = true
 	e.initRmMap()
 
-	// Initialize detectors with default detectors if not already set
+	// Initialize detectors with default detector if not already set
 	if e.detectors == nil {
-		e.detectors = []detector.Detector{
-			detector.NewDefaultDetector(),
-			detector.NewEffectConflictDetector(),
-		}
+		e.detectors = []detector.Detector{detector.NewDefaultDetector()}
 	}
 }
 
