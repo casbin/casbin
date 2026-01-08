@@ -1,0 +1,37 @@
+name: Post Benchmark Comment
+
+on:
+  workflow_run:
+    workflows: ["Performance Comparison for Pull Requests"]
+    types:
+      - completed
+
+permissions:
+  pull-requests: write
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 'Download artifact'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const script = require('./.github/scripts/download_artifact.js')
+            await script({github, context, core})
+
+      - name: 'Unzip artifact'
+        run: unzip benchmark-results.zip
+
+      - name: 'Post comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const script = require('./.github/scripts/post_comment.js')
+            await script({github, context, core})

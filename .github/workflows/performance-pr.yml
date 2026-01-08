@@ -4,10 +4,6 @@ on:
   pull_request:
     branches: [master]
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   benchmark-pr:
     name: Performance benchmark comparison
@@ -21,7 +17,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: 'stable'
 
       # Save commit SHAs for display
       - name: Save commit info
@@ -69,44 +65,29 @@ jobs:
           EOF
           benchstat base-bench.txt pr-bench.txt >> comparison.md || true
           echo '```' >> comparison.md
-        continue-on-error: true
 
-      # Post comment with results
-      - name: Post benchmark comparison comment
-        uses: actions/github-script@v7
+          # Post-process to append percentage + emoji column (🚀 faster < -10%, 🐌 slower > +10%, otherwise ➡️)
+          if [ ! -f comparison.md ]; then
+            echo "comparison.md not found after benchstat." >&2
+            exit 1
+          fi
+          python3 .github/scripts/benchmark_formatter.py
+
+      # Save PR number
+      - name: Save PR number
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          if [ -z "$PR_NUMBER" ]; then
+            echo "Error: Pull request number is not available in event payload." >&2
+            exit 1
+          fi
+          echo "$PR_NUMBER" > pr_number.txt
+
+      # Upload benchmark results
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            const fs = require('fs');
-            const comparison = fs.readFileSync('comparison.md', 'utf8');
-
-            // Find existing comment
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-
-            const botComment = comments.find(comment =>
-              comment.user.type === 'Bot' &&
-              comment.body.includes('Benchmark Comparison')
-            );
-
-            const footer = '<sub>🤖 This comment will be ' +
-              'automatically updated with the latest benchmark results.</sub>';
-            const commentBody = `${comparison}\n\n${footer}`;
-
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: commentBody
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: commentBody
-              });
-            }
+          name: benchmark-results
+          path: |
+            comparison.md
+            pr_number.txt
