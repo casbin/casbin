@@ -180,7 +180,6 @@ try:
             processed_lines.append(line)
             continue
 
-        original_line = line
         line = strip_worker_suffix(line)
         tokens = line.split()
         if not tokens:
