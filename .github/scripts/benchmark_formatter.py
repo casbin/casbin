@@ -151,12 +151,6 @@ try:
             stripped_header = re.sub(r'\s+Delta\b', '', stripped_header, flags=re.IGNORECASE)
 
             # Pad to diff_col_start
-            padding = diff_col_start - len(stripped_header)
-            if padding < 2: 
-                padding = 2 # minimum spacing
-                # If header is wider than data (unlikely but possible), adjust diff_col_start
-                # But for now let's trust max_content_width or just append
-            
             if len(stripped_header) < diff_col_start:
                 new_header = stripped_header + " " * (diff_col_start - len(stripped_header))
             else:
