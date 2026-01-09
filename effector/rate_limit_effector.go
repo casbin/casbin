@@ -24,20 +24,20 @@ import (
 	"time"
 )
 
-// RateLimitBucket holds the state for a rate limit bucket
+// RateLimitBucket holds the state for a rate limit bucket.
 type RateLimitBucket struct {
 	count     int
 	windowEnd time.Time
 }
 
-// RateLimitEffector is an effector that implements rate limiting
+// RateLimitEffector is an effector that implements rate limiting.
 type RateLimitEffector struct {
 	mu             sync.RWMutex
 	buckets        map[string]*RateLimitBucket
 	requestContext map[string]string // stores current request context (sub, obj, act)
 }
 
-// NewRateLimitEffector creates a new RateLimitEffector
+// NewRateLimitEffector creates a new RateLimitEffector.
 func NewRateLimitEffector() *RateLimitEffector {
 	return &RateLimitEffector{
 		buckets:        make(map[string]*RateLimitBucket),
@@ -47,8 +47,8 @@ func NewRateLimitEffector() *RateLimitEffector {
 
 var rateLimitRegex = regexp.MustCompile(`rate_limit\((\d+),\s*(\w+),\s*(\w+),\s*(\w+)\)`)
 
-// parseRateLimitExpr parses a rate_limit expression
-// Format: rate_limit(max, unit, count_type, bucket)
+// parseRateLimitExpr parses a rate_limit expression.
+// Format: rate_limit(max, unit, count_type, bucket).
 func parseRateLimitExpr(expr string) (max int, unit string, countType string, bucket string, err error) {
 	matches := rateLimitRegex.FindStringSubmatch(expr)
 	if matches == nil || len(matches) != 5 {
@@ -84,7 +84,7 @@ func parseRateLimitExpr(expr string) (max int, unit string, countType string, bu
 	return max, unit, countType, bucket, nil
 }
 
-// getWindowDuration returns the duration for a time unit
+// getWindowDuration returns the duration for a time unit.
 func getWindowDuration(unit string) time.Duration {
 	switch unit {
 	case "second":
@@ -100,7 +100,7 @@ func getWindowDuration(unit string) time.Duration {
 	}
 }
 
-// MergeEffects implements the Effector interface with rate limiting
+// MergeEffects implements the Effector interface with rate limiting.
 func (e *RateLimitEffector) MergeEffects(expr string, effects []Effect, matches []float64, policyIndex int, policyLength int) (Effect, int, error) {
 	// Check if this is a rate_limit expression
 	if !strings.Contains(expr, "rate_limit") {
@@ -172,8 +172,8 @@ func (e *RateLimitEffector) MergeEffects(expr string, effects []Effect, matches 
 	return baseEffect, explainIndex, nil
 }
 
-// SetRequestContext sets the request context for bucket key generation
-// This should be called before MergeEffects to provide request context
+// SetRequestContext sets the request context for bucket key generation.
+// This should be called before MergeEffects to provide request context.
 func (e *RateLimitEffector) SetRequestContext(sub, obj, act string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -182,8 +182,8 @@ func (e *RateLimitEffector) SetRequestContext(sub, obj, act string) {
 	e.requestContext["act"] = act
 }
 
-// generateBucketKeyLocked generates a bucket key based on the bucket type and request context
-// IMPORTANT: Must be called with e.mu held to avoid race conditions
+// generateBucketKeyLocked generates a bucket key based on the bucket type and request context.
+// IMPORTANT: Must be called with e.mu held to avoid race conditions.
 func (e *RateLimitEffector) generateBucketKeyLocked(bucketType string) string {
 	switch bucketType {
 	case "all":
@@ -208,7 +208,7 @@ func (e *RateLimitEffector) generateBucketKeyLocked(bucketType string) string {
 	}
 }
 
-// GetBucketState returns the current state of a bucket (for testing)
+// GetBucketState returns the current state of a bucket (for testing).
 func (e *RateLimitEffector) GetBucketState(key string) (count int, windowEnd time.Time, exists bool) {
 	e.mu.RLock()
 	defer e.mu.RUnlock()
@@ -220,7 +220,7 @@ func (e *RateLimitEffector) GetBucketState(key string) (count int, windowEnd tim
 	return bucket.count, bucket.windowEnd, true
 }
 
-// ResetBuckets clears all buckets (for testing)
+// ResetBuckets clears all buckets (for testing).
 func (e *RateLimitEffector) ResetBuckets() {
 	e.mu.Lock()
 	defer e.mu.Unlock()
