@@ -35,9 +35,9 @@ func TestRateLimitWithEnforcer(t *testing.T) {
 	// Test rate limiting for alice (limit: 3 per second)
 	// First 3 requests should succeed
 	for i := 0; i < 3; i++ {
-		ok, err := e.Enforce("alice", "data1", "read")
-		if err != nil {
-			t.Errorf("Request %d failed: %v", i+1, err)
+		ok, err2 := e.Enforce("alice", "data1", "read")
+		if err2 != nil {
+			t.Errorf("Request %d failed: %v", i+1, err2)
 		}
 		if !ok {
 			t.Errorf("Request %d should be allowed", i+1)
@@ -99,10 +99,10 @@ func TestRateLimitWithEnforcerWindowReset(t *testing.T) {
 
 func TestRateLimitDifferentBucketTypes(t *testing.T) {
 	testCases := []struct {
-		name       string
-		modelText  string
-		requests   [][]interface{}
-		expected   []bool
+		name      string
+		modelText string
+		requests  [][]interface{}
+		expected  []bool
 	}{
 		{
 			name: "bucket by all",
@@ -184,7 +184,7 @@ m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
 			if err != nil {
 				t.Fatalf("Failed to create enforcer: %v", err)
 			}
-			
+
 			// Add policies
 			e.AddPolicy("alice", "data1", "read")
 			e.AddPolicy("alice", "data1", "write")

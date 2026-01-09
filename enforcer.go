@@ -677,6 +677,16 @@ func (e *Enforcer) invalidateMatcherMap() {
 	e.matcherMap = sync.Map{}
 }
 
+// extractRequestParam extracts a string parameter from request values based on token name.
+func extractRequestParam(rvals []interface{}, rTokens map[string]int, tokenName string) string {
+	if idx, ok := rTokens[tokenName]; ok && idx < len(rvals) {
+		if val, ok := rvals[idx].(string); ok {
+			return val
+		}
+	}
+	return ""
+}
+
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
 	logEntry := e.onLogBeforeEventInEnforce(rvals)
@@ -799,29 +809,9 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	// If using RateLimitEffector, set request context
 	if rateLimitEft, ok := e.eft.(*effector.RateLimitEffector); ok {
-		sub, obj, act := "", "", ""
-		
-		// Extract sub from request
-		if subIdx, ok := rTokens[rType+"_sub"]; ok && subIdx < len(rvals) {
-			if subVal, ok := rvals[subIdx].(string); ok {
-				sub = subVal
-			}
-		}
-		
-		// Extract obj from request
-		if objIdx, ok := rTokens[rType+"_obj"]; ok && objIdx < len(rvals) {
-			if objVal, ok := rvals[objIdx].(string); ok {
-				obj = objVal
-			}
-		}
-		
-		// Extract act from request
-		if actIdx, ok := rTokens[rType+"_act"]; ok && actIdx < len(rvals) {
-			if actVal, ok := rvals[actIdx].(string); ok {
-				act = actVal
-			}
-		}
-		
+		sub := extractRequestParam(rvals, rTokens, rType+"_sub")
+		obj := extractRequestParam(rvals, rTokens, rType+"_obj")
+		act := extractRequestParam(rvals, rTokens, rType+"_act")
 		rateLimitEft.SetRequestContext(sub, obj, act)
 	}
 

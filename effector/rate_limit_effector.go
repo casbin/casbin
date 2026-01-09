@@ -113,8 +113,8 @@ func (e *RateLimitEffector) MergeEffects(expr string, effects []Effect, matches 
 	}
 
 	// For rate limiting, we need to check all matches first to determine the base result
-	var baseEffect Effect = Indeterminate
-	var explainIndex int = -1
+	var baseEffect = Indeterminate
+	var explainIndex = -1
 
 	// Find the first matching policy
 	for i := 0; i < policyLength; i++ {
