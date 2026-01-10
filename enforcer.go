@@ -56,6 +56,8 @@ type Enforcer struct {
 	autoNotifyWatcher    bool
 	autoNotifyDispatcher bool
 	acceptJsonRequest    bool
+
+	explainConfig ExplainConfig
 }
 
 // EnforceContext is used as the first element of the parameter "rvals" in method "enforce".
