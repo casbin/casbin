@@ -24,7 +24,7 @@ import (
 // function with complex matchers that include wildcards and OR conditions.
 // This addresses the issue: https://github.com/casbin/node-casbin/issues/481
 func TestGetImplicitPermissionsForUserWithComplexMatcher(t *testing.T) {
-	e, _ := NewEnforcer("/tmp/test_complex_matcher_model.conf", "/tmp/test_complex_matcher_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_with_complex_matcher_model.conf", "examples/rbac_with_complex_matcher_policy.csv")
 
 	// Test michael who has roles1 in tenant1
 	// michael -> roles1 -> abstract_roles1 in tenant1
@@ -111,7 +111,7 @@ func TestGetImplicitPermissionsForUserWithComplexMatcher(t *testing.T) {
 // TestGetImplicitPermissionsForUserWithoutDomain tests that GetImplicitPermissionsForUser
 // works correctly when no domain is specified with a domain-based model
 func TestGetImplicitPermissionsForUserWithoutDomain(t *testing.T) {
-	e, _ := NewEnforcer("/tmp/test_complex_matcher_model.conf", "/tmp/test_complex_matcher_policy.csv")
+	e, _ := NewEnforcer("examples/rbac_with_complex_matcher_model.conf", "examples/rbac_with_complex_matcher_policy.csv")
 
 	// When no domain is specified with a domain-based model, behavior depends on
 	// whether the grouping policies include domain-less entries.
