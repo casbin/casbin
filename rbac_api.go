@@ -310,6 +310,12 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 
 // GetNamedImplicitPermissionsForUser gets implicit permissions for a user or role by named policy.
 // Compared to GetNamedPermissionsForUser(), this function retrieves permissions for inherited roles.
+//
+// This function now supports complex matchers including:
+// - Wildcard domains (e.g., g(r.sub, p.sub, '*'))
+// - OR conditions in matchers (e.g., g(r.sub, p.sub, r.dom) || g(r.sub, p.sub, '*'))
+// - Domain pattern matching
+//
 // For example:
 // p, admin, data1, read
 // p2, admin, create
@@ -317,6 +323,14 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 //
 // GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p"
 // But you can specify the named policy "p2" to get: [["admin", "create"]] by    GetNamedImplicitPermissionsForUser("p2","alice").
+//
+// For complex matchers with wildcard domains:
+// p, role1, data, read, *
+// g, user1, role1, tenant1
+// g, user1, role1, *
+//
+// GetImplicitPermissionsForUser("user1", "tenant1") will return: [["role1", "data", "read", "tenant1"]]
+// (Note: wildcard domains in policies are replaced with the requested domain)
 func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, gtype string, user string, domain ...string) ([][]string, error) {
 	permission := make([][]string, 0)
 	
