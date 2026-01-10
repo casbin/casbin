@@ -33,9 +33,9 @@ func TestGetImplicitPermissionsForUserWithComplexMatcher(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetImplicitPermissionsForUser failed: %v", err)
 	}
-	
+
 	t.Logf("Permissions for michael in tenant1: %v", perms)
-	
+
 	// Michael should have access to devis read and create because:
 	// - g(michael, abstract_roles1, tenant1) is true (through roles1)
 	// - p.dom == '*' matches any domain, and we replace * with the requested domain
@@ -43,7 +43,7 @@ func TestGetImplicitPermissionsForUserWithComplexMatcher(t *testing.T) {
 		{"abstract_roles1", "devis", "read", "tenant1"},
 		{"abstract_roles1", "devis", "create", "tenant1"},
 	}
-	
+
 	if !util.Set2DEquals(expectedPerms, perms) {
 		t.Errorf("Expected permissions %v, got %v", expectedPerms, perms)
 	}
@@ -53,9 +53,9 @@ func TestGetImplicitPermissionsForUserWithComplexMatcher(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetImplicitPermissionsForUser failed: %v", err)
 	}
-	
+
 	t.Logf("Permissions for thomas in tenant1: %v", perms)
-	
+
 	// Thomas should have access to devis and organization because:
 	// - g(thomas, abstract_roles2, tenant1) is true (through roles2)
 	// - p.dom == '*' matches any domain, and we replace * with the requested domain
@@ -64,7 +64,7 @@ func TestGetImplicitPermissionsForUserWithComplexMatcher(t *testing.T) {
 		{"abstract_roles2", "organization", "read", "tenant1"},
 		{"abstract_roles2", "organization", "write", "tenant1"},
 	}
-	
+
 	if !util.Set2DEquals(expectedPerms, perms) {
 		t.Errorf("Expected permissions %v, got %v", expectedPerms, perms)
 	}
@@ -74,9 +74,9 @@ func TestGetImplicitPermissionsForUserWithComplexMatcher(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetImplicitPermissionsForUser failed: %v", err)
 	}
-	
+
 	t.Logf("Permissions for theo in any_tenant: %v", perms)
-	
+
 	// Theo should have access to all abstract_roles2 permissions because:
 	// - g(theo, abstract_roles2, '*') is true (through super_user)
 	// - p.dom == '*' matches any domain, and we replace * with the requested domain
@@ -85,7 +85,7 @@ func TestGetImplicitPermissionsForUserWithComplexMatcher(t *testing.T) {
 		{"abstract_roles2", "organization", "read", "any_tenant"},
 		{"abstract_roles2", "organization", "write", "any_tenant"},
 	}
-	
+
 	if !util.Set2DEquals(expectedPerms, perms) {
 		t.Errorf("Expected permissions %v, got %v", expectedPerms, perms)
 	}
@@ -109,7 +109,7 @@ func TestGetImplicitPermissionsForUserWithComplexMatcher(t *testing.T) {
 }
 
 // TestGetImplicitPermissionsForUserWithoutDomain tests that GetImplicitPermissionsForUser
-// works correctly when no domain is specified with a domain-based model
+// works correctly when no domain is specified with a domain-based model.
 func TestGetImplicitPermissionsForUserWithoutDomain(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_with_complex_matcher_model.conf", "examples/rbac_with_complex_matcher_policy.csv")
 
@@ -120,9 +120,9 @@ func TestGetImplicitPermissionsForUserWithoutDomain(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetImplicitPermissionsForUser failed: %v", err)
 	}
-	
+
 	t.Logf("Permissions for michael (no domain): %v", perms)
-	
+
 	// With this specific model/policy setup, no permissions are returned without domain
 	// because all role assignments have specific domains
 	if len(perms) != 0 {

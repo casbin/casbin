@@ -330,10 +330,10 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 // g, user1, role1, *
 //
 // GetImplicitPermissionsForUser("user1", "tenant1") will return: [["role1", "data", "read", "tenant1"]]
-// (Note: wildcard domains in policies are replaced with the requested domain)
+// (Note: wildcard domains in policies are replaced with the requested domain).
 func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, gtype string, user string, domain ...string) ([][]string, error) {
 	permission := make([][]string, 0)
-	
+
 	// Validate domain parameter
 	if len(domain) > 1 {
 		return nil, errors.ErrDomainParameter
@@ -352,7 +352,7 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, gtype string
 		if err != nil {
 			subIndex = 0
 		}
-		
+
 		for _, rule := range e.model["p"][ptype].Policy {
 			if rule[subIndex] == user {
 				if e.policyMatchesDomain(ptype, rule, domain...) {
@@ -366,7 +366,7 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, gtype string
 	// Get all roles for the user, considering complex matchers
 	rolesMap := make(map[string]bool)
 	rolesMap[user] = true // Include the user itself
-	
+
 	// Get roles with the specific domain if provided
 	if len(domain) > 0 {
 		roles, err := e.GetNamedImplicitRolesForUser(gtype, user, domain[0])
@@ -376,7 +376,7 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, gtype string
 		for _, role := range roles {
 			rolesMap[role] = true
 		}
-		
+
 		// Also get roles with wildcard domain
 		wildcardRoles, err := e.GetNamedImplicitRolesForUser(gtype, user, "*")
 		if err == nil {
@@ -405,57 +405,61 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, gtype string
 	// Check each policy
 	for _, rule := range e.model["p"][ptype].Policy {
 		policySubject := rule[subIndex]
-		
+
 		// Check if the policy subject is the user or one of their roles
-		if rolesMap[policySubject] {
-			// Check if the policy domain matches the requested domain
-			if e.policyMatchesDomain(ptype, rule, domain...) {
-				// If domain is specified and policy has wildcard domain, replace it
-				if len(domain) > 0 {
-					domIndex, err := e.GetFieldIndex(ptype, constant.DomainIndex)
-					if err == nil && domIndex < len(rule) && rule[domIndex] == "*" {
-						// Replace wildcard domain with requested domain
-						newRule := deepCopyPolicy(rule)
-						newRule[domIndex] = domain[0]
-						permission = append(permission, newRule)
-						continue
-					}
-				}
-				permission = append(permission, deepCopyPolicy(rule))
+		if !rolesMap[policySubject] {
+			continue
+		}
+
+		// Check if the policy domain matches the requested domain
+		if !e.policyMatchesDomain(ptype, rule, domain...) {
+			continue
+		}
+
+		// If domain is specified and policy has wildcard domain, replace it
+		if len(domain) > 0 {
+			domIndex, err := e.GetFieldIndex(ptype, constant.DomainIndex)
+			if err == nil && domIndex < len(rule) && rule[domIndex] == "*" {
+				// Replace wildcard domain with requested domain
+				newRule := deepCopyPolicy(rule)
+				newRule[domIndex] = domain[0]
+				permission = append(permission, newRule)
+				continue
 			}
 		}
+		permission = append(permission, deepCopyPolicy(rule))
 	}
-	
+
 	return permission, nil
 }
 
-// policyMatchesDomain checks if a policy matches the requested domain
+// policyMatchesDomain checks if a policy matches the requested domain.
 func (e *Enforcer) policyMatchesDomain(ptype string, policy []string, domain ...string) bool {
 	// If no domain requested, include all policies
 	if len(domain) == 0 {
 		return true
 	}
-	
+
 	// Get domain index
 	domIndex, err := e.GetFieldIndex(ptype, constant.DomainIndex)
 	if err != nil || domIndex >= len(policy) {
 		// No domain in policy - include it
 		return true
 	}
-	
+
 	policyDomain := policy[domIndex]
 	requestedDomain := domain[0]
-	
+
 	// Check for exact match
 	if policyDomain == requestedDomain {
 		return true
 	}
-	
+
 	// Check for wildcard in policy
 	if policyDomain == "*" {
 		return true
 	}
-	
+
 	// Use role manager to check for pattern matching if available
 	for _, rm := range e.rmMap {
 		if rm.Match(requestedDomain, policyDomain) {
@@ -467,7 +471,7 @@ func (e *Enforcer) policyMatchesDomain(ptype string, policy []string, domain ...
 			return true
 		}
 	}
-	
+
 	return false
 }
 
