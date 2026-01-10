@@ -16,6 +16,7 @@ package casbin
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -81,10 +82,10 @@ func (e *Enforcer) Explain(rvals ...interface{}) (string, error) {
 	}
 
 	// Build context for AI
-	context := e.buildExplainContext(rvals, result, matchedRules)
+	explainContext := e.buildExplainContext(rvals, result, matchedRules)
 
 	// Call AI API
-	explanation, err := e.callAIAPI(context)
+	explanation, err := e.callAIAPI(explainContext)
 	if err != nil {
 		return "", fmt.Errorf("failed to get AI explanation: %w", err)
 	}
@@ -143,7 +144,7 @@ func (e *Enforcer) buildExplainContext(rvals []interface{}, result bool, matched
 }
 
 // callAIAPI calls the configured AI API to get an explanation.
-func (e *Enforcer) callAIAPI(context string) (string, error) {
+func (e *Enforcer) callAIAPI(explainContext string) (string, error) {
 	// Prepare the request
 	messages := []aiMessage{
 		{
@@ -155,7 +156,7 @@ func (e *Enforcer) callAIAPI(context string) (string, error) {
 		},
 		{
 			Role:    "user",
-			Content: fmt.Sprintf("Please explain the following authorization decision:\n\n%s", context),
+			Content: fmt.Sprintf("Please explain the following authorization decision:\n\n%s", explainContext),
 		},
 	}
 
@@ -169,8 +170,11 @@ func (e *Enforcer) callAIAPI(context string) (string, error) {
 		return "", fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	// Create HTTP request
-	req, err := http.NewRequest("POST", e.explainConfig.Endpoint, bytes.NewBuffer(jsonData))
+	// Create HTTP request with context
+	reqCtx, cancel := context.WithTimeout(context.Background(), e.explainConfig.Timeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(reqCtx, http.MethodPost, e.explainConfig.Endpoint, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %w", err)
 	}
@@ -178,10 +182,8 @@ func (e *Enforcer) callAIAPI(context string) (string, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+e.explainConfig.APIKey)
 
-	// Execute request with timeout
-	client := &http.Client{
-		Timeout: e.explainConfig.Timeout,
-	}
+	// Execute request
+	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
