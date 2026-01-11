@@ -28,3 +28,4 @@ _testmain.go
 
 # vendor files
 vendor
+yml-test/
