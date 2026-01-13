@@ -311,6 +311,21 @@ func EscapeStringLiterals(expr string) string {
 	return result.String()
 }
 
+// ConvertInOperatorSyntax converts govaluate's IN operator syntax to expr's syntax.
+// Changes: `x in ('a', 'b')` to `x in ['a', 'b']`
+// Also handles: `x IN ('a', 'b')` (case insensitive)
+// And: `x IN array` to `x in array`
+func ConvertInOperatorSyntax(expression string) string {
+	// First, replace all IN/In/iN with lowercase 'in' (case insensitive)
+	// Use word boundaries to avoid replacing IN in the middle of identifiers
+	reCase := regexp.MustCompile(`\bIN\b`)
+	expression = reCase.ReplaceAllString(expression, "in")
+	
+	// Then, replace `in (...)` with `in [...]`
+	re := regexp.MustCompile(`\bin\s*\(([^)]+)\)`)
+	return re.ReplaceAllString(expression, "in [$1]")
+}
+
 func RemoveDuplicateElement(s []string) []string {
 	result := make([]string, 0, len(s))
 	temp := map[string]struct{}{}

@@ -160,6 +160,8 @@ func (e *Enforcer) GetFilteredNamedPolicyWithMatcher(ptype string, matcher strin
 	} else {
 		expString = util.RemoveComments(util.EscapeAssertion(matcher))
 	}
+	// Convert govaluate IN operator syntax to expr syntax
+	expString = util.ConvertInOperatorSyntax(expString)
 
 	var expression *vm.Program
 
@@ -168,7 +170,8 @@ func (e *Enforcer) GetFilteredNamedPolicyWithMatcher(ptype string, matcher strin
 	for k, v := range functions {
 		env[k] = v
 	}
-	expression, err = expr.Compile(expString, expr.Env(env))
+	// Compile with AllowUndefinedVariables to support dynamic parameter access
+	expression, err = expr.Compile(expString, expr.Env(env), expr.AllowUndefinedVariables())
 	if err != nil {
 		return res, err
 	}

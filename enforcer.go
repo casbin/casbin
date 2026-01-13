@@ -738,6 +738,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		// For custom matchers provided at runtime, escape backslashes in string literals
 		expString = util.EscapeStringLiterals(util.RemoveComments(util.EscapeAssertion(matcher)))
 	}
+	// Convert govaluate IN operator syntax to expr syntax
+	expString = util.ConvertInOperatorSyntax(expString)
 
 	rTokens := make(map[string]int, len(e.model["r"][rType].Tokens))
 	for i, token := range e.model["r"][rType].Tokens {
@@ -925,19 +927,13 @@ func (e *Enforcer) getAndStoreMatcherExpression(hasEval bool, expString string, 
 	if !hasEval && isPresent {
 		expression = cachedExpression.(*vm.Program)
 	} else {
-		// Create environment with functions and parameter names (with dummy values for type checking)
+		// Create environment with functions
 		env := make(map[string]interface{})
 		for k, v := range functions {
 			env[k] = v
 		}
-		// Add all r and p parameter names with string type for compilation
-		for token := range rTokens {
-			env[token] = ""
-		}
-		for token := range pTokens {
-			env[token] = ""
-		}
-		expression, err = expr.Compile(expString, expr.Env(env))
+		// Compile with AllowUndefinedVariables to support ABAC and dynamic parameter access
+		expression, err = expr.Compile(expString, expr.Env(env), expr.AllowUndefinedVariables())
 		if err != nil {
 			return nil, err
 		}
@@ -1118,19 +1114,13 @@ func generateEvalFunction(functions map[string]interface{}, parameters *enforceP
 			return nil, errors.New("argument of eval(subrule string) must be a string")
 		}
 		expression = util.EscapeAssertion(expression)
-		// Create environment with functions and parameter tokens for compilation
+		// Create environment with functions for compilation
 		env := make(map[string]interface{})
 		for k, v := range functions {
 			env[k] = v
 		}
-		// Add all r and p parameter names with empty string for type checking
-		for token := range parameters.rTokens {
-			env[token] = ""
-		}
-		for token := range parameters.pTokens {
-			env[token] = ""
-		}
-		program, err := expr.Compile(expression, expr.Env(env))
+		// Compile with AllowUndefinedVariables to support dynamic parameter access
+		program, err := expr.Compile(expression, expr.Env(env), expr.AllowUndefinedVariables())
 		if err != nil {
 			return nil, fmt.Errorf("error while parsing eval parameter: %s, %s", expression, err.Error())
 		}
