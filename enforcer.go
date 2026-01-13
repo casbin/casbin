@@ -1114,6 +1114,8 @@ func generateEvalFunction(functions map[string]interface{}, parameters *enforceP
 			return nil, errors.New("argument of eval(subrule string) must be a string")
 		}
 		expression = util.EscapeAssertion(expression)
+		// Convert IN operator syntax for compatibility
+		expression = util.ConvertInOperatorSyntax(expression)
 		// Create environment with functions for compilation
 		env := make(map[string]interface{})
 		for k, v := range functions {

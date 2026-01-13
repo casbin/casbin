@@ -318,10 +318,11 @@ func EscapeStringLiterals(expr string) string {
 func ConvertInOperatorSyntax(expression string) string {
 	// First, replace all IN/In/iN with lowercase 'in' (case insensitive)
 	// Use word boundaries to avoid replacing IN in the middle of identifiers
-	reCase := regexp.MustCompile(`\bIN\b`)
+	reCase := regexp.MustCompile(`(?i)\bIN\b`)
 	expression = reCase.ReplaceAllString(expression, "in")
 	
 	// Then, replace `in (...)` with `in [...]`
+	// This handles simple cases but may not work with deeply nested parentheses
 	re := regexp.MustCompile(`\bin\s*\(([^)]+)\)`)
 	return re.ReplaceAllString(expression, "in [$1]")
 }
