@@ -19,7 +19,6 @@ import (
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
 	"github.com/casbin/casbin/v3/rbac"
-	"github.com/casbin/govaluate"
 )
 
 var _ IEnforcer = &Enforcer{}
@@ -138,7 +137,7 @@ type IEnforcer interface {
 	RemoveNamedGroupingPolicy(ptype string, params ...interface{}) (bool, error)
 	RemoveNamedGroupingPolicies(ptype string, rules [][]string) (bool, error)
 	RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error)
-	AddFunction(name string, function govaluate.ExpressionFunction)
+	AddFunction(name string, function interface{})
 
 	UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, error)
 	UpdatePolicies(oldPolicies [][]string, newPolicies [][]string) (bool, error)

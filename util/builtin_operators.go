@@ -26,8 +26,6 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 
 	"github.com/casbin/casbin/v3/rbac"
-
-	"github.com/casbin/govaluate"
 )
 
 var (
@@ -402,10 +400,10 @@ func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 }
 
 // GenerateGFunction is the factory method of the g(_, _[, _]) function.
-func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
+func GenerateGFunction(rm rbac.RoleManager) func(args ...interface{}) (interface{}, error) {
 	memorized := sync.Map{}
 	return func(args ...interface{}) (interface{}, error) {
-		// Like all our other govaluate functions, all args are strings.
+		// Like all our other expression functions, all args are strings.
 
 		// Allocate and generate a cache key from the arguments...
 		total := len(args)
@@ -445,9 +443,9 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 }
 
 // GenerateConditionalGFunction is the factory method of the g(_, _[, _]) function with conditions.
-func GenerateConditionalGFunction(crm rbac.ConditionalRoleManager) govaluate.ExpressionFunction {
+func GenerateConditionalGFunction(crm rbac.ConditionalRoleManager) func(args ...interface{}) (interface{}, error) {
 	return func(args ...interface{}) (interface{}, error) {
-		// Like all our other govaluate functions, all args are strings.
+		// Like all our other expression functions, all args are strings.
 		var hasLink bool
 
 		name1, name2 := args[0].(string), args[1].(string)

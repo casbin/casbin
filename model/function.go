@@ -18,7 +18,6 @@ import (
 	"sync"
 
 	"github.com/casbin/casbin/v3/util"
-	"github.com/casbin/govaluate"
 )
 
 // FunctionMap represents the collection of Function.
@@ -26,10 +25,8 @@ type FunctionMap struct {
 	fns *sync.Map
 }
 
-// [string]govaluate.ExpressionFunction
-
 // AddFunction adds an expression function.
-func (fm *FunctionMap) AddFunction(name string, function govaluate.ExpressionFunction) {
+func (fm *FunctionMap) AddFunction(name string, function interface{}) {
 	fm.fns.LoadOrStore(name, function)
 }
 
@@ -54,11 +51,11 @@ func LoadFunctionMap() FunctionMap {
 }
 
 // GetFunctions return a map with all the functions.
-func (fm *FunctionMap) GetFunctions() map[string]govaluate.ExpressionFunction {
-	ret := make(map[string]govaluate.ExpressionFunction)
+func (fm *FunctionMap) GetFunctions() map[string]interface{} {
+	ret := make(map[string]interface{})
 
 	fm.fns.Range(func(k interface{}, v interface{}) bool {
-		ret[k.(string)] = v.(govaluate.ExpressionFunction)
+		ret[k.(string)] = v
 		return true
 	})
 

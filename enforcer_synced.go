@@ -19,8 +19,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/casbin/govaluate"
-
 	"github.com/casbin/casbin/v3/persist"
 	"github.com/casbin/casbin/v3/rbac"
 )
@@ -631,7 +629,7 @@ func (e *SyncedEnforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIn
 }
 
 // AddFunction adds a customized function.
-func (e *SyncedEnforcer) AddFunction(name string, function govaluate.ExpressionFunction) {
+func (e *SyncedEnforcer) AddFunction(name string, function interface{}) {
 	e.m.Lock()
 	defer e.m.Unlock()
 	e.Enforcer.AddFunction(name, function)
