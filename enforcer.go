@@ -1065,17 +1065,17 @@ type enforceParameters struct {
 // ToMap converts enforceParameters to a map suitable for expr evaluation.
 func (p enforceParameters) ToMap() map[string]interface{} {
 	env := make(map[string]interface{})
-	
+
 	// Add r parameters
 	for token, index := range p.rTokens {
 		env[token] = p.rVals[index]
 	}
-	
+
 	// Add p parameters
 	for token, index := range p.pTokens {
 		env[token] = p.pVals[index]
 	}
-	
+
 	return env
 }
 
