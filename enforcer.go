@@ -30,6 +30,7 @@ import (
 	"github.com/casbin/casbin/v3/rbac"
 	defaultrolemanager "github.com/casbin/casbin/v3/rbac/default-role-manager"
 	"github.com/casbin/casbin/v3/util"
+
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
 )
