@@ -19,10 +19,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/casbin/casbin/v3/constant"
-	"github.com/casbin/casbin/v3/util"
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
+
+	"github.com/casbin/casbin/v3/constant"
+	"github.com/casbin/casbin/v3/util"
 )
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
