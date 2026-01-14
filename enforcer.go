@@ -821,7 +821,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			for k, v := range functions {
 				env[k] = v
 			}
-			
+
 			result, err := expr.Run(expression, env)
 			// log.LogPrint("Result: ", result)
 
