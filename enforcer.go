@@ -21,9 +21,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/expr-lang/expr"
-	"github.com/expr-lang/expr/vm"
-
 	"github.com/casbin/casbin/v3/detector"
 	"github.com/casbin/casbin/v3/effector"
 	"github.com/casbin/casbin/v3/log"
@@ -33,6 +30,8 @@ import (
 	"github.com/casbin/casbin/v3/rbac"
 	defaultrolemanager "github.com/casbin/casbin/v3/rbac/default-role-manager"
 	"github.com/casbin/casbin/v3/util"
+	"github.com/expr-lang/expr"
+	"github.com/expr-lang/expr/vm"
 )
 
 // Enforcer is the main interface for authorization enforcement and policy management.
