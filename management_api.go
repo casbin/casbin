@@ -203,7 +203,7 @@ func (e *Enforcer) GetFilteredNamedPolicyWithMatcher(ptype string, matcher strin
 			for k, v := range functions {
 				evalEnv[k] = v
 			}
-			
+
 			result, err := expr.Run(expression, evalEnv)
 
 			if err != nil {
