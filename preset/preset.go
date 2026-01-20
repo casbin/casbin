@@ -18,6 +18,23 @@ import (
 	"github.com/casbin/casbin/v3/model"
 )
 
+const rbacModelText = `
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+`
+
 // RBAC returns a standard RBAC model.
 // This is equivalent to a model.conf with:
 //
@@ -36,22 +53,11 @@ import (
 //	[matchers]
 //	m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 func RBAC() model.Model {
-	text := `
-[request_definition]
-r = sub, obj, act
-
-[policy_definition]
-p = sub, obj, act
-
-[role_definition]
-g = _, _
-
-[policy_effect]
-e = some(where (p.eft == allow))
-
-[matchers]
-m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
-`
-	m, _ := model.NewModelFromString(text)
+	// Model creation from this hardcoded valid text should never fail.
+	// If it does, it indicates a programming error in the preset definition.
+	m, err := model.NewModelFromString(rbacModelText)
+	if err != nil {
+		panic("preset: failed to create RBAC model: " + err.Error())
+	}
 	return m
 }
