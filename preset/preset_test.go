@@ -17,7 +17,7 @@ package preset
 import (
 	"testing"
 
-	"github.com/casbin/casbin/v3"
+	casbin "github.com/casbin/casbin/v3"
 	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
 )
 

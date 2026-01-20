@@ -17,7 +17,7 @@ package rbac
 import (
 	"testing"
 
-	"github.com/casbin/casbin/v3"
+	casbin "github.com/casbin/casbin/v3"
 	"github.com/casbin/casbin/v3/preset"
 )
 

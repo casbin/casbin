@@ -15,7 +15,7 @@
 package rbac
 
 import (
-	"github.com/casbin/casbin/v3"
+	casbin "github.com/casbin/casbin/v3"
 )
 
 // AssignRole assigns a role to a user.
