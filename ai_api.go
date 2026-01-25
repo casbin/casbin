@@ -272,4 +272,3 @@ func (e *Enforcer) evaluateAIPolicy(policyDescription string, rvals []interface{
 	// If response doesn't clearly start with ALLOW or DENY, deny by default for safety
 	return false, nil
 }
-

@@ -680,6 +680,58 @@ func (e *Enforcer) invalidateMatcherMap() {
 	e.matcherMap = sync.Map{}
 }
 
+// checkAIPolicies evaluates AI policies and returns true if any policy allows the request.
+func (e *Enforcer) checkAIPolicies(rvals []interface{}) (bool, error) {
+	aType := "a"
+	
+	// Check if AI policies exist
+	if _, ok := e.model["a"]; !ok {
+		return false, nil
+	}
+	
+	aPolicies, ok := e.model["a"][aType]
+	if !ok || len(aPolicies.Policy) == 0 {
+		return false, nil
+	}
+	
+	// Evaluate AI policies
+	for _, aPolicy := range aPolicies.Policy {
+		if len(aPolicy) == 0 {
+			continue
+		}
+		
+		// The AI policy description is the first (and typically only) field
+		policyDescription := aPolicy[0]
+		allowed, err := e.evaluateAIPolicy(policyDescription, rvals)
+		if err != nil {
+			// If AI evaluation fails, log the error and continue with other AI policies
+			e.logAIPolicyError(err)
+			continue
+		}
+		
+		if allowed {
+			return true, nil
+		}
+	}
+	
+	return false, nil
+}
+
+// logAIPolicyError logs AI policy evaluation errors.
+func (e *Enforcer) logAIPolicyError(err error) {
+	if e.logger == nil {
+		return
+	}
+	
+	logEntry := &log.LogEntry{
+		EventType: "ai_policy_evaluation_error",
+		Error:     err,
+		StartTime: time.Now(),
+		EndTime:   time.Now(),
+	}
+	_ = e.logger.OnAfterEvent(logEntry)
+}
+
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
 	logEntry := e.onLogBeforeEventInEnforce(rvals)
@@ -801,44 +853,12 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	var explainIndex int
 
 	// Check AI policies first if they exist
-	aType := "a"
-	aiPolicyAllowed := false
-	if _, ok := e.model["a"]; ok {
-		if aPolicies, ok := e.model["a"][aType]; ok && len(aPolicies.Policy) > 0 {
-			// Evaluate AI policies
-			for _, aPolicy := range aPolicies.Policy {
-				if len(aPolicy) > 0 {
-					// The AI policy description is the first (and typically only) field
-					policyDescription := aPolicy[0]
-					allowed, err := e.evaluateAIPolicy(policyDescription, rvals)
-					if err != nil {
-						// If AI evaluation fails, log the error and continue with other AI policies
-						// This allows the system to try other AI policies or fall back to traditional policies
-						if e.logger != nil {
-							logEntry := &log.LogEntry{
-								EventType: "ai_policy_evaluation_error",
-								Error:     err,
-								StartTime: time.Now(),
-								EndTime:   time.Now(),
-							}
-							_ = e.logger.OnAfterEvent(logEntry)
-						}
-						continue
-					}
-					if allowed {
-						// AI policy allows the request
-						aiPolicyAllowed = true
-						break
-					}
-				}
-			}
-			// If we checked AI policies and one allowed the request, return true
-			if aiPolicyAllowed {
-				return true, nil
-			}
-			// If we checked AI policies but none allowed, fall through to traditional policies
-			// This allows combining AI and traditional policies
-		}
+	aiPolicyAllowed, err := e.checkAIPolicies(rvals)
+	if err != nil {
+		return false, err
+	}
+	if aiPolicyAllowed {
+		return true, nil
 	}
 
 	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") { //nolint:nestif // TODO: reduce function complexity
