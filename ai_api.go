@@ -145,18 +145,23 @@ func (e *Enforcer) buildExplainContext(rvals []interface{}, result bool, matched
 
 // callAIAPI calls the configured AI API to get an explanation.
 func (e *Enforcer) callAIAPI(explainContext string) (string, error) {
+	return e.callAIAPIWithSystemPrompt(explainContext, "You are an expert in access control and authorization systems. "+
+		"Explain why an authorization request was allowed or denied based on the "+
+		"provided access control model, policies, and enforcement result. "+
+		"Be clear, concise, and educational.")
+}
+
+// callAIAPIWithSystemPrompt calls the configured AI API with a custom system prompt.
+func (e *Enforcer) callAIAPIWithSystemPrompt(userContent, systemPrompt string) (string, error) {
 	// Prepare the request
 	messages := []aiMessage{
 		{
-			Role: "system",
-			Content: "You are an expert in access control and authorization systems. " +
-				"Explain why an authorization request was allowed or denied based on the " +
-				"provided access control model, policies, and enforcement result. " +
-				"Be clear, concise, and educational.",
+			Role:    "system",
+			Content: systemPrompt,
 		},
 		{
 			Role:    "user",
-			Content: fmt.Sprintf("Please explain the following authorization decision:\n\n%s", explainContext),
+			Content: userContent,
 		},
 	}
 
@@ -219,3 +224,46 @@ func (e *Enforcer) callAIAPI(explainContext string) (string, error) {
 
 	return chatResp.Choices[0].Message.Content, nil
 }
+
+// evaluateAIPolicy evaluates an AI policy by calling the configured LLM API.
+// It returns true if the AI policy allows the request, false otherwise.
+func (e *Enforcer) evaluateAIPolicy(policyDescription string, rvals []interface{}) (bool, error) {
+	if e.aiConfig.Endpoint == "" {
+		return false, errors.New("AI config not set, use SetAIConfig first")
+	}
+
+	// Build context for AI
+	var sb strings.Builder
+	sb.WriteString("Authorization Request:\n")
+	if len(rvals) > 0 {
+		sb.WriteString(fmt.Sprintf("Subject: %v\n", rvals[0]))
+	}
+	if len(rvals) > 1 {
+		sb.WriteString(fmt.Sprintf("Object: %v\n", rvals[1]))
+	}
+	if len(rvals) > 2 {
+		sb.WriteString(fmt.Sprintf("Action: %v\n", rvals[2]))
+	}
+
+	sb.WriteString(fmt.Sprintf("\nAI Policy Rule: %s\n", policyDescription))
+	sb.WriteString("\nQuestion: Does this request satisfy the AI policy rule? Answer with 'ALLOW' if yes, 'DENY' if no.")
+
+	// Call AI API
+	systemPrompt := "You are an AI security policy evaluator. " +
+		"Your task is to determine if an authorization request satisfies the given AI policy rule. " +
+		"Respond with ONLY the word 'ALLOW' or 'DENY' based on your evaluation."
+
+	response, err := e.callAIAPIWithSystemPrompt(sb.String(), systemPrompt)
+	if err != nil {
+		return false, fmt.Errorf("failed to evaluate AI policy: %w", err)
+	}
+
+	// Parse response
+	response = strings.TrimSpace(strings.ToUpper(response))
+	if strings.Contains(response, "ALLOW") {
+		return true, nil
+	}
+
+	return false, nil
+}
+

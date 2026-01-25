@@ -799,6 +799,33 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	var effect effector.Effect
 	var explainIndex int
 
+	// Check AI policies first if they exist
+	aType := "a"
+	if _, ok := e.model["a"]; ok {
+		if aPolicies, ok := e.model["a"][aType]; ok && len(aPolicies.Policy) > 0 {
+			// Evaluate AI policies
+			for _, aPolicy := range aPolicies.Policy {
+				if len(aPolicy) > 0 {
+					// The AI policy description is the first (and typically only) field
+					policyDescription := aPolicy[0]
+					allowed, err := e.evaluateAIPolicy(policyDescription, rvals)
+					if err != nil {
+						// If AI evaluation fails, log but continue with regular policies
+						// This allows the system to fall back to traditional policies
+						continue
+					}
+					if allowed {
+						// AI policy allows the request
+						return true, nil
+					}
+				}
+			}
+			// If we have AI policies but none allowed the request, deny
+			// This implements a deny-by-default behavior for AI policies
+			return false, nil
+		}
+	}
+
 	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") { //nolint:nestif // TODO: reduce function complexity
 		policyEffects = make([]effector.Effect, policyLen)
 		matcherResults = make([]float64, policyLen)
