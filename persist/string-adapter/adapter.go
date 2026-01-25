@@ -89,7 +89,7 @@ func (a *Adapter) SavePolicy(model model.Model) error {
 	if err := writer.Error(); err != nil {
 		return err
 	}
-	
+
 	a.Line = strings.TrimRight(tmp.String(), "\n")
 	return nil
 }

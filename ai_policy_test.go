@@ -73,8 +73,8 @@ func TestAIPolicyLoad(t *testing.T) {
 
 func TestAIPolicySave(t *testing.T) {
 	// Create a temporary file for testing
-	tmpFile := "/tmp/ai_policy_test.csv"
-	
+	tmpFile := t.TempDir() + "/ai_policy_test.csv"
+
 	e, err := NewEnforcer("examples/ai_policy_model.conf", "examples/ai_policy.csv")
 	if err != nil {
 		t.Fatal(err)
