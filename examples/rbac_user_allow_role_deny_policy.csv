@@ -1,0 +1,4 @@
+p, alice, data1, read, allow
+p, admin, data1, read, deny
+
+g, alice, admin
