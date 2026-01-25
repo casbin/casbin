@@ -105,6 +105,11 @@ func (model Model) ClearPolicy() {
 		ast.Policy = nil
 		ast.PolicyMap = map[string]int{}
 	}
+
+	for _, ast := range model["a"] {
+		ast.Policy = nil
+		ast.PolicyMap = map[string]int{}
+	}
 }
 
 // GetPolicy gets all rules in a policy.
