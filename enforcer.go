@@ -700,9 +700,9 @@ func (e *Enforcer) checkAIPolicies(rvals []interface{}) (bool, error) {
 			continue
 		}
 
-		// The AI policy description is the first (and typically only) field
-		policyDescription := aPolicy[0]
-		allowed, err := e.evaluateAIPolicy(policyDescription, rvals)
+		// The AI policy prompt is the first (and typically only) field
+		policyPrompt := aPolicy[0]
+		allowed, err := e.evaluateAIPolicy(policyPrompt, rvals)
 		if err != nil {
 			// If AI evaluation fails, log the error and continue with other AI policies
 			e.logAIPolicyError(err)

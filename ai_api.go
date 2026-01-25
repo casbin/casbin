@@ -227,7 +227,7 @@ func (e *Enforcer) callAIAPIWithSystemPrompt(userContent, systemPrompt string) (
 
 // evaluateAIPolicy evaluates an AI policy by calling the configured LLM API.
 // It returns true if the AI policy allows the request, false otherwise.
-func (e *Enforcer) evaluateAIPolicy(policyDescription string, rvals []interface{}) (bool, error) {
+func (e *Enforcer) evaluateAIPolicy(policyPrompt string, rvals []interface{}) (bool, error) {
 	if e.aiConfig.Endpoint == "" {
 		return false, errors.New("AI config not set, use SetAIConfig first")
 	}
@@ -245,7 +245,7 @@ func (e *Enforcer) evaluateAIPolicy(policyDescription string, rvals []interface{
 		sb.WriteString(fmt.Sprintf("Action: %v\n", rvals[2]))
 	}
 
-	sb.WriteString(fmt.Sprintf("\nAI Policy Rule: %s\n", policyDescription))
+	sb.WriteString(fmt.Sprintf("\nAI Policy Rule: %s\n", policyPrompt))
 	sb.WriteString("\nQuestion: Does this request satisfy the AI policy rule? Answer with 'ALLOW' if yes, 'DENY' if no.")
 
 	// Call AI API
