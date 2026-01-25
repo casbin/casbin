@@ -32,10 +32,10 @@ func TestExplainWithoutConfig(t *testing.T) {
 
 	_, err = e.Explain("alice", "data1", "read")
 	if err == nil {
-		t.Error("Expected error when explain config is not set")
+		t.Error("Expected error when AI config is not set")
 	}
-	if !strings.Contains(err.Error(), "explain config not set") {
-		t.Errorf("Expected 'explain config not set' error, got: %v", err)
+	if !strings.Contains(err.Error(), "AI config not set") {
+		t.Errorf("Expected 'AI config not set' error, got: %v", err)
 	}
 }
 
@@ -94,8 +94,8 @@ func TestExplainWithMockAPI(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Set explain config with mock server
-	e.SetExplainConfig(ExplainConfig{
+	// Set AI config with mock server
+	e.SetAIConfig(AIConfig{
 		Endpoint: mockServer.URL,
 		APIKey:   "test-api-key",
 		Model:    "gpt-3.5-turbo",
@@ -146,8 +146,8 @@ func TestExplainDenied(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Set explain config
-	e.SetExplainConfig(ExplainConfig{
+	// Set AI config
+	e.SetAIConfig(AIConfig{
 		Endpoint: mockServer.URL,
 		APIKey:   "test-api-key",
 		Model:    "gpt-3.5-turbo",
@@ -193,8 +193,8 @@ func TestExplainAPIError(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Set explain config
-	e.SetExplainConfig(ExplainConfig{
+	// Set AI config
+	e.SetAIConfig(AIConfig{
 		Endpoint: mockServer.URL,
 		APIKey:   "invalid-key",
 		Model:    "gpt-3.5-turbo",

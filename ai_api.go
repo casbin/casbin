@@ -26,8 +26,8 @@ import (
 	"time"
 )
 
-// ExplainConfig contains configuration for AI-based explanations.
-type ExplainConfig struct {
+// AIConfig contains configuration for AI API calls.
+type AIConfig struct {
 	// Endpoint is the API endpoint (e.g., "https://api.openai.com/v1/chat/completions")
 	Endpoint string
 	// APIKey is the authentication key for the API
@@ -60,19 +60,19 @@ type aiChatResponse struct {
 	} `json:"error,omitempty"`
 }
 
-// SetExplainConfig sets the configuration for AI-based explanations.
-func (e *Enforcer) SetExplainConfig(config ExplainConfig) {
+// SetAIConfig sets the configuration for AI API calls.
+func (e *Enforcer) SetAIConfig(config AIConfig) {
 	if config.Timeout == 0 {
 		config.Timeout = 30 * time.Second
 	}
-	e.explainConfig = config
+	e.aiConfig = config
 }
 
 // Explain returns an AI-generated explanation of why Enforce returned a particular result.
 // It calls the configured OpenAI-compatible API to generate a natural language explanation.
 func (e *Enforcer) Explain(rvals ...interface{}) (string, error) {
-	if e.explainConfig.Endpoint == "" {
-		return "", errors.New("explain config not set, use SetExplainConfig first")
+	if e.aiConfig.Endpoint == "" {
+		return "", errors.New("AI config not set, use SetAIConfig first")
 	}
 
 	// Get enforcement result and matched rules
@@ -161,7 +161,7 @@ func (e *Enforcer) callAIAPI(explainContext string) (string, error) {
 	}
 
 	reqBody := aiChatRequest{
-		Model:    e.explainConfig.Model,
+		Model:    e.aiConfig.Model,
 		Messages: messages,
 	}
 
@@ -171,16 +171,16 @@ func (e *Enforcer) callAIAPI(explainContext string) (string, error) {
 	}
 
 	// Create HTTP request with context
-	reqCtx, cancel := context.WithTimeout(context.Background(), e.explainConfig.Timeout)
+	reqCtx, cancel := context.WithTimeout(context.Background(), e.aiConfig.Timeout)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(reqCtx, http.MethodPost, e.explainConfig.Endpoint, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequestWithContext(reqCtx, http.MethodPost, e.aiConfig.Endpoint, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+e.explainConfig.APIKey)
+	req.Header.Set("Authorization", "Bearer "+e.aiConfig.APIKey)
 
 	// Execute request
 	client := &http.Client{}

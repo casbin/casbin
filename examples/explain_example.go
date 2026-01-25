@@ -31,7 +31,7 @@ func main() {
 
 	// Configure the Explain API with OpenAI-compatible endpoint
 	// This can be OpenAI, Azure OpenAI, or any compatible API
-	e.SetExplainConfig(casbin.ExplainConfig{
+	e.SetAIConfig(casbin.AIConfig{
 		Endpoint: "https://api.openai.com/v1/chat/completions",
 		APIKey:   "your-api-key-here", // Replace with your actual API key
 		Model:    "gpt-3.5-turbo",      // Or "gpt-4" for better explanations
