@@ -20,6 +20,7 @@ import (
 	"runtime/debug"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/casbin/casbin/v3/detector"
 	"github.com/casbin/casbin/v3/effector"
@@ -811,8 +812,17 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 					policyDescription := aPolicy[0]
 					allowed, err := e.evaluateAIPolicy(policyDescription, rvals)
 					if err != nil {
-						// If AI evaluation fails, log but continue with other AI policies
+						// If AI evaluation fails, log the error and continue with other AI policies
 						// This allows the system to try other AI policies or fall back to traditional policies
+						if e.logger != nil {
+							logEntry := &log.LogEntry{
+								EventType: "ai_policy_evaluation_error",
+								Error:     err,
+								StartTime: time.Now(),
+								EndTime:   time.Now(),
+							}
+							_ = e.logger.OnAfterEvent(logEntry)
+						}
 						continue
 					}
 					if allowed {

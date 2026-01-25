@@ -260,10 +260,16 @@ func (e *Enforcer) evaluateAIPolicy(policyDescription string, rvals []interface{
 
 	// Parse response
 	response = strings.TrimSpace(strings.ToUpper(response))
-	if strings.Contains(response, "ALLOW") {
+	// More robust parsing: check if response starts with ALLOW or DENY
+	// to avoid false positives like "I cannot ALLOW this"
+	if strings.HasPrefix(response, "ALLOW") {
 		return true, nil
 	}
+	if strings.HasPrefix(response, "DENY") {
+		return false, nil
+	}
 
+	// If response doesn't clearly start with ALLOW or DENY, deny by default for safety
 	return false, nil
 }
 
