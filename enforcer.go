@@ -683,23 +683,23 @@ func (e *Enforcer) invalidateMatcherMap() {
 // checkAIPolicies evaluates AI policies and returns true if any policy allows the request.
 func (e *Enforcer) checkAIPolicies(rvals []interface{}) (bool, error) {
 	aType := "a"
-	
+
 	// Check if AI policies exist
 	if _, ok := e.model["a"]; !ok {
 		return false, nil
 	}
-	
+
 	aPolicies, ok := e.model["a"][aType]
 	if !ok || len(aPolicies.Policy) == 0 {
 		return false, nil
 	}
-	
+
 	// Evaluate AI policies
 	for _, aPolicy := range aPolicies.Policy {
 		if len(aPolicy) == 0 {
 			continue
 		}
-		
+
 		// The AI policy description is the first (and typically only) field
 		policyDescription := aPolicy[0]
 		allowed, err := e.evaluateAIPolicy(policyDescription, rvals)
@@ -708,12 +708,12 @@ func (e *Enforcer) checkAIPolicies(rvals []interface{}) (bool, error) {
 			e.logAIPolicyError(err)
 			continue
 		}
-		
+
 		if allowed {
 			return true, nil
 		}
 	}
-	
+
 	return false, nil
 }
 
@@ -722,7 +722,7 @@ func (e *Enforcer) logAIPolicyError(err error) {
 	if e.logger == nil {
 		return
 	}
-	
+
 	logEntry := &log.LogEntry{
 		EventType: "ai_policy_evaluation_error",
 		Error:     err,
