@@ -69,7 +69,7 @@ func (e *DefaultEffector) MergeEffects(expr string, effects []Effect, matches []
 		// short-circuit some effects in the middle
 		if policyIndex < policyLength-1 {
 			// choose not to short-circuit
-			return Indeterminate, -1, nil
+			return result, explainIndex, nil
 		}
 		// At the last policy, scan for any matched Allow
 		// This is necessary because we must check all policies for deny first
