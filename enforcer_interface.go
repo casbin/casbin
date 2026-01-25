@@ -41,6 +41,7 @@ type IEnforcer interface {
 	GetRoleManager() rbac.RoleManager
 	SetRoleManager(rm rbac.RoleManager)
 	SetEffector(eft effector.Effector)
+	SetAIConfig(config AIConfig)
 	ClearPolicy()
 	LoadPolicy() error
 	LoadFilteredPolicy(filter interface{}) error
@@ -58,6 +59,7 @@ type IEnforcer interface {
 	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error)
 	BatchEnforce(requests [][]interface{}) ([]bool, error)
 	BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error)
+	Explain(rvals ...interface{}) (string, error)
 
 	/* RBAC API */
 	GetRolesForUser(name string, domain ...string) ([]string, error)
