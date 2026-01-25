@@ -62,14 +62,14 @@ func (e *Enforcer) AddAIPolicies(rules [][]string) (bool, error) {
 // If the rule already exists, the function returns false and the rule will not be added.
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddNamedAIPolicy(ptype string, params ...string) (bool, error) {
-	return e.addPolicyInternal("a", ptype, params)
+	return e.addPolicy("a", ptype, params)
 }
 
 // AddNamedAIPolicies adds AI policy rules to the current named policy.
 // If the rule already exists, the function returns false for the corresponding policy rule and the rule will not be added.
 // Otherwise the function returns true for the corresponding policy rule by adding the new rule.
 func (e *Enforcer) AddNamedAIPolicies(ptype string, rules [][]string) (bool, error) {
-	return e.addPoliciesInternal("a", ptype, rules)
+	return e.addPolicies("a", ptype, rules, false)
 }
 
 // RemoveAIPolicy removes an AI policy rule from the current policy.
@@ -89,17 +89,17 @@ func (e *Enforcer) RemoveFilteredAIPolicy(fieldIndex int, fieldValues ...string)
 
 // RemoveNamedAIPolicy removes an AI policy rule from the current named policy.
 func (e *Enforcer) RemoveNamedAIPolicy(ptype string, params ...string) (bool, error) {
-	return e.removePolicyInternal("a", ptype, params)
+	return e.removePolicy("a", ptype, params)
 }
 
 // RemoveNamedAIPolicies removes AI policy rules from the current named policy.
 func (e *Enforcer) RemoveNamedAIPolicies(ptype string, rules [][]string) (bool, error) {
-	return e.removePoliciesInternal("a", ptype, rules)
+	return e.removePolicies("a", ptype, rules)
 }
 
 // RemoveFilteredNamedAIPolicy removes an AI policy rule from the current named policy, field filters can be specified.
 func (e *Enforcer) RemoveFilteredNamedAIPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
-	return e.removeFilteredPolicyInternal("a", ptype, fieldIndex, fieldValues...)
+	return e.removeFilteredPolicy("a", ptype, fieldIndex, fieldValues)
 }
 
 // UpdateAIPolicy updates an AI policy rule from the current policy.
@@ -114,10 +114,10 @@ func (e *Enforcer) UpdateAIPolicies(oldPolicies [][]string, newPolicies [][]stri
 
 // UpdateNamedAIPolicy updates an AI policy rule from the current named policy.
 func (e *Enforcer) UpdateNamedAIPolicy(ptype string, oldPolicy []string, newPolicy []string) (bool, error) {
-	return e.updatePolicyInternal("a", ptype, oldPolicy, newPolicy)
+	return e.updatePolicy("a", ptype, oldPolicy, newPolicy)
 }
 
 // UpdateNamedAIPolicies updates AI policy rules from the current named policy.
 func (e *Enforcer) UpdateNamedAIPolicies(ptype string, oldPolicies [][]string, newPolicies [][]string) (bool, error) {
-	return e.updatePoliciesInternal("a", ptype, oldPolicies, newPolicies)
+	return e.updatePolicies("a", ptype, oldPolicies, newPolicies)
 }
