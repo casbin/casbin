@@ -1,0 +1,7 @@
+p, alice, data1, read, allow
+p, bob, data2, write, rate_limit
+p, data2_admin, data2, read, allow
+p, data2_admin, data2, write, allow
+p, charlie, data3, read, rate_limit
+
+g, alice, data2_admin
