@@ -9,6 +9,11 @@ try:
     lines = p.read_text(encoding="utf-8").splitlines()
     processed_lines = []
     in_code = False
+    delta_col = None  # record "Diff" column start per table
+    align_hint = None  # derived from benchstat header last pipe position
+
+    ALIGN_COLUMN = 60  # fallback alignment when header not found
+
     def strip_worker_suffix(text: str) -> str:
         return re.sub(r'(\S+?)-\d+(\s|$)', r'\1\2', text)
 
@@ -117,8 +122,6 @@ try:
     # Diff column width ~12 chars (e.g. "+100.00% 🚀")
     right_boundary = diff_col_start + 14
 
-    # Reset code fence tracking state for Pass 1
-    in_code = False
     for line in lines:
 
         if line.strip() == "```":
@@ -146,6 +149,12 @@ try:
             stripped_header = re.sub(r'\s+Delta\b', '', stripped_header, flags=re.IGNORECASE)
 
             # Pad to diff_col_start
+            padding = diff_col_start - len(stripped_header)
+            if padding < 2: 
+                padding = 2 # minimum spacing
+                # If header is wider than data (unlikely but possible), adjust diff_col_start
+                # But for now let's trust max_content_width or just append
+            
             if len(stripped_header) < diff_col_start:
                 new_header = stripped_header + " " * (diff_col_start - len(stripped_header))
             else:
@@ -169,6 +178,7 @@ try:
             processed_lines.append(line)
             continue
 
+        original_line = line
         line = strip_worker_suffix(line)
         tokens = line.split()
         if not tokens:
