@@ -44,6 +44,7 @@ var sectionNameMap = map[string]string{
 	"e": "policy_effect",
 	"m": "matchers",
 	"c": "constraint_definition",
+	"a": "ai_definition",
 }
 
 // Minimal required sections for a model to be valid.
@@ -78,7 +79,7 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 	ast.PolicyMap = make(map[string]int)
 	ast.FieldIndexMap = make(map[string]int)
 
-	if sec == "r" || sec == "p" {
+	if sec == "r" || sec == "p" || sec == "a" {
 		ast.Tokens = strings.Split(ast.Value, ",")
 		for i := range ast.Tokens {
 			ast.Tokens[i] = key + "_" + strings.TrimSpace(ast.Tokens[i])
@@ -187,6 +188,10 @@ func (model Model) LoadModelFromText(text string) error {
 func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 	for s := range sectionNameMap {
 		loadSection(model, cfg, s)
+		// Special handling for AI section to load "ai" key
+		if s == "a" {
+			loadAssertion(model, cfg, s, "ai")
+		}
 	}
 	ms := make([]string, 0)
 	for _, rs := range requiredSections {

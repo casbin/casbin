@@ -1,0 +1,6 @@
+p, alice, data1, read, 09:00, 18:00
+p, bob, data2, write, 13:00, 16:00
+
+g, cathy, alice
+
+ai, "if the request object contains anything like credential/secret leak, then deny"

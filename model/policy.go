@@ -105,6 +105,11 @@ func (model Model) ClearPolicy() {
 		ast.Policy = nil
 		ast.PolicyMap = map[string]int{}
 	}
+
+	for _, ast := range model["a"] {
+		ast.Policy = nil
+		ast.PolicyMap = map[string]int{}
+	}
 }
 
 // GetPolicy gets all rules in a policy.
@@ -148,11 +153,11 @@ func (model Model) HasPolicyEx(sec string, ptype string, rule []string) (bool, e
 		return false, err
 	}
 	switch sec {
-	case "p":
+	case "p", "a":
 		if len(rule) != len(assertion.Tokens) {
 			return false, fmt.Errorf(
 				"invalid policy rule size: expected %d, got %d, rule: %v",
-				len(model["p"][ptype].Tokens),
+				len(model[sec][ptype].Tokens),
 				len(rule),
 				rule)
 		}

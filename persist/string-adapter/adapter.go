@@ -16,12 +16,12 @@ package stringadapter
 
 import (
 	"bytes"
+	"encoding/csv"
 	"errors"
 	"strings"
 
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
-	"github.com/casbin/casbin/v3/util"
 )
 
 // Adapter is the string adapter for Casbin.
@@ -56,21 +56,40 @@ func (a *Adapter) LoadPolicy(model model.Model) error {
 // SavePolicy saves all policy rules to the storage.
 func (a *Adapter) SavePolicy(model model.Model) error {
 	var tmp bytes.Buffer
+	writer := csv.NewWriter(&tmp)
+
 	for ptype, ast := range model["p"] {
 		for _, rule := range ast.Policy {
-			tmp.WriteString(ptype + ", ")
-			tmp.WriteString(util.ArrayToString(rule))
-			tmp.WriteString("\n")
+			record := append([]string{ptype}, rule...)
+			if err := writer.Write(record); err != nil {
+				return err
+			}
 		}
 	}
 
 	for ptype, ast := range model["g"] {
 		for _, rule := range ast.Policy {
-			tmp.WriteString(ptype + ", ")
-			tmp.WriteString(util.ArrayToString(rule))
-			tmp.WriteString("\n")
+			record := append([]string{ptype}, rule...)
+			if err := writer.Write(record); err != nil {
+				return err
+			}
 		}
 	}
+
+	for ptype, ast := range model["a"] {
+		for _, rule := range ast.Policy {
+			record := append([]string{ptype}, rule...)
+			if err := writer.Write(record); err != nil {
+				return err
+			}
+		}
+	}
+
+	writer.Flush()
+	if err := writer.Error(); err != nil {
+		return err
+	}
+	
 	a.Line = strings.TrimRight(tmp.String(), "\n")
 	return nil
 }

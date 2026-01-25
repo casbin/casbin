@@ -41,6 +41,7 @@ type Filter struct {
 	G3 []string
 	G4 []string
 	G5 []string
+	AI []string
 }
 
 // NewFilteredAdapter is the constructor for FilteredAdapter.
@@ -137,6 +138,8 @@ func filterLine(line string, filter *Filter) bool {
 		filterSlice = filter.G4
 	case "g5":
 		filterSlice = filter.G5
+	case "ai":
+		filterSlice = filter.AI
 	}
 	return filterWords(p, filterSlice)
 }
