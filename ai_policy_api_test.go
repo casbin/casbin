@@ -275,20 +275,36 @@ func TestAIPolicyWithoutAIConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Add a traditional policy first (using IP addresses since the model uses ipMatch)
+	_, err = e.AddPolicy("192.168.1.0/24", "data1", "read")
+	if err != nil {
+		t.Fatalf("AddPolicy failed: %v", err)
+	}
+
 	// Add an AI policy without setting AI config
 	_, err = e.AddAIPolicy("allow all requests")
 	if err != nil {
 		t.Fatalf("AddAIPolicy failed: %v", err)
 	}
 
-	// Test enforcement - should fall back to deny since AI evaluation fails
-	allowed, err := e.Enforce("alice", "data1", "read")
+	// Test enforcement - should fall through to traditional policies since AI evaluation fails
+	// 192.168.1.5 has permission to read data1 from the policy we just added
+	allowed, err := e.Enforce("192.168.1.5", "data1", "read")
 	if err != nil {
 		t.Fatalf("Enforce failed: %v", err)
 	}
-	// Without AI config, AI policy evaluation will fail and be denied
+	// Without AI config, AI policy evaluation will fail and fall through to traditional policies
+	if !allowed {
+		t.Error("Expected request to be allowed by traditional policy when AI config is not set")
+	}
+
+	// Test a request that should be denied
+	allowed, err = e.Enforce("192.168.1.5", "data2", "write")
+	if err != nil {
+		t.Fatalf("Enforce failed: %v", err)
+	}
 	if allowed {
-		t.Error("Expected request to be denied when AI config is not set")
+		t.Error("Expected request to be denied when no matching policy exists")
 	}
 }
 

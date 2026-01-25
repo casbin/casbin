@@ -801,6 +801,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	// Check AI policies first if they exist
 	aType := "a"
+	aiPolicyAllowed := false
 	if _, ok := e.model["a"]; ok {
 		if aPolicies, ok := e.model["a"][aType]; ok && len(aPolicies.Policy) > 0 {
 			// Evaluate AI policies
@@ -810,19 +811,23 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 					policyDescription := aPolicy[0]
 					allowed, err := e.evaluateAIPolicy(policyDescription, rvals)
 					if err != nil {
-						// If AI evaluation fails, log but continue with regular policies
-						// This allows the system to fall back to traditional policies
+						// If AI evaluation fails, log but continue with other AI policies
+						// This allows the system to try other AI policies or fall back to traditional policies
 						continue
 					}
 					if allowed {
 						// AI policy allows the request
-						return true, nil
+						aiPolicyAllowed = true
+						break
 					}
 				}
 			}
-			// If we have AI policies but none allowed the request, deny
-			// This implements a deny-by-default behavior for AI policies
-			return false, nil
+			// If we checked AI policies and one allowed the request, return true
+			if aiPolicyAllowed {
+				return true, nil
+			}
+			// If we checked AI policies but none allowed, fall through to traditional policies
+			// This allows combining AI and traditional policies
 		}
 	}
 
