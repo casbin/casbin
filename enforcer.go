@@ -679,6 +679,16 @@ func (e *Enforcer) invalidateMatcherMap() {
 	e.matcherMap = sync.Map{}
 }
 
+// extractRequestParam extracts a string parameter from request values based on token name.
+func extractRequestParam(rvals []interface{}, rTokens map[string]int, tokenName string) string {
+	if idx, ok := rTokens[tokenName]; ok && idx < len(rvals) {
+		if val, ok := rvals[idx].(string); ok {
+			return val
+		}
+	}
+	return ""
+}
+
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
 	logEntry := e.onLogBeforeEventInEnforce(rvals)
@@ -798,6 +808,14 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	var effect effector.Effect
 	var explainIndex int
+
+	// If using RateLimitEffector, set request context
+	if rateLimitEft, ok := e.eft.(*effector.RateLimitEffector); ok {
+		sub := extractRequestParam(rvals, rTokens, rType+"_sub")
+		obj := extractRequestParam(rvals, rTokens, rType+"_obj")
+		act := extractRequestParam(rvals, rTokens, rType+"_act")
+		rateLimitEft.SetRequestContext(sub, obj, act)
+	}
 
 	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") { //nolint:nestif // TODO: reduce function complexity
 		policyEffects = make([]effector.Effect, policyLen)
