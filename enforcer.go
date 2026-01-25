@@ -679,6 +679,47 @@ func (e *Enforcer) invalidateMatcherMap() {
 	e.matcherMap = sync.Map{}
 }
 
+type policyEffectsBuffer struct {
+	values []effector.Effect
+}
+
+type matcherResultsBuffer struct {
+	values []float64
+}
+
+var globalPolicyEffectsPool = sync.Pool{New: func() interface{} { return &policyEffectsBuffer{values: make([]effector.Effect, 0)} }}
+var globalMatcherResultsPool = sync.Pool{New: func() interface{} { return &matcherResultsBuffer{values: make([]float64, 0)} }}
+
+func (e *Enforcer) getPolicyEffectsBuffer(size int) ([]effector.Effect, *policyEffectsBuffer) {
+	buffer := globalPolicyEffectsPool.Get().(*policyEffectsBuffer)
+	if cap(buffer.values) < size {
+		buffer.values = make([]effector.Effect, size)
+	} else {
+		buffer.values = buffer.values[:size]
+	}
+	return buffer.values, buffer
+}
+
+func (e *Enforcer) putPolicyEffectsBuffer(buffer *policyEffectsBuffer) {
+	buffer.values = buffer.values[:0]
+	globalPolicyEffectsPool.Put(buffer)
+}
+
+func (e *Enforcer) getMatcherResultsBuffer(size int) ([]float64, *matcherResultsBuffer) {
+	buffer := globalMatcherResultsPool.Get().(*matcherResultsBuffer)
+	if cap(buffer.values) < size {
+		buffer.values = make([]float64, size)
+	} else {
+		buffer.values = buffer.values[:size]
+	}
+	return buffer.values, buffer
+}
+
+func (e *Enforcer) putMatcherResultsBuffer(buffer *matcherResultsBuffer) {
+	buffer.values = buffer.values[:0]
+	globalMatcherResultsPool.Put(buffer)
+}
+
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
 	logEntry := e.onLogBeforeEventInEnforce(rvals)
@@ -793,15 +834,22 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			rvals)
 	}
 
-	var policyEffects []effector.Effect
-	var matcherResults []float64
-
 	var effect effector.Effect
 	var explainIndex int
 
 	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") { //nolint:nestif // TODO: reduce function complexity
-		policyEffects = make([]effector.Effect, policyLen)
-		matcherResults = make([]float64, policyLen)
+		policyEffects, policyEffectsBuffer := e.getPolicyEffectsBuffer(policyLen)
+		matcherResults, matcherResultsBuffer := e.getMatcherResultsBuffer(policyLen)
+		defer func() {
+			e.putPolicyEffectsBuffer(policyEffectsBuffer)
+			e.putMatcherResultsBuffer(matcherResultsBuffer)
+		}()
+		for i := range matcherResults {
+			matcherResults[i] = 0
+		}
+		for i := range policyEffects {
+			policyEffects[i] = 0
+		}
 
 		for policyIndex, pvals := range e.model["p"][pType].Policy {
 			// log.LogPrint("Policy Rule: ", pvals)
@@ -867,8 +915,12 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			return false, errors.New("please make sure rule exists in policy when using eval() in matcher")
 		}
 
-		policyEffects = make([]effector.Effect, 1)
-		matcherResults = make([]float64, 1)
+		policyEffects, policyEffectsBuffer := e.getPolicyEffectsBuffer(1)
+		matcherResults, matcherResultsBuffer := e.getMatcherResultsBuffer(1)
+		defer func() {
+			e.putPolicyEffectsBuffer(policyEffectsBuffer)
+			e.putMatcherResultsBuffer(matcherResultsBuffer)
+		}()
 		matcherResults[0] = 1
 
 		parameters.pVals = make([]string, len(parameters.pTokens))
