@@ -82,7 +82,6 @@ func TestAIPolicySave(t *testing.T) {
 
 	// Update adapter to save to temp file
 	e.SetAdapter(fileadapter.NewAdapter(tmpFile))
-	
 	// Save to the temporary file
 	err = e.SavePolicy()
 	if err != nil {
