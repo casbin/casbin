@@ -38,7 +38,7 @@ func JsonToMap(jsonStr string) (map[string]interface{}, error) {
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
 func EscapeAssertion(s string) string {
 	s = escapeAssertionRegex.ReplaceAllStringFunc(s, func(m string) string {
-		// Replace only the last dot with underscore (preserve the prefix character)
+		// Replace only the last dot with underscore (preserve the prefix character).
 		lastDotIdx := strings.LastIndex(m, ".")
 		if lastDotIdx > 0 {
 			return m[:lastDotIdx] + "_"
@@ -311,9 +311,56 @@ func EscapeStringLiterals(expr string) string {
 	return result.String()
 }
 
+// smallSliceThreshold is the threshold for using the fast path (linear scan).
+// instead of the slow path (map-based deduplication).
+// For small slices, linear scan avoids map allocation overhead.
+const smallSliceThreshold = 10
+
+// RemoveDuplicateElement removes duplicate elements from a string slice.
+// It uses a fast path (linear scan) for small slices and a slow path (map-based)
+// for larger slices to optimize performance.
 func RemoveDuplicateElement(s []string) []string {
+	n := len(s)
+	if n == 0 {
+		return []string{}
+	}
+	if n == 1 {
+		return []string{s[0]}
+	}
+
+	// Fast path: for small slices, use linear scan to avoid map allocation.
+	if n <= smallSliceThreshold {
+		return removeDuplicateElementLinear(s)
+	}
+
+	// Slow path: for larger slices, use map-based deduplication.
+	return removeDuplicateElementMap(s)
+}
+
+// removeDuplicateElementLinear removes duplicates using O(n^2) linear scan.
+// This is more efficient for small slices as it avoids map allocation overhead.
+func removeDuplicateElementLinear(s []string) []string {
 	result := make([]string, 0, len(s))
-	temp := map[string]struct{}{}
+	for _, item := range s {
+		found := false
+		for _, existing := range result {
+			if item == existing {
+				found = true
+				break
+			}
+		}
+		if !found {
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// removeDuplicateElementMap removes duplicates using a map for O(n) time complexity.
+// This is more efficient for larger slices despite the map allocation overhead.
+func removeDuplicateElementMap(s []string) []string {
+	result := make([]string, 0, len(s))
+	temp := make(map[string]struct{}, len(s))
 	for _, item := range s {
 		if _, ok := temp[item]; !ok {
 			temp[item] = struct{}{}
