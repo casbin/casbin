@@ -167,10 +167,7 @@ func (e *Enforcer) GetFilteredNamedPolicyWithMatcher(ptype string, matcher strin
 		return res, err
 	}
 
-	pTokens := make(map[string]int, len(e.model["p"][ptype].Tokens))
-	for i, token := range e.model["p"][ptype].Tokens {
-		pTokens[token] = i
-	}
+	pTokens := e.model["p"][ptype].TokenIndexMap
 
 	parameters := enforceParameters{
 		pTokens: pTokens,

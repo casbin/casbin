@@ -80,13 +80,19 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 
 	if sec == "r" || sec == "p" {
 		ast.Tokens = strings.Split(ast.Value, ",")
+		ast.TokenIndexMap = make(map[string]int, len(ast.Tokens))
 		for i := range ast.Tokens {
 			ast.Tokens[i] = key + "_" + strings.TrimSpace(ast.Tokens[i])
+			ast.TokenIndexMap[ast.Tokens[i]] = i
 		}
 	} else if sec == "g" {
 		ast.ParamsTokens = getParamsToken(ast.Value)
 		ast.Tokens = strings.Split(ast.Value, ",")
 		ast.Tokens = ast.Tokens[:len(ast.Tokens)-len(ast.ParamsTokens)]
+		ast.TokenIndexMap = make(map[string]int, len(ast.Tokens))
+		for i, token := range ast.Tokens {
+			ast.TokenIndexMap[token] = i
+		}
 	} else {
 		ast.Value = util.RemoveComments(util.EscapeAssertion(ast.Value))
 	}

@@ -740,14 +740,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		expString = util.EscapeStringLiterals(util.RemoveComments(util.EscapeAssertion(matcher)))
 	}
 
-	rTokens := make(map[string]int, len(e.model["r"][rType].Tokens))
-	for i, token := range e.model["r"][rType].Tokens {
-		rTokens[token] = i
-	}
-	pTokens := make(map[string]int, len(e.model["p"][pType].Tokens))
-	for i, token := range e.model["p"][pType].Tokens {
-		pTokens[token] = i
-	}
+	rTokens := e.model["r"][rType].TokenIndexMap
+	pTokens := e.model["p"][pType].TokenIndexMap
 
 	if e.acceptJsonRequest {
 		// try to parse all request values from json to map[string]interface{}
