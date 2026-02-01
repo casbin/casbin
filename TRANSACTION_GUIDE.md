@@ -109,32 +109,29 @@ package main
 
 import (
     "context"
-    "database/sql"
     "fmt"
     "log"
 
     "github.com/casbin/casbin/v3"
-    _ "github.com/lib/pq"
 )
 
 type UserService struct {
-    db       *sql.DB
     enforcer *casbin.TransactionalEnforcer
 }
 
 // UpdateUserRole atomically updates user role in database and Casbin
 func (s *UserService) UpdateUserRole(ctx context.Context, userId, oldRole, newRole string) error {
     return s.enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
-        // Get database transaction from adapter
-        // (This requires your adapter to provide access to the DB transaction)
+        // Note: In a real application, you would access the database transaction
+        // from your adapter to ensure both database and Casbin operations
+        // happen in the same transaction. See the GORM example below.
         
-        // Update user role in business database
-        _, err := s.db.ExecContext(ctx, 
-            "UPDATE users SET role = $1 WHERE id = $2", 
-            newRole, userId)
-        if err != nil {
-            return fmt.Errorf("failed to update user role: %w", err)
-        }
+        // Example (pseudo-code):
+        // dbTx := tx.GetDatabaseTransaction() // Adapter-specific
+        // _, err := dbTx.Exec("UPDATE users SET role = $1 WHERE id = $2", newRole, userId)
+        // if err != nil {
+        //     return fmt.Errorf("failed to update user role: %w", err)
+        // }
         
         // Remove old role mapping in Casbin
         if oldRole != "" {
@@ -155,13 +152,13 @@ func (s *UserService) UpdateUserRole(ctx context.Context, userId, oldRole, newRo
 // CreateUser atomically creates a user with initial permissions
 func (s *UserService) CreateUser(ctx context.Context, userId, role string, permissions [][]string) error {
     return s.enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
-        // Insert user into database
-        _, err := s.db.ExecContext(ctx,
-            "INSERT INTO users (id, role) VALUES ($1, $2)",
-            userId, role)
-        if err != nil {
-            return fmt.Errorf("failed to create user: %w", err)
-        }
+        // Note: In a real application, you would insert into your database here
+        // Example (pseudo-code):
+        // dbTx := tx.GetDatabaseTransaction() // Adapter-specific
+        // _, err := dbTx.Exec("INSERT INTO users (id, role) VALUES ($1, $2)", userId, role)
+        // if err != nil {
+        //     return fmt.Errorf("failed to create user: %w", err)
+        // }
         
         // Assign role in Casbin
         if _, err := tx.AddGroupingPolicy(userId, role); err != nil {

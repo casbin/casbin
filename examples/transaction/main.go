@@ -158,6 +158,9 @@ func userRoleManagementExample() {
 			}
 
 			// Add role-specific permissions
+			// Note: In a real application, you would check these errors.
+			// For this example, we're showing the pattern and ignoring errors
+			// since the policies might already exist.
 			switch newRole {
 			case "admin":
 				tx.AddPolicy("admin", "data1", "write")
