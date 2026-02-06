@@ -22,7 +22,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== RBAC with Resource Scope Demo ===\n")
+	fmt.Println("=== RBAC with Resource Scope Demo ===")
 
 	// Simple Resource Scope Example
 	fmt.Println("--- Simple Resource Scope Example ---")
