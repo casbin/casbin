@@ -43,6 +43,7 @@ type Transaction struct {
 	rolledBack  bool                       // Whether the transaction has been rolled back.
 	startTime   time.Time                  // Transaction start timestamp.
 	mutex       sync.RWMutex               // Protects transaction state.
+	isExternal  bool                       // Whether the DB transaction is managed externally.
 }
 
 // AddPolicy adds a policy within the transaction.

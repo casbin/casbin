@@ -119,3 +119,58 @@ func (te *TransactionalEnforcer) WithTransaction(ctx context.Context, fn func(*T
 
 	return tx.Commit()
 }
+
+// BeginTransactionWithContext starts a new Casbin transaction using an existing TransactionContext.
+// This enables Casbin operations to participate in an externally-managed database transaction
+// (e.g. a GORM transaction). Casbin will apply buffered policy operations through
+// txContext.GetAdapter() but will NOT call txContext.Commit() or txContext.Rollback() —
+// the caller is solely responsible for committing or rolling back the external transaction.
+func (te *TransactionalEnforcer) BeginTransactionWithContext(ctx context.Context, txContext persist.TransactionContext) (*Transaction, error) {
+	buffer := NewTransactionBuffer(te.model)
+
+	tx := &Transaction{
+		id:          uuid.New().String(),
+		enforcer:    te,
+		buffer:      buffer,
+		txContext:   txContext,
+		ctx:         ctx,
+		baseVersion: atomic.LoadInt64(&te.modelVersion),
+		startTime:   time.Now(),
+		isExternal:  true,
+	}
+
+	te.activeTransactions.Store(tx.id, tx)
+	return tx, nil
+}
+
+// WithExternalTransaction executes fn within the scope of an existing, externally-managed
+// database transaction. txContext must wrap the external transaction and provide a
+// Casbin adapter (via GetAdapter) that writes through it.
+//
+// On success, Casbin applies the buffered policy operations to the database using the
+// external transaction and updates the in-memory model. The database transaction itself
+// is NOT committed by Casbin — the caller must commit (or roll back) it.
+//
+// On failure (fn returns an error or a panic occurs), Casbin does NOT roll back the
+// external transaction; the caller is responsible for that as well.
+func (te *TransactionalEnforcer) WithExternalTransaction(ctx context.Context, txContext persist.TransactionContext, fn func(*Transaction) error) error {
+	tx, err := te.BeginTransactionWithContext(ctx, txContext)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			_ = tx.Rollback()
+			panic(r)
+		}
+	}()
+
+	err = fn(tx)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
+}
