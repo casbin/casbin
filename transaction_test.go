@@ -451,8 +451,8 @@ func TestWithExternalTransaction(t *testing.T) {
 	extCtx := &externalTxContext{adapter: adapter}
 
 	err = e.WithExternalTransaction(ctx, extCtx, func(tx *Transaction) error {
-		_, err := tx.AddPolicy("bob", "data2", "write")
-		return err
+		_, addErr := tx.AddPolicy("bob", "data2", "write")
+		return addErr
 	})
 	if err != nil {
 		t.Fatalf("WithExternalTransaction failed: %v", err)
