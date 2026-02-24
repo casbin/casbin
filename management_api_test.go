@@ -199,6 +199,51 @@ func TestGetPolicyAPI(t *testing.T) {
 	testHasGroupingPolicy(t, e, []string{"bob", "data2_admin"}, false)
 }
 
+func TestGetStrictFilteredPolicyAPI(t *testing.T) {
+	e, _ := NewEnforcer("examples/basic_model.conf", "examples/basic_policy.csv")
+
+	// Add a policy with an empty string field to test strict matching.
+	_, _ = e.AddPolicy("", "data1", "read")
+
+	// "*" acts as wildcard - matches any value in the field.
+	myRes, err := e.GetStrictFilteredPolicy(0, "*")
+	if err != nil {
+		t.Error(err)
+	}
+	// All rules (alice and the empty-subject rule) should be returned.
+	if len(myRes) != 3 {
+		t.Errorf("Expected 3 rules with wildcard, got %d: %v", len(myRes), myRes)
+	}
+
+	// "" matches only rules where the subject is literally an empty string.
+	myRes, err = e.GetStrictFilteredPolicy(0, "")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(myRes) != 1 || myRes[0][0] != "" {
+		t.Errorf("Expected 1 rule with empty subject, got %d: %v", len(myRes), myRes)
+	}
+
+	// "alice" matches only the alice rule.
+	myRes, err = e.GetStrictFilteredPolicy(0, "alice")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(myRes) != 1 || myRes[0][0] != "alice" {
+		t.Errorf("Expected 1 rule for alice, got %d: %v", len(myRes), myRes)
+	}
+
+	// Mix: "*" wildcard for subject, specific action.
+	myRes, err = e.GetStrictFilteredPolicy(0, "*", "data1", "read")
+	if err != nil {
+		t.Error(err)
+	}
+	// Both alice->data1->read and ""->data1->read should match.
+	if len(myRes) != 2 {
+		t.Errorf("Expected 2 rules, got %d: %v", len(myRes), myRes)
+	}
+}
+
 func TestModifyPolicyAPI(t *testing.T) {
 	e, _ := NewEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")
 
