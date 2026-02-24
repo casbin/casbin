@@ -320,6 +320,24 @@ func (e *SyncedEnforcer) GetFilteredNamedPolicy(ptype string, fieldIndex int, fi
 	return e.Enforcer.GetFilteredNamedPolicy(ptype, fieldIndex, fieldValues...)
 }
 
+// GetStrictFilteredPolicy gets all the authorization rules in the policy, field filters can be specified.
+// In contrast to GetFilteredPolicy, "" (empty string) is treated as a literal empty string match,
+// and "*" is treated as a wildcard that matches any value.
+func (e *SyncedEnforcer) GetStrictFilteredPolicy(fieldIndex int, fieldValues ...string) ([][]string, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetStrictFilteredPolicy(fieldIndex, fieldValues...)
+}
+
+// GetStrictFilteredNamedPolicy gets all the authorization rules in the named policy, field filters can be specified.
+// In contrast to GetFilteredNamedPolicy, "" (empty string) is treated as a literal empty string match,
+// and "*" is treated as a wildcard that matches any value.
+func (e *SyncedEnforcer) GetStrictFilteredNamedPolicy(ptype string, fieldIndex int, fieldValues ...string) ([][]string, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetStrictFilteredNamedPolicy(ptype, fieldIndex, fieldValues...)
+}
+
 // GetGroupingPolicy gets all the role inheritance rules in the policy.
 func (e *SyncedEnforcer) GetGroupingPolicy() ([][]string, error) {
 	e.m.RLock()
@@ -346,6 +364,24 @@ func (e *SyncedEnforcer) GetFilteredNamedGroupingPolicy(ptype string, fieldIndex
 	e.m.RLock()
 	defer e.m.RUnlock()
 	return e.Enforcer.GetFilteredNamedGroupingPolicy(ptype, fieldIndex, fieldValues...)
+}
+
+// GetStrictFilteredGroupingPolicy gets all the role inheritance rules in the policy, field filters can be specified.
+// In contrast to GetFilteredGroupingPolicy, "" (empty string) is treated as a literal empty string match,
+// and "*" is treated as a wildcard that matches any value.
+func (e *SyncedEnforcer) GetStrictFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) ([][]string, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetStrictFilteredGroupingPolicy(fieldIndex, fieldValues...)
+}
+
+// GetStrictFilteredNamedGroupingPolicy gets all the role inheritance rules in the named policy, field filters can be specified.
+// In contrast to GetFilteredNamedGroupingPolicy, "" (empty string) is treated as a literal empty string match,
+// and "*" is treated as a wildcard that matches any value.
+func (e *SyncedEnforcer) GetStrictFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) ([][]string, error) {
+	e.m.RLock()
+	defer e.m.RUnlock()
+	return e.Enforcer.GetStrictFilteredNamedGroupingPolicy(ptype, fieldIndex, fieldValues...)
 }
 
 // HasPolicy determines whether an authorization rule exists.
