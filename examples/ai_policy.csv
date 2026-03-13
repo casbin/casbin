@@ -1,0 +1,4 @@
+p, 192.168.2.0/24, data1, read
+p, 10.0.0.0/16, data2, write
+a, "allow US residential IPs to read data1"
+a, "allow global cloud IPs to write data2"

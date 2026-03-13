@@ -20,6 +20,7 @@ import (
 	"runtime/debug"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/casbin/casbin/v3/detector"
 	"github.com/casbin/casbin/v3/effector"
@@ -679,6 +680,58 @@ func (e *Enforcer) invalidateMatcherMap() {
 	e.matcherMap = sync.Map{}
 }
 
+// checkAIPolicies evaluates AI policies and returns true if any policy allows the request.
+func (e *Enforcer) checkAIPolicies(rvals []interface{}) (bool, error) {
+	aType := "a"
+
+	// Check if AI policies exist
+	if _, ok := e.model["a"]; !ok {
+		return false, nil
+	}
+
+	aPolicies, ok := e.model["a"][aType]
+	if !ok || len(aPolicies.Policy) == 0 {
+		return false, nil
+	}
+
+	// Evaluate AI policies
+	for _, aPolicy := range aPolicies.Policy {
+		if len(aPolicy) == 0 {
+			continue
+		}
+
+		// The AI policy prompt is the first (and typically only) field
+		policyPrompt := aPolicy[0]
+		allowed, err := e.evaluateAIPolicy(policyPrompt, rvals)
+		if err != nil {
+			// If AI evaluation fails, log the error and continue with other AI policies
+			e.logAIPolicyError(err)
+			continue
+		}
+
+		if allowed {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+// logAIPolicyError logs AI policy evaluation errors.
+func (e *Enforcer) logAIPolicyError(err error) {
+	if e.logger == nil {
+		return
+	}
+
+	logEntry := &log.LogEntry{
+		EventType: "ai_policy_evaluation_error",
+		Error:     err,
+		StartTime: time.Now(),
+		EndTime:   time.Now(),
+	}
+	_ = e.logger.OnAfterEvent(logEntry)
+}
+
 // enforce use a custom matcher to decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (matcher, sub, obj, act), use model matcher by default when matcher is "".
 func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interface{}) (ok bool, err error) { //nolint:funlen,cyclop,gocyclo // TODO: reduce function complexity
 	logEntry := e.onLogBeforeEventInEnforce(rvals)
@@ -798,6 +851,15 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 	var effect effector.Effect
 	var explainIndex int
+
+	// Check AI policies first if they exist
+	aiPolicyAllowed, err := e.checkAIPolicies(rvals)
+	if err != nil {
+		return false, err
+	}
+	if aiPolicyAllowed {
+		return true, nil
+	}
 
 	if policyLen := len(e.model["p"][pType].Policy); policyLen != 0 && strings.Contains(expString, pType+"_") { //nolint:nestif // TODO: reduce function complexity
 		policyEffects = make([]effector.Effect, policyLen)
