@@ -662,3 +662,40 @@ func TestTestMatch(t *testing.T) {
 	testTimeMatch(t, "0000-01-01 00:00:00", "_", true)
 	testTimeMatch(t, "9999-12-30 00:00:00", "_", false)
 }
+
+// BenchmarkRegexMatch benchmarks the RegexMatch function with cached regex compilation
+func BenchmarkRegexMatch(b *testing.B) {
+patterns := []string{
+"/topic/create",
+"/topic/edit/[0-9]+",
+"/topic/delete/[0-9]+",
+"^/api/[a-z]+/[0-9]+$",
+"^/resource/[a-zA-Z0-9_-]+/action$",
+}
+inputs := []string{
+"/topic/create",
+"/topic/edit/123",
+"/topic/delete/456",
+"/api/users/789",
+"/resource/test_resource/action",
+}
+
+b.ResetTimer()
+for i := 0; i < b.N; i++ {
+pattern := patterns[i%len(patterns)]
+input := inputs[i%len(inputs)]
+RegexMatch(input, pattern)
+}
+}
+
+// BenchmarkRegexMatchSamePattern benchmarks RegexMatch with the same pattern repeatedly
+// This demonstrates the caching benefit
+func BenchmarkRegexMatchSamePattern(b *testing.B) {
+pattern := "/topic/edit/[0-9]+"
+input := "/topic/edit/123"
+
+b.ResetTimer()
+for i := 0; i < b.N; i++ {
+RegexMatch(input, pattern)
+}
+}
