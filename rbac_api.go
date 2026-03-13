@@ -310,6 +310,12 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 
 // GetNamedImplicitPermissionsForUser gets implicit permissions for a user or role by named policy.
 // Compared to GetNamedPermissionsForUser(), this function retrieves permissions for inherited roles.
+//
+// This function now supports complex matchers including:
+// - Wildcard domains (e.g., g(r.sub, p.sub, '*'))
+// - OR conditions in matchers (e.g., g(r.sub, p.sub, r.dom) || g(r.sub, p.sub, '*'))
+// - Domain pattern matching
+//
 // For example:
 // p, admin, data1, read
 // p2, admin, create
@@ -317,49 +323,156 @@ func (e *Enforcer) GetImplicitPermissionsForUser(user string, domain ...string) 
 //
 // GetImplicitPermissionsForUser("alice") can only get: [["admin", "data1", "read"]], whose policy is default policy "p"
 // But you can specify the named policy "p2" to get: [["admin", "create"]] by    GetNamedImplicitPermissionsForUser("p2","alice").
+//
+// For complex matchers with wildcard domains:
+// p, role1, data, read, *
+// g, user1, role1, tenant1
+// g, user1, role1, *
+//
+// GetImplicitPermissionsForUser("user1", "tenant1") will return: [["role1", "data", "read", "tenant1"]]
+// (Note: wildcard domains in policies are replaced with the requested domain).
 func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, gtype string, user string, domain ...string) ([][]string, error) {
 	permission := make([][]string, 0)
+
+	// Validate domain parameter
+	if len(domain) > 1 {
+		return nil, errors.ErrDomainParameter
+	}
+
+	// Get all policies for the specified policy type
+	if _, ok := e.model["p"][ptype]; !ok {
+		return permission, nil
+	}
+
+	// Get role manager for domain matching
 	rm := e.GetNamedRoleManager(gtype)
 	if rm == nil {
-		return nil, fmt.Errorf("role manager %s is not initialized", gtype)
-	}
+		// If no role manager, just check direct permissions
+		subIndex, err := e.GetFieldIndex(ptype, constant.SubjectIndex)
+		if err != nil {
+			subIndex = 0
+		}
 
-	roles, err := e.GetNamedImplicitRolesForUser(gtype, user, domain...)
-	if err != nil {
-		return nil, err
-	}
-	policyRoles := make(map[string]struct{}, len(roles)+1)
-	policyRoles[user] = struct{}{}
-	for _, r := range roles {
-		policyRoles[r] = struct{}{}
-	}
-
-	domainIndex, err := e.GetFieldIndex(ptype, constant.DomainIndex)
-	for _, rule := range e.model["p"][ptype].Policy {
-		if len(domain) == 0 {
-			if _, ok := policyRoles[rule[0]]; ok {
-				permission = append(permission, deepCopyPolicy(rule))
+		for _, rule := range e.model["p"][ptype].Policy {
+			if rule[subIndex] == user {
+				if e.policyMatchesDomain(ptype, rule, domain...) {
+					permission = append(permission, deepCopyPolicy(rule))
+				}
 			}
-			continue
 		}
-		if len(domain) > 1 {
-			return nil, errors.ErrDomainParameter
-		}
+		return permission, nil
+	}
+
+	// Get all roles for the user, considering complex matchers
+	rolesMap := make(map[string]bool)
+	rolesMap[user] = true // Include the user itself
+
+	// Get roles with the specific domain if provided
+	if len(domain) > 0 {
+		roles, err := e.GetNamedImplicitRolesForUser(gtype, user, domain[0])
 		if err != nil {
 			return nil, err
 		}
-		d := domain[0]
-		matched := rm.Match(d, rule[domainIndex])
-		if !matched {
-			continue
+		for _, role := range roles {
+			rolesMap[role] = true
 		}
-		if _, ok := policyRoles[rule[0]]; ok {
-			newRule := deepCopyPolicy(rule)
-			newRule[domainIndex] = d
-			permission = append(permission, newRule)
+
+		// Also get roles with wildcard domain
+		wildcardRoles, err := e.GetNamedImplicitRolesForUser(gtype, user, "*")
+		if err == nil {
+			for _, role := range wildcardRoles {
+				rolesMap[role] = true
+			}
+		}
+	} else {
+		// No domain specified - get all possible roles
+		// This requires getting roles for all possible domains
+		roles, err := e.GetNamedImplicitRolesForUser(gtype, user)
+		if err != nil {
+			return nil, err
+		}
+		for _, role := range roles {
+			rolesMap[role] = true
 		}
 	}
+
+	// Get subject index
+	subIndex, err := e.GetFieldIndex(ptype, constant.SubjectIndex)
+	if err != nil {
+		subIndex = 0
+	}
+
+	// Check each policy
+	for _, rule := range e.model["p"][ptype].Policy {
+		policySubject := rule[subIndex]
+
+		// Check if the policy subject is the user or one of their roles
+		if !rolesMap[policySubject] {
+			continue
+		}
+
+		// Check if the policy domain matches the requested domain
+		if !e.policyMatchesDomain(ptype, rule, domain...) {
+			continue
+		}
+
+		// If domain is specified and policy has wildcard domain, replace it
+		if len(domain) > 0 {
+			domIndex, err := e.GetFieldIndex(ptype, constant.DomainIndex)
+			if err == nil && domIndex < len(rule) && rule[domIndex] == "*" {
+				// Replace wildcard domain with requested domain
+				newRule := deepCopyPolicy(rule)
+				newRule[domIndex] = domain[0]
+				permission = append(permission, newRule)
+				continue
+			}
+		}
+		permission = append(permission, deepCopyPolicy(rule))
+	}
+
 	return permission, nil
+}
+
+// policyMatchesDomain checks if a policy matches the requested domain.
+func (e *Enforcer) policyMatchesDomain(ptype string, policy []string, domain ...string) bool {
+	// If no domain requested, include all policies
+	if len(domain) == 0 {
+		return true
+	}
+
+	// Get domain index
+	domIndex, err := e.GetFieldIndex(ptype, constant.DomainIndex)
+	if err != nil || domIndex >= len(policy) {
+		// No domain in policy - include it
+		return true
+	}
+
+	policyDomain := policy[domIndex]
+	requestedDomain := domain[0]
+
+	// Check for exact match
+	if policyDomain == requestedDomain {
+		return true
+	}
+
+	// Check for wildcard in policy
+	if policyDomain == "*" {
+		return true
+	}
+
+	// Use role manager to check for pattern matching if available
+	for _, rm := range e.rmMap {
+		if rm.Match(requestedDomain, policyDomain) {
+			return true
+		}
+	}
+	for _, crm := range e.condRmMap {
+		if crm.Match(requestedDomain, policyDomain) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // GetImplicitUsersForPermission gets implicit users for a permission.
