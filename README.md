@@ -39,6 +39,7 @@ Casbin is a powerful and efficient open-source access control library for Golang
 - [Get started](#get-started)
 - [Policy management](#policy-management)
 - [Policy persistence](#policy-persistence)
+- [Transaction support](#transaction-support)
 - [Policy consistence between multiple nodes](#policy-consistence-between-multiple-nodes)
 - [Role manager](#role-manager)
 - [Benchmarks](#benchmarks)
@@ -199,6 +200,29 @@ We also provide a [web-based UI](https://casbin.org/docs/admin-portal) for model
 ## Policy persistence
 
 https://casbin.org/docs/adapters
+
+## Transaction support
+
+Casbin provides built-in support for transactional policy updates through the `TransactionalEnforcer`. This allows you to ensure atomic consistency between Casbin policy operations and business database operations.
+
+```go
+// Create a transactional enforcer
+enforcer, _ := casbin.NewTransactionalEnforcer("model.conf", transactionalAdapter)
+
+// Use transactions to ensure atomicity
+err := enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
+    // Update business data in your database
+    db.UpdateUserRole(userId, "admin")
+    
+    // Update Casbin policies in the same transaction
+    tx.AddGroupingPolicy(userId, "admin")
+    tx.AddPolicy("admin", "resource", "write")
+    
+    return nil // Commits both changes atomically
+})
+```
+
+See [TRANSACTION_GUIDE.md](TRANSACTION_GUIDE.md) for comprehensive documentation and [examples/transaction](examples/transaction) for working examples.
 
 ## Policy consistence between multiple nodes
 
