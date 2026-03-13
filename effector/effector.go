@@ -22,6 +22,7 @@ const (
 	Allow Effect = iota
 	Indeterminate
 	Deny
+	RateLimit
 )
 
 // Effector is the interface for Casbin effectors.
