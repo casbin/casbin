@@ -141,6 +141,37 @@ func (model Model) GetFilteredPolicy(sec string, ptype string, fieldIndex int, f
 	return res, nil
 }
 
+// GetStrictFilteredPolicy gets rules based on field filters from a policy.
+// In contrast to GetFilteredPolicy, "" (empty string) is treated as a literal empty string match,
+// and "*" is treated as a wildcard that matches any value.
+func (model Model) GetStrictFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) ([][]string, error) {
+	_, err := model.GetAssertion(sec, ptype)
+	if err != nil {
+		return nil, err
+	}
+	res := [][]string{}
+
+	for _, rule := range model[sec][ptype].Policy {
+		matched := true
+		for i, fieldValue := range fieldValues {
+			if fieldIndex+i >= len(rule) {
+				matched = false
+				break
+			}
+			if fieldValue != "*" && rule[fieldIndex+i] != fieldValue {
+				matched = false
+				break
+			}
+		}
+
+		if matched {
+			res = append(res, rule)
+		}
+	}
+
+	return res, nil
+}
+
 // HasPolicyEx determines whether a model has the specified policy rule with error.
 func (model Model) HasPolicyEx(sec string, ptype string, rule []string) (bool, error) {
 	assertion, err := model.GetAssertion(sec, ptype)
