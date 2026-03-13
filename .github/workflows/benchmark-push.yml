@@ -1,0 +1,58 @@
+name: Push Benchmark Data
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  benchmark:
+    name: Run Benchmark & Push Data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Run Benchmark
+        run: |
+          go test -bench '.' -benchmem ./... > benchmark_result.txt
+
+      - name: Checkout Data Repo
+        uses: actions/checkout@v4
+        with:
+          repository: casbin/casbin-benchmark-data
+          token: ${{ secrets.CASBIN_BENCHMARK_DATA_TOKEN }}
+          path: benchmark-data
+
+      - name: Format Benchmark Data
+        env:
+          COMMIT_AUTHOR_EMAIL: ${{ github.event.head_commit.author.email }}
+          COMMIT_AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
+          COMMIT_AUTHOR_USERNAME: ${{ github.event.head_commit.author.username }}
+          COMMIT_COMMITTER_EMAIL: ${{ github.event.head_commit.committer.email }}
+          COMMIT_COMMITTER_NAME: ${{ github.event.head_commit.committer.name }}
+          COMMIT_COMMITTER_USERNAME: ${{ github.event.head_commit.committer.username }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          COMMIT_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
+          COMMIT_URL: ${{ github.event.head_commit.url }}
+          COMMIT_ID: ${{ github.event.head_commit.id }}
+        run: |
+          python .github/scripts/format_benchmark_data.py benchmark_result.txt formatted_result.json
+
+      - name: Push Benchmark Result
+        working-directory: benchmark-data
+        run: |
+          mkdir -p casbin
+          cp ../formatted_result.json casbin/benchmark-${{ github.sha }}.json
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add casbin/benchmark-${{ github.sha }}.json
+          git commit -m "Add benchmark result for casbin commit ${{ github.sha }}"
+          git push
