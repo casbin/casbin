@@ -335,3 +335,173 @@ func TestTransactionBuffer(t *testing.T) {
 
 	tx.Rollback()
 }
+
+// externalTxContext wraps a MockTransactionalAdapter to simulate an externally-managed
+// DB transaction (e.g. GORM). Commit and Rollback are intentional no-ops because the
+// external system owns the transaction lifecycle.
+type externalTxContext struct {
+	adapter    *MockTransactionalAdapter
+	committed  bool
+	rolledBack bool
+}
+
+func (e *externalTxContext) Commit() error {
+	e.committed = true
+	return nil
+}
+
+func (e *externalTxContext) Rollback() error {
+	e.rolledBack = true
+	return nil
+}
+
+func (e *externalTxContext) GetAdapter() persist.Adapter {
+	return e.adapter
+}
+
+// TestBeginTransactionWithContext verifies that Casbin operations are applied to the
+// database adapter but the external transaction's Commit/Rollback are never called.
+func TestBeginTransactionWithContext(t *testing.T) {
+	adapter := NewMockTransactionalAdapter()
+	e, err := NewTransactionalEnforcer("examples/rbac_model.conf", adapter)
+	if err != nil {
+		t.Fatalf("Failed to create transactional enforcer: %v", err)
+	}
+	adapter.Enforcer = e.Enforcer
+
+	ctx := context.Background()
+	extCtx := &externalTxContext{adapter: adapter}
+
+	tx, err := e.BeginTransactionWithContext(ctx, extCtx)
+	if err != nil {
+		t.Fatalf("Failed to begin transaction with context: %v", err)
+	}
+
+	ok, err := tx.AddPolicy("alice", "data1", "read")
+	if !ok || err != nil {
+		t.Fatalf("Failed to add policy in external transaction: %v", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("Failed to commit external transaction: %v", err)
+	}
+
+	// Casbin should NOT have called Commit on the external context.
+	if extCtx.committed {
+		t.Error("Casbin must not commit the external transaction context")
+	}
+	if extCtx.rolledBack {
+		t.Error("Casbin must not rollback the external transaction context")
+	}
+
+	// The in-memory model should reflect the added policy.
+	bufferedModel := e.GetModel()
+	hasPolicy, _ := bufferedModel.HasPolicy("p", "p", []string{"alice", "data1", "read"})
+	if !hasPolicy {
+		t.Fatal("In-memory model should contain the added policy after commit")
+	}
+}
+
+// TestBeginTransactionWithContextRollback verifies that rolling back an external
+// transaction does not touch the external DB transaction.
+func TestBeginTransactionWithContextRollback(t *testing.T) {
+	adapter := NewMockTransactionalAdapter()
+	e, err := NewTransactionalEnforcer("examples/rbac_model.conf", adapter)
+	if err != nil {
+		t.Fatalf("Failed to create transactional enforcer: %v", err)
+	}
+	adapter.Enforcer = e.Enforcer
+
+	ctx := context.Background()
+	extCtx := &externalTxContext{adapter: adapter}
+
+	tx, err := e.BeginTransactionWithContext(ctx, extCtx)
+	if err != nil {
+		t.Fatalf("Failed to begin transaction with context: %v", err)
+	}
+
+	if _, err := tx.AddPolicy("alice", "data1", "read"); err != nil {
+		t.Fatalf("Failed to add policy in external transaction: %v", err)
+	}
+
+	if err := tx.Rollback(); err != nil {
+		t.Fatalf("Failed to rollback external transaction: %v", err)
+	}
+
+	// Casbin should NOT have called Rollback on the external context.
+	if extCtx.rolledBack {
+		t.Error("Casbin must not rollback the external transaction context")
+	}
+	if extCtx.committed {
+		t.Error("Casbin must not commit the external transaction context")
+	}
+}
+
+// TestWithExternalTransaction verifies the convenience wrapper applies operations
+// and does not commit/rollback the external context.
+func TestWithExternalTransaction(t *testing.T) {
+	adapter := NewMockTransactionalAdapter()
+	e, err := NewTransactionalEnforcer("examples/rbac_model.conf", adapter)
+	if err != nil {
+		t.Fatalf("Failed to create transactional enforcer: %v", err)
+	}
+	adapter.Enforcer = e.Enforcer
+
+	ctx := context.Background()
+	extCtx := &externalTxContext{adapter: adapter}
+
+	err = e.WithExternalTransaction(ctx, extCtx, func(tx *Transaction) error {
+		_, addErr := tx.AddPolicy("bob", "data2", "write")
+		return addErr
+	})
+	if err != nil {
+		t.Fatalf("WithExternalTransaction failed: %v", err)
+	}
+
+	// External context must not be committed/rolled back by Casbin.
+	if extCtx.committed {
+		t.Error("Casbin must not commit the external transaction context")
+	}
+	if extCtx.rolledBack {
+		t.Error("Casbin must not rollback the external transaction context")
+	}
+
+	// In-memory model should reflect the change.
+	hasPolicy, _ := e.GetModel().HasPolicy("p", "p", []string{"bob", "data2", "write"})
+	if !hasPolicy {
+		t.Fatal("In-memory model should contain the added policy after WithExternalTransaction")
+	}
+}
+
+// TestWithExternalTransactionRollbackOnError verifies that when fn returns an error,
+// the external context is not rolled back by Casbin.
+func TestWithExternalTransactionRollbackOnError(t *testing.T) {
+	adapter := NewMockTransactionalAdapter()
+	e, err := NewTransactionalEnforcer("examples/rbac_model.conf", adapter)
+	if err != nil {
+		t.Fatalf("Failed to create transactional enforcer: %v", err)
+	}
+	adapter.Enforcer = e.Enforcer
+
+	ctx := context.Background()
+	extCtx := &externalTxContext{adapter: adapter}
+
+	fnErr := errors.New("business logic failure")
+	err = e.WithExternalTransaction(ctx, extCtx, func(tx *Transaction) error {
+		if _, addErr := tx.AddPolicy("charlie", "data3", "read"); addErr != nil {
+			return addErr
+		}
+		return fnErr
+	})
+	if !errors.Is(err, fnErr) {
+		t.Fatalf("Expected fnErr, got %v", err)
+	}
+
+	// Casbin must not touch the external transaction.
+	if extCtx.rolledBack {
+		t.Error("Casbin must not rollback the external transaction context on error")
+	}
+	if extCtx.committed {
+		t.Error("Casbin must not commit the external transaction context on error")
+	}
+}

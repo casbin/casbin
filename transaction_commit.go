@@ -61,8 +61,10 @@ func (tx *Transaction) Commit() error {
 
 	// If no operations, just commit the database transaction and clear state.
 	if !tx.buffer.HasOperations() {
-		if err := tx.txContext.Commit(); err != nil {
-			return err
+		if !tx.isExternal {
+			if err := tx.txContext.Commit(); err != nil {
+				return err
+			}
 		}
 		tx.committed = true
 		tx.enforcer.activeTransactions.Delete(tx.id)
@@ -71,16 +73,20 @@ func (tx *Transaction) Commit() error {
 
 	// Phase 1: Apply all buffered operations to the database
 	if err := tx.applyOperationsToDatabase(); err != nil {
-		// Rollback database transaction on failure.
-		_ = tx.txContext.Rollback()
+		// Rollback database transaction on failure (only when managing our own transaction).
+		if !tx.isExternal {
+			_ = tx.txContext.Rollback()
+		}
 		tx.enforcer.activeTransactions.Delete(tx.id)
 		return err
 	}
 
-	// Commit database transaction.
-	if err := tx.txContext.Commit(); err != nil {
-		tx.enforcer.activeTransactions.Delete(tx.id)
-		return err
+	// Commit database transaction (only when managing our own transaction).
+	if !tx.isExternal {
+		if err := tx.txContext.Commit(); err != nil {
+			tx.enforcer.activeTransactions.Delete(tx.id)
+			return err
+		}
 	}
 
 	// Phase 2: Apply changes to the in-memory model
@@ -120,9 +126,11 @@ func (tx *Transaction) Rollback() error {
 		return errors.New("transaction already rolled back")
 	}
 
-	// Rollback database transaction.
-	if err := tx.txContext.Rollback(); err != nil {
-		return err
+	// Rollback database transaction (only when managing our own transaction).
+	if !tx.isExternal {
+		if err := tx.txContext.Rollback(); err != nil {
+			return err
+		}
 	}
 
 	tx.rolledBack = true
