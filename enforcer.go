@@ -31,7 +31,8 @@ import (
 	defaultrolemanager "github.com/casbin/casbin/v3/rbac/default-role-manager"
 	"github.com/casbin/casbin/v3/util"
 
-	"github.com/casbin/govaluate"
+	"github.com/expr-lang/expr"
+	"github.com/expr-lang/expr/vm"
 )
 
 // Enforcer is the main interface for authorization enforcement and policy management.
@@ -739,6 +740,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		// For custom matchers provided at runtime, escape backslashes in string literals
 		expString = util.EscapeStringLiterals(util.RemoveComments(util.EscapeAssertion(matcher)))
 	}
+	// Convert govaluate IN operator syntax to expr syntax
+	expString = util.ConvertInOperatorSyntax(expString)
 
 	rTokens := make(map[string]int, len(e.model["r"][rType].Tokens))
 	for i, token := range e.model["r"][rType].Tokens {
@@ -779,8 +782,8 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	if hasEval {
 		functions["eval"] = generateEvalFunction(functions, &parameters)
 	}
-	var expression *govaluate.EvaluableExpression
-	expression, err = e.getAndStoreMatcherExpression(hasEval, expString, functions)
+	var expression *vm.Program
+	expression, err = e.getAndStoreMatcherExpression(hasEval, expString, functions, rTokens, pTokens)
 	if err != nil {
 		return false, err
 	}
@@ -815,7 +818,13 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 			parameters.pVals = pvals
 
-			result, err := expression.Eval(parameters)
+			// Create environment with functions and parameters
+			env := parameters.ToMap()
+			for k, v := range functions {
+				env[k] = v
+			}
+
+			result, err := expr.Run(expression, env)
 			// log.LogPrint("Result: ", result)
 
 			if err != nil {
@@ -873,7 +882,13 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 		parameters.pVals = make([]string, len(parameters.pTokens))
 
-		result, err := expression.Eval(parameters)
+		// Create environment with functions and parameters
+		env := parameters.ToMap()
+		for k, v := range functions {
+			env[k] = v
+		}
+
+		result, err := expr.Run(expression, env)
 
 		if err != nil {
 			return false, err
@@ -906,15 +921,21 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	return result, nil
 }
 
-func (e *Enforcer) getAndStoreMatcherExpression(hasEval bool, expString string, functions map[string]govaluate.ExpressionFunction) (*govaluate.EvaluableExpression, error) {
-	var expression *govaluate.EvaluableExpression
+func (e *Enforcer) getAndStoreMatcherExpression(hasEval bool, expString string, functions map[string]interface{}, rTokens, pTokens map[string]int) (*vm.Program, error) {
+	var expression *vm.Program
 	var err error
 	var cachedExpression, isPresent = e.matcherMap.Load(expString)
 
 	if !hasEval && isPresent {
-		expression = cachedExpression.(*govaluate.EvaluableExpression)
+		expression = cachedExpression.(*vm.Program)
 	} else {
-		expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+		// Create environment with functions
+		env := make(map[string]interface{})
+		for k, v := range functions {
+			env[k] = v
+		}
+		// Compile with AllowUndefinedVariables to support ABAC and dynamic parameter access
+		expression, err = expr.Compile(expString, expr.Env(env), expr.AllowUndefinedVariables())
 		if err != nil {
 			return nil, err
 		}
@@ -1043,7 +1064,24 @@ type enforceParameters struct {
 	pVals   []string
 }
 
-// implements govaluate.Parameters.
+// ToMap converts enforceParameters to a map suitable for expr evaluation.
+func (p enforceParameters) ToMap() map[string]interface{} {
+	env := make(map[string]interface{})
+
+	// Add r parameters
+	for token, index := range p.rTokens {
+		env[token] = p.rVals[index]
+	}
+
+	// Add p parameters
+	for token, index := range p.pTokens {
+		env[token] = p.pVals[index]
+	}
+
+	return env
+}
+
+// Get implements parameter access for backward compatibility.
 func (p enforceParameters) Get(name string) (interface{}, error) {
 	if name == "" {
 		return nil, nil
@@ -1067,7 +1105,7 @@ func (p enforceParameters) Get(name string) (interface{}, error) {
 	}
 }
 
-func generateEvalFunction(functions map[string]govaluate.ExpressionFunction, parameters *enforceParameters) govaluate.ExpressionFunction {
+func generateEvalFunction(functions map[string]interface{}, parameters *enforceParameters) func(args ...interface{}) (interface{}, error) {
 	return func(args ...interface{}) (interface{}, error) {
 		if len(args) != 1 {
 			return nil, fmt.Errorf("function eval(subrule string) expected %d arguments, but got %d", 1, len(args))
@@ -1078,10 +1116,23 @@ func generateEvalFunction(functions map[string]govaluate.ExpressionFunction, par
 			return nil, errors.New("argument of eval(subrule string) must be a string")
 		}
 		expression = util.EscapeAssertion(expression)
-		expr, err := govaluate.NewEvaluableExpressionWithFunctions(expression, functions)
+		// Convert IN operator syntax for compatibility
+		expression = util.ConvertInOperatorSyntax(expression)
+		// Create environment with functions for compilation
+		env := make(map[string]interface{})
+		for k, v := range functions {
+			env[k] = v
+		}
+		// Compile with AllowUndefinedVariables to support dynamic parameter access
+		program, err := expr.Compile(expression, expr.Env(env), expr.AllowUndefinedVariables())
 		if err != nil {
 			return nil, fmt.Errorf("error while parsing eval parameter: %s, %s", expression, err.Error())
 		}
-		return expr.Eval(parameters)
+		// Create environment with parameters and functions for evaluation
+		evalEnv := parameters.ToMap()
+		for k, v := range functions {
+			evalEnv[k] = v
+		}
+		return expr.Run(program, evalEnv)
 	}
 }
