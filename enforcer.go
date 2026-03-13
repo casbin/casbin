@@ -318,14 +318,22 @@ func (e *Enforcer) RunDetections() error {
 	// Run detectors on all role managers
 	for _, rm := range e.rmMap {
 		for _, d := range e.detectors {
-			err := d.Check(rm)
-			// Skip if the role manager doesn't support the required iteration or is not initialized
-			if err != nil && (strings.Contains(err.Error(), "does not support Range iteration") ||
-				strings.Contains(err.Error(), "not properly initialized")) {
-				continue
-			}
-			if err != nil {
-				return err
+			// Check if this is a ModelDetector
+			if md, ok := d.(detector.ModelDetector); ok {
+				err := md.CheckModel(e.model, rm)
+				if err != nil {
+					return err
+				}
+			} else {
+				err := d.Check(rm)
+				// Skip if the role manager doesn't support the required iteration or is not initialized
+				if err != nil && (strings.Contains(err.Error(), "does not support Range iteration") ||
+					strings.Contains(err.Error(), "not properly initialized")) {
+					continue
+				}
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -333,14 +341,22 @@ func (e *Enforcer) RunDetections() error {
 	// Run detectors on all conditional role managers
 	for _, crm := range e.condRmMap {
 		for _, d := range e.detectors {
-			err := d.Check(crm)
-			// Skip if the role manager doesn't support the required iteration or is not initialized
-			if err != nil && (strings.Contains(err.Error(), "does not support Range iteration") ||
-				strings.Contains(err.Error(), "not properly initialized")) {
-				continue
-			}
-			if err != nil {
-				return err
+			// Check if this is a ModelDetector
+			if md, ok := d.(detector.ModelDetector); ok {
+				err := md.CheckModel(e.model, crm)
+				if err != nil {
+					return err
+				}
+			} else {
+				err := d.Check(crm)
+				// Skip if the role manager doesn't support the required iteration or is not initialized
+				if err != nil && (strings.Contains(err.Error(), "does not support Range iteration") ||
+					strings.Contains(err.Error(), "not properly initialized")) {
+					continue
+				}
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
