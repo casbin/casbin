@@ -119,9 +119,38 @@ func TestModel_AddDef(t *testing.T) {
 	if !ok {
 		t.Errorf("non empty assertion should be added")
 	}
+
+	ast := m["r"]["r"]
+	if len(ast.TokenIndexMap) != 3 {
+		t.Errorf("TokenIndexMap length should be 3, got %d", len(ast.TokenIndexMap))
+	}
+	if ast.TokenIndexMap["r_sub"] != 0 || ast.TokenIndexMap["r_obj"] != 1 || ast.TokenIndexMap["r_act"] != 2 {
+		t.Errorf("TokenIndexMap values are incorrect: %v", ast.TokenIndexMap)
+	}
+
 	ok = m.AddDef(s, s, "")
 	if ok {
 		t.Errorf("empty assertion value should not be added")
+	}
+}
+
+func TestAssertion_Copy(t *testing.T) {
+	m := NewModel()
+	_ = m.AddDef("r", "r", "sub, obj, act")
+	ast := m["r"]["r"]
+	newAst := ast.copy()
+
+	if len(newAst.TokenIndexMap) != 3 {
+		t.Errorf("Copied TokenIndexMap length should be 3, got %d", len(newAst.TokenIndexMap))
+	}
+	if newAst.TokenIndexMap["r_sub"] != 0 || newAst.TokenIndexMap["r_obj"] != 1 || newAst.TokenIndexMap["r_act"] != 2 {
+		t.Errorf("Copied TokenIndexMap values are incorrect: %v", newAst.TokenIndexMap)
+	}
+
+	// Verify it's a deep copy
+	newAst.TokenIndexMap["r_sub"] = 10
+	if ast.TokenIndexMap["r_sub"] != 0 {
+		t.Errorf("Deep copy failed, modifying copy affected original")
 	}
 }
 
