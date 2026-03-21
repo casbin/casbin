@@ -20,7 +20,7 @@
 github:
   description: >-
     Apache Casbin: an authorization library that supports access control models like ACL, RBAC, ABAC.
-  homepage: https://casbin.apache.org/
+  homepage: https://casbin.org/
   dependabot_alerts:  true
   dependabot_updates: false
 
