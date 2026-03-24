@@ -99,7 +99,7 @@ func (e *Enforcer) DeleteRolesForUser(user string, domain ...string) (bool, erro
 	} else if len(domain) > 1 {
 		return false, errors.ErrDomainParameter
 	} else {
-		args = []string{user, "", domain[0]}
+		args = []string{user, "*", domain[0]}
 	}
 	return e.RemoveFilteredGroupingPolicy(0, args...)
 }
@@ -194,6 +194,10 @@ func (e *Enforcer) GetNamedPermissionsForUser(ptype string, user string, domain 
 			continue
 		}
 		args := make([]string, len(assertion.Tokens))
+		// Fill all fields with "*" by default
+		for i := range args {
+			args[i] = "*"
+		}
 		subIndex, err := e.GetFieldIndex("p", constant.SubjectIndex)
 		if err != nil {
 			subIndex = 0
