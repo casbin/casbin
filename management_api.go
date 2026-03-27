@@ -21,7 +21,9 @@ import (
 
 	"github.com/casbin/casbin/v3/constant"
 	"github.com/casbin/casbin/v3/util"
-	"github.com/casbin/govaluate"
+
+	"github.com/expr-lang/expr"
+	"github.com/expr-lang/expr/vm"
 )
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
@@ -159,10 +161,18 @@ func (e *Enforcer) GetFilteredNamedPolicyWithMatcher(ptype string, matcher strin
 	} else {
 		expString = util.RemoveComments(util.EscapeAssertion(matcher))
 	}
+	// Convert govaluate IN operator syntax to expr syntax
+	expString = util.ConvertInOperatorSyntax(expString)
 
-	var expression *govaluate.EvaluableExpression
+	var expression *vm.Program
 
-	expression, err = govaluate.NewEvaluableExpressionWithFunctions(expString, functions)
+	// Create environment with functions
+	env := make(map[string]interface{})
+	for k, v := range functions {
+		env[k] = v
+	}
+	// Compile with AllowUndefinedVariables to support dynamic parameter access
+	expression, err = expr.Compile(expString, expr.Env(env), expr.AllowUndefinedVariables())
 	if err != nil {
 		return res, err
 	}
@@ -188,7 +198,13 @@ func (e *Enforcer) GetFilteredNamedPolicyWithMatcher(ptype string, matcher strin
 
 			parameters.pVals = pvals
 
-			result, err := expression.Eval(parameters)
+			// Create environment with functions and parameters
+			evalEnv := parameters.ToMap()
+			for k, v := range functions {
+				evalEnv[k] = v
+			}
+
+			result, err := expr.Run(expression, evalEnv)
 
 			if err != nil {
 				return res, err
@@ -480,7 +496,7 @@ func (e *Enforcer) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex in
 }
 
 // AddFunction adds a customized function.
-func (e *Enforcer) AddFunction(name string, function govaluate.ExpressionFunction) {
+func (e *Enforcer) AddFunction(name string, function interface{}) {
 	e.fm.AddFunction(name, function)
 }
 
