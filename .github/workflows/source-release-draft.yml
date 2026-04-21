@@ -1,0 +1,117 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: Build Source Release Draft
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-source-release-draft:
+    if: ${{ github.repository == 'apache/casbin' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute release metadata
+        id: release
+        run: |
+          TAG_NAME="${GITHUB_REF_NAME}"
+
+          VERSION="${TAG_NAME#v}"
+          BASENAME="casbin-${VERSION}-src"
+
+          echo "tag=${TAG_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "basename=${BASENAME}" >> "${GITHUB_OUTPUT}"
+
+      - name: Generate release notes
+        run: |
+          CURRENT_TAG="${{ steps.release.outputs.tag }}"
+          PREVIOUS_TAG="$(git describe --tags --abbrev=0 "${CURRENT_TAG}^" 2>/dev/null || true)"
+          RANGE="${CURRENT_TAG}"
+
+          if [ -n "${PREVIOUS_TAG}" ]; then
+            RANGE="${PREVIOUS_TAG}..${CURRENT_TAG}"
+          fi
+
+          FEATURES="$(git log --pretty=format:'%s (%h)' "${RANGE}" | grep -Ei '^(feat)(\(.+\))?: ' || true)"
+          FIXES="$(git log --pretty=format:'%s (%h)' "${RANGE}" | grep -Ei '^(fix)(\(.+\))?: ' || true)"
+          DOCS="$(git log --pretty=format:'%s (%h)' "${RANGE}" | grep -Ei '^(docs?|doc)(\(.+\))?: ' || true)"
+
+          {
+            echo "# Casbin ${CURRENT_TAG}"
+            echo
+            echo "This GitHub release is a draft helper for packaging and release notes."
+            echo
+            if [ -n "${PREVIOUS_TAG}" ]; then
+              echo "Changes since ${PREVIOUS_TAG}."
+            fi
+            echo
+
+            if [ -n "${FEATURES}" ]; then
+              echo "## Features"
+              echo
+              printf '%s\n' "${FEATURES}" | sed 's/^/- /'
+              echo
+            fi
+
+            if [ -n "${FIXES}" ]; then
+              echo "## Fixes"
+              echo
+              printf '%s\n' "${FIXES}" | sed 's/^/- /'
+              echo
+            fi
+
+            if [ -n "${DOCS}" ]; then
+              echo "## Docs"
+              echo
+              printf '%s\n' "${DOCS}" | sed 's/^/- /'
+              echo
+            fi
+
+            if [ -z "${FEATURES}${FIXES}${DOCS}" ]; then
+              echo "## Notes"
+              echo
+              echo "- No feat/fix/doc commits were found in this release range."
+            fi
+          } > RELEASE_NOTES.md
+
+      - name: Create source archives
+        run: |
+          mkdir -p dist
+          git archive --format=tar.gz --prefix="${{ steps.release.outputs.basename }}/" -o "dist/${{ steps.release.outputs.basename }}.tar.gz" "${{ steps.release.outputs.tag }}"
+          git archive --format=zip --prefix="${{ steps.release.outputs.basename }}/" -o "dist/${{ steps.release.outputs.basename }}.zip" "${{ steps.release.outputs.tag }}"
+
+      - name: Create draft GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release.outputs.tag }}
+          name: Casbin ${{ steps.release.outputs.tag }}
+          body_path: RELEASE_NOTES.md
+          draft: true
+          files: |
+            dist/${{ steps.release.outputs.basename }}.tar.gz
+            dist/${{ steps.release.outputs.basename }}.zip
