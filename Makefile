@@ -11,6 +11,3 @@ benchmark:
 
 lint:
 	golangci-lint run --verbose
-
-release:
-	npx semantic-release@v19.0.2
