@@ -40,68 +40,35 @@ jobs:
         id: snapshot
         run: |
           LATEST_RELEASE_TAG="$(
-            git ls-remote --tags origin "refs/tags/v*" |
-              awk -F'/' '
-                {
-                  tag = $NF
-                  sub(/\^\{\}$/, "", tag)
-                  if (tag ~ /^v[0-9]+\.[0-9]+\.[0-9]+$/) {
-                    version = substr(tag, 2)
-                    split(version, parts, ".")
-                    key = sprintf("%09d%09d%09d", parts[1], parts[2], parts[3])
-                    if (key > max_key) {
-                      max_key = key
-                      max_version = version
-                    }
-                  }
-                }
-                END {
-                  if (max_version == "") {
-                    print ""
-                  } else {
-                    printf "v%s\n", max_version
-                  }
-                }
-              '
+            git tag --list 'v*' |
+              grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' |
+              sort -V |
+              tail -n 1
           )"
 
           if [ -z "${LATEST_RELEASE_TAG}" ]; then
-            BASE_VERSION="${MODULE_MAJOR}.0.0"
+            BASE_VERSION="0.0.0"
           else
-            RELEASE_VERSION="${LATEST_RELEASE_TAG#v}"
-            BASE_VERSION="${RELEASE_VERSION}"
+            BASE_VERSION="${LATEST_RELEASE_TAG#v}"
           fi
 
+          ESCAPED_BASE_VERSION="${BASE_VERSION//./\\.}"
           LAST_SNAPSHOT_NUMBER="$(
-            git ls-remote --tags origin "refs/tags/${BASE_VERSION}-snapshot.*" |
-              awk -F'/' '
-                {
-                  tag = $NF
-                  sub(/\^\{\}$/, "", tag)
-                  if (tag ~ /^[0-9]+\.[0-9]+\.[0-9]+-snapshot\.[0-9]+$/) {
-                    split(tag, version_parts, "-snapshot.")
-                    snapshot_number = version_parts[2] + 0
-                    if (snapshot_number > max) {
-                      max = snapshot_number
-                    }
-                  }
-                }
-                END {
-                  if (max == "") {
-                    print 0
-                  } else {
-                    print max
-                  }
-                }
-              '
+            git tag --list "v${BASE_VERSION}-snapshot.*" |
+              sed -nE "s/^v${ESCAPED_BASE_VERSION}-snapshot\\.([0-9]+)$/\\1/p" |
+              sort -n |
+              tail -n 1
           )"
+          LAST_SNAPSHOT_NUMBER="${LAST_SNAPSHOT_NUMBER:-0}"
           NEXT_SNAPSHOT_NUMBER="$((LAST_SNAPSHOT_NUMBER + 1))"
           SNAPSHOT_VERSION="v${BASE_VERSION}-snapshot.${NEXT_SNAPSHOT_NUMBER}"
+          BASENAME="casbin-${SNAPSHOT_VERSION#v}-src"
 
           echo "latest_release_tag=${LATEST_RELEASE_TAG}" >> "${GITHUB_OUTPUT}"
           echo "base_version=${BASE_VERSION}" >> "${GITHUB_OUTPUT}"
           echo "number=${NEXT_SNAPSHOT_NUMBER}" >> "${GITHUB_OUTPUT}"
           echo "version=${SNAPSHOT_VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "basename=${BASENAME}" >> "${GITHUB_OUTPUT}"
 
       - name: Generate snapshot release notes
         run: |
@@ -147,6 +114,12 @@ jobs:
             fi
           } > SNAPSHOT_RELEASE_NOTES.md
 
+      - name: Create source archives
+        run: |
+          mkdir -p dist
+          git archive --format=tar.gz --prefix="${{ steps.snapshot.outputs.basename }}/" -o "dist/${{ steps.snapshot.outputs.basename }}.tar.gz" HEAD
+          git archive --format=zip --prefix="${{ steps.snapshot.outputs.basename }}/" -o "dist/${{ steps.snapshot.outputs.basename }}.zip" HEAD
+
       - name: Create snapshot GitHub release
         uses: softprops/action-gh-release@v2
         with:
@@ -156,3 +129,6 @@ jobs:
           body_path: SNAPSHOT_RELEASE_NOTES.md
           draft: false
           prerelease: true
+          files: |
+            dist/${{ steps.snapshot.outputs.basename }}.tar.gz
+            dist/${{ steps.snapshot.outputs.basename }}.zip

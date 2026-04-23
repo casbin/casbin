@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   build-source-release-draft:
-    if: ${{ github.repository == 'apache/casbin' }}
+    if: ${{ github.repository == 'apache/casbin' && !contains(github.ref_name, '-') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,18 +39,37 @@ jobs:
         id: release
         run: |
           TAG_NAME="${GITHUB_REF_NAME}"
+          if ! [[ "${TAG_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Unsupported release tag: ${TAG_NAME}" >&2
+            exit 1
+          fi
 
           VERSION="${TAG_NAME#v}"
           BASENAME="casbin-${VERSION}-src"
+          PREVIOUS_TAG="$(
+            git tag --list 'v*' |
+              grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' |
+              sort -V |
+              awk -v current="${TAG_NAME}" '
+                $0 == current {
+                  print previous
+                  exit
+                }
+                {
+                  previous = $0
+                }
+              '
+          )"
 
           echo "tag=${TAG_NAME}" >> "${GITHUB_OUTPUT}"
           echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
           echo "basename=${BASENAME}" >> "${GITHUB_OUTPUT}"
+          echo "previous_tag=${PREVIOUS_TAG}" >> "${GITHUB_OUTPUT}"
 
       - name: Generate release notes
         run: |
           CURRENT_TAG="${{ steps.release.outputs.tag }}"
-          PREVIOUS_TAG="$(git describe --tags --abbrev=0 "${CURRENT_TAG}^" 2>/dev/null || true)"
+          PREVIOUS_TAG="${{ steps.release.outputs.previous_tag }}"
           RANGE="${CURRENT_TAG}"
 
           if [ -n "${PREVIOUS_TAG}" ]; then
