@@ -56,6 +56,7 @@ type Enforcer struct {
 	autoNotifyWatcher    bool
 	autoNotifyDispatcher bool
 	acceptJsonRequest    bool
+	gFunctionCache       bool
 
 	aiConfig AIConfig
 }
@@ -193,6 +194,7 @@ func (e *Enforcer) initialize() {
 	e.autoBuildRoleLinks = true
 	e.autoNotifyWatcher = true
 	e.autoNotifyDispatcher = true
+	e.gFunctionCache = true
 	e.initRmMap()
 
 	// Initialize detectors with default detector if not already set
@@ -637,6 +639,14 @@ func (e *Enforcer) EnableAcceptJsonRequest(acceptJsonRequest bool) {
 	e.acceptJsonRequest = acceptJsonRequest
 }
 
+// EnableGFunctionCache controls whether to cache g() function results.
+// Disable this when inputs are high-cardinality (e.g. UUIDs or dynamic paths)
+// to prevent unbounded memory growth.
+func (e *Enforcer) EnableGFunctionCache(enabled bool) {
+	e.gFunctionCache = enabled
+	e.invalidateMatcherMap()
+}
+
 // BuildRoleLinks manually rebuild the role inheritance relations.
 func (e *Enforcer) BuildRoleLinks() error {
 	e.invalidateMatcherMap()
@@ -704,7 +714,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 			//   or a conditional role definition (ast.CondRM != nil)
 			// ast.RM and ast.CondRM shouldn't be nil at the same time
 			if ast.RM != nil {
-				functions[key] = util.GenerateGFunction(ast.RM)
+				functions[key] = util.GenerateGFunction(ast.RM, e.gFunctionCache)
 			}
 			if ast.CondRM != nil {
 				functions[key] = util.GenerateConditionalGFunction(ast.CondRM)
