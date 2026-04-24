@@ -402,34 +402,53 @@ func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 }
 
 // GenerateGFunction is the factory method of the g(_, _[, _]) function.
-func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
+// If useCache is true, results are memoized per unique argument combination for performance.
+// Set useCache to false when inputs are high-cardinality (e.g. UUIDs) to avoid unbounded memory growth.
+func GenerateGFunction(rm rbac.RoleManager, useCache bool) govaluate.ExpressionFunction {
 	memorized := sync.Map{}
 	return func(args ...interface{}) (interface{}, error) {
 		// Like all our other govaluate functions, all args are strings.
 
-		// Allocate and generate a cache key from the arguments...
-		total := len(args)
-		for _, a := range args {
-			aStr := a.(string)
-			total += len(aStr)
-		}
-		builder := strings.Builder{}
-		builder.Grow(total)
-		for _, arg := range args {
-			builder.WriteByte(0)
-			builder.WriteString(arg.(string))
-		}
-		key := builder.String()
+		if useCache {
+			// Allocate and generate a cache key from the arguments...
+			total := len(args)
+			for _, a := range args {
+				aStr := a.(string)
+				total += len(aStr)
+			}
+			builder := strings.Builder{}
+			builder.Grow(total)
+			for _, arg := range args {
+				builder.WriteByte(0)
+				builder.WriteString(arg.(string))
+			}
+			key := builder.String()
 
-		// ...and see if we've already calculated this.
-		v, found := memorized.Load(key)
-		if found {
+			// ...and see if we've already calculated this.
+			if v, found := memorized.Load(key); found {
+				return v, nil
+			}
+
+			// If not, do the calculation.
+			// There are guaranteed to be exactly 2 or 3 arguments.
+			name1, name2 := args[0].(string), args[1].(string)
+			var v interface{}
+			if rm == nil {
+				v = name1 == name2
+			} else if len(args) == 2 {
+				v, _ = rm.HasLink(name1, name2)
+			} else {
+				domain := args[2].(string)
+				v, _ = rm.HasLink(name1, name2, domain)
+			}
+
+			memorized.Store(key, v)
 			return v, nil
 		}
 
-		// If not, do the calculation.
-		// There are guaranteed to be exactly 2 or 3 arguments.
+		// No caching path.
 		name1, name2 := args[0].(string), args[1].(string)
+		var v interface{}
 		if rm == nil {
 			v = name1 == name2
 		} else if len(args) == 2 {
@@ -438,8 +457,6 @@ func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 			domain := args[2].(string)
 			v, _ = rm.HasLink(name1, name2, domain)
 		}
-
-		memorized.Store(key, v)
 		return v, nil
 	}
 }

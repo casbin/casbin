@@ -145,7 +145,7 @@ func (e *Enforcer) GetFilteredNamedPolicyWithMatcher(ptype string, matcher strin
 			//   or a conditional role definition (ast.CondRM != nil)
 			// ast.RM and ast.CondRM shouldn't be nil at the same time
 			if ast.RM != nil {
-				functions[key] = util.GenerateGFunction(ast.RM)
+				functions[key] = util.GenerateGFunction(ast.RM, e.gFunctionCache)
 			}
 			if ast.CondRM != nil {
 				functions[key] = util.GenerateConditionalGFunction(ast.CondRM)
