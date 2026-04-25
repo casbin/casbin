@@ -1,0 +1,150 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: Build Source Snapshot
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-source-snapshot:
+    if: ${{ github.repository == 'apache/casbin' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute snapshot metadata
+        id: snapshot
+        run: |
+          LATEST_RELEASE_TAG="$(
+            git tag --list 'v*' |
+              grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' |
+              sort -V |
+              tail -n 1
+          )"
+
+          if [ -z "${LATEST_RELEASE_TAG}" ]; then
+            BASE_VERSION="0.1.0"
+          else
+            RELEASE_VERSION="${LATEST_RELEASE_TAG#v}"
+            IFS='.' read -r MAJOR MINOR PATCH <<< "${RELEASE_VERSION}"
+            BASE_VERSION="${MAJOR}.$((MINOR + 1)).0"
+          fi
+
+          ESCAPED_BASE_VERSION="${BASE_VERSION//./\\.}"
+          LAST_SNAPSHOT_NUMBER="$(
+            git tag --list "v${BASE_VERSION}-snapshot.*" |
+              sed -nE "s/^v${ESCAPED_BASE_VERSION}-snapshot\\.([0-9]+)$/\\1/p" |
+              sort -n |
+              tail -n 1
+          )"
+          LAST_SNAPSHOT_NUMBER="${LAST_SNAPSHOT_NUMBER:-0}"
+          NEXT_SNAPSHOT_NUMBER="$((LAST_SNAPSHOT_NUMBER + 1))"
+          SNAPSHOT_VERSION="v${BASE_VERSION}-snapshot.${NEXT_SNAPSHOT_NUMBER}"
+          BASENAME="casbin-${SNAPSHOT_VERSION#v}-src"
+
+          if [ "${LAST_SNAPSHOT_NUMBER}" -gt 0 ]; then
+            CHANGELOG_START_TAG="v${BASE_VERSION}-snapshot.${LAST_SNAPSHOT_NUMBER}"
+          else
+            CHANGELOG_START_TAG="${LATEST_RELEASE_TAG}"
+          fi
+
+          echo "latest_release_tag=${LATEST_RELEASE_TAG}" >> "${GITHUB_OUTPUT}"
+          echo "changelog_start_tag=${CHANGELOG_START_TAG}" >> "${GITHUB_OUTPUT}"
+          echo "base_version=${BASE_VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "number=${NEXT_SNAPSHOT_NUMBER}" >> "${GITHUB_OUTPUT}"
+          echo "version=${SNAPSHOT_VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "basename=${BASENAME}" >> "${GITHUB_OUTPUT}"
+
+      - name: Generate snapshot release notes
+        run: |
+          PREVIOUS_TAG="${{ steps.snapshot.outputs.changelog_start_tag }}"
+          CURRENT_TAG="${{ steps.snapshot.outputs.version }}"
+          CURRENT_VERSION="${CURRENT_TAG#v}"
+          RELEASE_DATE="$(date -u +%F)"
+          RANGE="HEAD"
+
+          if [ -n "${PREVIOUS_TAG}" ]; then
+            RANGE="${PREVIOUS_TAG}..HEAD"
+          fi
+
+          FEATURES="$(git log --pretty=format:'%s (%h)' "${RANGE}" | grep -Ei '^(feat)(\(.+\))?: ' || true)"
+          FIXES="$(git log --pretty=format:'%s (%h)' "${RANGE}" | grep -Ei '^(fix)(\(.+\))?: ' || true)"
+          DOCS="$(git log --pretty=format:'%s (%h)' "${RANGE}" | grep -Ei '^(docs?|doc)(\(.+\))?: ' || true)"
+
+          {
+            if [ -n "${PREVIOUS_TAG}" ]; then
+              echo "# [${CURRENT_VERSION}](https://github.com/${GITHUB_REPOSITORY}/compare/${PREVIOUS_TAG}...${CURRENT_TAG}) (${RELEASE_DATE})"
+            else
+              echo "# ${CURRENT_VERSION} (${RELEASE_DATE})"
+            fi
+            echo
+            if [ -n "${FEATURES}" ]; then
+              echo "## Features"
+              echo
+              printf '%s\n' "${FEATURES}" | sed 's/^/- /'
+              echo
+            fi
+
+            if [ -n "${FIXES}" ]; then
+              echo "## Fixes"
+              echo
+              printf '%s\n' "${FIXES}" | sed 's/^/- /'
+              echo
+            fi
+
+            if [ -n "${DOCS}" ]; then
+              echo "## Docs"
+              echo
+              printf '%s\n' "${DOCS}" | sed 's/^/- /'
+              echo
+            fi
+
+            if [ -z "${FEATURES}${FIXES}${DOCS}" ]; then
+              echo "## Notes"
+              echo
+              echo "- No feat/fix/doc commits were found in this snapshot range."
+            fi
+          } > SNAPSHOT_RELEASE_NOTES.md
+
+      - name: Create source archives
+        run: |
+          mkdir -p dist
+          git archive --format=tar.gz --prefix="${{ steps.snapshot.outputs.basename }}/" -o "dist/${{ steps.snapshot.outputs.basename }}.tar.gz" HEAD
+          git archive --format=zip --prefix="${{ steps.snapshot.outputs.basename }}/" -o "dist/${{ steps.snapshot.outputs.basename }}.zip" HEAD
+
+      - name: Create snapshot GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.snapshot.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.snapshot.outputs.version }}
+          body_path: SNAPSHOT_RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+          files: |
+            dist/${{ steps.snapshot.outputs.basename }}.tar.gz
+            dist/${{ steps.snapshot.outputs.basename }}.zip
