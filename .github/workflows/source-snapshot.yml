@@ -64,7 +64,14 @@ jobs:
           SNAPSHOT_VERSION="v${BASE_VERSION}-snapshot.${NEXT_SNAPSHOT_NUMBER}"
           BASENAME="casbin-${SNAPSHOT_VERSION#v}-src"
 
+          if [ "${LAST_SNAPSHOT_NUMBER}" -gt 0 ]; then
+            CHANGELOG_START_TAG="v${BASE_VERSION}-snapshot.${LAST_SNAPSHOT_NUMBER}"
+          else
+            CHANGELOG_START_TAG="${LATEST_RELEASE_TAG}"
+          fi
+
           echo "latest_release_tag=${LATEST_RELEASE_TAG}" >> "${GITHUB_OUTPUT}"
+          echo "changelog_start_tag=${CHANGELOG_START_TAG}" >> "${GITHUB_OUTPUT}"
           echo "base_version=${BASE_VERSION}" >> "${GITHUB_OUTPUT}"
           echo "number=${NEXT_SNAPSHOT_NUMBER}" >> "${GITHUB_OUTPUT}"
           echo "version=${SNAPSHOT_VERSION}" >> "${GITHUB_OUTPUT}"
@@ -72,7 +79,10 @@ jobs:
 
       - name: Generate snapshot release notes
         run: |
-          PREVIOUS_TAG="${{ steps.snapshot.outputs.latest_release_tag }}"
+          PREVIOUS_TAG="${{ steps.snapshot.outputs.changelog_start_tag }}"
+          CURRENT_TAG="${{ steps.snapshot.outputs.version }}"
+          CURRENT_VERSION="${CURRENT_TAG#v}"
+          RELEASE_DATE="$(date -u +%F)"
           RANGE="HEAD"
 
           if [ -n "${PREVIOUS_TAG}" ]; then
@@ -84,7 +94,11 @@ jobs:
           DOCS="$(git log --pretty=format:'%s (%h)' "${RANGE}" | grep -Ei '^(docs?|doc)(\(.+\))?: ' || true)"
 
           {
-            echo "# Casbin ${{ steps.snapshot.outputs.version }}"
+            if [ -n "${PREVIOUS_TAG}" ]; then
+              echo "# [${CURRENT_VERSION}](https://github.com/${GITHUB_REPOSITORY}/compare/${PREVIOUS_TAG}...${CURRENT_TAG}) (${RELEASE_DATE})"
+            else
+              echo "# ${CURRENT_VERSION} (${RELEASE_DATE})"
+            fi
             echo
             if [ -n "${FEATURES}" ]; then
               echo "## Features"

@@ -69,7 +69,9 @@ jobs:
       - name: Generate release notes
         run: |
           CURRENT_TAG="${{ steps.release.outputs.tag }}"
+          CURRENT_VERSION="${CURRENT_TAG#v}"
           PREVIOUS_TAG="${{ steps.release.outputs.previous_tag }}"
+          RELEASE_DATE="$(date -u +%F)"
           RANGE="${CURRENT_TAG}"
 
           if [ -n "${PREVIOUS_TAG}" ]; then
@@ -81,15 +83,14 @@ jobs:
           DOCS="$(git log --pretty=format:'%s (%h)' "${RANGE}" | grep -Ei '^(docs?|doc)(\(.+\))?: ' || true)"
 
           {
-            echo "# Casbin ${CURRENT_TAG}"
+            if [ -n "${PREVIOUS_TAG}" ]; then
+              echo "# [${CURRENT_VERSION}](https://github.com/${GITHUB_REPOSITORY}/compare/${PREVIOUS_TAG}...${CURRENT_TAG}) (${RELEASE_DATE})"
+            else
+              echo "# ${CURRENT_VERSION} (${RELEASE_DATE})"
+            fi
             echo
             echo "This GitHub release is a draft helper for packaging and release notes."
             echo
-            if [ -n "${PREVIOUS_TAG}" ]; then
-              echo "Changes since ${PREVIOUS_TAG}."
-            fi
-            echo
-
             if [ -n "${FEATURES}" ]; then
               echo "## Features"
               echo
