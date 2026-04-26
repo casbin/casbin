@@ -35,6 +35,7 @@ type Assertion struct {
 	CondRM          rbac.ConditionalRoleManager
 	FieldIndexMap   map[string]int
 	FieldIndexMutex sync.RWMutex
+	TokenIndexMap   map[string]int
 }
 
 func (ast *Assertion) buildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, rules [][]string) error {
@@ -193,6 +194,13 @@ func (ast *Assertion) copy() *Assertion {
 		ParamsTokens:  append([]string(nil), ast.ParamsTokens...),
 		RM:            ast.RM,
 		CondRM:        ast.CondRM,
+	}
+
+	if ast.TokenIndexMap != nil {
+		newAst.TokenIndexMap = make(map[string]int)
+		for k, v := range ast.TokenIndexMap {
+			newAst.TokenIndexMap[k] = v
+		}
 	}
 
 	return newAst
