@@ -1,0 +1,4 @@
+p, alice, data1, read, allow
+p, bob, data2, write, rate_limit
+p, charlie, data3, read, deny
+p, david, data4, write, rate_limit
