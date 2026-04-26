@@ -332,11 +332,8 @@ func KeyMatch5Func(args ...interface{}) (interface{}, error) {
 
 // RegexMatch determines whether key1 matches the pattern of key2 in regular expression.
 func RegexMatch(key1 string, key2 string) bool {
-	res, err := regexp.MatchString(key2, key1)
-	if err != nil {
-		panic(err)
-	}
-	return res
+	re := mustCompileOrGet(key2)
+	return re.MatchString(key1)
 }
 
 // RegexMatchFunc is the wrapper for RegexMatch.
