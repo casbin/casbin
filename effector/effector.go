@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package effector //nolint:cyclop // TODO
+package effector
 
 // Effect is the result for a policy rule.
 type Effect int
