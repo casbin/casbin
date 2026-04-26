@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Build Source Snapshot
+name: Semantic Release
 
 on:
   push:
