@@ -48,7 +48,7 @@ func (e *ContextEnforcer) DeleteRolesForUserCtx(ctx context.Context, user string
 	} else if len(domain) > 1 {
 		return false, errors.ErrDomainParameter
 	} else {
-		args = []string{user, "", domain[0]}
+		args = []string{user, "*", domain[0]}
 	}
 	return e.RemoveFilteredGroupingPolicyCtx(ctx, 0, args...)
 }
