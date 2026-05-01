@@ -342,6 +342,20 @@ func testKeyMatchFunc(t *testing.T, res bool, err string, args ...interface{}) {
 	}
 }
 
+func testKeyGetFunc(t *testing.T, res interface{}, err string, args ...interface{}) {
+	t.Helper()
+	myRes, myErr := KeyGetFunc(args...)
+	myErrStr := ""
+
+	if myErr != nil {
+		myErrStr = myErr.Error()
+	}
+
+	if myRes != res || err != myErrStr {
+		t.Errorf("%v returns %v %v, supposed to be %v %v", args, myRes, myErr, res, err)
+	}
+}
+
 func testKeyMatch2Func(t *testing.T, res bool, err string, args ...interface{}) {
 	t.Helper()
 	myRes, myErr := KeyMatch2Func(args...)
@@ -356,9 +370,37 @@ func testKeyMatch2Func(t *testing.T, res bool, err string, args ...interface{}) 
 	}
 }
 
+func testKeyGet2Func(t *testing.T, res interface{}, err string, args ...interface{}) {
+	t.Helper()
+	myRes, myErr := KeyGet2Func(args...)
+	myErrStr := ""
+
+	if myErr != nil {
+		myErrStr = myErr.Error()
+	}
+
+	if myRes != res || err != myErrStr {
+		t.Errorf("%v returns %v %v, supposed to be %v %v", args, myRes, myErr, res, err)
+	}
+}
+
 func testKeyMatch3Func(t *testing.T, res bool, err string, args ...interface{}) {
 	t.Helper()
 	myRes, myErr := KeyMatch3Func(args...)
+	myErrStr := ""
+
+	if myErr != nil {
+		myErrStr = myErr.Error()
+	}
+
+	if myRes != res || err != myErrStr {
+		t.Errorf("%v returns %v %v, supposed to be %v %v", args, myRes, myErr, res, err)
+	}
+}
+
+func testKeyGet3Func(t *testing.T, res interface{}, err string, args ...interface{}) {
+	t.Helper()
+	myRes, myErr := KeyGet3Func(args...)
 	myErrStr := ""
 
 	if myErr != nil {
@@ -428,6 +470,16 @@ func TestKeyMatchFunc(t *testing.T) {
 	testKeyMatchFunc(t, true, "", "/foo/bar", "/foo*")
 }
 
+func TestKeyGetFunc(t *testing.T) {
+	testKeyGetFunc(t, false, "keyGet: expected 2 arguments, but got 1", "/foo")
+	testKeyGetFunc(t, false, "keyGet: expected 2 arguments, but got 3", "/foo/bar", "/foo/*", "bar")
+	testKeyGetFunc(t, false, "keyGet: argument must be a string", "/foo/bar", true)
+
+	testKeyGetFunc(t, "", "", "/foo/bar", "/foo")
+	testKeyGetFunc(t, "bar", "", "/foo/bar", "/foo/*")
+	testKeyGetFunc(t, "/bar", "", "/foo/bar", "/foo*")
+}
+
 func TestKeyMatch2Func(t *testing.T) {
 	testKeyMatch2Func(t, false, "keyMatch2: expected 2 arguments, but got 1", "/")
 	testKeyMatch2Func(t, false, "keyMatch2: expected 2 arguments, but got 3", "/foo/create/123", "/*", "/foo/update/123")
@@ -439,6 +491,16 @@ func TestKeyMatch2Func(t *testing.T) {
 	testKeyMatch2Func(t, true, "", "/foo", "/foo")
 	testKeyMatch2Func(t, true, "", "/foo", "/foo*")
 	testKeyMatch2Func(t, false, "", "/foo", "/foo/*")
+}
+
+func TestKeyGet2Func(t *testing.T) {
+	testKeyGet2Func(t, false, "keyGet2: expected 3 arguments, but got 2", "/myid/using/myresid", "/:id/using/:resId")
+	testKeyGet2Func(t, false, "keyGet2: expected 3 arguments, but got 4", "/myid/using/myresid", "/:id/using/:resId", "id", "resId")
+	testKeyGet2Func(t, false, "keyGet2: argument must be a string", "/myid/using/myresid", "/:id/using/:resId", true)
+
+	testKeyGet2Func(t, "myid", "", "/myid/using/myresid", "/:id/using/:resId", "id")
+	testKeyGet2Func(t, "myresid", "", "/myid/using/myresid", "/:id/using/:resId", "resId")
+	testKeyGet2Func(t, "", "", "/myid/using/myresid", "/:id/using/:resId", "missing")
 }
 
 func TestKeyMatch3Func(t *testing.T) {
@@ -467,6 +529,16 @@ func TestKeyMatch3Func(t *testing.T) {
 	testKeyMatch3Func(t, true, "", "/proxy/myid/res/res2", "/proxy/{id}/*")
 	testKeyMatch3Func(t, true, "", "/proxy/myid/res/res2/res3", "/proxy/{id}/*")
 	testKeyMatch3Func(t, false, "", "/proxy/", "/proxy/{id}/*")
+}
+
+func TestKeyGet3Func(t *testing.T) {
+	testKeyGet3Func(t, false, "keyGet3: expected 3 arguments, but got 2", "/myid/using/myresid", "/{id}/using/{resId}")
+	testKeyGet3Func(t, false, "keyGet3: expected 3 arguments, but got 4", "/myid/using/myresid", "/{id}/using/{resId}", "id", "resId")
+	testKeyGet3Func(t, false, "keyGet3: argument must be a string", "/myid/using/myresid", "/{id}/using/{resId}", true)
+
+	testKeyGet3Func(t, "myid", "", "/myid/using/myresid", "/{id}/using/{resId}", "id")
+	testKeyGet3Func(t, "group_name", "", "/api/group1_group_name/project1_admin/info", "/api/{g}_{gn}/{proj}_admin/info", "gn")
+	testKeyGet3Func(t, "", "", "/myid/using/myresid", "/{id}/using/{resId}", "missing")
 }
 
 func TestKeyMatch4Func(t *testing.T) {
