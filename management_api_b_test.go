@@ -172,3 +172,36 @@ func BenchmarkRemovePolicyLarge(b *testing.B) {
 		_, _ = e.RemovePolicy(fmt.Sprintf("user%d", rand.Intn(10000)), fmt.Sprintf("data%d", rand.Intn(10000)/10), "read")
 	}
 }
+
+func BenchmarkRemovePoliciesLarge(b *testing.B) {
+	e, _ := NewEnforcer("examples/basic_model.conf")
+
+	const batchSize = 100
+
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		rules := make([][]string, 0, batchSize)
+		for j := 0; j < batchSize; j++ {
+			id := i*batchSize + j
+			rules = append(rules, []string{fmt.Sprintf("user%d", id), fmt.Sprintf("data%d", id/10), "read"})
+		}
+
+		added, err := e.AddPolicies(rules)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if !added {
+			b.Fatal("expected AddPolicies to add rules")
+		}
+
+		b.StartTimer()
+		removed, err := e.RemovePolicies(rules)
+		b.StopTimer()
+		if err != nil {
+			b.Fatal(err)
+		}
+		if !removed {
+			b.Fatal("expected RemovePolicies to remove rules")
+		}
+	}
+}

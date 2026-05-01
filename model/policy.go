@@ -344,24 +344,47 @@ func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) (b
 
 // RemovePoliciesWithAffected removes policy rules from the model, and returns affected rules.
 func (model Model) RemovePoliciesWithAffected(sec string, ptype string, rules [][]string) ([][]string, error) {
-	_, err := model.GetAssertion(sec, ptype)
+	assertion, err := model.GetAssertion(sec, ptype)
 	if err != nil {
 		return nil, err
 	}
+
 	var affected [][]string
+	removeSet := make(map[string]struct{}, len(rules))
+
 	for _, rule := range rules {
-		index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
-		if !ok {
+		key := strings.Join(rule, DefaultSep)
+		if _, ok := assertion.PolicyMap[key]; !ok {
 			continue
 		}
-
-		affected = append(affected, rule)
-		model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
-		delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
-		for i := index; i < len(model[sec][ptype].Policy); i++ {
-			model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
+		if _, exists := removeSet[key]; exists {
+			continue
 		}
+		if affected == nil {
+			affected = make([][]string, 0, len(rules))
+		}
+		affected = append(affected, rule)
+		removeSet[key] = struct{}{}
 	}
+
+	if len(removeSet) == 0 {
+		return affected, nil
+	}
+
+	compactPolicy := assertion.Policy[:0]
+	compactPolicyMap := make(map[string]int, len(assertion.Policy)-len(removeSet))
+	for _, policyRule := range assertion.Policy {
+		key := strings.Join(policyRule, DefaultSep)
+		if _, ok := removeSet[key]; ok {
+			continue
+		}
+		compactPolicyMap[key] = len(compactPolicy)
+		compactPolicy = append(compactPolicy, policyRule)
+	}
+
+	assertion.Policy = compactPolicy
+	assertion.PolicyMap = compactPolicyMap
+
 	return affected, nil
 }
 
