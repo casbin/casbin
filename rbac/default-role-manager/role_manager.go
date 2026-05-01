@@ -170,7 +170,7 @@ type RoleManagerImpl struct {
 	matchingFunc       rbac.MatchingFunc
 	domainMatchingFunc rbac.MatchingFunc
 	matchingFuncCache  *util.SyncLRUCache
-	mutex              sync.Mutex
+	mutex              sync.RWMutex
 }
 
 // NewRoleManagerImpl is the constructor for creating an instance of the
@@ -311,7 +311,20 @@ func (rm *RoleManagerImpl) HasLink(name1 string, name2 string, domains ...string
 		return true, nil
 	}
 
-	// Lock to prevent race conditions between getRole and removeRole
+	// Fast path: try with read lock first (double-checked reading).
+	// This avoids write lock contention for the common case where both roles already exist.
+	rm.mutex.RLock()
+	user, userExists := rm.load(name1)
+	role, roleExists := rm.load(name2)
+	if userExists && roleExists {
+		result := rm.hasLinkHelper(role.name, map[string]*Role{user.name: user}, rm.maxHierarchyLevel)
+		rm.mutex.RUnlock()
+		return result, nil
+	}
+	rm.mutex.RUnlock()
+
+	// Slow path: acquire write lock to handle temporary role creation/deletion.
+	// This handles the case where roles need to be created for pattern matching.
 	rm.mutex.Lock()
 	defer rm.mutex.Unlock()
 
@@ -783,7 +796,20 @@ func (crm *ConditionalRoleManager) HasLink(name1 string, name2 string, domains .
 		return true, nil
 	}
 
-	// Lock to prevent race conditions between getRole and removeRole
+	// Fast path: try with read lock first (double-checked reading).
+	// This avoids write lock contention for the common case where both roles already exist.
+	crm.mutex.RLock()
+	user, userExists := crm.load(name1)
+	role, roleExists := crm.load(name2)
+	if userExists && roleExists {
+		result := crm.hasLinkHelper(role.name, map[string]*Role{user.name: user}, crm.maxHierarchyLevel, domains...)
+		crm.mutex.RUnlock()
+		return result, nil
+	}
+	crm.mutex.RUnlock()
+
+	// Slow path: acquire write lock to handle temporary role creation/deletion.
+	// This handles the case where roles need to be created for pattern matching.
 	crm.mutex.Lock()
 	defer crm.mutex.Unlock()
 
