@@ -17,12 +17,82 @@ package casbin
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/casbin/casbin/v3/constant"
 	"github.com/casbin/casbin/v3/util"
 	"github.com/casbin/govaluate"
 )
+
+func (e *Enforcer) getTypedPrincipals() ([]string, []string, bool, error) {
+	userSet := map[string]struct{}{}
+	roleSet := map[string]struct{}{}
+
+	appendByType := func(values []string) error {
+		for _, value := range values {
+			entityType, enabled, err := e.model.GetEntityType(value)
+			if err != nil {
+				return err
+			}
+			if !enabled {
+				return nil
+			}
+			switch entityType {
+			case "user":
+				userSet[value] = struct{}{}
+			case "role":
+				roleSet[value] = struct{}{}
+			}
+		}
+		return nil
+	}
+
+	enabled := false
+	values, err := e.model.GetValuesForFieldInPolicyAllTypesByName("p", constant.SubjectIndex)
+	if err != nil {
+		return nil, nil, false, err
+	}
+	if err := appendByType(values); err != nil {
+		return nil, nil, false, err
+	}
+	if _, typedEnabled, err := e.model.GetEntityType(""); err != nil {
+		return nil, nil, false, err
+	} else {
+		enabled = typedEnabled
+	}
+	if !enabled {
+		return nil, nil, false, nil
+	}
+
+	if _, err := e.model.GetAssertion("g", "g"); err == nil {
+		groupingPolicy, err := e.GetNamedGroupingPolicy("g")
+		if err != nil {
+			return nil, nil, false, err
+		}
+		for _, rule := range groupingPolicy {
+			limit := 2
+			if len(rule) < limit {
+				limit = len(rule)
+			}
+			if err := appendByType(rule[:limit]); err != nil {
+				return nil, nil, false, err
+			}
+		}
+	}
+
+	users := make([]string, 0, len(userSet))
+	for user := range userSet {
+		users = append(users, user)
+	}
+	roles := make([]string, 0, len(roleSet))
+	for role := range roleSet {
+		roles = append(roles, role)
+	}
+	sort.Strings(users)
+	sort.Strings(roles)
+	return users, roles, true, nil
+}
 
 // GetAllSubjects gets the list of subjects that show up in the current policy.
 func (e *Enforcer) GetAllSubjects() ([]string, error) {
@@ -68,6 +138,13 @@ func (e *Enforcer) GetAllNamedActions(ptype string) ([]string, error) {
 
 // GetAllRoles gets the list of roles that show up in the current policy.
 func (e *Enforcer) GetAllRoles() ([]string, error) {
+	_, roles, enabled, err := e.getTypedPrincipals()
+	if err != nil {
+		return nil, err
+	}
+	if enabled {
+		return roles, nil
+	}
 	return e.model.GetValuesForFieldInPolicyAllTypes("g", 1)
 }
 
@@ -79,6 +156,14 @@ func (e *Enforcer) GetAllNamedRoles(ptype string) ([]string, error) {
 // GetAllUsers gets the list of users that show up in the current policy.
 // Users are subjects that are not roles (i.e., subjects that do not appear as the second element in any grouping policy).
 func (e *Enforcer) GetAllUsers() ([]string, error) {
+	users, _, enabled, err := e.getTypedPrincipals()
+	if err != nil {
+		return nil, err
+	}
+	if enabled {
+		return users, nil
+	}
+
 	subjects, err := e.GetAllSubjects()
 	if err != nil {
 		return nil, err
@@ -89,8 +174,8 @@ func (e *Enforcer) GetAllUsers() ([]string, error) {
 		return nil, err
 	}
 
-	users := util.SetSubtract(subjects, roles)
-	return users, nil
+	result := util.SetSubtract(subjects, roles)
+	return result, nil
 }
 
 // GetPolicy gets all the authorization rules in the policy.

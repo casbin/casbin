@@ -371,6 +371,28 @@ func (e *Enforcer) GetNamedImplicitPermissionsForUser(ptype string, gtype string
 // GetImplicitUsersForPermission("data1", "read") will get: ["alice", "bob"].
 // Note: only users will be returned, roles (2nd arg in "g") will be excluded.
 func (e *Enforcer) GetImplicitUsersForPermission(permission ...string) ([]string, error) {
+	if _, _, enabled, err := e.getTypedPrincipals(); err != nil {
+		return nil, err
+	} else if enabled {
+		subjects, err := e.GetAllUsers()
+		if err != nil {
+			return nil, err
+		}
+
+		res := []string{}
+		for _, user := range subjects {
+			req := util.JoinSliceAny(user, permission...)
+			allowed, err := e.Enforce(req...)
+			if err != nil {
+				return nil, err
+			}
+			if allowed {
+				res = append(res, user)
+			}
+		}
+		return res, nil
+	}
+
 	pSubjects, err := e.GetAllSubjects()
 	if err != nil {
 		return nil, err
