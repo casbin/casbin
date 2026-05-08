@@ -23,6 +23,7 @@ var (
 	ErrLinkNotFound                = errors.New("error: link between name1 and name2 does not exist")
 	ErrUseDomainParameter          = errors.New("error: useDomain should be 1 parameter")
 	ErrInvalidFieldValuesParameter = errors.New("fieldValues requires at least one parameter")
+	ErrInvalidTypeDefinition       = errors.New("error: invalid type definition")
 
 	// GetAllowedObjectConditions errors.
 	ErrObjCondition   = errors.New("need to meet the prefix required by the object condition")

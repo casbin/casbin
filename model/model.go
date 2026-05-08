@@ -44,6 +44,7 @@ var sectionNameMap = map[string]string{
 	"e": "policy_effect",
 	"m": "matchers",
 	"c": "constraint_definition",
+	"t": "type_definition",
 }
 
 // Minimal required sections for a model to be valid.
@@ -118,6 +119,12 @@ func getKeySuffix(i int) string {
 }
 
 func loadSection(model Model, cfg config.ConfigInterface, sec string) {
+	if sec == "t" {
+		loadAssertion(model, cfg, sec, userTypeKey)
+		loadAssertion(model, cfg, sec, roleTypeKey)
+		return
+	}
+
 	i := 1
 	for {
 		if !loadAssertion(model, cfg, sec, sec+getKeySuffix(i)) {
@@ -200,6 +207,10 @@ func (model Model) loadModelFromConfig(cfg config.ConfigInterface) error {
 
 	// Validate constraints after model is loaded
 	if err := model.ValidateConstraints(); err != nil {
+		return err
+	}
+
+	if err := model.ValidateTypeDefinitions(); err != nil {
 		return err
 	}
 

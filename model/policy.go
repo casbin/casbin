@@ -199,6 +199,9 @@ func (model Model) AddPolicy(sec string, ptype string, rule []string) error {
 	if err != nil {
 		return err
 	}
+	if err := model.ValidatePolicyTypes(sec, ptype, rule); err != nil {
+		return err
+	}
 	assertion.Policy = append(assertion.Policy, rule)
 	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
 
@@ -282,6 +285,9 @@ func (model Model) UpdatePolicy(sec string, ptype string, oldRule []string, newR
 	if err != nil {
 		return false, err
 	}
+	if err := model.ValidatePolicyTypes(sec, ptype, newRule); err != nil {
+		return false, err
+	}
 	oldPolicy := strings.Join(oldRule, DefaultSep)
 	index, ok := model[sec][ptype].PolicyMap[oldPolicy]
 	if !ok {
@@ -300,6 +306,11 @@ func (model Model) UpdatePolicies(sec string, ptype string, oldRules, newRules [
 	_, err := model.GetAssertion(sec, ptype)
 	if err != nil {
 		return false, err
+	}
+	for _, newRule := range newRules {
+		if err := model.ValidatePolicyTypes(sec, ptype, newRule); err != nil {
+			return false, err
+		}
 	}
 	rollbackFlag := false
 	// index -> []{oldIndex, newIndex}
