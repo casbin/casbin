@@ -21,9 +21,22 @@ github:
   description: >-
     Apache Casbin: an authorization library that supports access control models like ACL, RBAC, ABAC.
   homepage: https://casbin.apache.org/
-  dependabot_alerts:  true
+  dependabot_alerts: true
   dependabot_updates: false
 
+  rulesets:
+    - name: "Default Branch Protection"
+      type: branch
+      branches:
+        includes:
+          - "~DEFAULT_BRANCH"
+          - "release/*"
+          - "rel/*"
+        excludes: []
+      bypass_teams:
+        - root
+      restrict_deletion: true
+      restrict_force_push: true
 notifications:
   commits: commits@casbin.apache.org
 
