@@ -19,6 +19,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/casbin/casbin/v3/persist"
 	"github.com/casbin/casbin/v3/persist/cache"
 )
 
@@ -89,6 +90,31 @@ func (e *SyncedCachedEnforcer) LoadPolicy() error {
 		}
 	}
 	return e.SyncedEnforcer.LoadPolicy()
+}
+
+// SetWatcher sets the current watcher for the SyncedCachedEnforcer.
+// It overrides the base SyncedEnforcer.SetWatcher to ensure that:
+// 1) For WatcherEx implementations (e.g., Redis watcher), a proper callback is set
+//    that calls InvalidateCache() + LoadPolicy() for efficient cache clearing.
+// 2) For basic Watcher implementations, the callback calls LoadPolicy() which clears cache.
+func (e *SyncedCachedEnforcer) SetWatcher(watcher persist.Watcher) error {
+	e.SyncedEnforcer.watcher = watcher
+	if _, ok := watcher.(persist.WatcherEx); ok {
+		// For WatcherEx, set a callback that invalidates cache on any policy change.
+		// The callback is invoked by the watcher implementation (e.g., Redis pub/sub subscriber)
+		// when another instance modifies the policy.
+		return watcher.SetUpdateCallback(func(string) {
+			// First invalidate the cache to prevent stale reads
+			if atomic.LoadInt32(&e.enableCache) != 0 {
+				_ = e.InvalidateCache()
+			}
+			// Then reload the policy from the persistence layer
+			_ = e.LoadPolicy()
+		})
+	}
+	// For basic Watcher, the default callback is sufficient since
+	// LoadPolicy() on SyncedCachedEnforcer already clears the cache.
+	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
 }
 
 func (e *SyncedCachedEnforcer) AddPolicy(params ...interface{}) (bool, error) {

@@ -20,6 +20,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/casbin/casbin/v3/persist"
 	"github.com/casbin/casbin/v3/persist/cache"
 )
 
@@ -87,6 +88,7 @@ func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
 	return res, err
 }
 
+// LoadPolicy reloads the policy from file/database and clears the cache.
 func (e *CachedEnforcer) LoadPolicy() error {
 	if atomic.LoadInt32(&e.enableCache) != 0 {
 		if err := e.cache.Clear(); err != nil {
@@ -96,6 +98,33 @@ func (e *CachedEnforcer) LoadPolicy() error {
 	return e.Enforcer.LoadPolicy()
 }
 
+// SetWatcher sets the current watcher for the CachedEnforcer.
+// It overrides the base Enforcer.SetWatcher to ensure that:
+// 1) For WatcherEx implementations (e.g., Redis watcher), a proper callback is set
+//    that calls CachedEnforcer.InvalidateCache() + LoadPolicy() for efficient cache clearing.
+// 2) For basic Watcher implementations, the callback calls LoadPolicy() which clears cache.
+func (e *CachedEnforcer) SetWatcher(watcher persist.Watcher) error {
+	e.watcher = watcher
+	if _, ok := watcher.(persist.WatcherEx); ok {
+		// For WatcherEx, set a callback that invalidates cache on any policy change.
+		// The callback is invoked by the watcher implementation (e.g., Redis pub/sub subscriber)
+		// when another instance modifies the policy.
+		return watcher.SetUpdateCallback(func(string) {
+			// First invalidate the cache to prevent stale reads
+			if atomic.LoadInt32(&e.enableCache) != 0 {
+				_ = e.InvalidateCache()
+			}
+			// Then reload the policy from the persistence layer
+			_ = e.LoadPolicy()
+		})
+	}
+	// For basic Watcher, the default callback is sufficient since
+	// LoadPolicy() on CachedEnforcer already clears the cache.
+	return watcher.SetUpdateCallback(func(string) { _ = e.LoadPolicy() })
+}
+
+// RemovePolicy removes an authorization rule from the current policy.
+// It also removes the corresponding cache entry.
 func (e *CachedEnforcer) RemovePolicy(params ...interface{}) (bool, error) {
 	if atomic.LoadInt32(&e.enableCache) != 0 {
 		key, ok := e.getKey(params...)
@@ -132,10 +161,16 @@ func (e *CachedEnforcer) getCachedResult(key string) (res bool, err error) {
 	return e.cache.Get(key)
 }
 
+// SetExpireTime sets the cache expiration time (TTL).
+// Use 0 or negative duration to make cache entries never expire.
+// This is useful in multi-instance scenarios where you want to avoid lock contention
+// and recalculation overhead, and instead manually trigger LoadPolicy() or InvalidateCache()
+// when policies change.
 func (e *CachedEnforcer) SetExpireTime(expireTime time.Duration) {
 	e.expireTime = expireTime
 }
 
+// SetCache sets the cache implementation.
 func (e *CachedEnforcer) SetCache(c cache.Cache) {
 	e.cache = c
 }
@@ -173,7 +208,7 @@ func GetCacheKey(params ...interface{}) (string, bool) {
 	return key.String(), true
 }
 
-// ClearPolicy clears all policy.
+// ClearPolicy clears all policy and the cache.
 func (e *CachedEnforcer) ClearPolicy() {
 	if atomic.LoadInt32(&e.enableCache) != 0 {
 		if err := e.cache.Clear(); err != nil {
