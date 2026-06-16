@@ -15,6 +15,7 @@
 package persist
 
 import (
+	"bytes"
 	"encoding/csv"
 	"strings"
 
@@ -38,6 +39,23 @@ func LoadPolicyLine(line string, m model.Model) error {
 	}
 
 	return LoadPolicyArray(tokens, m)
+}
+
+// PolicyLineToCsv serializes a policy type and its rule fields into a CSV-safe line.
+// Fields containing commas are properly quoted so the line can be round-tripped
+// through LoadPolicyLine without corruption.
+func PolicyLineToCsv(ptype string, rule []string) (string, error) {
+	record := append([]string{ptype}, rule...)
+	var buf bytes.Buffer
+	w := csv.NewWriter(&buf)
+	if err := w.Write(record); err != nil {
+		return "", err
+	}
+	w.Flush()
+	if err := w.Error(); err != nil {
+		return "", err
+	}
+	return strings.TrimRight(buf.String(), "\r\n"), nil
 }
 
 // LoadPolicyArray loads a policy rule to model.

@@ -15,10 +15,12 @@
 package stringadapter
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/casbin/casbin/v3/model"
+	"github.com/casbin/casbin/v3/persist"
 )
 
 func Test_KeyMatchRbac(t *testing.T) {
@@ -58,6 +60,70 @@ g, alice, data_group_admin
 	act := "POST"
 	if res, _ := e.Enforce(sub, obj, act); !res {
 		t.Error("unexpected enforce result")
+	}
+}
+
+// Test_SavePolicyRoundTripWithCommas verifies that a policy rule whose fields contain
+// commas (e.g. ABAC condition expressions) survives a SavePolicy → LoadPolicy round trip
+// without corruption. See https://github.com/apache/casbin/issues/1733.
+func Test_SavePolicyRoundTripWithCommas(t *testing.T) {
+	conf := `
+[request_definition]
+r = sub, obj, act, cond
+
+[policy_definition]
+p = sub, obj, act, cond
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
+`
+	// cond field intentionally contains commas (as in ABAC expressions).
+	condWithComma := `r.attrs in ('val1','val2')`
+	line := "p, alice, data1, read, " + `"` + condWithComma + `"`
+
+	a := NewAdapter(line)
+	m := model.NewModel()
+	if err := m.LoadModelFromText(conf); err != nil {
+		t.Fatalf("load model: %v", err)
+	}
+	e, err := casbin.NewEnforcer(m, a)
+	if err != nil {
+		t.Fatalf("new enforcer: %v", err)
+	}
+
+	// SavePolicy serialises in-memory rules back to the adapter string.
+	if err := e.SavePolicy(); err != nil {
+		t.Fatalf("SavePolicy: %v", err)
+	}
+
+	// The saved line must be a properly quoted CSV so that re-loading produces
+	// exactly one rule with the comma-containing cond field intact.
+	saved := a.Line
+	reloaded := model.NewModel()
+	if err := reloaded.LoadModelFromText(conf); err != nil {
+		t.Fatalf("reload model: %v", err)
+	}
+	for _, l := range strings.Split(saved, "\n") {
+		if l == "" {
+			continue
+		}
+		if err := persist.LoadPolicyLine(l, reloaded); err != nil {
+			t.Fatalf("LoadPolicyLine on saved line %q: %v", l, err)
+		}
+	}
+
+	rules, err := reloaded.GetPolicy("p", "p")
+	if err != nil {
+		t.Fatalf("GetPolicy: %v", err)
+	}
+	if len(rules) != 1 {
+		t.Fatalf("expected 1 rule after round-trip, got %d (saved: %q)", len(rules), saved)
+	}
+	if rules[0][3] != condWithComma {
+		t.Errorf("cond field corrupted after round-trip: got %q, want %q", rules[0][3], condWithComma)
 	}
 }
 

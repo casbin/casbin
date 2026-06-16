@@ -23,7 +23,6 @@ import (
 
 	"github.com/casbin/casbin/v3/model"
 	"github.com/casbin/casbin/v3/persist"
-	"github.com/casbin/casbin/v3/util"
 )
 
 // Adapter is the file adapter for Casbin.
@@ -68,16 +67,22 @@ func (a *Adapter) SavePolicy(model model.Model) error {
 
 	for ptype, ast := range model["p"] {
 		for _, rule := range ast.Policy {
-			tmp.WriteString(ptype + ", ")
-			tmp.WriteString(util.ArrayToString(rule))
+			line, err := persist.PolicyLineToCsv(ptype, rule)
+			if err != nil {
+				return err
+			}
+			tmp.WriteString(line)
 			tmp.WriteString("\n")
 		}
 	}
 
 	for ptype, ast := range model["g"] {
 		for _, rule := range ast.Policy {
-			tmp.WriteString(ptype + ", ")
-			tmp.WriteString(util.ArrayToString(rule))
+			line, err := persist.PolicyLineToCsv(ptype, rule)
+			if err != nil {
+				return err
+			}
+			tmp.WriteString(line)
 			tmp.WriteString("\n")
 		}
 	}
