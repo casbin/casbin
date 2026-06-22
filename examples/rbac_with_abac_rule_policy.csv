@@ -1,13 +1,13 @@
 p, admin, data1, read, noRule, allow
-p, admin, data1, read, r.ctx.age < 18 || r.ctx.type == "minor", deny
+p, admin, data1, read, r.ctx.age < 18 || r.ctx.type == 'minor', deny
 
 p, admin, data2, write, noRule, allow
-p, admin, data2, write, r.ctx.network == "http", deny
+p, admin, data2, write, r.ctx.network == 'http', deny
 
 p, admin, data3, *, noRule, allow
 
 p, user, data4, read, noRule, allow
-p, user, data4, read, r.ctx.RiskStatus == "high", deny
+p, user, data4, read, r.ctx.RiskStatus == 'high', deny
 
 g, alice, admin
 g, alice, user
