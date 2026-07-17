@@ -137,6 +137,19 @@ func KeyGetFunc(args ...interface{}) (interface{}, error) {
 // KeyMatch2 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/:resource".
 func KeyMatch2(key1 string, key2 string) bool {
+	// Fast paths: equality, bare "*", and pattern-free literals avoid the
+	// string-transform + RegexMatch work that dominates BuildRoleLinks when
+	// DomainMatchingFunc is KeyMatch2 over mostly-concrete domains (see #1004).
+	if key1 == key2 {
+		return true
+	}
+	if key2 == "*" {
+		return true
+	}
+	if !strings.ContainsAny(key2, "*:") {
+		return false
+	}
+
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 
 	key2 = keyMatch2Re.ReplaceAllString(key2, "$1[^/]+$2")
@@ -194,6 +207,16 @@ func KeyGet2Func(args ...interface{}) (interface{}, error) {
 // KeyMatch3 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/{resource}".
 func KeyMatch3(key1 string, key2 string) bool {
+	if key1 == key2 {
+		return true
+	}
+	if key2 == "*" {
+		return true
+	}
+	if !strings.ContainsAny(key2, "*{") {
+		return false
+	}
+
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 	key2 = keyMatch3Re.ReplaceAllString(key2, "$1[^/]+$2")
 
@@ -253,6 +276,16 @@ func KeyGet3Func(args ...interface{}) (interface{}, error) {
 // "/parent/123/child/456" does not match "/parent/{id}/child/{id}"
 // But KeyMatch3 will match both.
 func KeyMatch4(key1 string, key2 string) bool {
+	if key1 == key2 {
+		return true
+	}
+	if key2 == "*" {
+		return true
+	}
+	if !strings.ContainsAny(key2, "*{") {
+		return false
+	}
+
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 
 	tokens := []string{}
@@ -310,6 +343,16 @@ func KeyMatch5(key1 string, key2 string) bool {
 
 	if i != -1 {
 		key1 = key1[:i]
+	}
+
+	if key1 == key2 {
+		return true
+	}
+	if key2 == "*" {
+		return true
+	}
+	if !strings.ContainsAny(key2, "*{") {
+		return false
 	}
 
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
