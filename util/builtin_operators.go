@@ -57,32 +57,20 @@ func mustCompileOrGet(key string) *regexp.Regexp {
 }
 
 // keyMatchFastPath handles cheap cases shared by KeyMatch2/3/4/5 before the
-// string-transform + RegexMatch path.
+// string-transform + RegexMatch path. handled=true means matched is final.
 //
-// When handled is true, matched is the final result and the caller must return it.
-//
-// Cases:
-//  1. key1 == key2 → true
-//  2. key2 == "*" → true (bare wildcard). Explicitly handled so domain matchers
-//     using AddNamedDomainMatchingFunc do not depend on compiling "^*$", which
-//     historically panicked ("missing argument to repetition operator") on some
-//     Go/regexp versions — see #330. On current Go, "^*$" match-alls; either way
-//     the intended semantics for a bare "*" is match-any.
-//  3. key2 is a pure literal → false (equality already checked). RegexMatch
-//     embeds key2 unescaped into "^"+key2+"$", so it is not enough to look only
-//     for matcher-specific pattern characters (* / : / {): values like "acme.com"
-//     contain no KeyMatch dialect markers but `.` is still a regexp metacharacter.
-//     We therefore require regexp.QuoteMeta(key2) == key2, plus none of
-//     extraPatternChars (e.g. ":" for KeyMatch2, which QuoteMeta does not escape).
+//  1. key2 == "*" → true (bare wildcard / domain admin). Avoids depending on
+//     compiling "^*$", which historically panicked on some Go versions (#330).
+//  2. key2 is a pure literal → key1 == key2. Literal means QuoteMeta(key2) == key2
+//     and no matcher-specific chars in extraPatternChars (e.g. ":" for KeyMatch2's
+//     :param dialect). Equality is inside this gate so patterns or stray regexp
+//     metas (".", "+", …) still take the regex path and keep prior behavior.
 func keyMatchFastPath(key1, key2, extraPatternChars string) (matched bool, handled bool) {
-	if key1 == key2 {
-		return true, true
-	}
 	if key2 == "*" {
 		return true, true
 	}
 	if regexp.QuoteMeta(key2) == key2 && !strings.ContainsAny(key2, extraPatternChars) {
-		return false, true
+		return key1 == key2, true
 	}
 	return false, false
 }

@@ -123,11 +123,21 @@ func TestKeyMatch2(t *testing.T) {
 	// Pure literals only match via equality.
 	testKeyMatch2(t, "team/1", "team/2", false)
 	testKeyMatch2(t, "team/1", "team/1", true)
+	// ":" is KeyMatch2 :param dialect (not a Go regexp meta). Must NOT take the
+	// literal equality fast path: "team:1" becomes "team[^/]+", so unequal
+	// suffixes still match. KeyMatch3 treats ":" as a literal (see TestKeyMatch3).
+	testKeyMatch2(t, "team:1", "team:1", true)
+	testKeyMatch2(t, "team:1", "team:2", true)
+	testKeyMatch2(t, "team:1", "other:1", false)
 	// RegexMatch does not QuoteMeta key2: non-matcher regexp metas like "." must
 	// still take the regex path (behavior-preserving vs pre-fast-path KeyMatch2).
 	testKeyMatch2(t, "acmeXcom", "acme.com", true)
 	testKeyMatch2(t, "api.example.com", "api.example.com", true)
 	testKeyMatch2(t, "api.example.com", "api.example.org", false)
+	// key1 == key2 must NOT short-circuit to true when key2 carries a regexp
+	// metacharacter that does not match itself: "^a+b$" does not match "a+b".
+	testKeyMatch2(t, "a+b", "a+b", false)
+	testKeyMatch2(t, "a?b", "a?b", false)
 }
 
 func testKeyGet2(t *testing.T, key1 string, key2 string, pathVar string, res string) {
@@ -212,7 +222,12 @@ func TestKeyMatch3(t *testing.T) {
 	testKeyMatch3(t, "team/1", "*", true)
 	testKeyMatch3(t, "team/1", "team/2", false)
 	testKeyMatch3(t, "team/1", "team/1", true)
+	// Unlike KeyMatch2, ":" is not a pattern char here — pure literal equality.
+	testKeyMatch3(t, "team:1", "team:1", true)
+	testKeyMatch3(t, "team:1", "team:2", false)
 	testKeyMatch3(t, "acmeXcom", "acme.com", true)
+	testKeyMatch3(t, "a+b", "a+b", false)
+	testKeyMatch3(t, "a?b", "a?b", false)
 }
 
 func testKeyGet3(t *testing.T, key1 string, key2 string, pathVar string, res string) {
@@ -294,6 +309,33 @@ func TestKeyMatch4(t *testing.T) {
 	testKeyMatch4(t, "team/1", "team/2", false)
 	testKeyMatch4(t, "team/1", "team/1", true)
 	testKeyMatch4(t, "acmeXcom", "acme.com", true)
+	testKeyMatch4(t, "a+b", "a+b", false)
+	testKeyMatch4(t, "a?b", "a?b", false)
+}
+
+func testKeyMatch5(t *testing.T, key1 string, key2 string, res bool) {
+	t.Helper()
+	myRes := KeyMatch5(key1, key2)
+	t.Logf("%s < %s: %t", key1, key2, myRes)
+
+	if myRes != res {
+		t.Errorf("%s < %s: %t, supposed to be %t", key1, key2, !res, res)
+	}
+}
+
+func TestKeyMatch5(t *testing.T) {
+	testKeyMatch5(t, "/foo/bar?status=1&type=2", "/foo/bar", true)
+	testKeyMatch5(t, "/foo/bar?status=1&type=2", "/foo/baz", false)
+	testKeyMatch5(t, "/parent/child1?status=1", "/parent/*", true)
+
+	testKeyMatch5(t, "team/1", "*", true)
+	testKeyMatch5(t, "/foo/bar?x=1", "*", true)
+	testKeyMatch5(t, "team/1", "team/2", false)
+	testKeyMatch5(t, "team/1", "team/1", true)
+	testKeyMatch5(t, "/foo/bar?x=1", "/foo/bar", true)
+	testKeyMatch5(t, "acmeXcom", "acme.com", true)
+	testKeyMatch5(t, "a+b", "a+b", false)
+	testKeyMatch5(t, "a?b", "a?b", false)
 }
 
 func testRegexMatch(t *testing.T, key1 string, key2 string, res bool) {
