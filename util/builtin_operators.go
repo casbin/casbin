@@ -56,6 +56,37 @@ func mustCompileOrGet(key string) *regexp.Regexp {
 	return re
 }
 
+// keyMatchFastPath handles cheap cases shared by KeyMatch2/3/4/5 before the
+// string-transform + RegexMatch path.
+//
+// When handled is true, matched is the final result and the caller must return it.
+//
+// Cases:
+//  1. key1 == key2 → true
+//  2. key2 == "*" → true (bare wildcard). Explicitly handled so domain matchers
+//     using AddNamedDomainMatchingFunc do not depend on compiling "^*$", which
+//     historically panicked ("missing argument to repetition operator") on some
+//     Go/regexp versions — see #330. On current Go, "^*$" match-alls; either way
+//     the intended semantics for a bare "*" is match-any.
+//  3. key2 is a pure literal → false (equality already checked). RegexMatch
+//     embeds key2 unescaped into "^"+key2+"$", so it is not enough to look only
+//     for matcher-specific pattern characters (* / : / {): values like "acme.com"
+//     contain no KeyMatch dialect markers but `.` is still a regexp metacharacter.
+//     We therefore require regexp.QuoteMeta(key2) == key2, plus none of
+//     extraPatternChars (e.g. ":" for KeyMatch2, which QuoteMeta does not escape).
+func keyMatchFastPath(key1, key2, extraPatternChars string) (matched bool, handled bool) {
+	if key1 == key2 {
+		return true, true
+	}
+	if key2 == "*" {
+		return true, true
+	}
+	if regexp.QuoteMeta(key2) == key2 && !strings.ContainsAny(key2, extraPatternChars) {
+		return false, true
+	}
+	return false, false
+}
+
 // validate the variadic parameter size and type as string.
 func validateVariadicArgs(expectedLen int, args ...interface{}) error {
 	if len(args) != expectedLen {
@@ -137,17 +168,12 @@ func KeyGetFunc(args ...interface{}) (interface{}, error) {
 // KeyMatch2 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/:resource".
 func KeyMatch2(key1 string, key2 string) bool {
-	// Fast paths: equality, bare "*", and pattern-free literals avoid the
-	// string-transform + RegexMatch work that dominates BuildRoleLinks when
-	// DomainMatchingFunc is KeyMatch2 over mostly-concrete domains (see #1004).
-	if key1 == key2 {
-		return true
-	}
-	if key2 == "*" {
-		return true
-	}
-	if !strings.ContainsAny(key2, "*:") {
-		return false
+	// Fast paths avoid string-transform + RegexMatch work that dominates
+	// BuildRoleLinks when DomainMatchingFunc is KeyMatch2 over mostly-concrete
+	// domains (see #1004). extraPatternChars ":" covers KeyMatch2's :param
+	// dialect (not escaped by QuoteMeta).
+	if matched, handled := keyMatchFastPath(key1, key2, ":"); handled {
+		return matched
 	}
 
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
@@ -207,14 +233,8 @@ func KeyGet2Func(args ...interface{}) (interface{}, error) {
 // KeyMatch3 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/{resource}".
 func KeyMatch3(key1 string, key2 string) bool {
-	if key1 == key2 {
-		return true
-	}
-	if key2 == "*" {
-		return true
-	}
-	if !strings.ContainsAny(key2, "*{") {
-		return false
+	if matched, handled := keyMatchFastPath(key1, key2, ""); handled {
+		return matched
 	}
 
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
@@ -276,14 +296,8 @@ func KeyGet3Func(args ...interface{}) (interface{}, error) {
 // "/parent/123/child/456" does not match "/parent/{id}/child/{id}"
 // But KeyMatch3 will match both.
 func KeyMatch4(key1 string, key2 string) bool {
-	if key1 == key2 {
-		return true
-	}
-	if key2 == "*" {
-		return true
-	}
-	if !strings.ContainsAny(key2, "*{") {
-		return false
+	if matched, handled := keyMatchFastPath(key1, key2, ""); handled {
+		return matched
 	}
 
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
@@ -345,14 +359,8 @@ func KeyMatch5(key1 string, key2 string) bool {
 		key1 = key1[:i]
 	}
 
-	if key1 == key2 {
-		return true
-	}
-	if key2 == "*" {
-		return true
-	}
-	if !strings.ContainsAny(key2, "*{") {
-		return false
+	if matched, handled := keyMatchFastPath(key1, key2, ""); handled {
+		return matched
 	}
 
 	key2 = strings.Replace(key2, "/*", "/.*", -1)

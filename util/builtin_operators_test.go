@@ -115,14 +115,19 @@ func TestKeyMatch2(t *testing.T) {
 
 	testKeyMatch2(t, "/alice/all", "/:/all", false)
 
-	// Bare "*" matches any key (used as domain wildcard with AddNamedDomainMatchingFunc).
+	// Bare "*" is match-any (domain wildcard / #330 — avoid depending on "^*$").
 	testKeyMatch2(t, "team/1", "*", true)
 	testKeyMatch2(t, "", "*", true)
 	testKeyMatch2(t, "*", "*", true)
 	testKeyMatch2(t, "*", "team/1", false)
-	// Pattern-free literals only match via equality.
+	// Pure literals only match via equality.
 	testKeyMatch2(t, "team/1", "team/2", false)
 	testKeyMatch2(t, "team/1", "team/1", true)
+	// RegexMatch does not QuoteMeta key2: non-matcher regexp metas like "." must
+	// still take the regex path (behavior-preserving vs pre-fast-path KeyMatch2).
+	testKeyMatch2(t, "acmeXcom", "acme.com", true)
+	testKeyMatch2(t, "api.example.com", "api.example.com", true)
+	testKeyMatch2(t, "api.example.com", "api.example.org", false)
 }
 
 func testKeyGet2(t *testing.T, key1 string, key2 string, pathVar string, res string) {
@@ -207,6 +212,7 @@ func TestKeyMatch3(t *testing.T) {
 	testKeyMatch3(t, "team/1", "*", true)
 	testKeyMatch3(t, "team/1", "team/2", false)
 	testKeyMatch3(t, "team/1", "team/1", true)
+	testKeyMatch3(t, "acmeXcom", "acme.com", true)
 }
 
 func testKeyGet3(t *testing.T, key1 string, key2 string, pathVar string, res string) {
@@ -287,6 +293,7 @@ func TestKeyMatch4(t *testing.T) {
 	testKeyMatch4(t, "team/1", "*", true)
 	testKeyMatch4(t, "team/1", "team/2", false)
 	testKeyMatch4(t, "team/1", "team/1", true)
+	testKeyMatch4(t, "acmeXcom", "acme.com", true)
 }
 
 func testRegexMatch(t *testing.T, key1 string, key2 string, res bool) {
