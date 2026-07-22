@@ -1,5 +1,4 @@
 SHELL = /bin/bash
-export PATH := $(shell yarn global bin):$(PATH)
 
 default: lint test
 
