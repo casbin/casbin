@@ -200,12 +200,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
---------------------------------------------------------------------------------
+THIRD-PARTY COMPONENTS
 
-The following component is included under the MIT License:
-
-.golangci.yml
-Based on https://gist.github.com/maratori/47a4d00457a92aa426dbd48a18776322
+The .golangci.yml configuration is based on
+https://gist.github.com/maratori/47a4d00457a92aa426dbd48a18776322
+and is licensed under the MIT License.
 
 MIT License
 
