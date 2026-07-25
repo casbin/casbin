@@ -15,15 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-SHELL = /bin/bash
-
-default: lint test
-
-test:
-	go test -race -v ./...
-
-benchmark:
-	go test -bench=.
-
-lint:
-	golangci-lint run --verbose
+# Repository-only development infrastructure and contributor guidance are not
+# part of the source release.
+.github export-ignore
+CONTRIBUTING.md export-ignore
