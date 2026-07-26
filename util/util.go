@@ -285,9 +285,7 @@ func EscapeStringLiterals(expr string) string {
 	inString := false
 	var quote rune
 
-	for i := 0; i < len(expr); i++ {
-		ch := rune(expr[i])
-
+	for _, ch := range expr {
 		if inString {
 			result.WriteRune(ch)
 			if ch == '\\' {
