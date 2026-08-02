@@ -257,6 +257,11 @@ func TestEscapeStringLiterals(t *testing.T) {
 	testEscapeStringLiterals(t, `regexMatch("\1\2", p.obj)`, `regexMatch("\\1\\2", p.obj)`)
 	testEscapeStringLiterals(t, `r.sub == '\test'`, `r.sub == '\\test'`)
 
+	// Test that non-ASCII (multi-byte UTF-8) string literals are preserved
+	testEscapeStringLiterals(t, `r.sub == '香港'`, `r.sub == '香港'`)
+	testEscapeStringLiterals(t, `r.obj == "café"`, `r.obj == "café"`)
+	testEscapeStringLiterals(t, `keyMatch(r.obj, 'naïve\1')`, `keyMatch(r.obj, 'naïve\\1')`)
+
 	// Test expressions without string literals
 	testEscapeStringLiterals(t, `r.sub == p.sub`, `r.sub == p.sub`)
 	testEscapeStringLiterals(t, `keyMatch(r.obj, p.obj)`, `keyMatch(r.obj, p.obj)`)
