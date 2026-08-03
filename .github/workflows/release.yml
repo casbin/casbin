@@ -1,0 +1,204 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+# Releases are driven by manually pushed tags only. Nothing is published
+# automatically when a pull request is merged.
+#
+#   v<X>.<Y>.<Z>-rc<N>  GitHub pre-release only.
+#   v<X>.<Y>.<Z>        GitHub release plus the Go module proxy.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: ${{ github.repository == 'apache/casbin' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute release metadata
+        id: release
+        run: |
+          set -euo pipefail
+
+          TAG_NAME="${GITHUB_REF_NAME}"
+          if [[ "${TAG_NAME}" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            IS_RC="false"
+          elif [[ "${TAG_NAME}" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)-rc[0-9]+$ ]]; then
+            IS_RC="true"
+          else
+            echo "::error::Unsupported release tag: ${TAG_NAME}. Expected vX.Y.Z or vX.Y.Z-rcN."
+            exit 1
+          fi
+
+          VERSION="${BASH_REMATCH[1]}"
+          BASENAME="apache-casbin-incubating-${VERSION}-src"
+
+          # Previous release, used as the start of the change log range.
+          PREVIOUS_TAG="$(
+            {
+              git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || true
+              echo "v${VERSION}"
+            } |
+              sort -V -u |
+              awk -v current="v${VERSION}" '
+                $0 == current {
+                  print previous
+                  exit
+                }
+                {
+                  previous = $0
+                }
+              '
+          )"
+
+          {
+            echo "tag=${TAG_NAME}"
+            echo "version=${VERSION}"
+            echo "is_rc=${IS_RC}"
+            echo "basename=${BASENAME}"
+            echo "previous_tag=${PREVIOUS_TAG}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Generate release notes
+        run: |
+          set -euo pipefail
+
+          CURRENT_TAG="${{ steps.release.outputs.tag }}"
+          CURRENT_VERSION="${CURRENT_TAG#v}"
+          PREVIOUS_TAG="${{ steps.release.outputs.previous_tag }}"
+          RELEASE_DATE="$(date -u +%F)"
+          RANGE="${CURRENT_TAG}"
+
+          if [ -n "${PREVIOUS_TAG}" ]; then
+            RANGE="${PREVIOUS_TAG}..${CURRENT_TAG}"
+          fi
+
+          FEATURES="$(git log --pretty=format:'%s (%h)' "${RANGE}" | grep -Ei '^(feat)(\(.+\))?: ' || true)"
+          FIXES="$(git log --pretty=format:'%s (%h)' "${RANGE}" | grep -Ei '^(fix)(\(.+\))?: ' || true)"
+          DOCS="$(git log --pretty=format:'%s (%h)' "${RANGE}" | grep -Ei '^(docs?|doc)(\(.+\))?: ' || true)"
+
+          {
+            if [ -n "${PREVIOUS_TAG}" ]; then
+              echo "# [${CURRENT_VERSION}](https://github.com/${GITHUB_REPOSITORY}/compare/${PREVIOUS_TAG}...${CURRENT_TAG}) (${RELEASE_DATE})"
+            else
+              echo "# ${CURRENT_VERSION} (${RELEASE_DATE})"
+            fi
+            echo
+            if [ "${{ steps.release.outputs.is_rc }}" = "true" ]; then
+              echo "Release candidate for ${{ steps.release.outputs.version }}. This is not an official release."
+              echo
+            fi
+
+            if [ -n "${FEATURES}" ]; then
+              echo "## Features"
+              echo
+              printf '%s\n' "${FEATURES}" | sed 's/^/- /'
+              echo
+            fi
+
+            if [ -n "${FIXES}" ]; then
+              echo "## Fixes"
+              echo
+              printf '%s\n' "${FIXES}" | sed 's/^/- /'
+              echo
+            fi
+
+            if [ -n "${DOCS}" ]; then
+              echo "## Docs"
+              echo
+              printf '%s\n' "${DOCS}" | sed 's/^/- /'
+              echo
+            fi
+
+            if [ -z "${FEATURES}${FIXES}${DOCS}" ]; then
+              echo "## Notes"
+              echo
+              echo "- No feat/fix/doc commits were found in this release range."
+            fi
+          } > RELEASE_NOTES.md
+
+      - name: Create source archives
+        run: |
+          set -euo pipefail
+
+          BASENAME="${{ steps.release.outputs.basename }}"
+          mkdir -p dist
+          git archive --format=tar.gz --prefix="${BASENAME}/" -o "dist/${BASENAME}.tar.gz" "${{ steps.release.outputs.tag }}"
+          git archive --format=zip --prefix="${BASENAME}/" -o "dist/${BASENAME}.zip" "${{ steps.release.outputs.tag }}"
+
+          cd dist
+          for archive in "${BASENAME}.tar.gz" "${BASENAME}.zip"; do
+            sha512sum "${archive}" > "${archive}.sha512"
+          done
+          sha512sum --check ./*.sha512
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [ "${{ steps.release.outputs.is_rc }}" = "true" ]; then
+            TITLE="Apache Casbin (Incubating) ${{ steps.release.outputs.version }} (release candidate ${{ steps.release.outputs.tag }})"
+            FLAGS=(--prerelease)
+          else
+            TITLE="Apache Casbin (Incubating) ${{ steps.release.outputs.version }}"
+            FLAGS=(--latest)
+          fi
+
+          gh release create "${{ steps.release.outputs.tag }}" \
+            --verify-tag \
+            --title "${TITLE}" \
+            --notes-file RELEASE_NOTES.md \
+            "${FLAGS[@]}" \
+            dist/*
+
+      - name: Publish to the Go module proxy
+        if: ${{ steps.release.outputs.is_rc == 'false' }}
+        run: |
+          set -euo pipefail
+
+          MODULE_PATH="$(awk '/^module /{print $2; exit}' go.mod)"
+          TAG="${{ steps.release.outputs.tag }}"
+
+          # Requesting the version makes the proxy fetch and cache it, which is
+          # what publishes the release to the Go module ecosystem.
+          for attempt in 1 2 3; do
+            if curl --fail --silent --show-error --location \
+              "https://proxy.golang.org/${MODULE_PATH}/@v/${TAG}.info"; then
+              echo
+              echo "Published ${MODULE_PATH}@${TAG} to proxy.golang.org."
+              exit 0
+            fi
+            echo "Attempt ${attempt} failed, retrying in 30s..."
+            sleep 30
+          done
+
+          echo "::error::Failed to publish ${MODULE_PATH}@${TAG} to proxy.golang.org."
+          exit 1
