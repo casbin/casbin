@@ -20,7 +20,7 @@ under the License.
 Apache Casbin
 ====
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/apache/casbin)](https://goreportcard.com/report/github.com/apache/casbin)
+[![Lint](https://github.com/apache/casbin/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/apache/casbin/actions/workflows/golangci-lint.yml)
 [![Build](https://github.com/apache/casbin/actions/workflows/default.yml/badge.svg)](https://github.com/apache/casbin/actions/workflows/default.yml)
 [![Coverage Status](https://coveralls.io/repos/github/apache/casbin/badge.svg?branch=master)](https://coveralls.io/github/apache/casbin?branch=master)
 [![Godoc](https://godoc.org/github.com/apache/casbin?status.svg)](https://pkg.go.dev/github.com/casbin/casbin/v2)
