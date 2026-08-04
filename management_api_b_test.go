@@ -176,3 +176,50 @@ func BenchmarkRemovePolicyLarge(b *testing.B) {
 		_, _ = e.RemovePolicy(fmt.Sprintf("user%d", rand.Intn(10000)), fmt.Sprintf("data%d", rand.Intn(10000)/10), "read")
 	}
 }
+
+func BenchmarkRemovePoliciesLarge(b *testing.B) {
+	e, _ := NewEnforcer("examples/basic_model.conf")
+
+	// 10000 roles, 1000 resources.
+	pPolicies := make([][]string, 0)
+	for i := 0; i < 10000; i++ {
+		pPolicies = append(pPolicies, []string{fmt.Sprintf("user%d", i), fmt.Sprintf("data%d", i/10), "read"})
+	}
+	_, err := e.AddPolicies(pPolicies)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	// Remove 100 rules per batch, restoring them afterwards so that every
+	// iteration runs against the same 10000-rule policy set. Batches are taken
+	// in order, and restored rules go to the end of the policy list, so the
+	// next batch is always at the front - the worst case for index rebuilding.
+	const batchSize = 100
+	batches := make([][][]string, 0, len(pPolicies)/batchSize)
+	for i := 0; i < len(pPolicies); i += batchSize {
+		batches = append(batches, pPolicies[i:i+batchSize])
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		rules := batches[i%len(batches)]
+
+		removed, err := e.RemovePolicies(rules)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if !removed {
+			b.Fatal("expected RemovePolicies to remove rules")
+		}
+
+		b.StopTimer()
+		added, err := e.AddPolicies(rules)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if !added {
+			b.Fatal("expected AddPolicies to add rules")
+		}
+		b.StartTimer()
+	}
+}
