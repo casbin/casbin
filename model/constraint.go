@@ -135,12 +135,12 @@ func parseConstraint(key, value string) (*Constraint, error) {
 // ValidateConstraints validates all constraints against the current policy.
 func (model Model) ValidateConstraints() error {
 	// Check if constraints exist
-	if model["c"] == nil || len(model["c"]) == 0 {
+	if len(model["c"]) == 0 {
 		return nil // No constraints to validate
 	}
 
 	// Check if RBAC is enabled
-	if model["g"] == nil || len(model["g"]) == 0 {
+	if len(model["g"]) == 0 {
 		return errors.ErrConstraintRequiresRBAC
 	}
 

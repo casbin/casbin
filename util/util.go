@@ -291,10 +291,11 @@ func EscapeStringLiterals(expr string) string {
 	for _, ch := range expr {
 		if inString {
 			result.WriteRune(ch)
-			if ch == '\\' {
+			switch ch {
+			case '\\':
 				// Found a backslash inside a string - double it
 				result.WriteRune('\\')
-			} else if ch == quote {
+			case quote:
 				// End of string literal
 				inString = false
 			}

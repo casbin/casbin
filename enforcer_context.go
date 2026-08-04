@@ -42,8 +42,8 @@ func NewContextEnforcer(params ...interface{}) (IEnforcerContext, error) {
 		return nil, err
 	}
 
-	if e.Enforcer.adapter != nil {
-		if contextAdapter, ok := e.Enforcer.adapter.(persist.ContextAdapter); ok {
+	if e.adapter != nil {
+		if contextAdapter, ok := e.adapter.(persist.ContextAdapter); ok {
 			e.adapterCtx = contextAdapter
 		} else {
 			return nil, errors.New("adapter does not support context operations, ContextAdapter interface not implemented")

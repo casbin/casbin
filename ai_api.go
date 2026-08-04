@@ -102,20 +102,20 @@ func (e *Enforcer) buildExplainContext(rvals []interface{}, result bool, matched
 
 	// Add request information
 	sb.WriteString("Authorization Request:\n")
-	sb.WriteString(fmt.Sprintf("Subject: %v\n", rvals[0]))
+	fmt.Fprintf(&sb, "Subject: %v\n", rvals[0])
 	if len(rvals) > 1 {
-		sb.WriteString(fmt.Sprintf("Object: %v\n", rvals[1]))
+		fmt.Fprintf(&sb, "Object: %v\n", rvals[1])
 	}
 	if len(rvals) > 2 {
-		sb.WriteString(fmt.Sprintf("Action: %v\n", rvals[2]))
+		fmt.Fprintf(&sb, "Action: %v\n", rvals[2])
 	}
-	sb.WriteString(fmt.Sprintf("\nEnforcement Result: %v\n", result))
+	fmt.Fprintf(&sb, "\nEnforcement Result: %v\n", result)
 
 	// Add matched rules
 	if len(matchedRules) > 0 {
 		sb.WriteString("\nMatched Policy Rules:\n")
 		for _, rule := range matchedRules {
-			sb.WriteString(fmt.Sprintf("- %s\n", rule))
+			fmt.Fprintf(&sb, "- %s\n", rule)
 		}
 	} else {
 		sb.WriteString("\nNo policy rules matched.\n")
@@ -125,12 +125,12 @@ func (e *Enforcer) buildExplainContext(rvals []interface{}, result bool, matched
 	sb.WriteString("\nAccess Control Model:\n")
 	if m, ok := e.model["m"]; ok {
 		for key, ast := range m {
-			sb.WriteString(fmt.Sprintf("Matcher (%s): %s\n", key, ast.Value))
+			fmt.Fprintf(&sb, "Matcher (%s): %s\n", key, ast.Value)
 		}
 	}
 	if eff, ok := e.model["e"]; ok {
 		for key, ast := range eff {
-			sb.WriteString(fmt.Sprintf("Effect (%s): %s\n", key, ast.Value))
+			fmt.Fprintf(&sb, "Effect (%s): %s\n", key, ast.Value)
 		}
 	}
 
@@ -139,7 +139,7 @@ func (e *Enforcer) buildExplainContext(rvals []interface{}, result bool, matched
 	if len(policies) > 0 {
 		sb.WriteString("\nAll Policy Rules:\n")
 		for _, policy := range policies {
-			sb.WriteString(fmt.Sprintf("- %s\n", strings.Join(policy, ", ")))
+			fmt.Fprintf(&sb, "- %s\n", strings.Join(policy, ", "))
 		}
 	}
 

@@ -89,14 +89,20 @@ func (e EnforceContext) GetCacheKey() string {
 func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 	e := &Enforcer{}
 
-	parsedParamLen := 0
-	paramLen := len(params)
+	// Bind the parameters up front so the accesses below are provably in range.
+	var param0, param1 interface{}
+	if len(params) > 0 {
+		param0 = params[0]
+	}
+	if len(params) > 1 {
+		param1 = params[1]
+	}
 
-	switch paramLen - parsedParamLen {
+	switch len(params) {
 	case 2:
-		switch p0 := params[0].(type) {
+		switch p0 := param0.(type) {
 		case string:
-			switch p1 := params[1].(type) {
+			switch p1 := param1.(type) {
 			case string:
 				err := e.InitWithFile(p0, p1)
 				if err != nil {
@@ -109,18 +115,18 @@ func NewEnforcer(params ...interface{}) (*Enforcer, error) {
 				}
 			}
 		default:
-			switch params[1].(type) {
+			switch param1.(type) {
 			case string:
 				return nil, errors.New("invalid parameters for enforcer")
 			default:
-				err := e.InitWithModelAndAdapter(p0.(model.Model), params[1].(persist.Adapter))
+				err := e.InitWithModelAndAdapter(p0.(model.Model), param1.(persist.Adapter))
 				if err != nil {
 					return nil, err
 				}
 			}
 		}
 	case 1:
-		switch p0 := params[0].(type) {
+		switch p0 := param0.(type) {
 		case string:
 			err := e.InitWithFile(p0, "")
 			if err != nil {
@@ -316,7 +322,7 @@ func (e *Enforcer) SetDetectors(detectors []detector.Detector) {
 // Returns the first error encountered, or nil if all checks pass.
 // Silently skips role managers that don't support the required iteration methods.
 func (e *Enforcer) RunDetections() error {
-	if e.detectors == nil || len(e.detectors) == 0 {
+	if len(e.detectors) == 0 {
 		return nil
 	}
 
@@ -851,11 +857,12 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 			if j, ok := parameters.pTokens[pType+"_eft"]; ok {
 				eft := parameters.pVals[j]
-				if eft == "allow" {
+				switch eft {
+				case "allow":
 					policyEffects[policyIndex] = effector.Allow
-				} else if eft == "deny" {
+				case "deny":
 					policyEffects[policyIndex] = effector.Deny
-				} else {
+				default:
 					policyEffects[policyIndex] = effector.Indeterminate
 				}
 			} else {
@@ -909,10 +916,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	}
 
 	// effect -> result
-	result := false
-	if effect == effector.Allow {
-		result = true
-	}
+	result := effect == effector.Allow
 
 	return result, nil
 }

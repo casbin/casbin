@@ -19,7 +19,7 @@ package casbin
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -39,7 +39,7 @@ func TestCasbinJsGetPermissionForUser(t *testing.T) {
 	if err != nil {
 		t.Errorf("Test error: %s", err)
 	}
-	expectedModel, err := ioutil.ReadFile("examples/rbac_model.conf")
+	expectedModel, err := os.ReadFile("examples/rbac_model.conf")
 	if err != nil {
 		t.Errorf("Test error: %s", err)
 	}
@@ -52,7 +52,7 @@ func TestCasbinJsGetPermissionForUser(t *testing.T) {
 		t.Errorf("%s supposed to be %s", actualModelStr, expectedModelStr)
 	}
 
-	expectedPolicies, err := ioutil.ReadFile("examples/rbac_with_hierarchy_policy.csv")
+	expectedPolicies, err := os.ReadFile("examples/rbac_with_hierarchy_policy.csv")
 	if err != nil {
 		t.Errorf("Test error: %s", err)
 	}

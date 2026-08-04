@@ -184,7 +184,7 @@ func KeyMatch2(key1 string, key2 string) bool {
 		return matched
 	}
 
-	key2 = strings.Replace(key2, "/*", "/.*", -1)
+	key2 = strings.ReplaceAll(key2, "/*", "/.*")
 
 	key2 = keyMatch2Re.ReplaceAllString(key2, "$1[^/]+$2")
 
@@ -207,7 +207,7 @@ func KeyMatch2Func(args ...interface{}) (interface{}, error) {
 // For example, "/resource1" matches "/:resource"
 // if the pathVar == "resource", then "resource1" will be returned.
 func KeyGet2(key1, key2 string, pathVar string) string {
-	key2 = strings.Replace(key2, "/*", "/.*", -1)
+	key2 = strings.ReplaceAll(key2, "/*", "/.*")
 	keys := keyGet2Re1.FindAllString(key2, -1)
 	key2 = keyGet2Re1.ReplaceAllString(key2, "$1([^/]+)$2")
 	key2 = "^" + key2 + "$"
@@ -245,7 +245,7 @@ func KeyMatch3(key1 string, key2 string) bool {
 		return matched
 	}
 
-	key2 = strings.Replace(key2, "/*", "/.*", -1)
+	key2 = strings.ReplaceAll(key2, "/*", "/.*")
 	key2 = keyMatch3Re.ReplaceAllString(key2, "$1[^/]+$2")
 
 	return RegexMatch(key1, "^"+key2+"$")
@@ -267,7 +267,7 @@ func KeyMatch3Func(args ...interface{}) (interface{}, error) {
 // For example, "project/proj_project1_admin/" matches "project/proj_{project}_admin/"
 // if the pathVar == "project", then "project1" will be returned.
 func KeyGet3(key1, key2 string, pathVar string) string {
-	key2 = strings.Replace(key2, "/*", "/.*", -1)
+	key2 = strings.ReplaceAll(key2, "/*", "/.*")
 
 	keys := keyGet3Re1.FindAllString(key2, -1)
 	key2 = keyGet3Re1.ReplaceAllString(key2, "$1([^/]+?)$2")
@@ -308,7 +308,7 @@ func KeyMatch4(key1 string, key2 string) bool {
 		return matched
 	}
 
-	key2 = strings.Replace(key2, "/*", "/.*", -1)
+	key2 = strings.ReplaceAll(key2, "/*", "/.*")
 
 	tokens := []string{}
 
@@ -373,7 +373,7 @@ func KeyMatch5(key1 string, key2 string) bool {
 		return matched
 	}
 
-	key2 = strings.Replace(key2, "/*", "/.*", -1)
+	key2 = strings.ReplaceAll(key2, "/*", "/.*")
 	key2 = keyMatch5Re.ReplaceAllString(key2, "$1[^/]+$2")
 
 	return RegexMatch(key1, "^"+key2+"$")

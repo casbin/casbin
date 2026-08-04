@@ -18,7 +18,7 @@
 package model
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -66,7 +66,7 @@ func TestNewModelFromFile(t *testing.T) {
 }
 
 func TestNewModelFromString(t *testing.T) {
-	modelBytes, _ := ioutil.ReadFile(basicExample)
+	modelBytes, _ := os.ReadFile(basicExample)
 	modelString := string(modelBytes)
 	m, err := NewModelFromString(modelString)
 	if err != nil {

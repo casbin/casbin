@@ -134,10 +134,10 @@ m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
 	}
 
 	m := model.NewModel()
-	if err := m.LoadModelFromText(conf); err != nil {
+	if err = m.LoadModelFromText(conf); err != nil {
 		t.Fatalf("load model: %v", err)
 	}
-	if err := persist.LoadPolicyLine(line, m); err != nil {
+	if err = persist.LoadPolicyLine(line, m); err != nil {
 		t.Fatalf("LoadPolicyLine on %q: %v", line, err)
 	}
 

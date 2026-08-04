@@ -39,7 +39,7 @@ type AssertionMap map[string]*Assertion
 
 const (
 	defaultDomain    string = ""
-	defaultSeparator        = "::"
+	defaultSeparator string = "::"
 )
 
 var sectionNameMap = map[string]string{
@@ -83,16 +83,17 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 	ast.PolicyMap = make(map[string]int)
 	ast.FieldIndexMap = make(map[string]int)
 
-	if sec == "r" || sec == "p" {
+	switch sec {
+	case "r", "p":
 		ast.Tokens = strings.Split(ast.Value, ",")
 		for i := range ast.Tokens {
 			ast.Tokens[i] = key + "_" + strings.TrimSpace(ast.Tokens[i])
 		}
-	} else if sec == "g" {
+	case "g":
 		ast.ParamsTokens = getParamsToken(ast.Value)
 		ast.Tokens = strings.Split(ast.Value, ",")
 		ast.Tokens = ast.Tokens[:len(ast.Tokens)-len(ast.ParamsTokens)]
-	} else {
+	default:
 		ast.Value = util.RemoveComments(util.EscapeAssertion(ast.Value))
 	}
 
@@ -101,7 +102,7 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 		ast.Value = util.EscapeStringLiterals(ast.Value)
 
 		if strings.Contains(ast.Value, "in") {
-			ast.Value = strings.Replace(strings.Replace(ast.Value, "[", "(", -1), "]", ")", -1)
+			ast.Value = strings.ReplaceAll(strings.ReplaceAll(ast.Value, "[", "("), "]", ")")
 		}
 	}
 
@@ -369,9 +370,9 @@ func (model Model) ToText() string {
 		for ptype := range model[sec] {
 			value := model[sec][ptype].Value
 			for tokenPattern, newToken := range tokenPatterns {
-				value = strings.Replace(value, tokenPattern, newToken, -1)
+				value = strings.ReplaceAll(value, tokenPattern, newToken)
 			}
-			s.WriteString(fmt.Sprintf("%s = %s\n", sec, value))
+			fmt.Fprintf(&s, "%s = %s\n", sec, value)
 		}
 	}
 	s.WriteString("[request_definition]\n")
@@ -381,13 +382,13 @@ func (model Model) ToText() string {
 	if _, ok := model["g"]; ok {
 		s.WriteString("[role_definition]\n")
 		for ptype := range model["g"] {
-			s.WriteString(fmt.Sprintf("%s = %s\n", ptype, model["g"][ptype].Value))
+			fmt.Fprintf(&s, "%s = %s\n", ptype, model["g"][ptype].Value)
 		}
 	}
 	if _, ok := model["c"]; ok {
 		s.WriteString("[constraint_definition]\n")
 		for ptype := range model["c"] {
-			s.WriteString(fmt.Sprintf("%s = %s\n", ptype, model["c"][ptype].Value))
+			fmt.Fprintf(&s, "%s = %s\n", ptype, model["c"][ptype].Value)
 		}
 	}
 	s.WriteString("[policy_effect]\n")
