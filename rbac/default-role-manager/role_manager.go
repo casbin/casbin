@@ -825,7 +825,6 @@ func (crm *ConditionalRoleManager) hasLinkHelper(targetName string, roles map[st
 
 func (crm *ConditionalRoleManager) getNextRoles(currentRole, nextRole *Role, domains []string, nextRoles map[string]*Role) bool {
 	passLinkConditionFunc, err := crm.checkLinkCondition(currentRole.name, nextRole.name, domains)
-
 	if err != nil {
 		// Logger has been removed - error is ignored
 		return false

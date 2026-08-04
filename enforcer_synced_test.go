@@ -495,6 +495,7 @@ func testSyncedEnforcerGetUsers(t *testing.T, e *SyncedEnforcer, res []string, n
 		t.Error("Users for ", name, ": ", myRes, ", supposed to be ", res)
 	}
 }
+
 func TestSyncedEnforcerAddGroupingPoliciesEx(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		e, _ := NewSyncedEnforcer("examples/rbac_model.conf", "examples/rbac_policy.csv")

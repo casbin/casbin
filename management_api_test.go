@@ -162,7 +162,8 @@ func TestGetPolicyAPI(t *testing.T) {
 		{"alice", "data1", "read"},
 		{"bob", "data2", "write"},
 		{"data2_admin", "data2", "read"},
-		{"data2_admin", "data2", "write"}})
+		{"data2_admin", "data2", "write"},
+	})
 
 	testGetFilteredPolicy(t, e, 0, [][]string{{"alice", "data1", "read"}}, "alice")
 	testGetFilteredPolicy(t, e, 0, [][]string{{"bob", "data2", "write"}}, "bob")
@@ -177,7 +178,8 @@ func TestGetPolicyAPI(t *testing.T) {
 		{"alice", "data1", "read"},
 		{"bob", "data2", "write"},
 		{"data2_admin", "data2", "read"},
-		{"data2_admin", "data2", "write"}})
+		{"data2_admin", "data2", "write"},
+	})
 
 	testGetFilteredPolicy(t, e, 0, [][]string{{"data2_admin", "data2", "read"}, {"data2_admin", "data2", "write"}}, "data2_admin", "data2")
 	// Note: "" (empty string) in fieldValues means matching all values.
@@ -209,7 +211,8 @@ func TestModifyPolicyAPI(t *testing.T) {
 		{"alice", "data1", "read"},
 		{"bob", "data2", "write"},
 		{"data2_admin", "data2", "read"},
-		{"data2_admin", "data2", "write"}})
+		{"data2_admin", "data2", "write"},
+	})
 
 	_, _ = e.RemovePolicy("alice", "data1", "read")
 	_, _ = e.RemovePolicy("bob", "data2", "write")
@@ -238,7 +241,8 @@ func TestModifyPolicyAPI(t *testing.T) {
 		{"jack", "data4", "read"},
 		{"katy", "data4", "write"},
 		{"leyo", "data4", "read"},
-		{"ham", "data4", "write"}})
+		{"ham", "data4", "write"},
+	})
 
 	_, _ = e.RemovePolicies(rules)
 	_, _ = e.RemovePolicies(rules)
@@ -250,7 +254,8 @@ func TestModifyPolicyAPI(t *testing.T) {
 	testGetPolicy(t, e, [][]string{
 		{"data2_admin", "data2", "read"},
 		{"data2_admin", "data2", "write"},
-		{"eve", "data3", "read"}})
+		{"eve", "data3", "read"},
+	})
 
 	_, _ = e.RemoveFilteredPolicy(1, "data2")
 

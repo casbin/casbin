@@ -132,6 +132,7 @@ func testContainEval(t *testing.T, s string, res bool) {
 		t.Errorf("%s: %t, supposed to be %t", s, myRes, res)
 	}
 }
+
 func TestContainEval(t *testing.T) {
 	testContainEval(t, "eval() && a && b && c", true)
 	testContainEval(t, "eval) && a && b && c", false)
@@ -148,6 +149,7 @@ func testReplaceEval(t *testing.T, s string, rule string, res string) {
 		t.Errorf("%s: %s supposed to be %s", s, myRes, res)
 	}
 }
+
 func TestReplaceEval(t *testing.T) {
 	testReplaceEval(t, "eval() && a && b && c", "a", "(a) && a && b && c")
 	testReplaceEval(t, "eval() && a && b && c", "(a)", "((a)) && a && b && c")

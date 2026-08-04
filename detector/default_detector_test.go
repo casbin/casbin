@@ -47,7 +47,6 @@ func TestDefaultDetector_NoCycle(t *testing.T) {
 
 	detector := NewDefaultDetector()
 	err := detector.Check(rm)
-
 	if err != nil {
 		t.Errorf("Expected no cycle, but got error: %v", err)
 	}
@@ -149,7 +148,6 @@ func TestDefaultDetector_DisconnectedComponents(t *testing.T) {
 
 	detector := NewDefaultDetector()
 	err := detector.Check(rm)
-
 	if err != nil {
 		t.Errorf("Expected no cycle in disconnected components, but got error: %v", err)
 	}
@@ -205,7 +203,6 @@ func TestDefaultDetector_EmptyRoleManager(t *testing.T) {
 
 	detector := NewDefaultDetector()
 	err := detector.Check(rm)
-
 	if err != nil {
 		t.Errorf("Expected no error for empty role manager, but got: %v", err)
 	}
@@ -224,7 +221,6 @@ func TestDefaultDetector_LargeGraphNoCycle(t *testing.T) {
 
 	detector := NewDefaultDetector()
 	err := detector.Check(rm)
-
 	if err != nil {
 		t.Errorf("Expected no cycle in large graph, but got error: %v", err)
 	}
@@ -287,7 +283,6 @@ func TestDefaultDetector_PerformanceLargeGraph(t *testing.T) {
 
 	detector := NewDefaultDetector()
 	err := detector.Check(rm)
-
 	if err != nil {
 		t.Errorf("Expected no cycle in large performance test, but got error: %v", err)
 	}
@@ -303,7 +298,6 @@ func TestDefaultDetector_MultipleInheritance(t *testing.T) {
 
 	detector := NewDefaultDetector()
 	err := detector.Check(rm)
-
 	if err != nil {
 		t.Errorf("Expected no cycle with multiple inheritance, but got error: %v", err)
 	}
@@ -319,7 +313,6 @@ func TestDefaultDetector_DiamondPattern(t *testing.T) {
 
 	detector := NewDefaultDetector()
 	err := detector.Check(rm)
-
 	if err != nil {
 		t.Errorf("Expected no cycle in diamond pattern, but got error: %v", err)
 	}

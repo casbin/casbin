@@ -25,9 +25,11 @@ import (
 	"github.com/casbin/govaluate"
 )
 
-var _ IEnforcer = &Enforcer{}
-var _ IEnforcer = &SyncedEnforcer{}
-var _ IEnforcer = &CachedEnforcer{}
+var (
+	_ IEnforcer = &Enforcer{}
+	_ IEnforcer = &SyncedEnforcer{}
+	_ IEnforcer = &CachedEnforcer{}
+)
 
 // IEnforcer is the API interface of Enforcer.
 type IEnforcer interface {

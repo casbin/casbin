@@ -451,12 +451,15 @@ func (rm *testCustomRoleManager) Clear() error { return nil }
 func (rm *testCustomRoleManager) AddLink(name1 string, name2 string, domain ...string) error {
 	return nil
 }
+
 func (rm *testCustomRoleManager) BuildRelationship(name1 string, name2 string, domain ...string) error {
 	return nil
 }
+
 func (rm *testCustomRoleManager) DeleteLink(name1 string, name2 string, domain ...string) error {
 	return nil
 }
+
 func (rm *testCustomRoleManager) HasLink(name1 string, name2 string, domain ...string) (bool, error) {
 	if name1 == "alice" && name2 == "alice" {
 		return true, nil
@@ -467,15 +470,19 @@ func (rm *testCustomRoleManager) HasLink(name1 string, name2 string, domain ...s
 	}
 	return false, nil
 }
+
 func (rm *testCustomRoleManager) GetRoles(name string, domain ...string) ([]string, error) {
 	return []string{}, nil
 }
+
 func (rm *testCustomRoleManager) GetUsers(name string, domain ...string) ([]string, error) {
 	return []string{}, nil
 }
+
 func (rm *testCustomRoleManager) GetDomains(name string) ([]string, error) {
 	return []string{}, nil
 }
+
 func (rm *testCustomRoleManager) GetAllDomains() ([]string, error) {
 	return []string{}, nil
 }
@@ -487,10 +494,13 @@ func (rm *testCustomRoleManager) AddDomainMatchingFunc(name string, fn rbac.Matc
 
 func (rm *testCustomRoleManager) AddLinkConditionFunc(userName, roleName string, fn rbac.LinkConditionFunc) {
 }
+
 func (rm *testCustomRoleManager) SetLinkConditionFuncParams(userName, roleName string, params ...string) {
 }
+
 func (rm *testCustomRoleManager) AddDomainLinkConditionFunc(user string, role string, domain string, fn rbac.LinkConditionFunc) {
 }
+
 func (rm *testCustomRoleManager) SetDomainLinkConditionFuncParams(user string, role string, domain string, params ...string) {
 }
 

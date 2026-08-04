@@ -30,6 +30,7 @@ type SampleWatcherEx struct {
 func (w SampleWatcherEx) UpdateForAddPolicy(sec, ptype string, params ...string) error {
 	return nil
 }
+
 func (w SampleWatcherEx) UpdateForRemovePolicy(sec, ptype string, params ...string) error {
 	return nil
 }

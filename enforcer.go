@@ -830,7 +830,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 
 			result, err := expression.Eval(parameters)
 			// log.LogPrint("Result: ", result)
-
 			if err != nil {
 				return false, err
 			}
@@ -887,7 +886,6 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		parameters.pVals = make([]string, len(parameters.pTokens))
 
 		result, err := expression.Eval(parameters)
-
 		if err != nil {
 			return false, err
 		}
@@ -922,7 +920,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 func (e *Enforcer) getAndStoreMatcherExpression(hasEval bool, expString string, functions map[string]govaluate.ExpressionFunction) (*govaluate.EvaluableExpression, error) {
 	var expression *govaluate.EvaluableExpression
 	var err error
-	var cachedExpression, isPresent = e.matcherMap.Load(expString)
+	cachedExpression, isPresent := e.matcherMap.Load(expString)
 
 	if !hasEval && isPresent {
 		expression = cachedExpression.(*govaluate.EvaluableExpression)

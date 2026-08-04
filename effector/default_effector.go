@@ -24,8 +24,7 @@ import (
 )
 
 // DefaultEffector is default effector for Casbin.
-type DefaultEffector struct {
-}
+type DefaultEffector struct{}
 
 // NewDefaultEffector is the constructor for DefaultEffector.
 func NewDefaultEffector() *DefaultEffector {

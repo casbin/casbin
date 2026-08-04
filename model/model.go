@@ -37,8 +37,10 @@ type Model map[string]AssertionMap
 // AssertionMap is the collection of assertions, can be "r", "p", "g", "e", "m".
 type AssertionMap map[string]*Assertion
 
-const defaultDomain string = ""
-const defaultSeparator = "::"
+const (
+	defaultDomain    string = ""
+	defaultSeparator        = "::"
+)
 
 var sectionNameMap = map[string]string{
 	"r": "request_definition",

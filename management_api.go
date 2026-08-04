@@ -192,7 +192,6 @@ func (e *Enforcer) GetFilteredNamedPolicyWithMatcher(ptype string, matcher strin
 			parameters.pVals = pvals
 
 			result, err := expression.Eval(parameters)
-
 			if err != nil {
 				return res, err
 			}

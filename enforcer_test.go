@@ -148,8 +148,7 @@ func TestRBACModelInMemory(t *testing.T) {
 }
 
 func TestRBACModelInMemory2(t *testing.T) {
-	text :=
-		`
+	text := `
 [request_definition]
 r = sub, obj, act
 
@@ -431,6 +430,7 @@ func TestInitEmpty(t *testing.T) {
 
 	testEnforce(t, e, "alice", "/alice_data/resource1", "GET", true)
 }
+
 func testEnforceEx(t *testing.T, e *Enforcer, sub, obj, act interface{}, res []string) {
 	t.Helper()
 	_, myRes, _ := e.EnforceEx(sub, obj, act)
