@@ -1,0 +1,20 @@
+# RBAC roles combined with a per-policy ABAC condition.
+#
+#   p, role, object, action, cond, effect
+#
+# "cond" is a matcher expression evaluated against the ctx argument of the
+# request. Write "true" for a policy that carries no condition. A cond may only
+# read attributes that every request reaching it actually supplies: reading an
+# attribute the ctx does not have makes Enforce return an error rather than a
+# plain "denied", so pass a struct (or a map with every attribute filled in).
+
+p, employee, data1, read, r.ctx.Hour >= 9 && r.ctx.Hour < 18, allow
+p, employee, data2, write, r.ctx.Secure == true, allow
+p, admin, data3, read, true, allow
+
+# Deny overrides every allow above: a high-risk session gets nothing.
+p, employee, *, *, r.ctx.Risk == 'high', deny
+
+g, admin, employee
+g, alice, admin
+g, bob, employee
