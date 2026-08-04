@@ -45,20 +45,31 @@ func LoadPolicyLine(line string, m model.Model) error {
 }
 
 // PolicyLineToCsv serializes a policy type and its rule fields into a CSV-safe line.
+// Fields are separated by ", " to match the conventional layout of Casbin policy
+// files, which LoadPolicyLine accepts because its reader trims leading spaces.
 // Fields containing commas are properly quoted so the line can be round-tripped
 // through LoadPolicyLine without corruption.
 func PolicyLineToCsv(ptype string, rule []string) (string, error) {
 	record := append([]string{ptype}, rule...)
+
+	// Each field is written as its own single-field record so that the standard
+	// library decides on quoting, then the fields are joined with ", ".
 	var buf bytes.Buffer
 	w := csv.NewWriter(&buf)
-	if err := w.Write(record); err != nil {
-		return "", err
+	fields := make([]string, 0, len(record))
+	for _, field := range record {
+		buf.Reset()
+		if err := w.Write([]string{field}); err != nil {
+			return "", err
+		}
+		w.Flush()
+		if err := w.Error(); err != nil {
+			return "", err
+		}
+		fields = append(fields, strings.TrimRight(buf.String(), "\r\n"))
 	}
-	w.Flush()
-	if err := w.Error(); err != nil {
-		return "", err
-	}
-	return strings.TrimRight(buf.String(), "\r\n"), nil
+
+	return strings.Join(fields, ", "), nil
 }
 
 // LoadPolicyArray loads a policy rule to model.

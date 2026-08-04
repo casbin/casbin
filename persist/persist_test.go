@@ -18,6 +18,7 @@
 package persist_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/casbin/casbin/v3"
@@ -53,4 +54,101 @@ func TestDuplicateRuleInAdapter(t *testing.T) {
 	_ = persist.LoadPolicyArray([]string{"p", "alice", "data1", "read"}, e.GetModel())
 
 	testRuleCount(t, e.GetModel(), 1, "p", "p", "LoadPolicyArray")
+}
+
+func TestPolicyLineToCsv(t *testing.T) {
+	tests := []struct {
+		name     string
+		ptype    string
+		rule     []string
+		expected string
+	}{
+		{
+			// Fields are separated by ", ", the layout used by the policy files
+			// under examples/, so that SavePolicy does not reformat them.
+			name:     "plain fields keep the space after the comma",
+			ptype:    "p",
+			rule:     []string{"alice", "data1", "read"},
+			expected: "p, alice, data1, read",
+		},
+		{
+			name:     "field containing a comma is quoted",
+			ptype:    "p",
+			rule:     []string{"alice", "data1", "read", "r.attrs in ('val1','val2')"},
+			expected: `p, alice, data1, read, "r.attrs in ('val1','val2')"`,
+		},
+		{
+			name:     "field containing a quote is escaped",
+			ptype:    "p",
+			rule:     []string{"alice", `say "hi"`, "read"},
+			expected: `p, alice, "say ""hi""", read`,
+		},
+		{
+			// A leading space must stay quoted: LoadPolicyLine trims leading
+			// spaces on unquoted fields.
+			name:     "field with a leading space is quoted",
+			ptype:    "g",
+			rule:     []string{" alice", "admin"},
+			expected: `g, " alice", admin`,
+		},
+		{
+			name:     "empty field",
+			ptype:    "p",
+			rule:     []string{"alice", "", "read"},
+			expected: "p, alice, , read",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			line, err := persist.PolicyLineToCsv(tt.ptype, tt.rule)
+			if err != nil {
+				t.Fatalf("PolicyLineToCsv: %v", err)
+			}
+			if line != tt.expected {
+				t.Errorf("line: %q, expected %q", line, tt.expected)
+			}
+		})
+	}
+}
+
+func TestPolicyLineToCsvRoundTrip(t *testing.T) {
+	conf := `
+[request_definition]
+r = sub, obj, act, cond
+
+[policy_definition]
+p = sub, obj, act, cond
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
+`
+	rule := []string{" alice", `say "hi"`, "read", "r.attrs in ('val1','val2')"}
+
+	line, err := persist.PolicyLineToCsv("p", rule)
+	if err != nil {
+		t.Fatalf("PolicyLineToCsv: %v", err)
+	}
+
+	m := model.NewModel()
+	if err := m.LoadModelFromText(conf); err != nil {
+		t.Fatalf("load model: %v", err)
+	}
+	if err := persist.LoadPolicyLine(line, m); err != nil {
+		t.Fatalf("LoadPolicyLine on %q: %v", line, err)
+	}
+
+	rules, err := m.GetPolicy("p", "p")
+	if err != nil {
+		t.Fatalf("GetPolicy: %v", err)
+	}
+	if len(rules) != 1 {
+		t.Fatalf("rule count: %d, expected 1 (line: %q)", len(rules), line)
+	}
+	if !reflect.DeepEqual(rules[0], rule) {
+		t.Errorf("rule after round-trip: %q, expected %q (line: %q)", rules[0], rule, line)
+	}
 }
