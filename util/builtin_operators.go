@@ -44,6 +44,46 @@ var (
 	reCacheMu   = sync.RWMutex{}
 )
 
+// regexpMetaChars is exactly the set of characters that regexp.QuoteMeta escapes.
+// It is spelled out instead of calling QuoteMeta so that keyMatchShortcut never
+// allocates; TestRegexpMetaChars guards the two against drifting apart.
+const regexpMetaChars = `\.+*?()|[]{}^$`
+
+// keyMatchShortcut answers KeyMatch2/3/4/5 for the two cases that need no regexp
+// work at all. ok reports whether matched is the final answer; when it is false
+// the caller falls through to its unchanged rewrite-and-match path.
+//
+// The two cases are:
+//
+//  1. key2 == "*", the bare wildcard used as the "all domains" key. The regexp
+//     path reaches the same answer via "^*$", which only works by accident (see
+//     issue #330); making it explicit is both faster and less fragile.
+//
+//  2. key2 is plain, i.e. it holds no regexp metacharacter and none of the
+//     matcher's own pattern characters (extraChars, ":" for KeyMatch2's :param
+//     dialect; the "{}" and "*" of the other matchers are already metacharacters).
+//     Then "^"+key2+"$" can only match key2 itself, so key1 == key2 is the answer.
+//
+// Case 2 has to stay conservative because RegexMatch embeds key2 unescaped: a
+// stray metacharacter makes key2 behave as a regexp, so "acme.com" does match
+// "acmeXcom", and key1 == key2 is not sufficient either ("^a+b$" does not match
+// "a+b"). Any such key2 keeps taking the regexp path.
+//
+// This matters because a DomainMatchingFunc is called O(N*D) times while building
+// role links, and real deployments mostly hold concrete domains ("team/123") that
+// pay for the full pipeline only to come back false.
+func keyMatchShortcut(key1 string, key2 string, extraChars string) (matched bool, ok bool) {
+	if key2 == "*" {
+		return true, true
+	}
+
+	if !strings.ContainsAny(key2, regexpMetaChars) && !strings.ContainsAny(key2, extraChars) {
+		return key1 == key2, true
+	}
+
+	return false, false
+}
+
 func mustCompileOrGet(key string) *regexp.Regexp {
 	reCacheMu.RLock()
 	re, ok := reCache[key]
@@ -140,6 +180,10 @@ func KeyGetFunc(args ...interface{}) (interface{}, error) {
 // KeyMatch2 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/:resource".
 func KeyMatch2(key1 string, key2 string) bool {
+	if matched, ok := keyMatchShortcut(key1, key2, ":"); ok {
+		return matched
+	}
+
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 
 	key2 = keyMatch2Re.ReplaceAllString(key2, "$1[^/]+$2")
@@ -197,6 +241,10 @@ func KeyGet2Func(args ...interface{}) (interface{}, error) {
 // KeyMatch3 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/{resource}".
 func KeyMatch3(key1 string, key2 string) bool {
+	if matched, ok := keyMatchShortcut(key1, key2, ""); ok {
+		return matched
+	}
+
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 	key2 = keyMatch3Re.ReplaceAllString(key2, "$1[^/]+$2")
 
@@ -256,6 +304,10 @@ func KeyGet3Func(args ...interface{}) (interface{}, error) {
 // "/parent/123/child/456" does not match "/parent/{id}/child/{id}"
 // But KeyMatch3 will match both.
 func KeyMatch4(key1 string, key2 string) bool {
+	if matched, ok := keyMatchShortcut(key1, key2, ""); ok {
+		return matched
+	}
+
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
 
 	tokens := []string{}
@@ -313,6 +365,12 @@ func KeyMatch5(key1 string, key2 string) bool {
 
 	if i != -1 {
 		key1 = key1[:i]
+	}
+
+	// After the query string is stripped, so that key1 is compared in the same
+	// shape the regexp path would have matched.
+	if matched, ok := keyMatchShortcut(key1, key2, ""); ok {
+		return matched
 	}
 
 	key2 = strings.Replace(key2, "/*", "/.*", -1)
