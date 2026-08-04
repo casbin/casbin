@@ -639,6 +639,26 @@ func TestPriorityModel(t *testing.T) {
 	testEnforce(t, e, "bob", "data2", "write", false)
 }
 
+func TestPriorityExplicitRemovePolicyKeepsOrder(t *testing.T) {
+	e, _ := NewEnforcer("examples/priority_model_explicit.conf")
+
+	if _, err := e.AddPolicies([][]string{
+		{"1", "carol", "data9", "read", "allow"},
+		{"2", "alice", "data1", "read", "deny"},
+		{"3", "alice", "data1", "read", "allow"},
+	}); err != nil {
+		t.Fatalf("AddPolicies: %v", err)
+	}
+	testEnforce(t, e, "alice", "data1", "read", false)
+
+	// Removing an unrelated rule must not reorder the remaining ones, otherwise
+	// the priority 3 rule would take precedence over the priority 2 one.
+	if _, err := e.RemovePolicy("1", "carol", "data9", "read", "allow"); err != nil {
+		t.Fatalf("RemovePolicy: %v", err)
+	}
+	testEnforce(t, e, "alice", "data1", "read", false)
+}
+
 func TestPriorityModelIndeterminate(t *testing.T) {
 	e, _ := NewEnforcer("examples/priority_model.conf", "examples/priority_indeterminate_policy.csv")
 

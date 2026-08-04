@@ -267,14 +267,15 @@ func (model Model) RemovePolicy(sec string, ptype string, rule []string) (bool, 
 		return false, nil
 	}
 
-	lastIdx := len(ast.Policy) - 1
-	if index != lastIdx {
-		ast.Policy[index] = ast.Policy[lastIdx]
-		lastPolicyKey := strings.Join(ast.Policy[index], DefaultSep)
-		ast.PolicyMap[lastPolicyKey] = index
-	}
-	ast.Policy = ast.Policy[:lastIdx]
+	// The order of Policy is significant: it carries the priority semantics of
+	// the "priority(p_eft)" effector, both for explicit priority models and for
+	// implicit ones where the priority is the policy order itself. So the rule
+	// has to be shifted out instead of being swapped with the last one.
+	ast.Policy = append(ast.Policy[:index], ast.Policy[index+1:]...)
 	delete(ast.PolicyMap, key)
+	for i := index; i < len(ast.Policy); i++ {
+		ast.PolicyMap[strings.Join(ast.Policy[i], DefaultSep)] = i
+	}
 	return true, nil
 }
 
