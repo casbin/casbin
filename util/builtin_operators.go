@@ -84,6 +84,49 @@ func keyMatchShortcut(key1 string, key2 string, extraChars string) (matched bool
 	return false, false
 }
 
+// compiledPattern is the fully prepared form of a matcher's key2: the regexp that
+// key1 is tested against, plus the names of the pattern variables in the order
+// their capture groups appear (only KeyGet2/KeyGet3/KeyMatch4 use tokens).
+//
+// Everything in it is a pure function of key2, so it is built once per distinct
+// key2 and reused afterwards.
+type compiledPattern struct {
+	re     *regexp.Regexp
+	tokens []string
+}
+
+// patternCache memoizes compiledPattern by raw key2, one cache per matcher since
+// each of them reads key2 in its own dialect. Only compiling the regexp used to be
+// cached (see mustCompileOrGet), which still left every call rebuilding the regexp
+// source with a chain of ReplaceAll passes just to look it up. Keying on key2
+// instead makes the steady state a single map read.
+//
+// A policy holds a bounded set of patterns, so the cache converges to that set
+// after the first pass; sync.Map suits that read-mostly shape.
+type patternCache struct {
+	m sync.Map // string -> *compiledPattern
+}
+
+func (c *patternCache) get(key2 string, build func(key2 string) *compiledPattern) *compiledPattern {
+	if v, ok := c.m.Load(key2); ok {
+		return v.(*compiledPattern)
+	}
+
+	p := build(key2)
+	c.m.Store(key2, p)
+
+	return p
+}
+
+var (
+	keyMatch2Cache patternCache
+	keyMatch3Cache patternCache
+	keyMatch4Cache patternCache
+	keyMatch5Cache patternCache
+	keyGet2Cache   patternCache
+	keyGet3Cache   patternCache
+)
+
 func mustCompileOrGet(key string) *regexp.Regexp {
 	reCacheMu.RLock()
 	re, ok := reCache[key]
@@ -184,11 +227,15 @@ func KeyMatch2(key1 string, key2 string) bool {
 		return matched
 	}
 
+	return keyMatch2Cache.get(key2, buildKeyMatch2).re.MatchString(key1)
+}
+
+func buildKeyMatch2(key2 string) *compiledPattern {
 	key2 = strings.ReplaceAll(key2, "/*", "/.*")
 
 	key2 = keyMatch2Re.ReplaceAllString(key2, "$1[^/]+$2")
 
-	return RegexMatch(key1, "^"+key2+"$")
+	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$")}
 }
 
 // KeyMatch2Func is the wrapper for KeyMatch2.
@@ -207,22 +254,32 @@ func KeyMatch2Func(args ...interface{}) (interface{}, error) {
 // For example, "/resource1" matches "/:resource"
 // if the pathVar == "resource", then "resource1" will be returned.
 func KeyGet2(key1, key2 string, pathVar string) string {
-	key2 = strings.ReplaceAll(key2, "/*", "/.*")
-	keys := keyGet2Re1.FindAllString(key2, -1)
-	key2 = keyGet2Re1.ReplaceAllString(key2, "$1([^/]+)$2")
-	key2 = "^" + key2 + "$"
+	p := keyGet2Cache.get(key2, buildKeyGet2)
 
-	re := mustCompileOrGet(key2)
-	values := re.FindAllStringSubmatch(key1, -1)
+	values := p.re.FindAllStringSubmatch(key1, -1)
 	if len(values) == 0 {
 		return ""
 	}
-	for i, key := range keys {
-		if pathVar == key[1:] {
+	for i, key := range p.tokens {
+		if pathVar == key {
 			return values[0][i+1]
 		}
 	}
 	return ""
+}
+
+func buildKeyGet2(key2 string) *compiledPattern {
+	key2 = strings.ReplaceAll(key2, "/*", "/.*")
+
+	// The ":" is dropped here so that the lookup in KeyGet2 is a plain comparison.
+	tokens := keyGet2Re1.FindAllString(key2, -1)
+	for i, token := range tokens {
+		tokens[i] = token[1:]
+	}
+
+	key2 = keyGet2Re1.ReplaceAllString(key2, "$1([^/]+)$2")
+
+	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$"), tokens: tokens}
 }
 
 // KeyGet2Func is the wrapper for KeyGet2.
@@ -245,10 +302,14 @@ func KeyMatch3(key1 string, key2 string) bool {
 		return matched
 	}
 
+	return keyMatch3Cache.get(key2, buildKeyMatch3).re.MatchString(key1)
+}
+
+func buildKeyMatch3(key2 string) *compiledPattern {
 	key2 = strings.ReplaceAll(key2, "/*", "/.*")
 	key2 = keyMatch3Re.ReplaceAllString(key2, "$1[^/]+$2")
 
-	return RegexMatch(key1, "^"+key2+"$")
+	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$")}
 }
 
 // KeyMatch3Func is the wrapper for KeyMatch3.
@@ -267,22 +328,33 @@ func KeyMatch3Func(args ...interface{}) (interface{}, error) {
 // For example, "project/proj_project1_admin/" matches "project/proj_{project}_admin/"
 // if the pathVar == "project", then "project1" will be returned.
 func KeyGet3(key1, key2 string, pathVar string) string {
-	key2 = strings.ReplaceAll(key2, "/*", "/.*")
+	p := keyGet3Cache.get(key2, buildKeyGet3)
 
-	keys := keyGet3Re1.FindAllString(key2, -1)
-	key2 = keyGet3Re1.ReplaceAllString(key2, "$1([^/]+?)$2")
-	key2 = "^" + key2 + "$"
-	re := mustCompileOrGet(key2)
-	values := re.FindAllStringSubmatch(key1, -1)
+	values := p.re.FindAllStringSubmatch(key1, -1)
 	if len(values) == 0 {
 		return ""
 	}
-	for i, key := range keys {
-		if pathVar == key[1:len(key)-1] {
+	for i, key := range p.tokens {
+		if pathVar == key {
 			return values[0][i+1]
 		}
 	}
 	return ""
+}
+
+func buildKeyGet3(key2 string) *compiledPattern {
+	key2 = strings.ReplaceAll(key2, "/*", "/.*")
+
+	// The surrounding "{}" is dropped here so that the lookup in KeyGet3 is a plain
+	// comparison.
+	tokens := keyGet3Re1.FindAllString(key2, -1)
+	for i, token := range tokens {
+		tokens[i] = token[1 : len(token)-1]
+	}
+
+	key2 = keyGet3Re1.ReplaceAllString(key2, "$1([^/]+?)$2")
+
+	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$"), tokens: tokens}
 }
 
 // KeyGet3Func is the wrapper for KeyGet3.
@@ -308,30 +380,21 @@ func KeyMatch4(key1 string, key2 string) bool {
 		return matched
 	}
 
-	key2 = strings.ReplaceAll(key2, "/*", "/.*")
+	p := keyMatch4Cache.get(key2, buildKeyMatch4)
 
-	tokens := []string{}
-
-	re := keyMatch4Re
-	key2 = re.ReplaceAllStringFunc(key2, func(s string) string {
-		tokens = append(tokens, s[1:len(s)-1])
-		return "([^/]+)"
-	})
-
-	re = mustCompileOrGet("^" + key2 + "$")
-	matches := re.FindStringSubmatch(key1)
+	matches := p.re.FindStringSubmatch(key1)
 	if matches == nil {
 		return false
 	}
 	matches = matches[1:]
 
-	if len(tokens) != len(matches) {
+	if len(p.tokens) != len(matches) {
 		panic(errors.New("KeyMatch4: number of tokens is not equal to number of values"))
 	}
 
 	values := map[string]string{}
 
-	for key, token := range tokens {
+	for key, token := range p.tokens {
 		if _, ok := values[token]; !ok {
 			values[token] = matches[key]
 		}
@@ -341,6 +404,19 @@ func KeyMatch4(key1 string, key2 string) bool {
 	}
 
 	return true
+}
+
+func buildKeyMatch4(key2 string) *compiledPattern {
+	key2 = strings.ReplaceAll(key2, "/*", "/.*")
+
+	tokens := []string{}
+
+	key2 = keyMatch4Re.ReplaceAllStringFunc(key2, func(s string) string {
+		tokens = append(tokens, s[1:len(s)-1])
+		return "([^/]+)"
+	})
+
+	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$"), tokens: tokens}
 }
 
 // KeyMatch4Func is the wrapper for KeyMatch4.
@@ -373,10 +449,14 @@ func KeyMatch5(key1 string, key2 string) bool {
 		return matched
 	}
 
+	return keyMatch5Cache.get(key2, buildKeyMatch5).re.MatchString(key1)
+}
+
+func buildKeyMatch5(key2 string) *compiledPattern {
 	key2 = strings.ReplaceAll(key2, "/*", "/.*")
 	key2 = keyMatch5Re.ReplaceAllString(key2, "$1[^/]+$2")
 
-	return RegexMatch(key1, "^"+key2+"$")
+	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$")}
 }
 
 // KeyMatch5Func is the wrapper for KeyMatch5.
