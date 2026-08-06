@@ -48,6 +48,28 @@ type Transaction struct {
 	mutex       sync.RWMutex               // Protects transaction state.
 }
 
+// GetAdapter returns the adapter that operates within this transaction.
+// Writes done through it join the same database transaction as the buffered
+// policy changes, so non-policy operations can be made atomic together with the
+// policy changes, e.g. with the GORM adapter:
+//
+//	err := e.WithTransaction(ctx, func(tx *casbin.Transaction) error {
+//		db := tx.GetAdapter().(*gormadapter.Adapter).GetDb().
+//			Session(&gorm.Session{NewDB: true})
+//		if err := db.Where("name = ?", "admin").Delete(&Role{}).Error; err != nil {
+//			return err
+//		}
+//		_, err := tx.RemoveGroupingPolicy("alice", "admin")
+//		return err
+//	})
+//
+// Mind the Session(&gorm.Session{NewDB: true}): the GORM adapter pins its
+// *gorm.DB to the policy table, and without resetting the statement every query
+// would silently run against casbin_rule instead of the caller's own table.
+func (tx *Transaction) GetAdapter() persist.Adapter {
+	return tx.txContext.GetAdapter()
+}
+
 // AddPolicy adds a policy within the transaction.
 // The policy is buffered and will be applied when the transaction is committed.
 func (tx *Transaction) AddPolicy(params ...interface{}) (bool, error) {
