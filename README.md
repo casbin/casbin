@@ -26,7 +26,6 @@ Apache Casbin
 [![Godoc](https://godoc.org/github.com/apache/casbin?status.svg)](https://pkg.go.dev/github.com/casbin/casbin/v2)
 [![Release](https://img.shields.io/github/release/apache/casbin.svg)](https://github.com/apache/casbin/releases/latest)
 [![Discord](https://img.shields.io/discord/1022748306096537660?logo=discord&label=discord&color=5865F2)](https://discord.gg/S5UjpzGZjN)
-[![Sourcegraph](https://sourcegraph.com/github.com/apache/casbin/-/badge.svg)](https://sourcegraph.com/github.com/apache/casbin?badge)
 
 **News**: still worry about how to write the correct Apache Casbin policy? ``Apache Casbin online editor`` is coming to help! Try it at: https://casbin.apache.org/editor/
 
