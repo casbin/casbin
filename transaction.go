@@ -20,6 +20,7 @@ package casbin
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -70,12 +71,6 @@ func (tx *Transaction) GetAdapter() persist.Adapter {
 	return tx.txContext.GetAdapter()
 }
 
-// AddPolicy adds a policy within the transaction.
-// The policy is buffered and will be applied when the transaction is committed.
-func (tx *Transaction) AddPolicy(params ...interface{}) (bool, error) {
-	return tx.AddNamedPolicy("p", params...)
-}
-
 // buildRuleFromParams converts parameters to a rule slice.
 func (tx *Transaction) buildRuleFromParams(params ...interface{}) []string {
 	if len(params) == 1 {
@@ -101,68 +96,38 @@ func (tx *Transaction) checkTransactionStatus() error {
 	return nil
 }
 
-// AddNamedPolicy adds a named policy within the transaction.
-// The policy is buffered and will be applied when the transaction is committed.
-func (tx *Transaction) AddNamedPolicy(ptype string, params ...interface{}) (bool, error) {
-	tx.mutex.Lock()
-	defer tx.mutex.Unlock()
-
+// getBufferedModel returns the model with all buffered operations applied.
+// The caller must hold tx.mutex.
+func (tx *Transaction) getBufferedModel() (model.Model, error) {
 	if err := tx.checkTransactionStatus(); err != nil {
-		return false, err
+		return nil, err
 	}
 
-	rule := tx.buildRuleFromParams(params...)
-
-	// Check if policy already exists in the buffered model.
-	bufferedModel, err := tx.buffer.ApplyOperationsToModel(tx.buffer.GetModelSnapshot())
-	if err != nil {
-		return false, err
-	}
-
-	hasPolicy, err := bufferedModel.HasPolicy("p", ptype, rule)
-	if hasPolicy || err != nil {
-		return false, err
-	}
-
-	// Add operation to buffer.
-	op := persist.PolicyOperation{
-		Type:       persist.OperationAdd,
-		Section:    "p",
-		PolicyType: ptype,
-		Rules:      [][]string{rule},
-	}
-	tx.buffer.AddOperation(op)
-
-	return true, nil
+	return tx.buffer.ApplyOperationsToModel(tx.buffer.GetModelSnapshot())
 }
 
-// AddPolicies adds multiple policies within the transaction.
-func (tx *Transaction) AddPolicies(rules [][]string) (bool, error) {
-	return tx.AddNamedPolicies("p", rules)
-}
-
-// AddNamedPolicies adds multiple named policies within the transaction.
-func (tx *Transaction) AddNamedPolicies(ptype string, rules [][]string) (bool, error) {
+// bufferAdd buffers an add operation for the rules that are not present yet.
+// Rules that already exist in the buffered model are skipped, and false is
+// returned when nothing is left to add.
+func (tx *Transaction) bufferAdd(sec string, ptype string, rules [][]string) (bool, error) {
 	tx.mutex.Lock()
 	defer tx.mutex.Unlock()
-
-	if err := tx.checkTransactionStatus(); err != nil {
-		return false, err
-	}
 
 	if len(rules) == 0 {
+		if err := tx.checkTransactionStatus(); err != nil {
+			return false, err
+		}
 		return false, nil
 	}
 
-	// Check if any policies already exist in the buffered model.
-	bufferedModel, err := tx.buffer.ApplyOperationsToModel(tx.buffer.GetModelSnapshot())
+	bufferedModel, err := tx.getBufferedModel()
 	if err != nil {
 		return false, err
 	}
 
 	var validRules [][]string
 	for _, rule := range rules {
-		hasPolicy, err := bufferedModel.HasPolicy("p", ptype, rule)
+		hasPolicy, err := bufferedModel.HasPolicy(sec, ptype, rule)
 		if err != nil {
 			return false, err
 		}
@@ -175,84 +140,38 @@ func (tx *Transaction) AddNamedPolicies(ptype string, rules [][]string) (bool, e
 		return false, nil
 	}
 
-	// Add operation to buffer.
-	op := persist.PolicyOperation{
+	tx.buffer.AddOperation(persist.PolicyOperation{
 		Type:       persist.OperationAdd,
-		Section:    "p",
+		Section:    sec,
 		PolicyType: ptype,
 		Rules:      validRules,
-	}
-	tx.buffer.AddOperation(op)
+	})
 
 	return true, nil
 }
 
-// RemovePolicy removes a policy within the transaction.
-func (tx *Transaction) RemovePolicy(params ...interface{}) (bool, error) {
-	return tx.RemoveNamedPolicy("p", params...)
-}
-
-// RemoveNamedPolicy removes a named policy within the transaction.
-func (tx *Transaction) RemoveNamedPolicy(ptype string, params ...interface{}) (bool, error) {
+// bufferRemove buffers a remove operation for the rules that are present.
+// Rules that are missing from the buffered model are skipped, and false is
+// returned when nothing is left to remove.
+func (tx *Transaction) bufferRemove(sec string, ptype string, rules [][]string) (bool, error) {
 	tx.mutex.Lock()
 	defer tx.mutex.Unlock()
-
-	if err := tx.checkTransactionStatus(); err != nil {
-		return false, err
-	}
-
-	rule := tx.buildRuleFromParams(params...)
-
-	// Check if policy exists in the buffered model.
-	bufferedModel, err := tx.buffer.ApplyOperationsToModel(tx.buffer.GetModelSnapshot())
-	if err != nil {
-		return false, err
-	}
-
-	hasPolicy, err := bufferedModel.HasPolicy("p", ptype, rule)
-	if !hasPolicy || err != nil {
-		return false, err
-	}
-
-	// Add operation to buffer.
-	op := persist.PolicyOperation{
-		Type:       persist.OperationRemove,
-		Section:    "p",
-		PolicyType: ptype,
-		Rules:      [][]string{rule},
-	}
-	tx.buffer.AddOperation(op)
-
-	return true, nil
-}
-
-// RemovePolicies removes multiple policies within the transaction.
-func (tx *Transaction) RemovePolicies(rules [][]string) (bool, error) {
-	return tx.RemoveNamedPolicies("p", rules)
-}
-
-// RemoveNamedPolicies removes multiple named policies within the transaction.
-func (tx *Transaction) RemoveNamedPolicies(ptype string, rules [][]string) (bool, error) {
-	tx.mutex.Lock()
-	defer tx.mutex.Unlock()
-
-	if err := tx.checkTransactionStatus(); err != nil {
-		return false, err
-	}
 
 	if len(rules) == 0 {
+		if err := tx.checkTransactionStatus(); err != nil {
+			return false, err
+		}
 		return false, nil
 	}
 
-	// Check if policies exist in the buffered model.
-	bufferedModel, err := tx.buffer.ApplyOperationsToModel(tx.buffer.GetModelSnapshot())
+	bufferedModel, err := tx.getBufferedModel()
 	if err != nil {
 		return false, err
 	}
 
 	var validRules [][]string
 	for _, rule := range rules {
-		hasPolicy, err := bufferedModel.HasPolicy("p", ptype, rule)
+		hasPolicy, err := bufferedModel.HasPolicy(sec, ptype, rule)
 		if err != nil {
 			return false, err
 		}
@@ -265,16 +184,156 @@ func (tx *Transaction) RemoveNamedPolicies(ptype string, rules [][]string) (bool
 		return false, nil
 	}
 
-	// Add operation to buffer.
-	op := persist.PolicyOperation{
+	tx.buffer.AddOperation(persist.PolicyOperation{
 		Type:       persist.OperationRemove,
-		Section:    "p",
+		Section:    sec,
 		PolicyType: ptype,
 		Rules:      validRules,
-	}
-	tx.buffer.AddOperation(op)
+	})
 
 	return true, nil
+}
+
+// bufferRemoveFiltered resolves the filter against the buffered model and
+// buffers the matched rules for removal. Resolving the filter here keeps the
+// operation a plain remove, so it works with every adapter and takes part in
+// conflict detection like any other remove.
+func (tx *Transaction) bufferRemoveFiltered(sec string, ptype string, fieldIndex int, fieldValues []string) (bool, error) {
+	tx.mutex.Lock()
+	defer tx.mutex.Unlock()
+
+	bufferedModel, err := tx.getBufferedModel()
+	if err != nil {
+		return false, err
+	}
+
+	matched, err := bufferedModel.GetFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	if err != nil {
+		return false, err
+	}
+	if len(matched) == 0 {
+		return false, nil
+	}
+
+	// The matched rules belong to a throwaway model copy, so keep our own copy.
+	rules := make([][]string, 0, len(matched))
+	for _, rule := range matched {
+		rules = append(rules, append([]string(nil), rule...))
+	}
+
+	tx.buffer.AddOperation(persist.PolicyOperation{
+		Type:       persist.OperationRemove,
+		Section:    sec,
+		PolicyType: ptype,
+		Rules:      rules,
+	})
+
+	return true, nil
+}
+
+// bufferUpdate buffers an update operation. The update is all-or-nothing: it is
+// buffered only if every old rule exists and no new rule exists yet.
+func (tx *Transaction) bufferUpdate(sec string, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
+	tx.mutex.Lock()
+	defer tx.mutex.Unlock()
+
+	if len(oldRules) != len(newRules) {
+		return false, fmt.Errorf("the length of oldRules should be equal to the length of newRules, but got the length of oldRules is %d, the length of newRules is %d", len(oldRules), len(newRules))
+	}
+
+	if len(oldRules) == 0 {
+		if err := tx.checkTransactionStatus(); err != nil {
+			return false, err
+		}
+		return false, nil
+	}
+
+	bufferedModel, err := tx.getBufferedModel()
+	if err != nil {
+		return false, err
+	}
+
+	for i, oldRule := range oldRules {
+		hasOldPolicy, err := bufferedModel.HasPolicy(sec, ptype, oldRule)
+		if err != nil {
+			return false, err
+		}
+		if !hasOldPolicy {
+			return false, nil
+		}
+
+		hasNewPolicy, err := bufferedModel.HasPolicy(sec, ptype, newRules[i])
+		if err != nil {
+			return false, err
+		}
+		if hasNewPolicy {
+			return false, nil
+		}
+	}
+
+	tx.buffer.AddOperation(persist.PolicyOperation{
+		Type:       persist.OperationUpdate,
+		Section:    sec,
+		PolicyType: ptype,
+		Rules:      newRules,
+		OldRules:   oldRules,
+	})
+
+	return true, nil
+}
+
+// AddPolicy adds a policy within the transaction.
+// The policy is buffered and will be applied when the transaction is committed.
+func (tx *Transaction) AddPolicy(params ...interface{}) (bool, error) {
+	return tx.AddNamedPolicy("p", params...)
+}
+
+// AddNamedPolicy adds a named policy within the transaction.
+// The policy is buffered and will be applied when the transaction is committed.
+func (tx *Transaction) AddNamedPolicy(ptype string, params ...interface{}) (bool, error) {
+	return tx.bufferAdd("p", ptype, [][]string{tx.buildRuleFromParams(params...)})
+}
+
+// AddPolicies adds multiple policies within the transaction.
+func (tx *Transaction) AddPolicies(rules [][]string) (bool, error) {
+	return tx.AddNamedPolicies("p", rules)
+}
+
+// AddNamedPolicies adds multiple named policies within the transaction.
+func (tx *Transaction) AddNamedPolicies(ptype string, rules [][]string) (bool, error) {
+	return tx.bufferAdd("p", ptype, rules)
+}
+
+// RemovePolicy removes a policy within the transaction.
+func (tx *Transaction) RemovePolicy(params ...interface{}) (bool, error) {
+	return tx.RemoveNamedPolicy("p", params...)
+}
+
+// RemoveNamedPolicy removes a named policy within the transaction.
+func (tx *Transaction) RemoveNamedPolicy(ptype string, params ...interface{}) (bool, error) {
+	return tx.bufferRemove("p", ptype, [][]string{tx.buildRuleFromParams(params...)})
+}
+
+// RemovePolicies removes multiple policies within the transaction.
+func (tx *Transaction) RemovePolicies(rules [][]string) (bool, error) {
+	return tx.RemoveNamedPolicies("p", rules)
+}
+
+// RemoveNamedPolicies removes multiple named policies within the transaction.
+func (tx *Transaction) RemoveNamedPolicies(ptype string, rules [][]string) (bool, error) {
+	return tx.bufferRemove("p", ptype, rules)
+}
+
+// RemoveFilteredPolicy removes the policies that match the filter within the transaction.
+// An empty string in fieldValues means "match any value" for that field.
+func (tx *Transaction) RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) (bool, error) {
+	return tx.RemoveFilteredNamedPolicy("p", fieldIndex, fieldValues...)
+}
+
+// RemoveFilteredNamedPolicy removes the named policies that match the filter within the transaction.
+// An empty string in fieldValues means "match any value" for that field.
+func (tx *Transaction) RemoveFilteredNamedPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
+	return tx.bufferRemoveFiltered("p", ptype, fieldIndex, fieldValues)
 }
 
 // UpdatePolicy updates a policy within the transaction.
@@ -284,46 +343,19 @@ func (tx *Transaction) UpdatePolicy(oldPolicy []string, newPolicy []string) (boo
 
 // UpdateNamedPolicy updates a named policy within the transaction.
 func (tx *Transaction) UpdateNamedPolicy(ptype string, oldPolicy []string, newPolicy []string) (bool, error) {
-	tx.mutex.Lock()
-	defer tx.mutex.Unlock()
+	return tx.bufferUpdate("p", ptype, [][]string{oldPolicy}, [][]string{newPolicy})
+}
 
-	if err := tx.checkTransactionStatus(); err != nil {
-		return false, err
-	}
+// UpdatePolicies updates multiple policies within the transaction.
+// Nothing is buffered unless every old policy exists and no new policy exists yet.
+func (tx *Transaction) UpdatePolicies(oldPolicies [][]string, newPolicies [][]string) (bool, error) {
+	return tx.UpdateNamedPolicies("p", oldPolicies, newPolicies)
+}
 
-	// Check if old policy exists and new policy doesn't exist.
-	bufferedModel, err := tx.buffer.ApplyOperationsToModel(tx.buffer.GetModelSnapshot())
-	if err != nil {
-		return false, err
-	}
-
-	hasOldPolicy, err := bufferedModel.HasPolicy("p", ptype, oldPolicy)
-	if err != nil {
-		return false, err
-	}
-	if !hasOldPolicy {
-		return false, nil
-	}
-
-	hasNewPolicy, errNew := bufferedModel.HasPolicy("p", ptype, newPolicy)
-	if errNew != nil {
-		return false, errNew
-	}
-	if hasNewPolicy {
-		return false, nil
-	}
-
-	// Add operation to buffer.
-	op := persist.PolicyOperation{
-		Type:       persist.OperationUpdate,
-		Section:    "p",
-		PolicyType: ptype,
-		Rules:      [][]string{newPolicy},
-		OldRules:   [][]string{oldPolicy},
-	}
-	tx.buffer.AddOperation(op)
-
-	return true, nil
+// UpdateNamedPolicies updates multiple named policies within the transaction.
+// Nothing is buffered unless every old policy exists and no new policy exists yet.
+func (tx *Transaction) UpdateNamedPolicies(ptype string, oldPolicies [][]string, newPolicies [][]string) (bool, error) {
+	return tx.bufferUpdate("p", ptype, oldPolicies, newPolicies)
 }
 
 // AddGroupingPolicy adds a grouping policy within the transaction.
@@ -333,36 +365,17 @@ func (tx *Transaction) AddGroupingPolicy(params ...interface{}) (bool, error) {
 
 // AddNamedGroupingPolicy adds a named grouping policy within the transaction.
 func (tx *Transaction) AddNamedGroupingPolicy(ptype string, params ...interface{}) (bool, error) {
-	tx.mutex.Lock()
-	defer tx.mutex.Unlock()
+	return tx.bufferAdd("g", ptype, [][]string{tx.buildRuleFromParams(params...)})
+}
 
-	if err := tx.checkTransactionStatus(); err != nil {
-		return false, err
-	}
+// AddGroupingPolicies adds multiple grouping policies within the transaction.
+func (tx *Transaction) AddGroupingPolicies(rules [][]string) (bool, error) {
+	return tx.AddNamedGroupingPolicies("g", rules)
+}
 
-	rule := tx.buildRuleFromParams(params...)
-
-	// Check if grouping policy already exists in the buffered model.
-	bufferedModel, err := tx.buffer.ApplyOperationsToModel(tx.buffer.GetModelSnapshot())
-	if err != nil {
-		return false, err
-	}
-
-	hasPolicy, err := bufferedModel.HasPolicy("g", ptype, rule)
-	if hasPolicy || err != nil {
-		return false, err
-	}
-
-	// Add operation to buffer.
-	op := persist.PolicyOperation{
-		Type:       persist.OperationAdd,
-		Section:    "g",
-		PolicyType: ptype,
-		Rules:      [][]string{rule},
-	}
-	tx.buffer.AddOperation(op)
-
-	return true, nil
+// AddNamedGroupingPolicies adds multiple named grouping policies within the transaction.
+func (tx *Transaction) AddNamedGroupingPolicies(ptype string, rules [][]string) (bool, error) {
+	return tx.bufferAdd("g", ptype, rules)
 }
 
 // RemoveGroupingPolicy removes a grouping policy within the transaction.
@@ -372,36 +385,52 @@ func (tx *Transaction) RemoveGroupingPolicy(params ...interface{}) (bool, error)
 
 // RemoveNamedGroupingPolicy removes a named grouping policy within the transaction.
 func (tx *Transaction) RemoveNamedGroupingPolicy(ptype string, params ...interface{}) (bool, error) {
-	tx.mutex.Lock()
-	defer tx.mutex.Unlock()
+	return tx.bufferRemove("g", ptype, [][]string{tx.buildRuleFromParams(params...)})
+}
 
-	if err := tx.checkTransactionStatus(); err != nil {
-		return false, err
-	}
+// RemoveGroupingPolicies removes multiple grouping policies within the transaction.
+func (tx *Transaction) RemoveGroupingPolicies(rules [][]string) (bool, error) {
+	return tx.RemoveNamedGroupingPolicies("g", rules)
+}
 
-	rule := tx.buildRuleFromParams(params...)
+// RemoveNamedGroupingPolicies removes multiple named grouping policies within the transaction.
+func (tx *Transaction) RemoveNamedGroupingPolicies(ptype string, rules [][]string) (bool, error) {
+	return tx.bufferRemove("g", ptype, rules)
+}
 
-	// Check if grouping policy exists in the buffered model.
-	bufferedModel, err := tx.buffer.ApplyOperationsToModel(tx.buffer.GetModelSnapshot())
-	if err != nil {
-		return false, err
-	}
+// RemoveFilteredGroupingPolicy removes the grouping policies that match the filter within the transaction.
+// An empty string in fieldValues means "match any value" for that field.
+func (tx *Transaction) RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) (bool, error) {
+	return tx.RemoveFilteredNamedGroupingPolicy("g", fieldIndex, fieldValues...)
+}
 
-	hasPolicy, err := bufferedModel.HasPolicy("g", ptype, rule)
-	if !hasPolicy || err != nil {
-		return false, err
-	}
+// RemoveFilteredNamedGroupingPolicy removes the named grouping policies that match
+// the filter within the transaction.
+// An empty string in fieldValues means "match any value" for that field.
+func (tx *Transaction) RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error) {
+	return tx.bufferRemoveFiltered("g", ptype, fieldIndex, fieldValues)
+}
 
-	// Add operation to buffer.
-	op := persist.PolicyOperation{
-		Type:       persist.OperationRemove,
-		Section:    "g",
-		PolicyType: ptype,
-		Rules:      [][]string{rule},
-	}
-	tx.buffer.AddOperation(op)
+// UpdateGroupingPolicy updates a grouping policy within the transaction.
+func (tx *Transaction) UpdateGroupingPolicy(oldRule []string, newRule []string) (bool, error) {
+	return tx.UpdateNamedGroupingPolicy("g", oldRule, newRule)
+}
 
-	return true, nil
+// UpdateNamedGroupingPolicy updates a named grouping policy within the transaction.
+func (tx *Transaction) UpdateNamedGroupingPolicy(ptype string, oldRule []string, newRule []string) (bool, error) {
+	return tx.bufferUpdate("g", ptype, [][]string{oldRule}, [][]string{newRule})
+}
+
+// UpdateGroupingPolicies updates multiple grouping policies within the transaction.
+// Nothing is buffered unless every old rule exists and no new rule exists yet.
+func (tx *Transaction) UpdateGroupingPolicies(oldRules [][]string, newRules [][]string) (bool, error) {
+	return tx.UpdateNamedGroupingPolicies("g", oldRules, newRules)
+}
+
+// UpdateNamedGroupingPolicies updates multiple named grouping policies within the transaction.
+// Nothing is buffered unless every old rule exists and no new rule exists yet.
+func (tx *Transaction) UpdateNamedGroupingPolicies(ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
+	return tx.bufferUpdate("g", ptype, oldRules, newRules)
 }
 
 // GetBufferedModel returns the model as it would look after applying all buffered operations.
@@ -410,11 +439,7 @@ func (tx *Transaction) GetBufferedModel() (model.Model, error) {
 	tx.mutex.RLock()
 	defer tx.mutex.RUnlock()
 
-	if err := tx.checkTransactionStatus(); err != nil {
-		return nil, err
-	}
-
-	return tx.buffer.ApplyOperationsToModel(tx.buffer.GetModelSnapshot())
+	return tx.getBufferedModel()
 }
 
 // HasOperations returns true if the transaction has any buffered operations.
