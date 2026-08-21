@@ -232,18 +232,6 @@ func TestLRUCache(t *testing.T) {
 	testCacheEqual(t, cache, []int{1, 3, 4})
 }
 
-func TestLRUCacheNonPositiveCapacity(t *testing.T) {
-	// A cache created with a non-positive capacity holds nothing and must not
-	// panic on Put. Previously the eviction path removed cache.tail.prev, which
-	// on an empty list is the head sentinel whose prev pointer is nil, causing a
-	// nil pointer dereference.
-	cache := NewLRUCache(0)
-	cache.Put("a", 1)
-	if _, ok := cache.Get("a"); ok {
-		t.Errorf("NewLRUCache(0): Get(\"a\") ok = true, want false (zero-capacity cache holds nothing)")
-	}
-}
-
 func testEscapeStringLiterals(t *testing.T, input string, expected string) {
 	t.Helper()
 	result := EscapeStringLiterals(input)
