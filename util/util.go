@@ -391,6 +391,10 @@ func (cache *LRUCache) Get(key interface{}) (value interface{}, ok bool) {
 }
 
 func (cache *LRUCache) Put(key interface{}, value interface{}) {
+	if cache.capacity <= 0 {
+		return
+	}
+
 	n, ok := cache.m[key]
 	if ok {
 		cache.remove(n, false)
