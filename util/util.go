@@ -392,10 +392,9 @@ func (cache *LRUCache) Get(key interface{}) (value interface{}, ok bool) {
 
 func (cache *LRUCache) Put(key interface{}, value interface{}) {
 	if cache.capacity <= 0 {
-		// A cache with non-positive capacity holds nothing, so there is nothing
-		// to store and no eviction to perform.
 		return
 	}
+
 	n, ok := cache.m[key]
 	if ok {
 		cache.remove(n, false)
