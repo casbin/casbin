@@ -158,31 +158,37 @@ func SetEquals(a []string, b []string) bool {
 		return false
 	}
 
-	sort.Strings(a)
-	sort.Strings(b)
-
-	for i, v := range a {
-		if v != b[i] {
+	count := make(map[string]int, len(a))
+	for _, v := range a {
+		count[v]++
+	}
+	for _, v := range b {
+		count[v]--
+		if count[v] < 0 {
 			return false
 		}
 	}
+
 	return true
 }
 
-// SetEquals determines whether two int sets are identical.
+// SetEqualsInt determines whether two int sets are identical.
 func SetEqualsInt(a []int, b []int) bool {
 	if len(a) != len(b) {
 		return false
 	}
 
-	sort.Ints(a)
-	sort.Ints(b)
-
-	for i, v := range a {
-		if v != b[i] {
+	count := make(map[int]int, len(a))
+	for _, v := range a {
+		count[v]++
+	}
+	for _, v := range b {
+		count[v]--
+		if count[v] < 0 {
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -192,18 +198,22 @@ func Set2DEquals(a [][]string, b [][]string) bool {
 		return false
 	}
 
-	var aa []string
-	for _, v := range a {
-		sort.Strings(v)
-		aa = append(aa, strings.Join(v, ", "))
-	}
-	var bb []string
-	for _, v := range b {
-		sort.Strings(v)
-		bb = append(bb, strings.Join(v, ", "))
+	return SetEquals(setKeys(a), setKeys(b))
+}
+
+// setKeys maps every row to an order-independent key, without touching the row.
+// The fields are joined on a NUL because a policy value may contain a comma.
+func setKeys(rows [][]string) []string {
+	keys := make([]string, len(rows))
+
+	for i, row := range rows {
+		fields := make([]string, len(row))
+		copy(fields, row)
+		sort.Strings(fields)
+		keys[i] = strings.Join(fields, "\x00")
 	}
 
-	return SetEquals(aa, bb)
+	return keys
 }
 
 // JoinSlice joins a string and a slice into a new slice.
