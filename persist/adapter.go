@@ -78,6 +78,7 @@ func LoadPolicyArray(rule []string, m model.Model) error {
 	if len(rule) == 0 || rule[0] == "" {
 		return errors.New("invalid policy rule: missing policy type")
 	}
+
 	key := rule[0]
 	sec := key[:1]
 	ok, err := m.HasPolicyEx(sec, key, rule[1:])
