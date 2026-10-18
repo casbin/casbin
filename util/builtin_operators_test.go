@@ -462,6 +462,8 @@ func TestRegexMatchFunc(t *testing.T) {
 	testRegexMatchFunc(t, false, "regexMatch: expected 2 arguments, but got 3", "/topic/create/123", "/topic/create", "/topic/update")
 	testRegexMatchFunc(t, false, "regexMatch: argument must be a string", "/topic/create", false)
 	testRegexMatchFunc(t, true, "", "/topic/create/123", "/topic/create")
+	testRegexMatchFunc(t, false, "regexMatch: error parsing regexp: missing closing ]: `[0-9`", "/topic/edit/123", "/topic/edit/[0-9")
+	testRegexMatchFunc(t, false, "regexMatch: error parsing regexp: missing closing ): `/topic/(a|b`", "/topic/a", "/topic/(a|b")
 }
 
 func TestKeyMatchFunc(t *testing.T) {

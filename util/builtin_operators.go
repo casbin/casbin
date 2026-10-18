@@ -127,16 +127,34 @@ var (
 	keyGet3Cache   patternCache
 )
 
-func mustCompileOrGet(key string) *regexp.Regexp {
+// compileOrGet returns the cached regexp for key, compiling and caching it on
+// first use. A key that fails to compile is not cached.
+func compileOrGet(key string) (*regexp.Regexp, error) {
 	reCacheMu.RLock()
 	re, ok := reCache[key]
 	reCacheMu.RUnlock()
 
-	if !ok {
-		re = regexp.MustCompile(key)
-		reCacheMu.Lock()
-		reCache[key] = re
-		reCacheMu.Unlock()
+	if ok {
+		return re, nil
+	}
+
+	re, err := regexp.Compile(key)
+	if err != nil {
+		return nil, err
+	}
+
+	reCacheMu.Lock()
+	reCache[key] = re
+	reCacheMu.Unlock()
+
+	return re, nil
+}
+
+func mustCompileOrGet(key string) *regexp.Regexp {
+	re, err := compileOrGet(key)
+	if err != nil {
+		// Let regexp.MustCompile raise the panic so its message stays the same.
+		return regexp.MustCompile(key)
 	}
 
 	return re
@@ -485,7 +503,14 @@ func RegexMatchFunc(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return RegexMatch(name1, name2), nil
+	// Compile here rather than going through RegexMatch, so that an invalid
+	// pattern in a policy comes back as an error instead of a panic.
+	re, err := compileOrGet(name2)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", "regexMatch", err)
+	}
+
+	return re.MatchString(name1), nil
 }
 
 // IPMatch determines whether IP address ip1 matches the pattern of IP address ip2, ip2 can be an IP address or a CIDR pattern.
