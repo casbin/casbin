@@ -576,3 +576,50 @@ func TestTransactionRemoveFilteredPolicyRollback(t *testing.T) {
 		t.Fatal("The policy should still exist after a rollback")
 	}
 }
+
+func TestTransactionCommitNotifiesWatcher(t *testing.T) {
+	adapter := NewMockTransactionalAdapter()
+	e, err := NewTransactionalEnforcer("examples/rbac_model.conf", adapter)
+	if err != nil {
+		t.Fatalf("Failed to create transactional enforcer: %v", err)
+	}
+	adapter.Enforcer = e.Enforcer
+
+	updates := 0
+	watcher := &SampleWatcher{}
+	if err := e.SetWatcher(watcher); err != nil {
+		t.Fatalf("Failed to set watcher: %v", err)
+	}
+	watcher.callback = func(string) { updates++ }
+
+	tx, err := e.BeginTransaction(context.Background())
+	if err != nil {
+		t.Fatalf("Failed to begin transaction: %v", err)
+	}
+	if _, err := tx.AddPolicy("alice", "data1", "read"); err != nil {
+		t.Fatalf("Failed to add policy in transaction: %v", err)
+	}
+	if updates != 0 {
+		t.Fatalf("Watcher should not be notified before commit, got %d updates", updates)
+	}
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("Failed to commit transaction: %v", err)
+	}
+	if updates != 1 {
+		t.Fatalf("Watcher should be notified once after commit, got %d updates", updates)
+	}
+
+	tx, err = e.BeginTransaction(context.Background())
+	if err != nil {
+		t.Fatalf("Failed to begin transaction: %v", err)
+	}
+	if _, err := tx.RemovePolicy("alice", "data1", "read"); err != nil {
+		t.Fatalf("Failed to remove policy in transaction: %v", err)
+	}
+	if err := tx.Rollback(); err != nil {
+		t.Fatalf("Failed to roll back transaction: %v", err)
+	}
+	if updates != 1 {
+		t.Fatalf("Watcher should not be notified after rollback, got %d updates", updates)
+	}
+}

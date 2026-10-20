@@ -100,6 +100,40 @@ func (tx *Transaction) Commit() error {
 	tx.committed = true
 	tx.enforcer.activeTransactions.Delete(tx.id)
 
+	return tx.notifyWatcher()
+}
+
+// notifyWatcher tells other instances about the committed operations,
+// mirroring what the non-transactional management API does.
+func (tx *Transaction) notifyWatcher() error {
+	e := tx.enforcer
+	if !e.shouldNotify() {
+		return nil
+	}
+
+	watcherEx, isWatcherEx := e.watcher.(persist.WatcherEx)
+	updatableWatcher, isUpdatableWatcher := e.watcher.(persist.UpdatableWatcher)
+	if !isWatcherEx && !isUpdatableWatcher {
+		return e.watcher.Update()
+	}
+
+	for _, op := range tx.buffer.GetOperations() {
+		var err error
+		switch {
+		case op.Type == persist.OperationAdd && isWatcherEx:
+			err = watcherEx.UpdateForAddPolicies(op.Section, op.PolicyType, op.Rules...)
+		case op.Type == persist.OperationRemove && isWatcherEx:
+			err = watcherEx.UpdateForRemovePolicies(op.Section, op.PolicyType, op.Rules...)
+		case op.Type == persist.OperationUpdate && isUpdatableWatcher:
+			err = updatableWatcher.UpdateForUpdatePolicies(op.Section, op.PolicyType, op.OldRules, op.Rules)
+		default:
+			err = e.watcher.Update()
+		}
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
