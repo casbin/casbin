@@ -18,9 +18,11 @@
 package casbin
 
 import (
+	"strings"
 	"testing"
 
 	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
+	"github.com/casbin/casbin/v3/util"
 )
 
 func TestPathError(t *testing.T) {
@@ -284,5 +286,36 @@ func TestMockAdapterErrors(t *testing.T) {
 	} else {
 		t.Log("Test on error: ")
 		t.Log(err10.Error())
+	}
+}
+
+func TestInvalidPatternInPolicy(t *testing.T) {
+	e, err := NewEnforcer("examples/keymatch_model.conf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = e.AddPolicy("alice", "/alice_data/*", "(GET"); err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = e.Enforce("alice", "/alice_data/resource1", "GET")
+	if err == nil || strings.HasPrefix(err.Error(), "panic:") ||
+		!strings.Contains(err.Error(), "regexMatch: error parsing regexp: missing closing ): `(GET`") {
+		t.Errorf("Enforce returns %v, supposed to be a regexMatch parse error", err)
+	}
+
+	e, err = NewEnforcer("examples/rbac_with_pattern_model.conf", "examples/rbac_with_pattern_policy.csv")
+	if err != nil {
+		t.Fatal(err)
+	}
+	e.AddNamedMatchingFunc("g2", "matchingFunc", util.KeyMatch2)
+	if _, err = e.AddNamedGroupingPolicy("g2", "/book/(1", "book_group"); err != nil {
+		t.Fatal(err)
+	}
+
+	testEnforce(t, e, "alice", "/book/1", "GET", true)
+	testEnforce(t, e, "alice", "/book/(1", "GET", true)
+	if roles, err := e.GetNamedImplicitRolesForUser("g2", "/book/(1"); err != nil || len(roles) != 1 {
+		t.Errorf("GetNamedImplicitRolesForUser returns %v %v, supposed to be [book_group]", roles, err)
 	}
 }

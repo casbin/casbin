@@ -40,8 +40,6 @@ var (
 	keyMatch5Re = regexp.MustCompile(`\{[^/]+\}`)
 	keyGet2Re1  = regexp.MustCompile(`:[^/]+`)
 	keyGet3Re1  = regexp.MustCompile(`\{[^/]+?\}`) // non-greedy match of `{...}` to support multiple {} in `/.../`
-	reCache     = map[string]*regexp.Regexp{}
-	reCacheMu   = sync.RWMutex{}
 )
 
 // regexpMetaChars is exactly the set of characters that regexp.QuoteMeta escapes.
@@ -89,17 +87,31 @@ func keyMatchShortcut(key1 string, key2 string, extraChars string) (matched bool
 // their capture groups appear (only KeyGet2/KeyGet3/KeyMatch4 use tokens).
 //
 // Everything in it is a pure function of key2, so it is built once per distinct
-// key2 and reused afterwards.
+// key2 and reused afterwards. A key2 that does not compile keeps its error here,
+// so it is reported on every call without being compiled again.
 type compiledPattern struct {
 	re     *regexp.Regexp
 	tokens []string
+	err    error
+}
+
+func compilePattern(expr string, tokens []string) *compiledPattern {
+	re, err := regexp.Compile(expr)
+	return &compiledPattern{re: re, tokens: tokens, err: err}
+}
+
+func (p *compiledPattern) match(key1 string) (bool, error) {
+	if p.err != nil {
+		return false, p.err
+	}
+	return p.re.MatchString(key1), nil
 }
 
 // patternCache memoizes compiledPattern by raw key2, one cache per matcher since
 // each of them reads key2 in its own dialect. Only compiling the regexp used to be
-// cached (see mustCompileOrGet), which still left every call rebuilding the regexp
-// source with a chain of ReplaceAll passes just to look it up. Keying on key2
-// instead makes the steady state a single map read.
+// cached, which still left every call rebuilding the regexp source with a chain of
+// ReplaceAll passes just to look it up. Keying on key2 instead makes the steady
+// state a single map read.
 //
 // A policy holds a bounded set of patterns, so the cache converges to that set
 // after the first pass; sync.Map suits that read-mostly shape.
@@ -125,22 +137,8 @@ var (
 	keyMatch5Cache patternCache
 	keyGet2Cache   patternCache
 	keyGet3Cache   patternCache
+	regexCache     patternCache
 )
-
-func mustCompileOrGet(key string) *regexp.Regexp {
-	reCacheMu.RLock()
-	re, ok := reCache[key]
-	reCacheMu.RUnlock()
-
-	if !ok {
-		re = regexp.MustCompile(key)
-		reCacheMu.Lock()
-		reCache[key] = re
-		reCacheMu.Unlock()
-	}
-
-	return re
-}
 
 // validate the variadic parameter size and type as string.
 func validateVariadicArgs(expectedLen int, args ...interface{}) error {
@@ -222,12 +220,18 @@ func KeyGetFunc(args ...interface{}) (interface{}, error) {
 
 // KeyMatch2 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/:resource".
+// An invalid pattern matches nothing; KeyMatch2Func reports it as an error.
 func KeyMatch2(key1 string, key2 string) bool {
+	matched, _ := keyMatch2(key1, key2)
+	return matched
+}
+
+func keyMatch2(key1 string, key2 string) (bool, error) {
 	if matched, ok := keyMatchShortcut(key1, key2, ":"); ok {
-		return matched
+		return matched, nil
 	}
 
-	return keyMatch2Cache.get(key2, buildKeyMatch2).re.MatchString(key1)
+	return keyMatch2Cache.get(key2, buildKeyMatch2).match(key1)
 }
 
 func buildKeyMatch2(key2 string) *compiledPattern {
@@ -235,7 +239,7 @@ func buildKeyMatch2(key2 string) *compiledPattern {
 
 	key2 = keyMatch2Re.ReplaceAllString(key2, "$1[^/]+$2")
 
-	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$")}
+	return compilePattern("^"+key2+"$", nil)
 }
 
 // KeyMatch2Func is the wrapper for KeyMatch2.
@@ -247,25 +251,38 @@ func KeyMatch2Func(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return KeyMatch2(name1, name2), nil
+	matched, err := keyMatch2(name1, name2)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", "keyMatch2", err)
+	}
+
+	return matched, nil
 }
 
 // KeyGet2 returns value matched pattern
 // For example, "/resource1" matches "/:resource"
 // if the pathVar == "resource", then "resource1" will be returned.
+// An invalid pattern returns ""; KeyGet2Func reports it as an error.
 func KeyGet2(key1, key2 string, pathVar string) string {
-	p := keyGet2Cache.get(key2, buildKeyGet2)
+	value, _ := keyGet(keyGet2Cache.get(key2, buildKeyGet2), key1, pathVar)
+	return value
+}
+
+func keyGet(p *compiledPattern, key1 string, pathVar string) (string, error) {
+	if p.err != nil {
+		return "", p.err
+	}
 
 	values := p.re.FindAllStringSubmatch(key1, -1)
 	if len(values) == 0 {
-		return ""
+		return "", nil
 	}
 	for i, key := range p.tokens {
 		if pathVar == key {
-			return values[0][i+1]
+			return values[0][i+1], nil
 		}
 	}
-	return ""
+	return "", nil
 }
 
 func buildKeyGet2(key2 string) *compiledPattern {
@@ -279,7 +296,7 @@ func buildKeyGet2(key2 string) *compiledPattern {
 
 	key2 = keyGet2Re1.ReplaceAllString(key2, "$1([^/]+)$2")
 
-	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$"), tokens: tokens}
+	return compilePattern("^"+key2+"$", tokens)
 }
 
 // KeyGet2Func is the wrapper for KeyGet2.
@@ -292,24 +309,35 @@ func KeyGet2Func(args ...interface{}) (interface{}, error) {
 	name2 := args[1].(string)
 	key := args[2].(string)
 
-	return KeyGet2(name1, name2, key), nil
+	value, err := keyGet(keyGet2Cache.get(name2, buildKeyGet2), name1, key)
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", "keyGet2", err)
+	}
+
+	return value, nil
 }
 
 // KeyMatch3 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
 // For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/{resource}".
+// An invalid pattern matches nothing; KeyMatch3Func reports it as an error.
 func KeyMatch3(key1 string, key2 string) bool {
+	matched, _ := keyMatch3(key1, key2)
+	return matched
+}
+
+func keyMatch3(key1 string, key2 string) (bool, error) {
 	if matched, ok := keyMatchShortcut(key1, key2, ""); ok {
-		return matched
+		return matched, nil
 	}
 
-	return keyMatch3Cache.get(key2, buildKeyMatch3).re.MatchString(key1)
+	return keyMatch3Cache.get(key2, buildKeyMatch3).match(key1)
 }
 
 func buildKeyMatch3(key2 string) *compiledPattern {
 	key2 = strings.ReplaceAll(key2, "/*", "/.*")
 	key2 = keyMatch3Re.ReplaceAllString(key2, "$1[^/]+$2")
 
-	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$")}
+	return compilePattern("^"+key2+"$", nil)
 }
 
 // KeyMatch3Func is the wrapper for KeyMatch3.
@@ -321,25 +349,21 @@ func KeyMatch3Func(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return KeyMatch3(name1, name2), nil
+	matched, err := keyMatch3(name1, name2)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", "keyMatch3", err)
+	}
+
+	return matched, nil
 }
 
 // KeyGet3 returns value matched pattern
 // For example, "project/proj_project1_admin/" matches "project/proj_{project}_admin/"
 // if the pathVar == "project", then "project1" will be returned.
+// An invalid pattern returns ""; KeyGet3Func reports it as an error.
 func KeyGet3(key1, key2 string, pathVar string) string {
-	p := keyGet3Cache.get(key2, buildKeyGet3)
-
-	values := p.re.FindAllStringSubmatch(key1, -1)
-	if len(values) == 0 {
-		return ""
-	}
-	for i, key := range p.tokens {
-		if pathVar == key {
-			return values[0][i+1]
-		}
-	}
-	return ""
+	value, _ := keyGet(keyGet3Cache.get(key2, buildKeyGet3), key1, pathVar)
+	return value
 }
 
 func buildKeyGet3(key2 string) *compiledPattern {
@@ -354,7 +378,7 @@ func buildKeyGet3(key2 string) *compiledPattern {
 
 	key2 = keyGet3Re1.ReplaceAllString(key2, "$1([^/]+?)$2")
 
-	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$"), tokens: tokens}
+	return compilePattern("^"+key2+"$", tokens)
 }
 
 // KeyGet3Func is the wrapper for KeyGet3.
@@ -367,7 +391,12 @@ func KeyGet3Func(args ...interface{}) (interface{}, error) {
 	name2 := args[1].(string)
 	key := args[2].(string)
 
-	return KeyGet3(name1, name2, key), nil
+	value, err := keyGet(keyGet3Cache.get(name2, buildKeyGet3), name1, key)
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", "keyGet3", err)
+	}
+
+	return value, nil
 }
 
 // KeyMatch4 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
@@ -375,16 +404,25 @@ func KeyGet3Func(args ...interface{}) (interface{}, error) {
 // "/parent/123/child/123" matches "/parent/{id}/child/{id}"
 // "/parent/123/child/456" does not match "/parent/{id}/child/{id}"
 // But KeyMatch3 will match both.
+// An invalid pattern matches nothing; KeyMatch4Func reports it as an error.
 func KeyMatch4(key1 string, key2 string) bool {
+	matched, _ := keyMatch4(key1, key2)
+	return matched
+}
+
+func keyMatch4(key1 string, key2 string) (bool, error) {
 	if matched, ok := keyMatchShortcut(key1, key2, ""); ok {
-		return matched
+		return matched, nil
 	}
 
 	p := keyMatch4Cache.get(key2, buildKeyMatch4)
+	if p.err != nil {
+		return false, p.err
+	}
 
 	matches := p.re.FindStringSubmatch(key1)
 	if matches == nil {
-		return false
+		return false, nil
 	}
 	matches = matches[1:]
 
@@ -399,11 +437,11 @@ func KeyMatch4(key1 string, key2 string) bool {
 			values[token] = matches[key]
 		}
 		if values[token] != matches[key] {
-			return false
+			return false, nil
 		}
 	}
 
-	return true
+	return true, nil
 }
 
 func buildKeyMatch4(key2 string) *compiledPattern {
@@ -416,7 +454,7 @@ func buildKeyMatch4(key2 string) *compiledPattern {
 		return "([^/]+)"
 	})
 
-	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$"), tokens: tokens}
+	return compilePattern("^"+key2+"$", tokens)
 }
 
 // KeyMatch4Func is the wrapper for KeyMatch4.
@@ -428,7 +466,12 @@ func KeyMatch4Func(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return KeyMatch4(name1, name2), nil
+	matched, err := keyMatch4(name1, name2)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", "keyMatch4", err)
+	}
+
+	return matched, nil
 }
 
 // KeyMatch5 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *
@@ -436,7 +479,13 @@ func KeyMatch4Func(args ...interface{}) (interface{}, error) {
 // - "/foo/bar?status=1&type=2" matches "/foo/bar"
 // - "/parent/child1" and "/parent/child1" matches "/parent/*"
 // - "/parent/child1?status=1" matches "/parent/*".
+// An invalid pattern matches nothing; KeyMatch5Func reports it as an error.
 func KeyMatch5(key1 string, key2 string) bool {
+	matched, _ := keyMatch5(key1, key2)
+	return matched
+}
+
+func keyMatch5(key1 string, key2 string) (bool, error) {
 	i := strings.Index(key1, "?")
 
 	if i != -1 {
@@ -446,17 +495,17 @@ func KeyMatch5(key1 string, key2 string) bool {
 	// After the query string is stripped, so that key1 is compared in the same
 	// shape the regexp path would have matched.
 	if matched, ok := keyMatchShortcut(key1, key2, ""); ok {
-		return matched
+		return matched, nil
 	}
 
-	return keyMatch5Cache.get(key2, buildKeyMatch5).re.MatchString(key1)
+	return keyMatch5Cache.get(key2, buildKeyMatch5).match(key1)
 }
 
 func buildKeyMatch5(key2 string) *compiledPattern {
 	key2 = strings.ReplaceAll(key2, "/*", "/.*")
 	key2 = keyMatch5Re.ReplaceAllString(key2, "$1[^/]+$2")
 
-	return &compiledPattern{re: mustCompileOrGet("^" + key2 + "$")}
+	return compilePattern("^"+key2+"$", nil)
 }
 
 // KeyMatch5Func is the wrapper for KeyMatch5.
@@ -468,12 +517,23 @@ func KeyMatch5Func(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return KeyMatch5(name1, name2), nil
+	matched, err := keyMatch5(name1, name2)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", "keyMatch5", err)
+	}
+
+	return matched, nil
 }
 
 // RegexMatch determines whether key1 matches the pattern of key2 in regular expression.
+// An invalid pattern matches nothing; RegexMatchFunc reports it as an error.
 func RegexMatch(key1 string, key2 string) bool {
-	return mustCompileOrGet(key2).MatchString(key1)
+	matched, _ := regexCache.get(key2, buildRegexMatch).match(key1)
+	return matched
+}
+
+func buildRegexMatch(key2 string) *compiledPattern {
+	return compilePattern(key2, nil)
 }
 
 // RegexMatchFunc is the wrapper for RegexMatch.
@@ -485,7 +545,12 @@ func RegexMatchFunc(args ...interface{}) (interface{}, error) {
 	name1 := args[0].(string)
 	name2 := args[1].(string)
 
-	return RegexMatch(name1, name2), nil
+	matched, err := regexCache.get(name2, buildRegexMatch).match(name1)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", "regexMatch", err)
+	}
+
+	return matched, nil
 }
 
 // IPMatch determines whether IP address ip1 matches the pattern of IP address ip2, ip2 can be an IP address or a CIDR pattern.

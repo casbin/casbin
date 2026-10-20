@@ -295,6 +295,17 @@ func TestRegexMatch(t *testing.T) {
 	testRegexMatch(t, "/foo/delete/123", "/topic/delete/[0-9]+", false)
 	testRegexMatch(t, "/topic/delete/0", "/topic/delete/[0-9]+", true)
 	testRegexMatch(t, "/topic/edit/123s", "/topic/delete/[0-9]+", false)
+	testRegexMatch(t, "/topic/edit/1", "/topic/edit/[0-9", false)
+}
+
+func TestInvalidPatternMatchesNothing(t *testing.T) {
+	if KeyMatch2("/foo/(bar", "/foo/(bar") || KeyMatch3("/foo/(bar", "/foo/(bar") ||
+		KeyMatch4("/foo/(bar", "/foo/(bar") || KeyMatch5("/foo/(bar", "/foo/(bar") {
+		t.Error("an invalid pattern should match nothing")
+	}
+	if KeyGet2("/foo/(bar", "/:id/(bar", "id") != "" || KeyGet3("/foo/(bar", "/{id}/(bar", "id") != "" {
+		t.Error("an invalid pattern should get nothing")
+	}
 }
 
 func testIPMatch(t *testing.T, ip1 string, ip2 string, res bool) {
@@ -462,6 +473,8 @@ func TestRegexMatchFunc(t *testing.T) {
 	testRegexMatchFunc(t, false, "regexMatch: expected 2 arguments, but got 3", "/topic/create/123", "/topic/create", "/topic/update")
 	testRegexMatchFunc(t, false, "regexMatch: argument must be a string", "/topic/create", false)
 	testRegexMatchFunc(t, true, "", "/topic/create/123", "/topic/create")
+	testRegexMatchFunc(t, false, "regexMatch: error parsing regexp: missing closing ]: `[0-9`", "/topic/edit/1", "/topic/edit/[0-9")
+	testRegexMatchFunc(t, false, "regexMatch: error parsing regexp: missing closing ): `(GET`", "GET", "(GET")
 }
 
 func TestKeyMatchFunc(t *testing.T) {
@@ -494,6 +507,7 @@ func TestKeyMatch2Func(t *testing.T) {
 	testKeyMatch2Func(t, true, "", "/foo", "/foo")
 	testKeyMatch2Func(t, true, "", "/foo", "/foo*")
 	testKeyMatch2Func(t, false, "", "/foo", "/foo/*")
+	testKeyMatch2Func(t, false, "keyMatch2: error parsing regexp: missing closing ): `^/foo/(bar$`", "/foo/bar", "/foo/(bar")
 }
 
 func TestKeyGet2Func(t *testing.T) {
@@ -504,6 +518,7 @@ func TestKeyGet2Func(t *testing.T) {
 	testKeyGet2Func(t, "myid", "", "/myid/using/myresid", "/:id/using/:resId", "id")
 	testKeyGet2Func(t, "myresid", "", "/myid/using/myresid", "/:id/using/:resId", "resId")
 	testKeyGet2Func(t, "", "", "/myid/using/myresid", "/:id/using/:resId", "missing")
+	testKeyGet2Func(t, "", "keyGet2: error parsing regexp: missing closing ): `^/([^/]+)/(using$`", "/myid/using", "/:id/(using", "id")
 }
 
 func TestKeyMatch3Func(t *testing.T) {
