@@ -182,6 +182,8 @@ https://casbin.apache.org/docs/tutorials
 
 Note: you can also initialize an enforcer with policy in DB instead of file, see [Policy-persistence](#policy-persistence) section for details.
 
+Note: `Enforcer` is not safe for concurrent use. If the enforcer is shared by multiple goroutines (e.g., in a web server) and the policy can change at run-time (management API, watcher callback, periodic `LoadPolicy()`), use `casbin.NewSyncedEnforcer()` instead, or `casbin.NewSyncedContextEnforcer()` for the context-aware API. See [Production Deployment](https://casbin.apache.org/docs/production-deployment) for details.
+
 2. Add an enforcement hook into your code right before the access happens:
 
     ```go
@@ -224,6 +226,8 @@ https://casbin.apache.org/docs/adapters
 ## Policy consistence between multiple nodes
 
 https://casbin.apache.org/docs/watchers
+
+https://casbin.apache.org/docs/production-deployment
 
 ## Role manager
 
