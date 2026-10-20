@@ -434,3 +434,54 @@ func TestConcurrentHasLink(t *testing.T) {
 			inconsistencies, numGoroutines*numIterations)
 	}
 }
+
+func TestConditionalDomainPatternLinkCondition(t *testing.T) {
+	deny := func(args ...string) (bool, error) { return false, nil }
+	allow := func(args ...string) (bool, error) { return true, nil }
+
+	rm := NewConditionalDomainManager(10)
+	rm.AddDomainMatchingFunc("keyMatch", util.KeyMatch)
+
+	_ = rm.AddLink("bob", "admin", "domain2")
+	_ = rm.AddLink("alice", "admin", "domain*")
+	rm.AddDomainLinkConditionFunc("alice", "admin", "domain*", deny)
+	_ = rm.AddLink("carol", "admin", "domain*")
+	rm.AddDomainLinkConditionFunc("carol", "admin", "domain*", allow)
+
+	for _, domain := range []string{"domain*", "domain1", "domain2"} {
+		if ok, _ := rm.HasLink("alice", "admin", domain); ok {
+			t.Errorf("alice should not have role admin in %s", domain)
+		}
+		if ok, _ := rm.HasLink("carol", "admin", domain); !ok {
+			t.Errorf("carol should have role admin in %s", domain)
+		}
+	}
+	if ok, _ := rm.HasLink("bob", "admin", "domain2"); !ok {
+		t.Errorf("bob should have role admin in domain2")
+	}
+
+	rm.AddDomainLinkConditionFunc("dave", "admin", "domain9", deny)
+	_ = rm.AddLink("dave", "admin", "domain9")
+	if ok, _ := rm.HasLink("dave", "admin", "domain9"); ok {
+		t.Errorf("dave should not have role admin in domain9")
+	}
+
+	param := func(args ...string) (bool, error) { return len(args) == 1 && args[0] == "yes", nil }
+	rm = NewConditionalDomainManager(10)
+	_ = rm.AddLink("alice", "admin", "domain*")
+	rm.AddDomainLinkConditionFunc("alice", "admin", "domain*", param)
+	rm.SetDomainLinkConditionFuncParams("alice", "admin", "domain*", "no")
+	_ = rm.AddLink("carol", "admin", "domain*")
+	rm.AddDomainLinkConditionFunc("carol", "admin", "domain*", param)
+	rm.SetDomainLinkConditionFuncParams("carol", "admin", "domain*", "yes")
+	rm.AddDomainMatchingFunc("keyMatch", util.KeyMatch)
+
+	for _, domain := range []string{"domain*", "domain1"} {
+		if ok, _ := rm.HasLink("alice", "admin", domain); ok {
+			t.Errorf("alice should not have role admin in %s after adding the domain matching function", domain)
+		}
+		if ok, _ := rm.HasLink("carol", "admin", domain); !ok {
+			t.Errorf("carol should have role admin in %s after adding the domain matching function", domain)
+		}
+	}
+}
