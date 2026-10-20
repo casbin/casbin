@@ -69,7 +69,7 @@ func (e *CachedEnforcer) EnableCache(enableCache bool) {
 // Enforce decides whether a "subject" can access a "object" with the operation "action", input parameters are usually: (sub, obj, act).
 // if rvals is not string , ignore the cache.
 func (e *CachedEnforcer) Enforce(rvals ...interface{}) (bool, error) {
-	if atomic.LoadInt32(&e.enableCache) == 0 {
+	if atomic.LoadInt32(&e.enableCache) == 0 || !e.enabled {
 		return e.Enforcer.Enforce(rvals...)
 	}
 

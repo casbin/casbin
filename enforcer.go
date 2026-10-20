@@ -637,6 +637,7 @@ func (e *Enforcer) initRmMap() {
 // EnableEnforce changes the enforcing state of Casbin, when Casbin is disabled, all access will be allowed by the Enforce() function.
 func (e *Enforcer) EnableEnforce(enable bool) {
 	e.enabled = enable
+	e.bumpPolicyVersion()
 }
 
 // EnableAutoNotifyWatcher controls whether to save a policy rule automatically notify the Watcher when it is added or removed.
