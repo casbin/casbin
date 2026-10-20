@@ -509,6 +509,15 @@ type DomainManager struct {
 	matchingFunc       rbac.MatchingFunc
 	domainMatchingFunc rbac.MatchingFunc
 	matchingFuncCache  *util.SyncLRUCache
+
+	// domains each link is added in, the role managers also hold links inherited from domain patterns
+	links   map[roleLink][]string
+	linksMu sync.Mutex
+}
+
+type roleLink struct {
+	name1 string
+	name2 string
 }
 
 // NewDomainManager is the constructor for creating an instance of the
@@ -539,27 +548,78 @@ func (dm *DomainManager) AddDomainMatchingFunc(name string, fn rbac.MatchingFunc
 	dm.rebuild()
 }
 
-// clears the map of RoleManagers.
+// rebuilds the map of RoleManagers from the added links.
 func (dm *DomainManager) rebuild() {
-	rmMap := dm.rmMap
+	links := dm.takeLinks()
 	_ = dm.Clear()
-	rmMap.Range(func(key, value interface{}) bool {
-		domain := key.(string)
-		rm := value.(*RoleManagerImpl)
-
-		rm.Range(func(name1, name2 string, _ ...string) bool {
-			_ = dm.AddLink(name1, name2, domain)
-			return true
-		})
-		return true
-	})
+	for link, domains := range links {
+		for _, domain := range domains {
+			_ = dm.AddLink(link.name1, link.name2, domain)
+		}
+	}
 }
 
 // Clear clears all stored data and resets the role manager to the initial state.
 func (dm *DomainManager) Clear() error {
 	dm.rmMap = &sync.Map{}
 	dm.matchingFuncCache = util.NewSyncLRUCache(100)
+	_ = dm.takeLinks()
 	return nil
+}
+
+func (dm *DomainManager) takeLinks() map[roleLink][]string {
+	dm.linksMu.Lock()
+	defer dm.linksMu.Unlock()
+	links := dm.links
+	dm.links = map[roleLink][]string{}
+	return links
+}
+
+func (dm *DomainManager) addLinkRecord(name1, name2, domain string) {
+	dm.linksMu.Lock()
+	defer dm.linksMu.Unlock()
+	link := roleLink{name1, name2}
+	for _, domain2 := range dm.links[link] {
+		if domain2 == domain {
+			return
+		}
+	}
+	dm.links[link] = append(dm.links[link], domain)
+}
+
+// deleteLinkRecord returns the domains in which the link is still added.
+func (dm *DomainManager) deleteLinkRecord(name1, name2, domain string) []string {
+	dm.linksMu.Lock()
+	defer dm.linksMu.Unlock()
+	link := roleLink{name1, name2}
+	domains := removeDomain(dm.links[link], domain)
+	if len(domains) == 0 {
+		delete(dm.links, link)
+		return nil
+	}
+	dm.links[link] = domains
+	return append([]string(nil), domains...)
+}
+
+func removeDomain(domains []string, domain string) []string {
+	for i, domain2 := range domains {
+		if domain2 == domain {
+			last := len(domains) - 1
+			domains[i] = domains[last]
+			domains[last] = ""
+			return domains[:last]
+		}
+	}
+	return domains
+}
+
+func (dm *DomainManager) linkGranted(domain string, grantDomains []string) bool {
+	for _, grantDomain := range grantDomains {
+		if dm.Match(domain, grantDomain) {
+			return true
+		}
+	}
+	return false
 }
 
 func (dm *DomainManager) getDomain(domains ...string) (domain string, err error) {
@@ -583,12 +643,12 @@ func (dm *DomainManager) Match(str string, pattern string) bool {
 	}
 }
 
-func (dm *DomainManager) rangeAffectedRoleManagers(domain string, fn func(rm *RoleManagerImpl)) {
+func (dm *DomainManager) rangeAffectedRoleManagers(domain string, fn func(domain2 string, rm *RoleManagerImpl)) {
 	if dm.domainMatchingFunc != nil {
 		dm.rmMap.Range(func(key, value interface{}) bool {
 			domain2 := key.(string)
 			if domain != domain2 && dm.Match(domain2, domain) {
-				fn(value.(*RoleManagerImpl))
+				fn(domain2, value.(*RoleManagerImpl))
 			}
 			return true
 		})
@@ -633,10 +693,11 @@ func (dm *DomainManager) AddLink(name1 string, name2 string, domains ...string) 
 	if err != nil {
 		return err
 	}
+	dm.addLinkRecord(name1, name2, domain)
 	roleManager := dm.getRoleManager(domain, true) // create role manager if it does not exist
 	_ = roleManager.AddLink(name1, name2, domains...)
 
-	dm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
+	dm.rangeAffectedRoleManagers(domain, func(_ string, rm *RoleManagerImpl) {
 		_ = rm.AddLink(name1, name2, domains...)
 	})
 	return nil
@@ -649,11 +710,16 @@ func (dm *DomainManager) DeleteLink(name1 string, name2 string, domains ...strin
 	if err != nil {
 		return err
 	}
+	grantDomains := dm.deleteLinkRecord(name1, name2, domain)
 	roleManager := dm.getRoleManager(domain, true) // create role manager if it does not exist
-	_ = roleManager.DeleteLink(name1, name2, domains...)
+	if !dm.linkGranted(domain, grantDomains) {
+		_ = roleManager.DeleteLink(name1, name2, domains...)
+	}
 
-	dm.rangeAffectedRoleManagers(domain, func(rm *RoleManagerImpl) {
-		_ = rm.DeleteLink(name1, name2, domains...)
+	dm.rangeAffectedRoleManagers(domain, func(domain2 string, rm *RoleManagerImpl) {
+		if !dm.linkGranted(domain2, grantDomains) {
+			_ = rm.DeleteLink(name1, name2, domains...)
+		}
 	})
 	return nil
 }
@@ -750,6 +816,15 @@ func (dm *DomainManager) BuildRelationship(name1 string, name2 string, domain ..
 // DeleteDomain deletes the specified domain from DomainManager.
 func (dm *DomainManager) DeleteDomain(domain string) error {
 	dm.rmMap.Delete(domain)
+	dm.linksMu.Lock()
+	for link, domains := range dm.links {
+		if domains = removeDomain(domains, domain); len(domains) == 0 {
+			delete(dm.links, link)
+		} else {
+			dm.links[link] = domains
+		}
+	}
+	dm.linksMu.Unlock()
 	return nil
 }
 
@@ -1135,12 +1210,12 @@ func (cdm *ConditionalDomainManager) load(name interface{}) (value *ConditionalR
 	return nil, false
 }
 
-func (cdm *ConditionalDomainManager) rangeAffectedConditionalRoleManagers(domain string, fn func(rm *ConditionalRoleManager)) {
+func (cdm *ConditionalDomainManager) rangeAffectedConditionalRoleManagers(domain string, fn func(domain2 string, rm *ConditionalRoleManager)) {
 	if cdm.domainMatchingFunc != nil {
 		cdm.rmMap.Range(func(key, value interface{}) bool {
 			domain2 := key.(string)
 			if domain != domain2 && cdm.Match(domain2, domain) {
-				fn(value.(*ConditionalRoleManager))
+				fn(domain2, value.(*ConditionalRoleManager))
 			}
 			return true
 		})
@@ -1225,10 +1300,11 @@ func (cdm *ConditionalDomainManager) AddLink(name1 string, name2 string, domains
 	if err != nil {
 		return err
 	}
+	cdm.addLinkRecord(name1, name2, domain)
 	conditionalRoleManager := cdm.getConditionalRoleManager(domain, true) // create role manager if it does not exist
 	_ = conditionalRoleManager.AddLink(name1, name2, domain)
 
-	cdm.rangeAffectedConditionalRoleManagers(domain, func(rm *ConditionalRoleManager) {
+	cdm.rangeAffectedConditionalRoleManagers(domain, func(_ string, rm *ConditionalRoleManager) {
 		_ = rm.AddLink(name1, name2, domain)
 	})
 	return nil
@@ -1241,11 +1317,16 @@ func (cdm *ConditionalDomainManager) DeleteLink(name1 string, name2 string, doma
 	if err != nil {
 		return err
 	}
+	grantDomains := cdm.deleteLinkRecord(name1, name2, domain)
 	conditionalRoleManager := cdm.getConditionalRoleManager(domain, true) // create role manager if it does not exist
-	_ = conditionalRoleManager.DeleteLink(name1, name2, domain)
+	if !cdm.linkGranted(domain, grantDomains) {
+		_ = conditionalRoleManager.DeleteLink(name1, name2, domain)
+	}
 
-	cdm.rangeAffectedConditionalRoleManagers(domain, func(rm *ConditionalRoleManager) {
-		_ = rm.DeleteLink(name1, name2, domain)
+	cdm.rangeAffectedConditionalRoleManagers(domain, func(domain2 string, rm *ConditionalRoleManager) {
+		if !cdm.linkGranted(domain2, grantDomains) {
+			_ = rm.DeleteLink(name1, name2, domain)
+		}
 	})
 	return nil
 }
@@ -1293,20 +1374,16 @@ func (cdm *ConditionalDomainManager) AddDomainMatchingFunc(name string, fn rbac.
 	cdm.rebuild()
 }
 
-// rebuild clears the map of ConditionalRoleManagers.
+// rebuild rebuilds the map of ConditionalRoleManagers from the added links.
 func (cdm *ConditionalDomainManager) rebuild() {
 	rmMap := cdm.rmMap
+	links := cdm.takeLinks()
 	_ = cdm.Clear()
-	rmMap.Range(func(key, value interface{}) bool {
-		domain := key.(string)
-		crm := value.(*ConditionalRoleManager)
-
-		crm.Range(func(name1, name2 string, _ ...string) bool {
-			_ = cdm.AddLink(name1, name2, domain)
-			return true
-		})
-		return true
-	})
+	for link, domains := range links {
+		for _, domain := range domains {
+			_ = cdm.AddLink(link.name1, link.name2, domain)
+		}
+	}
 	rmMap.Range(func(key, value interface{}) bool {
 		rm := cdm.getConditionalRoleManager(key.(string), true)
 		value.(*ConditionalRoleManager).allRoles.Range(func(name, src interface{}) bool {

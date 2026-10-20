@@ -426,3 +426,17 @@ func TestGetRolesForUserInDomainWithConditionalFunctions(t *testing.T) {
 		}
 	})
 }
+
+func TestRemoveGroupingPolicyWithDomainPattern(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domain_pattern_model.conf", "examples/rbac_with_domain_pattern_policy.csv")
+	e.AddNamedDomainMatchingFunc("g", "KeyMatch", util.KeyMatch)
+
+	_, _ = e.AddGroupingPolicy("alice", "admin", "domain1")
+	_, _ = e.RemoveGroupingPolicy("alice", "admin", "domain1")
+	_, _ = e.AddGroupingPolicy("bob", "admin", "*")
+	_, _ = e.RemoveGroupingPolicy("bob", "admin", "*")
+
+	testDomainEnforce(t, e, "alice", "domain1", "data1", "read", true)
+	testDomainEnforce(t, e, "bob", "domain2", "data2", "read", true)
+	testDomainEnforce(t, e, "bob", "domain1", "data1", "read", false)
+}

@@ -343,6 +343,33 @@ func TestDomainMatchingFuncWithDifferentDomain(t *testing.T) {
 	testDomainRole(t, rm, "alice", "admin", "domain2", false)
 }
 
+func TestDomainPatternDeleteLink(t *testing.T) {
+	rm := NewRoleManager(10)
+	rm.AddDomainMatchingFunc("keyMatch", util.KeyMatch)
+
+	_ = rm.AddLink("alice", "admin", "*")
+	_ = rm.AddLink("alice", "admin", "domain1")
+	_ = rm.DeleteLink("alice", "admin", "domain1")
+	testDomainRole(t, rm, "alice", "admin", "domain1", true)
+
+	_ = rm.AddLink("bob", "admin", "domain2")
+	_ = rm.AddLink("bob", "admin", "*")
+	_ = rm.DeleteLink("bob", "admin", "*")
+	testDomainRole(t, rm, "bob", "admin", "domain2", true)
+	testDomainRole(t, rm, "bob", "admin", "domain1", false)
+
+	_ = rm.AddLink("carol", "admin", "domain3")
+	rm.AddDomainMatchingFunc("keyMatch", util.KeyMatch)
+	_ = rm.DeleteLink("alice", "admin", "*")
+	testDomainRole(t, rm, "alice", "admin", "domain1", false)
+	testDomainRole(t, rm, "alice", "admin", "domain3", false)
+	testDomainRole(t, rm, "bob", "admin", "domain2", true)
+	testDomainRole(t, rm, "carol", "admin", "domain3", true)
+
+	_ = rm.DeleteLink("bob", "admin", "domain2")
+	testDomainRole(t, rm, "bob", "admin", "domain2", false)
+}
+
 func TestTemporaryRoles(t *testing.T) {
 	rm := NewRoleManager(10)
 	rm.AddMatchingFunc("regexMatch", util.RegexMatch)
@@ -482,6 +509,35 @@ func TestConditionalDomainPatternLinkCondition(t *testing.T) {
 		}
 		if ok, _ := rm.HasLink("carol", "admin", domain); !ok {
 			t.Errorf("carol should have role admin in %s after adding the domain matching function", domain)
+		}
+	}
+}
+
+func TestConditionalDomainPatternDeleteLink(t *testing.T) {
+	rm := NewConditionalDomainManager(10)
+	rm.AddDomainMatchingFunc("keyMatch", util.KeyMatch)
+
+	_ = rm.AddLink("alice", "admin", "*")
+	_ = rm.AddLink("alice", "admin", "domain1")
+	_ = rm.DeleteLink("alice", "admin", "domain1")
+	_ = rm.AddLink("bob", "admin", "domain2")
+	_ = rm.AddLink("bob", "admin", "*")
+	_ = rm.DeleteLink("bob", "admin", "*")
+	rm.AddDomainMatchingFunc("keyMatch", util.KeyMatch)
+
+	tests := []struct {
+		name   string
+		domain string
+		res    bool
+	}{
+		{"alice", "domain1", true},
+		{"alice", "domain2", true},
+		{"bob", "domain2", true},
+		{"bob", "domain1", false},
+	}
+	for _, tt := range tests {
+		if ok, _ := rm.HasLink(tt.name, "admin", tt.domain); ok != tt.res {
+			t.Errorf("%s, admin, %s: %t, supposed to be %t", tt.name, tt.domain, ok, tt.res)
 		}
 	}
 }
