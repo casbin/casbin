@@ -53,6 +53,9 @@ func TestEscapeAssertion(t *testing.T) {
 	// Test that patterns inside strings are not escaped
 	testEscapeAssertion(t, `r.sub == "a.p.p.l.e"`, `r_sub == "a.p.p.l.e"`)
 	testEscapeAssertion(t, `r.sub == "test.p.value"`, `r_sub == "test.p.value"`)
+	testEscapeAssertion(t, `r.obj == "https://p.example.com"`, `r_obj == "https://p.example.com"`)
+	testEscapeAssertion(t, `r.obj == 'https://p.example.com' && p.sub == r.sub`, `r_obj == 'https://p.example.com' && p_sub == r_sub`)
+	testEscapeAssertion(t, `keyMatch(r.obj, "/p.*") || r.obj == "a\"/r.b"`, `keyMatch(r_obj, "/p.*") || r_obj == "a\"/r.b"`)
 }
 
 func testRemoveComments(t *testing.T, s string, res string) {

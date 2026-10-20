@@ -39,8 +39,38 @@ func JsonToMap(jsonStr string) (map[string]interface{}, error) {
 }
 
 // EscapeAssertion escapes the dots in the assertion, because the expression evaluation doesn't support such variable names.
+// Quoted string literals are kept as they are.
 func EscapeAssertion(s string) string {
-	s = escapeAssertionRegex.ReplaceAllStringFunc(s, func(m string) string {
+	var b strings.Builder
+	start := 0
+	for i := 0; i < len(s); i++ {
+		quote := s[i]
+		if quote != '"' && quote != '\'' {
+			continue
+		}
+		end := i + 1
+		for end < len(s) && s[end] != quote {
+			if s[end] == '\\' {
+				end++
+			}
+			end++
+		}
+		if end < len(s) {
+			end++
+		} else {
+			end = len(s)
+		}
+		b.WriteString(escapeAssertionUnquoted(s[start:i]))
+		b.WriteString(s[i:end])
+		start = end
+		i = end - 1
+	}
+	b.WriteString(escapeAssertionUnquoted(s[start:]))
+	return b.String()
+}
+
+func escapeAssertionUnquoted(s string) string {
+	return escapeAssertionRegex.ReplaceAllStringFunc(s, func(m string) string {
 		// Replace only the last dot with underscore (preserve the prefix character)
 		lastDotIdx := strings.LastIndex(m, ".")
 		if lastDotIdx > 0 {
@@ -48,7 +78,6 @@ func EscapeAssertion(s string) string {
 		}
 		return m
 	})
-	return s
 }
 
 // RemoveComments removes the comments starting with # in the text.
