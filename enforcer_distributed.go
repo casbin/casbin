@@ -157,6 +157,10 @@ func (d *DistributedEnforcer) ClearPolicySelf(shouldPersist func() bool) error {
 	}
 
 	d.model.ClearPolicy()
+	if d.autoBuildRoleLinks {
+		d.clearRoleLinks()
+	}
+	d.invalidateMatcherMap()
 
 	return nil
 }

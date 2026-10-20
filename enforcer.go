@@ -372,6 +372,18 @@ func (e *Enforcer) ClearPolicy() {
 		return
 	}
 	e.model.ClearPolicy()
+	if e.autoBuildRoleLinks {
+		e.clearRoleLinks()
+	}
+}
+
+func (e *Enforcer) clearRoleLinks() {
+	for _, rm := range e.rmMap {
+		_ = rm.Clear()
+	}
+	for _, crm := range e.condRmMap {
+		_ = crm.Clear()
+	}
 }
 
 // LoadPolicy reloads the policy from file/database.
