@@ -1,0 +1,84 @@
+{
+  "model": "basic_without_users_model.conf",
+  "policy": "basic_without_users_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "data1",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "data2",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

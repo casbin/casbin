@@ -1,0 +1,2846 @@
+{
+  "model": "rbac_with_different_types_of_roles_model.conf",
+  "policy": "rbac_with_different_types_of_roles_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "0000-01-02 00:00:00",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "0000-01-02 00:00:00",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "9999-12-30 00:00:00",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "9999-12-30 00:00:00",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "_",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "alice",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "alice",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "bob",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "bob",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "carol",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "data1",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "data2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "domain1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "domain2",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "domain2",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "role:developer",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "role:owner",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "role:owner",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "0000-01-02 00:00:00",
+        "unknown",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "0000-01-02 00:00:00",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "9999-12-30 00:00:00",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "9999-12-30 00:00:00",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "_",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "_",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "alice",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "bob",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "bob",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "carol",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "data1",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "data1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "data2",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "domain1",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "domain2",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "domain2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "role:developer",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "role:developer",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "role:owner",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "unknown",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "9999-12-30 00:00:00",
+        "unknown",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "0000-01-02 00:00:00",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "9999-12-30 00:00:00",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "9999-12-30 00:00:00",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "_",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "_",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "alice",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "bob",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "bob",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "carol",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "carol",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "data1",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "data2",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "domain1",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "domain2",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "domain2",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "role:developer",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "role:developer",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "role:owner",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "unknown",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "_",
+        "unknown",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "0000-01-02 00:00:00",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "0000-01-02 00:00:00",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "9999-12-30 00:00:00",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "_",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "_",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "carol",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "carol",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain1",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain1",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "data2",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data2",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain1",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain1",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:developer",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:owner",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:owner",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "0000-01-02 00:00:00",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "9999-12-30 00:00:00",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "9999-12-30 00:00:00",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "_",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "_",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "carol",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data1",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data2",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain2",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain2",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "domain1",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain2",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain2",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "domain2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain2",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "domain2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "role:developer",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "role:owner",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "role:owner",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "0000-01-02 00:00:00",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "0000-01-02 00:00:00",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "9999-12-30 00:00:00",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "9999-12-30 00:00:00",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "_",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "alice",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "carol",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "data1",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "data1",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "data2",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain2",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "carol",
+        "data2",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain2",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "carol",
+        "domain1",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "domain1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "domain2",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain2",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "carol",
+        "domain2",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "domain2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain2",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "carol",
+        "role:developer",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "role:developer",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "role:owner",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "role:owner",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "carol",
+        "unknown",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "0000-01-02 00:00:00",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "0000-01-02 00:00:00",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "9999-12-30 00:00:00",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "_",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "_",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "alice",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "bob",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "carol",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "carol",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "data1",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "data2",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "domain1",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "domain1",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "domain2",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "role:developer",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "role:developer",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "role:owner",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "role:owner",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "unknown",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "0000-01-02 00:00:00",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "0000-01-02 00:00:00",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "9999-12-30 00:00:00",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "9999-12-30 00:00:00",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "_",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "alice",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "alice",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "bob",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "carol",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "carol",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "data1",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "data2",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "domain1",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "domain1",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "domain2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "domain2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "role:developer",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "role:owner",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "role:owner",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "unknown",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "0000-01-02 00:00:00",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "0000-01-02 00:00:00",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "9999-12-30 00:00:00",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "9999-12-30 00:00:00",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "_",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "bob",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "carol",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "data1",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "data2",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:developer",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:owner",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:owner",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "0000-01-02 00:00:00",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "9999-12-30 00:00:00",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "9999-12-30 00:00:00",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "_",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "alice",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "alice",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "bob",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "bob",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "carol",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "data1",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "data1",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "data2",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain1",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain2",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "role:developer",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "role:developer",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "role:owner",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "unknown",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "unknown",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "0000-01-02 00:00:00",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "9999-12-30 00:00:00",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "9999-12-30 00:00:00",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "_",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "_",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "alice",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "bob",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "carol",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "carol",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "data1",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain1",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "role:developer",
+        "data1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain1",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "role:developer",
+        "data2",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain2",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "role:developer",
+        "data2",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain2",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "role:developer",
+        "domain1",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain1",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "role:developer",
+        "domain1",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "domain1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain1",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "role:developer",
+        "domain1",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "domain2",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain2",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "role:developer",
+        "domain2",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "domain2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:developer",
+        "domain2",
+        "_",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "role:developer",
+        "role:developer",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "role:developer",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "role:owner",
+        "carol"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "unknown",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:developer",
+        "unknown",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "0000-01-02 00:00:00",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "0000-01-02 00:00:00",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "9999-12-30 00:00:00",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "_",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "_",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "alice",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "bob",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "carol",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "carol",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "data1",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain1",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "role:owner",
+        "data1",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain1",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "role:owner",
+        "data2",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain2",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "role:owner",
+        "data2",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain2",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "role:owner",
+        "data2",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "domain1",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain1",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "role:owner",
+        "domain1",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "domain1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain1",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "role:owner",
+        "domain2",
+        "(read|write)"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain2",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "role:owner",
+        "domain2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "domain2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:owner",
+        "domain2",
+        "_",
+        "(read|write)"
+      ]
+    },
+    {
+      "request": [
+        "role:owner",
+        "role:developer",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "role:developer",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "role:owner",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "role:owner",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:owner",
+        "unknown",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "0000-01-02 00:00:00",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "0000-01-02 00:00:00",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "9999-12-30 00:00:00",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "9999-12-30 00:00:00",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "_",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "carol",
+        "(read|write)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "carol",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "_"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "role:developer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "0000-01-02 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "role:owner"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:developer",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:owner",
+        "9999-12-30 00:00:00"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:owner",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

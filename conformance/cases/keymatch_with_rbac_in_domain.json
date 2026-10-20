@@ -1,0 +1,3246 @@
+{
+  "model": "keymatch_with_rbac_in_domain.conf",
+  "policy": "keymatch_with_rbac_in_domain.csv",
+  "tests": [
+    {
+      "request": [
+        "*",
+        "*",
+        "*",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "*",
+        "*",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "*",
+        "Username==test2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "*",
+        "can_manage",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "*",
+        "can_use",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "*",
+        "engines/engine1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "*",
+        "unknown",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "Username==test2",
+        "*",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "Username==test2",
+        "Username==test2",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "Username==test2",
+        "can_manage",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "Username==test2",
+        "can_use",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "Username==test2",
+        "engines/engine1",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "Username==test2",
+        "unknown",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_manage",
+        "*",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_manage",
+        "Username==test2",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_manage",
+        "can_manage",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_manage",
+        "can_use",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_manage",
+        "engines/engine1",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_manage",
+        "unknown",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_use",
+        "*",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_use",
+        "Username==test2",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_use",
+        "can_manage",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_use",
+        "can_use",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_use",
+        "engines/engine1",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "can_use",
+        "unknown",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/*",
+        "*",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/*",
+        "Username==test2",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/*",
+        "can_manage",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/*",
+        "can_use",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/*",
+        "engines/engine1",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/*",
+        "unknown",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/engine1",
+        "*",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/engine1",
+        "Username==test2",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/engine1",
+        "can_manage",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/engine1",
+        "can_use",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/engine1",
+        "engines/engine1",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "engines/engine1",
+        "unknown",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "unknown",
+        "*",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "unknown",
+        "Username==test2",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "unknown",
+        "can_manage",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "unknown",
+        "can_use",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "unknown",
+        "engines/engine1",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "unknown",
+        "unknown",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "*",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "*",
+        "*",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "*",
+        "Username==test2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "*",
+        "can_manage",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "*",
+        "can_use",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "*",
+        "engines/engine1",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "*",
+        "unknown",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "Username==test2",
+        "*",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "Username==test2",
+        "Username==test2",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "Username==test2",
+        "can_manage",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "Username==test2",
+        "can_use",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "Username==test2",
+        "engines/engine1",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "Username==test2",
+        "unknown",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_manage",
+        "*",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_manage",
+        "Username==test2",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_manage",
+        "can_manage",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_manage",
+        "can_use",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_manage",
+        "engines/engine1",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_manage",
+        "unknown",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_use",
+        "*",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_use",
+        "Username==test2",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_use",
+        "can_manage",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_use",
+        "can_use",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_use",
+        "engines/engine1",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "can_use",
+        "unknown",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/*",
+        "*",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/*",
+        "Username==test2",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/*",
+        "can_manage",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/*",
+        "can_use",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/*",
+        "engines/engine1",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/*",
+        "unknown",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "*",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "*",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "*",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "Username==test2",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "Username==test2",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "Username==test2",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "can_manage",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "can_manage",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "can_manage",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "can_use",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "can_use",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "engines/engine1",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "engines/engine1",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "engines/engine1",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "unknown",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "unknown",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "Username==test2",
+        "engines/engine1",
+        "unknown",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "unknown",
+        "*",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "unknown",
+        "Username==test2",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "unknown",
+        "can_manage",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "unknown",
+        "can_use",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "unknown",
+        "engines/engine1",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "Username==test2",
+        "unknown",
+        "unknown",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "*",
+        "*",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "*",
+        "Username==test2",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "*",
+        "can_manage",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "*",
+        "can_use",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "*",
+        "engines/engine1",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "*",
+        "unknown",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "Username==test2",
+        "*",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "Username==test2",
+        "Username==test2",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "Username==test2",
+        "can_manage",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "Username==test2",
+        "can_use",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "Username==test2",
+        "engines/engine1",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "Username==test2",
+        "unknown",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_manage",
+        "*",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_manage",
+        "Username==test2",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_manage",
+        "can_manage",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_manage",
+        "can_use",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_manage",
+        "engines/engine1",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_manage",
+        "unknown",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_use",
+        "*",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_use",
+        "Username==test2",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_use",
+        "can_manage",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_use",
+        "can_manage",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_use",
+        "can_use",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_use",
+        "engines/engine1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "can_use",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "Username==test2",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "Username==test2",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "Username==test2",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "can_manage",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "can_manage",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "can_manage",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "can_use",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "can_use",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "can_use",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "engines/engine1",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "engines/engine1",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "unknown",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "unknown",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/*",
+        "unknown",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "*",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "*",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "*",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "Username==test2",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "Username==test2",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "Username==test2",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "can_manage",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "can_manage",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "can_manage",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "can_use",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "can_use",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "engines/engine1",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "engines/engine1",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "engines/engine1",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "unknown",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "unknown",
+        "(pause)|(resume)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_manage",
+        "engines/*",
+        "*",
+        "(pause)|(resume)"
+      ]
+    },
+    {
+      "request": [
+        "can_manage",
+        "engines/engine1",
+        "unknown",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "unknown",
+        "*",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "unknown",
+        "Username==test2",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "unknown",
+        "can_manage",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "unknown",
+        "can_use",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "unknown",
+        "engines/engine1",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_manage",
+        "unknown",
+        "unknown",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "*",
+        "*",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "*",
+        "Username==test2",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "*",
+        "can_manage",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "*",
+        "can_use",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "*",
+        "engines/engine1",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "*",
+        "unknown",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "Username==test2",
+        "*",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "Username==test2",
+        "Username==test2",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "Username==test2",
+        "can_manage",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "Username==test2",
+        "can_use",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "Username==test2",
+        "engines/engine1",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "Username==test2",
+        "unknown",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_manage",
+        "*",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_manage",
+        "Username==test2",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_manage",
+        "can_manage",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_manage",
+        "can_use",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_manage",
+        "engines/engine1",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_manage",
+        "unknown",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_use",
+        "*",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_use",
+        "Username==test2",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_use",
+        "can_manage",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_use",
+        "can_use",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_use",
+        "engines/engine1",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_use",
+        "engines/engine1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "can_use",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/*",
+        "Username==test2",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/*",
+        "Username==test2",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/*",
+        "can_manage",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/*",
+        "can_manage",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/*",
+        "can_use",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/*",
+        "can_use",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/*",
+        "engines/engine1",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/*",
+        "engines/engine1",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/*",
+        "unknown",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/*",
+        "unknown",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/engine1",
+        "*",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/engine1",
+        "*",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/engine1",
+        "Username==test2",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/engine1",
+        "Username==test2",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/engine1",
+        "can_manage",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/engine1",
+        "can_manage",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/engine1",
+        "can_use",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/engine1",
+        "can_use",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/engine1",
+        "engines/engine1",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/engine1",
+        "unknown",
+        "(attach)|(detach)"
+      ],
+      "allow": true,
+      "explain": [
+        "can_use",
+        "engines/*",
+        "*",
+        "(attach)|(detach)"
+      ]
+    },
+    {
+      "request": [
+        "can_use",
+        "engines/engine1",
+        "unknown",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "unknown",
+        "*",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "unknown",
+        "Username==test2",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "unknown",
+        "can_manage",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "unknown",
+        "can_use",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "unknown",
+        "engines/engine1",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "can_use",
+        "unknown",
+        "unknown",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "*",
+        "*",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "*",
+        "Username==test2",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "*",
+        "can_manage",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "*",
+        "can_manage",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "*",
+        "can_use",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "*",
+        "engines/engine1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "*",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "Username==test2",
+        "*",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "Username==test2",
+        "Username==test2",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "Username==test2",
+        "can_manage",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "Username==test2",
+        "can_use",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "Username==test2",
+        "engines/engine1",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "Username==test2",
+        "unknown",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_manage",
+        "*",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_manage",
+        "Username==test2",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_manage",
+        "can_manage",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_manage",
+        "can_use",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_manage",
+        "engines/engine1",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_manage",
+        "unknown",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_use",
+        "*",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_use",
+        "Username==test2",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_use",
+        "can_manage",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_use",
+        "can_use",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_use",
+        "engines/engine1",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "can_use",
+        "unknown",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/*",
+        "*",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/*",
+        "Username==test2",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/*",
+        "can_manage",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/*",
+        "can_use",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/*",
+        "engines/engine1",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/*",
+        "unknown",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/engine1",
+        "*",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/engine1",
+        "Username==test2",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/engine1",
+        "can_manage",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/engine1",
+        "can_use",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/engine1",
+        "engines/engine1",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "engines/engine1",
+        "unknown",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "unknown",
+        "*",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "unknown",
+        "Username==test2",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "unknown",
+        "can_manage",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "unknown",
+        "can_use",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "unknown",
+        "engines/engine1",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "engines/engine1",
+        "unknown",
+        "unknown",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "*",
+        "*",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "*",
+        "Username==test2",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "*",
+        "Username==test2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "*",
+        "can_manage",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "*",
+        "can_use",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "*",
+        "engines/engine1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "*",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "Username==test2",
+        "*",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "Username==test2",
+        "Username==test2",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "Username==test2",
+        "can_manage",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "Username==test2",
+        "can_use",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "Username==test2",
+        "engines/engine1",
+        "engines/engine1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "Username==test2",
+        "unknown",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_manage",
+        "*",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_manage",
+        "Username==test2",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_manage",
+        "can_manage",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_manage",
+        "can_use",
+        "can_use"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_manage",
+        "engines/engine1",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_manage",
+        "unknown",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_use",
+        "*",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_use",
+        "Username==test2",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_use",
+        "can_manage",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_use",
+        "can_use",
+        "can_manage"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_use",
+        "engines/engine1",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "can_use",
+        "unknown",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/*",
+        "*",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/*",
+        "Username==test2",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/*",
+        "can_manage",
+        "Username==test2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/*",
+        "can_use",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/*",
+        "engines/engine1",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/*",
+        "unknown",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/engine1",
+        "*",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/engine1",
+        "Username==test2",
+        "*"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/engine1",
+        "can_manage",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/engine1",
+        "can_use",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/engine1",
+        "engines/engine1",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "engines/engine1",
+        "unknown",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "*",
+        "(pause)|(resume)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "Username==test2",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "can_manage",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "can_use",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "engines/engine1",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "(attach)|(detach)"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

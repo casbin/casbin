@@ -1,0 +1,586 @@
+{
+  "model": "eval_operator_model.conf",
+  "policy": "eval_operator_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "admin",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "r.obj == 'users'",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "r.obj == 'users'",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "r.obj == 'users'",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "r.obj == 'users'",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "users",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "users",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "users",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "users",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "r.sub == 'admin' || false",
+        "r.obj == 'users'",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "admin",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "admin",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "r.obj == 'users'",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "r.obj == 'users'",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "r.obj == 'users'",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "r.obj == 'users'",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "unknown",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "users",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "users",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "users",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "r.sub == 'admin' || false",
+        "users",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "r.obj == 'users'",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "r.obj == 'users'",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "r.obj == 'users'",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "r.obj == 'users'",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "users",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "users",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "users",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "users",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "admin",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "admin",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "r.obj == 'users'",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "r.obj == 'users'",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "r.obj == 'users'",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "r.obj == 'users'",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "unknown",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "users",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "users",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "users",
+        "users"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "users",
+        "users",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

@@ -1,0 +1,930 @@
+{
+  "model": "rbac_model.conf",
+  "policy": "rbac_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "alice",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "data1",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data2",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "data2_admin",
+        "data2",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data2",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "data2_admin",
+        "data2",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "data2_admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data2_admin",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data2_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data2_admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data2_admin",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data1",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data2",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data2",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "bob",
+        "data2",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "data2_admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data2_admin",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data2_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data2_admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data2_admin",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "alice",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data1",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data2",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "data2_admin",
+        "data2",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data2",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "data2_admin",
+        "data2",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data2_admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data2_admin",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data2_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data2_admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "data2_admin",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "unknown",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2_admin",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2_admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2_admin",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2_admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2_admin",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "data2_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

@@ -1,0 +1,3286 @@
+{
+  "model": "orbac_model.conf",
+  "policy": "orbac_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "alice",
+        "alice",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "manager",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "charlie",
+        "write",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "employee",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data2",
+        "unknown",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "document",
+        "document",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "employee",
+        "report2",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "modify",
+        "david",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "org1",
+        "data1",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "org1",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "org1",
+        "data2",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "org1",
+        "data2",
+        "modify"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "org1",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "org1",
+        "data2",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "org1",
+        "document",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "org1",
+        "document",
+        "modify"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "org1",
+        "document",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "org1",
+        "report2",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "read",
+        "david",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "report",
+        "report1",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "report2",
+        "data2",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "report",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "data1",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "read",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "consult",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "data1",
+        "read",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "david",
+        "consult",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "document",
+        "org2",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "manager",
+        "charlie",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "modify",
+        "org1",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "org1",
+        "data1",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "org1",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "org1",
+        "data2",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "org1",
+        "document",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "org1",
+        "document",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "org2",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "read",
+        "org1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "report1",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "report2",
+        "modify",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "write",
+        "alice",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "alice",
+        "manager",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "bob",
+        "write",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "consult",
+        "employee",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "data1",
+        "unknown",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "david",
+        "document",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "document",
+        "report2",
+        "report2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "manager",
+        "david",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "modify",
+        "report2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "org2",
+        "david",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "org2",
+        "report",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "charlie",
+        "org2",
+        "report",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "charlie",
+        "org2",
+        "report",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "charlie",
+        "org2",
+        "report1",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "charlie",
+        "org2",
+        "report1",
+        "modify"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "charlie",
+        "org2",
+        "report1",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "charlie",
+        "org2",
+        "report2",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "charlie",
+        "org2",
+        "report2",
+        "modify"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "charlie",
+        "org2",
+        "report2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "charlie",
+        "org2",
+        "report2",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "charlie",
+        "read",
+        "report1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "report1",
+        "david",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "report2",
+        "report1",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "charlie",
+        "write",
+        "data2",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "alice",
+        "report",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "charlie",
+        "data1",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "consult",
+        "read",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "data2",
+        "consult",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "david",
+        "org2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "employee",
+        "charlie",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "manager",
+        "org1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "org1",
+        "bob",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "org2",
+        "org1",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "report",
+        "bob",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "report1",
+        "modify",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "unknown",
+        "alice",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "consult",
+        "write",
+        "manager",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "alice",
+        "write",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "charlie",
+        "employee",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "consult",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "data2",
+        "document",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "david",
+        "report2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "employee",
+        "document",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "manager",
+        "report2",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "org1",
+        "david",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "org2",
+        "report1",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "report",
+        "data2",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "report1",
+        "report",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "unknown",
+        "data1",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data1",
+        "write",
+        "read",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "bob",
+        "consult",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "charlie",
+        "org2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "data1",
+        "charlie",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "data2",
+        "org2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "document",
+        "charlie",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "employee",
+        "org1",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "modify",
+        "bob",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "org1",
+        "modify",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "read",
+        "alice",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "report",
+        "manager",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "report1",
+        "write",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "unknown",
+        "employee",
+        "report2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "data2",
+        "write",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "bob",
+        "employee",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "charlie",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "data1",
+        "document",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "data2",
+        "report2",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "document",
+        "david",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "employee",
+        "report1",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "modify",
+        "data2",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "org1",
+        "report",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "org2",
+        "report",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "david",
+        "org2",
+        "report1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "david",
+        "org2",
+        "report2",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "david",
+        "org2",
+        "report2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "david",
+        "read",
+        "data2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "report",
+        "report",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "report2",
+        "data1",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "david",
+        "unknown",
+        "read",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "alice",
+        "consult",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "bob",
+        "org2",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "consult",
+        "charlie",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "data1",
+        "org1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "david",
+        "bob",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "document",
+        "modify",
+        "report2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "manager",
+        "bob",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "modify",
+        "modify",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "org2",
+        "alice",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "read",
+        "manager",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "report",
+        "write",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "report2",
+        "employee",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "document",
+        "unknown",
+        "unknown",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "alice",
+        "document",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "bob",
+        "report2",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "consult",
+        "david",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "data1",
+        "report1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "david",
+        "david",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "document",
+        "report1",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "manager",
+        "data2",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "modify",
+        "report",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "org1",
+        "data1",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "employee",
+        "org1",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "employee",
+        "org1",
+        "data2",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "employee",
+        "org1",
+        "document",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "employee",
+        "org1",
+        "document",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "employee",
+        "org2",
+        "data1",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "org2",
+        "report",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "employee",
+        "org2",
+        "report",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "employee",
+        "org2",
+        "report1",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "employee",
+        "org2",
+        "report2",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "employee",
+        "org2",
+        "report2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "employee",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "employee",
+        "read",
+        "report",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "report1",
+        "data1",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "report2",
+        "read",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "employee",
+        "write",
+        "consult",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "alice",
+        "org2",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "charlie",
+        "charlie",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "consult",
+        "org1",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "data2",
+        "bob",
+        "report2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "david",
+        "modify",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "employee",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "manager",
+        "modify",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "org1",
+        "alice",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "org1",
+        "data1",
+        "modify"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org1",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org1",
+        "data1",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org1",
+        "data2",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org1",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org1",
+        "document",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org1",
+        "document",
+        "modify"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org1",
+        "document",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org1",
+        "document",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "document",
+        "org1"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org2",
+        "manager",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "org2",
+        "report",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org2",
+        "report",
+        "modify"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org2",
+        "report",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org2",
+        "report",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org2",
+        "report1",
+        "consult"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org2",
+        "report1",
+        "modify"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org2",
+        "report2",
+        "modify"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org2",
+        "report2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "consult",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "org2",
+        "report2",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "manager",
+        "modify",
+        "report",
+        "org2"
+      ]
+    },
+    {
+      "request": [
+        "manager",
+        "report",
+        "alice",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "report1",
+        "manager",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "report2",
+        "write",
+        "report2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "manager",
+        "write",
+        "employee",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "alice",
+        "write",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "charlie",
+        "employee",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "consult",
+        "unknown",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "data2",
+        "document",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "david",
+        "report2",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "employee",
+        "david",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "manager",
+        "report1",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "org1",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "org2",
+        "report",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "report",
+        "data1",
+        "report2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "report1",
+        "report",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "unknown",
+        "data1",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "modify",
+        "write",
+        "read",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "bob",
+        "consult",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "charlie",
+        "org2",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "data1",
+        "charlie",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "data2",
+        "org1",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "document",
+        "bob",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "employee",
+        "modify",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "modify",
+        "alice",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "org1",
+        "manager",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "read",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "report",
+        "manager",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "report1",
+        "write",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "unknown",
+        "employee",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org1",
+        "write",
+        "unknown",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "bob",
+        "document",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "charlie",
+        "report2",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "data1",
+        "david",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "data2",
+        "report1",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "document",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "employee",
+        "report1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "modify",
+        "data2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "org1",
+        "report",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "read",
+        "data1",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "report",
+        "read",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "report2",
+        "consult",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "org2",
+        "unknown",
+        "org2",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "alice",
+        "charlie",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "bob",
+        "org1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "consult",
+        "bob",
+        "report2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "data1",
+        "modify",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "david",
+        "bob",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "document",
+        "modify",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "manager",
+        "alice",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "modify",
+        "manager",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "org1",
+        "write",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "read",
+        "employee",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "report",
+        "unknown",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "report2",
+        "document",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "read",
+        "unknown",
+        "report2",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "alice",
+        "david",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "bob",
+        "report1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "consult",
+        "david",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "data1",
+        "report1",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "david",
+        "data2",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "document",
+        "report",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "manager",
+        "data1",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "modify",
+        "read",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "org2",
+        "consult",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "read",
+        "org2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "report1",
+        "charlie",
+        "report2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "report2",
+        "org1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report",
+        "write",
+        "charlie",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "alice",
+        "org1",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "charlie",
+        "bob",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "consult",
+        "modify",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "data2",
+        "alice",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "david",
+        "manager",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "document",
+        "write",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "manager",
+        "employee",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "modify",
+        "unknown",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "org2",
+        "document",
+        "report2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "read",
+        "report2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "report1",
+        "document",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "report2",
+        "report2",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report1",
+        "write",
+        "david",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "alice",
+        "report1",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "charlie",
+        "data2",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "consult",
+        "report",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "data2",
+        "data1",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "david",
+        "read",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "employee",
+        "consult",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "manager",
+        "org2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "org1",
+        "consult",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "org2",
+        "org2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "report",
+        "charlie",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "report1",
+        "org1",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "unknown",
+        "bob",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "report2",
+        "write",
+        "modify",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "alice",
+        "modify"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "charlie",
+        "manager",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "consult",
+        "write",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data2",
+        "employee",
+        "report2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "david",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "employee",
+        "employee",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "manager",
+        "unknown",
+        "consult"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "org1",
+        "document",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "org2",
+        "report2",
+        "david"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "report",
+        "david",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "report1",
+        "report1",
+        "manager"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "data2",
+        "org2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "write",
+        "report",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "bob",
+        "data1",
+        "report1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "charlie",
+        "read",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "data1",
+        "consult",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "data2",
+        "read",
+        "charlie"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "document",
+        "consult",
+        "data1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "employee",
+        "org2",
+        "data2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "modify",
+        "charlie",
+        "document"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "org1",
+        "org1",
+        "employee"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "read",
+        "bob",
+        "org1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "report",
+        "modify",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "report2",
+        "alice",
+        "report"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "write",
+        "unknown",
+        "manager",
+        "report2"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

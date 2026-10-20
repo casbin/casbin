@@ -1,0 +1,16 @@
+p, root, data1, read, deny
+p, admin, data1, read, deny
+
+p, editor, data1, read, deny
+p, subscriber, data1, read, deny
+
+p, jane, data1, read, allow
+p, alice, data1, read, allow
+
+g, admin, root
+
+g, editor, admin
+g, subscriber, admin
+
+g, jane, editor
+g, alice, subscriber

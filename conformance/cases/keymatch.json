@@ -1,0 +1,926 @@
+{
+  "model": "keymatch_model.conf",
+  "policy": "keymatch_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "alice",
+        "/alice_data/*",
+        "(GET)|(POST)"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "/alice_data/*",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/*",
+        "GET"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "/alice_data/*",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/*",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/*",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/resource1",
+        "(GET)|(POST)"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "/alice_data/*",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/resource1",
+        "GET"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "/alice_data/*",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/resource1",
+        "POST"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "/alice_data/resource1",
+        "POST"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/resource1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/resource2",
+        "(GET)|(POST)"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "/alice_data/*",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/resource2",
+        "GET"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "/alice_data/*",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/resource2",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/resource2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/bob_data/*",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/bob_data/*",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/bob_data/*",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/bob_data/*",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/cathy_data",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/cathy_data",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/cathy_data",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/cathy_data",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/*",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/*",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/*",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/*",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/resource1",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/resource1",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/resource1",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/resource1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/resource2",
+        "(GET)|(POST)"
+      ],
+      "allow": true,
+      "explain": [
+        "bob",
+        "/alice_data/resource2",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/resource2",
+        "GET"
+      ],
+      "allow": true,
+      "explain": [
+        "bob",
+        "/alice_data/resource2",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/resource2",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/alice_data/resource2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/bob_data/*",
+        "(GET)|(POST)"
+      ],
+      "allow": true,
+      "explain": [
+        "bob",
+        "/bob_data/*",
+        "POST"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "/bob_data/*",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/bob_data/*",
+        "POST"
+      ],
+      "allow": true,
+      "explain": [
+        "bob",
+        "/bob_data/*",
+        "POST"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "/bob_data/*",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/cathy_data",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/cathy_data",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/cathy_data",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "/cathy_data",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/*",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/*",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/*",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/*",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/resource1",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/resource1",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/resource1",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/resource1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/resource2",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/resource2",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/resource2",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/alice_data/resource2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/bob_data/*",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/bob_data/*",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/bob_data/*",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/bob_data/*",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "/cathy_data",
+        "(GET)|(POST)"
+      ],
+      "allow": true,
+      "explain": [
+        "cathy",
+        "/cathy_data",
+        "(GET)|(POST)"
+      ]
+    },
+    {
+      "request": [
+        "cathy",
+        "/cathy_data",
+        "GET"
+      ],
+      "allow": true,
+      "explain": [
+        "cathy",
+        "/cathy_data",
+        "(GET)|(POST)"
+      ]
+    },
+    {
+      "request": [
+        "cathy",
+        "/cathy_data",
+        "POST"
+      ],
+      "allow": true,
+      "explain": [
+        "cathy",
+        "/cathy_data",
+        "(GET)|(POST)"
+      ]
+    },
+    {
+      "request": [
+        "cathy",
+        "/cathy_data",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "unknown",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "unknown",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "unknown",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "cathy",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/*",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/*",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/*",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/*",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/resource1",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/resource1",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/resource1",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/resource1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/resource2",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/resource2",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/resource2",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/resource2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/bob_data/*",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/bob_data/*",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/bob_data/*",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/bob_data/*",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/cathy_data",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/cathy_data",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/cathy_data",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/cathy_data",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "(GET)|(POST)"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

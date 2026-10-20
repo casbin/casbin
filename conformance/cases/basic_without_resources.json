@@ -1,0 +1,84 @@
+{
+  "model": "basic_without_resources_model.conf",
+  "policy": "basic_without_resources_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "alice",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "bob",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

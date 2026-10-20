@@ -1,0 +1,1466 @@
+{
+  "model": "rbac_with_multiple_policy_model.conf",
+  "policy": "rbac_with_multiple_policy_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "admin",
+        "/data",
+        "GET"
+      ],
+      "allow": true,
+      "explain": [
+        "user",
+        "/data",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "admin",
+        "/data",
+        "POST"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "/data",
+        "POST"
+      ]
+    },
+    {
+      "request": [
+        "admin",
+        "/data",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "/data",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "/data",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "/data",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "/data",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "/data",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/data",
+        "GET"
+      ],
+      "allow": true,
+      "explain": [
+        "user",
+        "/data",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "/data",
+        "POST"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "/data",
+        "POST"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "/data",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/data",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/data",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/data",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/data",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/data",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/data",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/data",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/data",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/data",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/data",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/data",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/data",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/data",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "/data",
+        "GET"
+      ],
+      "allow": true,
+      "explain": [
+        "user",
+        "/data",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "user",
+        "/data",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "/data",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "/data",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "/data",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "/data",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "/data",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "/data",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "POST"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "create"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "view"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

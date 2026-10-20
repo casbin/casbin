@@ -1,0 +1,2726 @@
+{
+  "model": "rebac_model.conf",
+  "policy": "rebac_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "alice",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "collaborator",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "collaborator",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "collaborator",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "collaborator",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "collaborator",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "collaborator",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc1",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc1",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc1",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "collaborator",
+        "doc",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "doc1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc2",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc2",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc2",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "doc2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "collaborator",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "collaborator",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "collaborator",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "collaborator",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "collaborator",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "collaborator",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc1",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc1",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc1",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc2",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc2",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc2",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "doc2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "collaborator",
+        "doc",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "doc2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "alice",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "alice",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "alice",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "alice",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "bob",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "bob",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "bob",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "bob",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "collaborator",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "collaborator",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "collaborator",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "collaborator",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "collaborator",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "collaborator",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc1",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc1",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc1",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc2",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc2",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc2",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "doc2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "unknown",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "unknown",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "unknown",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "unknown",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "collaborator",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "alice",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "alice",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "alice",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "alice",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "bob",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "bob",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "bob",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "bob",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "collaborator",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "collaborator",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "collaborator",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "collaborator",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "collaborator",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "collaborator",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "collaborator",
+        "doc",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "doc",
+        "doc",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc1",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc1",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc1",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc1",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc2",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc2",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc2",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "doc2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "unknown",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "unknown",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "unknown",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "alice",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "alice",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "alice",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "alice",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "bob",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "bob",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "bob",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "bob",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "collaborator",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "collaborator",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "collaborator",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "collaborator",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "collaborator",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "collaborator",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc1",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc1",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc1",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc1",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "collaborator",
+        "doc",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "doc1",
+        "doc1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc2",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc2",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc2",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "doc2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "unknown",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "unknown",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "unknown",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc1",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "alice",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "alice",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "alice",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "bob",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "bob",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "bob",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "bob",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "collaborator",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "collaborator",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "collaborator",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "collaborator",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "collaborator",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "collaborator",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc1",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc1",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc1",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc1",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc2",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc2",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc2",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "doc2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "collaborator",
+        "doc",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "doc2",
+        "doc2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "unknown",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "unknown",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "unknown",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "doc2",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "collaborator",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "collaborator",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "collaborator",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "collaborator",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "collaborator",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "collaborator",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc1",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc1",
+        "doc"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc1",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc1",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc2",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc2",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc2",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "doc2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "collaborator"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "doc1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "doc2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

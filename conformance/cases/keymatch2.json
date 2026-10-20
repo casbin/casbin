@@ -1,0 +1,122 @@
+{
+  "model": "keymatch2_model.conf",
+  "policy": "keymatch2_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "alice",
+        "/alice_data/:resource",
+        "GET"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "/alice_data/:resource",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data/:resource",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data2/:id/using/:resId",
+        "GET"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "/alice_data2/:id/using/:resId",
+        "GET"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "/alice_data2/:id/using/:resId",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/:resource",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data/:resource",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data2/:id/using/:resId",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "/alice_data2/:id/using/:resId",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "GET"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

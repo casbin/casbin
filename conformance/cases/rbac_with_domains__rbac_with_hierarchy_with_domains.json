@@ -1,0 +1,3046 @@
+{
+  "model": "rbac_with_domains_model.conf",
+  "policy": "rbac_with_hierarchy_with_domains_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "alice",
+        "alice",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "data1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "domain1",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "role:global_admin",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "role:reader",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "role:writer",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "data1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:reader",
+        "domain1",
+        "data1",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "data1",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "role:writer",
+        "domain1",
+        "data1",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "domain1",
+        "data2",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "data2",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "domain1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "role:global_admin",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "role:writer",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "alice",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "data1",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "domain2",
+        "data2",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "role:global_admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "role:reader",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "role:writer",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "unknown",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:global_admin",
+        "alice",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:global_admin",
+        "data1",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:global_admin",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:global_admin",
+        "role:global_admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:global_admin",
+        "role:reader",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:global_admin",
+        "role:writer",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:global_admin",
+        "unknown",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:reader",
+        "alice",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:reader",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:reader",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:reader",
+        "role:global_admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:reader",
+        "role:reader",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:reader",
+        "role:writer",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:reader",
+        "unknown",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:writer",
+        "alice",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:writer",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:writer",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:writer",
+        "role:global_admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:writer",
+        "role:reader",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:writer",
+        "role:writer",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "role:writer",
+        "unknown",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "alice",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "role:global_admin",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "role:reader",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "role:writer",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "unknown",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "alice",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "domain1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "role:global_admin",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "role:reader",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "role:writer",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "unknown",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "alice",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "domain1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "role:global_admin",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "role:reader",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "role:writer",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "unknown",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "domain1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "role:global_admin",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "role:reader",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "role:writer",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "unknown",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:global_admin",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:global_admin",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:global_admin",
+        "domain1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:global_admin",
+        "role:global_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:global_admin",
+        "role:reader",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:global_admin",
+        "role:writer",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:global_admin",
+        "unknown",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:reader",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:reader",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:reader",
+        "domain1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:reader",
+        "role:global_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:reader",
+        "role:reader",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:reader",
+        "role:writer",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:reader",
+        "unknown",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:writer",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:writer",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:writer",
+        "domain1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:writer",
+        "role:global_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:writer",
+        "role:reader",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:writer",
+        "role:writer",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "role:writer",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "domain1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "role:global_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "role:reader",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "role:writer",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "alice",
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "alice",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "alice",
+        "domain1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "alice",
+        "role:global_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "alice",
+        "role:reader",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "alice",
+        "role:writer",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "alice",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain1",
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain1",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:reader",
+        "domain1",
+        "data1",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain1",
+        "data1",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "role:writer",
+        "domain1",
+        "data1",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain1",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain1",
+        "domain1",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain1",
+        "role:global_admin",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain1",
+        "role:reader",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain1",
+        "role:writer",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain2",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain2",
+        "data1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain2",
+        "data2",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain2",
+        "domain1",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain2",
+        "role:global_admin",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain2",
+        "role:reader",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "domain2",
+        "role:writer",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:global_admin",
+        "alice",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:global_admin",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:global_admin",
+        "data2",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:global_admin",
+        "domain1",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:global_admin",
+        "role:global_admin",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:global_admin",
+        "role:reader",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:global_admin",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:reader",
+        "alice",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:reader",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:reader",
+        "data2",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:reader",
+        "domain1",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:reader",
+        "role:global_admin",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:reader",
+        "role:reader",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:reader",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:writer",
+        "alice",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:writer",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:writer",
+        "data2",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:writer",
+        "domain1",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:writer",
+        "role:global_admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:writer",
+        "role:reader",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "role:writer",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "unknown",
+        "alice",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "unknown",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "unknown",
+        "data2",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "unknown",
+        "domain1",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "unknown",
+        "role:global_admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "unknown",
+        "role:reader",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:global_admin",
+        "unknown",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "alice",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "alice",
+        "data1",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "alice",
+        "data2",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "alice",
+        "domain1",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "alice",
+        "role:global_admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "alice",
+        "role:reader",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "alice",
+        "unknown",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain1",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain1",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "role:reader",
+        "domain1",
+        "data1",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain1",
+        "data1",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain1",
+        "data2",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain1",
+        "domain1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain1",
+        "role:global_admin",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain1",
+        "role:writer",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain1",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain2",
+        "alice",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain2",
+        "data1",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain2",
+        "data2",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain2",
+        "domain1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain2",
+        "role:reader",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain2",
+        "role:writer",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "domain2",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:global_admin",
+        "alice",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:global_admin",
+        "data1",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:global_admin",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:global_admin",
+        "domain1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:global_admin",
+        "role:reader",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:global_admin",
+        "role:writer",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:global_admin",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:reader",
+        "alice",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:reader",
+        "data1",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:reader",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:reader",
+        "domain1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:reader",
+        "role:reader",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:reader",
+        "role:writer",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:reader",
+        "unknown",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:writer",
+        "alice",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:writer",
+        "data1",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:writer",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:writer",
+        "domain1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:writer",
+        "role:reader",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:writer",
+        "role:writer",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "role:writer",
+        "unknown",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "unknown",
+        "alice",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "unknown",
+        "data1",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "unknown",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "unknown",
+        "role:global_admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "unknown",
+        "role:reader",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "unknown",
+        "role:writer",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:reader",
+        "unknown",
+        "unknown",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "alice",
+        "alice",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "alice",
+        "data1",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "alice",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "alice",
+        "role:global_admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "alice",
+        "role:reader",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "alice",
+        "role:writer",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "alice",
+        "unknown",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain1",
+        "alice",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain1",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain1",
+        "data1",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "role:writer",
+        "domain1",
+        "data1",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain1",
+        "domain1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain1",
+        "role:global_admin",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain1",
+        "role:reader",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain1",
+        "role:writer",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain1",
+        "unknown",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain2",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain2",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain2",
+        "domain1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain2",
+        "role:global_admin",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain2",
+        "role:reader",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain2",
+        "role:writer",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "domain2",
+        "unknown",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:global_admin",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:global_admin",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:global_admin",
+        "domain1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:global_admin",
+        "role:global_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:global_admin",
+        "role:reader",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:global_admin",
+        "role:writer",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:global_admin",
+        "unknown",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:reader",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:reader",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:reader",
+        "domain1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:reader",
+        "role:global_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:reader",
+        "role:reader",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:reader",
+        "role:writer",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:reader",
+        "unknown",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:writer",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:writer",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:writer",
+        "domain1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:writer",
+        "role:global_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:writer",
+        "role:reader",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:writer",
+        "role:writer",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "role:writer",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "unknown",
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "unknown",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "unknown",
+        "domain1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "unknown",
+        "role:global_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "unknown",
+        "role:reader",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "unknown",
+        "role:writer",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "role:writer",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "domain1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "role:global_admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "role:reader",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "role:writer",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "data2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "domain1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "role:global_admin",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "role:reader",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "role:writer",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "alice",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "data2",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "domain1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "role:global_admin",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "role:reader",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "role:writer",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:global_admin",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:global_admin",
+        "data2",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:global_admin",
+        "domain1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:global_admin",
+        "role:global_admin",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:global_admin",
+        "role:reader",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:global_admin",
+        "role:writer",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:global_admin",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:reader",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:reader",
+        "data2",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:reader",
+        "domain1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:reader",
+        "role:global_admin",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:reader",
+        "role:reader",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:reader",
+        "role:writer",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:reader",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:writer",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:writer",
+        "data2",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:writer",
+        "domain1",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:writer",
+        "role:global_admin",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:writer",
+        "role:reader",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:writer",
+        "role:writer",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "role:writer",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "domain1",
+        "role:global_admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "role:global_admin",
+        "role:reader"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "role:reader",
+        "role:writer"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "role:writer",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

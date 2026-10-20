@@ -1,0 +1,3066 @@
+{
+  "model": "rbac_with_domains_model.conf",
+  "policy": "rbac_with_domains_policy2.csv",
+  "tests": [
+    {
+      "request": [
+        "admin",
+        "admin",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "data2",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "domain2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "unknown",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "alice",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "data1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "domain1",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "domain3",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "user",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "bob",
+        "bob",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "bob",
+        "data2",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "bob",
+        "domain2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "bob",
+        "unknown",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain1",
+        "alice",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain1",
+        "data1",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain1",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "domain1",
+        "data1",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "admin",
+        "domain1",
+        "data1",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "domain1",
+        "data1",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "admin",
+        "domain1",
+        "domain1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain1",
+        "domain3",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain2",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain2",
+        "bob",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain2",
+        "data2",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain2",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "domain2",
+        "data2",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "admin",
+        "domain2",
+        "data2",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "domain2",
+        "data2",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "admin",
+        "domain2",
+        "domain2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain2",
+        "user",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain3",
+        "alice",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain3",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain3",
+        "domain1",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "domain3",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "admin",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "bob",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "domain2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "user",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "alice",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "data1",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "domain1",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "user",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "admin",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "bob",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "domain2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "user",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "alice",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "data1",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "domain1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "domain3",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "admin",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "bob",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "domain2",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "bob",
+        "user",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "alice",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "data1",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "domain1",
+        "data1",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "data1",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "domain1",
+        "data1",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "domain1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain1",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "admin",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "bob",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "domain2",
+        "data2",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "data2",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "domain2",
+        "data2",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "domain1",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "domain3",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain2",
+        "user",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain3",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain3",
+        "data1",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain3",
+        "domain2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "domain3",
+        "unknown",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "admin",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "domain3",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "user",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "data1",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "domain2",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "user",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "admin",
+        "admin",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "admin",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "admin",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "admin",
+        "domain3",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "admin",
+        "user",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "alice",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "data1",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "domain2",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "alice",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "admin",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "data2",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "domain3",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "bob",
+        "user",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain1",
+        "alice",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain1",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain1",
+        "domain1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain1",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain2",
+        "admin",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain2",
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain2",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "domain2",
+        "data2",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "domain2",
+        "data2",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "admin",
+        "domain2",
+        "data2",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "domain2",
+        "domain1",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain2",
+        "domain3",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain2",
+        "user",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain3",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain3",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain3",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "user",
+        "domain3",
+        "data2",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "bob",
+        "domain3",
+        "domain2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "domain3",
+        "unknown",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "bob",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "domain1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "domain3",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "unknown",
+        "user",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "user",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "user",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "user",
+        "domain2",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "bob",
+        "user",
+        "unknown",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "admin",
+        "admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "admin",
+        "bob",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "admin",
+        "domain1",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "admin",
+        "domain3",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "admin",
+        "user",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "domain2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "alice",
+        "unknown",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "bob",
+        "admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "bob",
+        "bob",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "bob",
+        "domain1",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "bob",
+        "domain3",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "bob",
+        "user",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "domain2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain1",
+        "unknown",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "admin",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "domain1",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "domain3",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain2",
+        "user",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain3",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain3",
+        "data1",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain3",
+        "domain2",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "domain3",
+        "unknown",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "admin",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "domain3",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "unknown",
+        "user",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "user",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "user",
+        "data1",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "user",
+        "domain2",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain1",
+        "user",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "admin",
+        "admin",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "admin",
+        "bob",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "admin",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "admin",
+        "domain3",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "admin",
+        "user",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "alice",
+        "alice",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "alice",
+        "data1",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "alice",
+        "domain2",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "alice",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "bob",
+        "admin",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "bob",
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "bob",
+        "data2",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "bob",
+        "domain3",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "bob",
+        "user",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain1",
+        "alice",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain1",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain1",
+        "domain1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain1",
+        "unknown",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain2",
+        "admin",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain2",
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain2",
+        "data2",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain2",
+        "domain3",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain2",
+        "user",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain3",
+        "alice",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain3",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain3",
+        "domain1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "domain3",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "unknown",
+        "admin",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "unknown",
+        "bob",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "unknown",
+        "data2",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "unknown",
+        "domain3",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "unknown",
+        "user",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "user",
+        "alice",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "user",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "user",
+        "domain1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain2",
+        "user",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "admin",
+        "admin",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "admin",
+        "bob",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "admin",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "admin",
+        "domain3",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "admin",
+        "user",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "alice",
+        "alice",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "alice",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "alice",
+        "domain1",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "alice",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "bob",
+        "admin",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "bob",
+        "bob",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "bob",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "bob",
+        "domain2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "bob",
+        "user",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain1",
+        "alice",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain1",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain1",
+        "domain1",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain1",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain2",
+        "admin",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain2",
+        "bob",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain2",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain2",
+        "domain2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain2",
+        "user",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain3",
+        "alice",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain3",
+        "data1",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain3",
+        "domain1",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "domain3",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "unknown",
+        "admin",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "unknown",
+        "bob",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "unknown",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "unknown",
+        "domain2",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "unknown",
+        "user",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "user",
+        "alice",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "user",
+        "data1",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "user",
+        "domain1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "domain3",
+        "user",
+        "domain3",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "admin",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "bob",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "domain2",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "user",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "alice",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "data1",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "domain1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "domain3",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "bob",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "data2",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "domain2",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "bob",
+        "user",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "alice",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "data1",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "domain1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain1",
+        "domain3",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "bob",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "data2",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "domain2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain2",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain3",
+        "alice",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain3",
+        "data1",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain3",
+        "domain1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "domain3",
+        "domain3",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "bob",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "data2",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "domain2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "data1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "domain1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "user",
+        "domain3",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "data2",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "domain2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "admin",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "data1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "domain1",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "alice",
+        "domain3",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "bob",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "bob",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "bob",
+        "data2",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "bob",
+        "domain2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "bob",
+        "unknown",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain1",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain1",
+        "data1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain1",
+        "domain1",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain1",
+        "domain3",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain1",
+        "user",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain2",
+        "bob",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain2",
+        "data2",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain2",
+        "domain2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain2",
+        "unknown",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain3",
+        "alice",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain3",
+        "data1",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain3",
+        "data2",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "user",
+        "domain3",
+        "data2",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "user",
+        "domain3",
+        "domain1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "domain3",
+        "domain3",
+        "user"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "bob",
+        "bob"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "data2",
+        "domain2"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "domain2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "unknown",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "data1",
+        "domain1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "domain1",
+        "domain3"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "user",
+        "user",
+        "domain3",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

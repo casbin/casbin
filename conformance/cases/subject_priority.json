@@ -1,0 +1,2726 @@
+{
+  "model": "subject_priority_model.conf",
+  "policy": "subject_priority_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "admin",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "alice",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "data1",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "data1",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": [
+        "admin",
+        "data1",
+        "read",
+        "deny"
+      ]
+    },
+    {
+      "request": [
+        "admin",
+        "data1",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "editor",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "editor",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "editor",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "editor",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "editor",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "jane",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "jane",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "jane",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "jane",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "jane",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "root",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "root",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "root",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "root",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "root",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "root",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "subscriber",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "subscriber",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "subscriber",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "subscriber",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "subscriber",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "admin",
+        "unknown",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "alice",
+        "data1",
+        "read",
+        "allow"
+      ]
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "editor",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "editor",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "editor",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "editor",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "editor",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "jane",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "jane",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "jane",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "jane",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "jane",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "root",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "root",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "root",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "root",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "root",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "root",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "subscriber",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "subscriber",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "subscriber",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "subscriber",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "subscriber",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "alice",
+        "unknown",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "admin",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "admin",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "alice",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "alice",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "data1",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "data1",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "data1",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "data1",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "data1",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "editor",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "editor",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "editor",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "editor",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "editor",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "editor",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "jane",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "jane",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "jane",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "jane",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "jane",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "root",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "root",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "root",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "root",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "root",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "subscriber",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "subscriber",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "subscriber",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "subscriber",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "subscriber",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "subscriber",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "unknown",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "unknown",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "editor",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "admin",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "admin",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "admin",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "admin",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "alice",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "alice",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "alice",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "data1",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "jane",
+        "data1",
+        "read",
+        "allow"
+      ]
+    },
+    {
+      "request": [
+        "jane",
+        "data1",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "data1",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "editor",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "editor",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "editor",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "editor",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "editor",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "editor",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "jane",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "jane",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "jane",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "jane",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "jane",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "root",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "root",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "root",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "root",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "root",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "root",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "subscriber",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "subscriber",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "subscriber",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "subscriber",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "subscriber",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "unknown",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "unknown",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "unknown",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "jane",
+        "unknown",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "admin",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "admin",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "alice",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "alice",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "data1",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "data1",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "data1",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "data1",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "data1",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "editor",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "editor",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "editor",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "editor",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "editor",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "editor",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "jane",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "jane",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "jane",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "jane",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "jane",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "root",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "root",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "root",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "root",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "root",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "subscriber",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "subscriber",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "subscriber",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "subscriber",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "subscriber",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "subscriber",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "unknown",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "unknown",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "root",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "admin",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "admin",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "admin",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "admin",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "admin",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "alice",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "alice",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "alice",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "alice",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "alice",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "alice",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "data1",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": [
+        "subscriber",
+        "data1",
+        "read",
+        "deny"
+      ]
+    },
+    {
+      "request": [
+        "subscriber",
+        "data1",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "editor",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "editor",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "editor",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "editor",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "editor",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "jane",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "jane",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "jane",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "jane",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "jane",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "jane",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "root",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "root",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "root",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "root",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "root",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "subscriber",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "subscriber",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "subscriber",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "subscriber",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "subscriber",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "unknown",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "unknown",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "unknown",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "subscriber",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "admin",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "alice",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "editor",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "editor",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "editor",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "editor",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "editor",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "jane",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "jane",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "jane",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "jane",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "jane",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "root",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "root",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "root",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "root",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "root",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "root",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "subscriber",
+        "alice"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "subscriber",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "subscriber",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "subscriber",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "subscriber",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "admin"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "editor"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "jane"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "root"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "unknown",
+        "unknown",
+        "subscriber"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

@@ -1,0 +1,2718 @@
+{
+  "model": "ipmatch_model.conf",
+  "policy": "ipmatch_policy.csv",
+  "tests": [
+    {
+      "request": [
+        "10.0.0.5",
+        "10.0.0.5",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "10.0.0.5",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "10.0.0.5",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "10.0.0.5",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "10.0.0.5",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "10.0.0.5",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "10.0.0.5",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "10.0.0.5",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "127.0.0.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "127.0.0.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "127.0.0.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "127.0.0.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "127.0.0.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "127.0.0.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "127.0.0.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.0.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.0.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.0.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.0.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.0.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.0.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.0.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.0.1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.123",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.123",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.123",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.123",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.123",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.123",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.123",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "192.168.2.123",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data2",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data2",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data2",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data2",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data2",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "data2",
+        "write"
+      ],
+      "allow": true,
+      "explain": [
+        "10.0.0.0/16",
+        "data2",
+        "write"
+      ]
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "unknown",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "unknown",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "unknown",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "unknown",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "unknown",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "10.0.0.5",
+        "unknown",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "10.0.0.5",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "10.0.0.5",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "10.0.0.5",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "10.0.0.5",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "10.0.0.5",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "10.0.0.5",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "10.0.0.5",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "127.0.0.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "127.0.0.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "127.0.0.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "127.0.0.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "127.0.0.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "127.0.0.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "127.0.0.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "127.0.0.1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.0.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.0.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.0.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.0.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.0.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.0.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.0.1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.123",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.123",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.123",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.123",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.123",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.123",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "192.168.2.123",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data2",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data2",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data2",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data2",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data2",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "unknown",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "unknown",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "unknown",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "unknown",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "unknown",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "127.0.0.1",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "10.0.0.5",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "10.0.0.5",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "10.0.0.5",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "10.0.0.5",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "10.0.0.5",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "10.0.0.5",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "10.0.0.5",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "10.0.0.5",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "127.0.0.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "127.0.0.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "127.0.0.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "127.0.0.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "127.0.0.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "127.0.0.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "127.0.0.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.0.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.0.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.0.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.0.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.0.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.0.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.0.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.0.1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.123",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.123",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.123",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.123",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.123",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.123",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.123",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "192.168.2.123",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data2",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data2",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data2",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data2",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data2",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "unknown",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "unknown",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "unknown",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "unknown",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "unknown",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.0.1",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "10.0.0.5",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "10.0.0.5",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "10.0.0.5",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "10.0.0.5",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "10.0.0.5",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "10.0.0.5",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "10.0.0.5",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "10.0.0.5",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "127.0.0.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "127.0.0.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "127.0.0.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "127.0.0.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "127.0.0.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "127.0.0.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "127.0.0.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.0.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.0.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.0.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.0.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.0.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.0.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.0.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.0.1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.123",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.123",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.123",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.123",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.123",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.123",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.123",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "192.168.2.123",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "192.168.2.0/24",
+        "data1",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data2",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data2",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data2",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data2",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data2",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "unknown",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "unknown",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "unknown",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "unknown",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "unknown",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.1",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "10.0.0.5",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "10.0.0.5",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "10.0.0.5",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "10.0.0.5",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "10.0.0.5",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "10.0.0.5",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "10.0.0.5",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "10.0.0.5",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "127.0.0.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "127.0.0.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "127.0.0.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "127.0.0.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "127.0.0.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "127.0.0.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "127.0.0.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.0.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.0.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.0.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.0.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.0.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.0.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.0.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.0.1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.1",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.123",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.123",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.123",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.123",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.123",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.123",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.123",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "192.168.2.123",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data1",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data1",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data1",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data1",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data1",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data1",
+        "read"
+      ],
+      "allow": true,
+      "explain": [
+        "192.168.2.0/24",
+        "data1",
+        "read"
+      ]
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data1",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data1",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data2",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data2",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data2",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data2",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data2",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data2",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "data2",
+        "write"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "unknown",
+        "10.0.0.5"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "unknown",
+        "127.0.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "unknown",
+        "192.168.0.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "unknown",
+        "192.168.2.1"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "unknown",
+        "192.168.2.123"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "unknown",
+        "read"
+      ],
+      "allow": false,
+      "explain": []
+    },
+    {
+      "request": [
+        "192.168.2.123",
+        "unknown",
+        "unknown"
+      ],
+      "allow": false,
+      "explain": []
+    }
+  ]
+}

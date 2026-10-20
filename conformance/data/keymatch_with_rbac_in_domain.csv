@@ -1,0 +1,6 @@
+g, can_manage, can_use, *
+
+p, can_manage, engines/*, *, (pause)|(resume)
+p, can_use, engines/*, *, (attach)|(detach)
+
+g, Username==test2, can_manage, engines/engine1
