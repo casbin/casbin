@@ -230,8 +230,8 @@ func generateConformanceCases(t *testing.T) {
 			for i, v := range request {
 				rvals[i] = v
 			}
-			allow, explain, err := e.EnforceEx(rvals...)
-			if err != nil {
+			allow, explain, enforceErr := e.EnforceEx(rvals...)
+			if enforceErr != nil {
 				continue
 			}
 			if explain == nil {

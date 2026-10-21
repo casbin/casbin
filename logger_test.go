@@ -37,7 +37,7 @@ func verifyBufferOutput(t *testing.T, logOutput string) {
 
 func verifyCallbackEntries(t *testing.T, entries []*log.LogEntry) {
 	t.Helper()
-	found := map[log.EventType]bool{}
+	found := make(map[log.EventType]bool)
 
 	for _, entry := range entries {
 		found[entry.EventType] = true
@@ -217,7 +217,7 @@ func verifySelectiveBufferOutput(t *testing.T, logOutput string) {
 
 func verifySelectiveCallbackEntries(t *testing.T, entries []*log.LogEntry) {
 	t.Helper()
-	found := map[log.EventType]bool{}
+	found := make(map[log.EventType]bool)
 
 	for _, entry := range entries {
 		found[entry.EventType] = true
